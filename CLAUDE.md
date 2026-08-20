@@ -68,14 +68,43 @@ src/
 
 ## 設計方針
 
+この 2 つが、このリポジトリで最も守ってほしい決まり。
+
+1. **画面はアトミックデザインの層で組む**（下の層は上の層を知らない）
+2. **見た目の値は一元管理する**（コンポーネントに色・px・文字列を直書きしない）
+
+### アトミックデザイン
+
+画面を組み立てる部品は [src/components/](src/components/) に 4 層で置く。
+**下の層は上の層を import しない。** 常に `atoms` → `molecules` → `organisms` → `templates` の一方向で組み上げる。
+
+| 層 | 役割 | 置いてあるもの |
+| --- | --- | --- |
+| `atoms/` | これ以上分けられない部品。単体では意味を持たない | Button / Picker / NumberField / Segmented / Note / Swatch |
+| `molecules/` | atoms を組み合わせた小さなまとまり | SectionHeader / KpiTile / ChartTooltip / PersonNode / RelationEdge / GroupRegion |
+| `organisms/` | それだけで意味を持つ塊。データを受け取って見せる | ChartCard / DataTable / FilterPanel / KpiGrid / MapLegend / ProsePanel / 各グラフ / RelationshipMap |
+| `templates/` | 画面の骨格。何を出すかは知らず、並べ方だけを決める | AppLayout（画面 1 枚）/ AppShell（サイト全体の枠） |
+
+画面そのもの（どのデータをどの organism に渡すか）は [src/pages/](src/pages/) にあり、components には置かない。
+
+#### 部品を追加するときのチェックリスト
+
+- [ ] どの層に置くか決めたか（迷ったら「他の部品を組み合わせているか」で判断する。組み合わせていなければ atom）
+- [ ] 下の層から上の層を import していないか（`atoms/` が `molecules/` を読んでいないか）
+- [ ] 色・px・日本語を直書きしていないか（下の「ハードコード禁止・一元管理」）
+- [ ] props の型を書いたか。各 prop に「何のためのものか」のコメントを付けたか
+- [ ] その層の `index.ts` に export を足したか
+- [ ] 同じ見た目の部品が既にないか。あるなら新設せず、そちらに props を足す
+
 ### ハードコード禁止・一元管理
 
 **コンポーネントに色コード・px・日本語の文字列を直書きしない。** 必ず下の表のファイルを参照する。
+値は 1 か所で定義し、使う側は参照するだけにする。
 
 | 変えたいもの | 編集するファイル |
 | --- | --- |
 | 色そのもの | [src/theme/palette.ts](src/theme/palette.ts) |
-| 書体・余白・角丸・寸法 | [src/theme/tokens.ts](src/theme/tokens.ts) |
+| **文字の大きさ**・書体・余白・角丸・線の太さ・寸法 | [src/theme/tokens.ts](src/theme/tokens.ts) |
 | 部品ごとの色の割り当て | [src/config/colors.ts](src/config/colors.ts) |
 | ページごとの見た目（スキン） | [src/config/skins.ts](src/config/skins.ts) |
 | グラフの寸法・軸・ラベル | [src/config/charts.ts](src/config/charts.ts) |
@@ -85,6 +114,24 @@ src/
 | 相関図の配置・ノード・領域 | [src/map/config.ts](src/map/config.ts) |
 | ページの解説文 | [src/content/](src/content/) |
 | タブ名・URL | [src/routes.ts](src/routes.ts) |
+
+#### 書いてよい形 / いけない形
+
+| 種類 | いけない | よい |
+| --- | --- | --- |
+| 文字の大きさ | `text-[13px]` `style={{ fontSize: 13 }}` | `text-sm`（JS で数値が要るなら `FONT_SIZE.sm`） |
+| 色 | `bg-[#ffffff]` `fill="#2a78d6"` | `bg-surface` / `figureColors(theme).primary` |
+| 余白 | `p-[12px]` `mb-4` | `p-lg` `mb-section` |
+| 角丸 | `rounded-[8px]` | `rounded-md`（SVG では `skinnedRadius(RADIUS.md)`） |
+| 線の太さ | `border-2` | `border-hairline` / `border-thick` |
+| 文言 | `<h2>絞り込み</h2>` | `<h2>{STATS_TEXT.filter.title}</h2>` |
+
+- **文字の大きさは `theme/tokens.ts` の `FONT_SIZE` が唯一の定義場所。** 新しい大きさが要るならまずここに名前付きで足し、
+  クラス（`text-<名前>`）から使う。既存の値に近ければ流用する
+- SVG やグラフ（Recharts）は CSS クラスを通せないので、`FONT_SIZE` の値を
+  `skinnedFontSize()` に通してから属性へ渡す。生の数値を書かない
+- 全体を大きく／小さくしたいときは `FONT_SIZE` の表だけを書き換える。ページごとの調整は
+  [src/config/skins.ts](src/config/skins.ts) の `fontScale`
 
 ### Tailwind と実行時トークンのつなぎ方
 
@@ -98,12 +145,18 @@ src/
 - 線の太さはスキンで倍率が変わるので、`border-2` ではなく `border-hairline` / `border-thick`（`@utility` で定義）を使う
 - 複数の部品で同じ見た目になるものは [src/components/classes.ts](src/components/classes.ts) に定数として置く
 
-### 層の分け方
+### データと表示の分け方
 
-- **純関数の層**（`lib/` `map/geometry.ts` `map/layout.ts`）は React にも SVG にも依存しない
-- **見せ方を決める層**（`lib/display.ts` `map/display.ts`）が、config と theme を組み合わせて色・寸法・文言を返す
-- **コンポーネント**は上の層が返した値を属性へ渡すだけ。自分で色や寸法を決めない
-- 画面を組み立てる部品は `atoms` → `molecules` → `organisms` → `templates` の順に組み上げる
+アトミックデザインが「部品の大きさ」の分け方なら、こちらは「決定の種類」の分け方。
+
+1. **純関数の層**（`lib/` `map/geometry.ts` `map/layout.ts`）は React にも SVG にも依存しない。
+   同じ入力なら同じ出力を返し、入力を変更しない
+2. **見せ方を決める層**（`lib/display.ts` `map/display.ts`）が、config と theme を組み合わせて
+   色・寸法・文言を組み立てて返す。ここが「何をどう見せるか」の決定を全部持つ
+3. **コンポーネント**は 2 が返した値を属性へ渡すだけ。自分で色・寸法・文言を決めない
+
+新しい見せ方の判断（この状態のときは色を薄くする、件数に応じて高さを変える、など）が要るときは、
+コンポーネントに書かず `display.ts` に関数として足す。
 
 ### アクセシビリティ
 
@@ -156,5 +209,14 @@ src/
 ## 変更時の確認
 
 - `npm run build`（型検査とコントラスト検査を含む）が通ること
+- 追加した部品が正しい層（atoms / molecules / organisms / templates）に置かれ、
+  下の層から上の層を import していないこと
+- 色コード・px・日本語の文字列を直書きしていないこと。次の検索で何も出ないこと
+
+  ```shell
+  # var(--sr-*) 以外の Tailwind 任意値（例: text-[13px]、bg-[#fff]）
+  grep -rnoE '\b[a-z-]+-\[[^]]*\]' --include='*.tsx' src/ | grep -v 'var(--sr-'
+  ```
+
 - 配色を変えたら、ライト / ダーク × 標準 / ドット絵風の 4 通りで見え方を確認する
 - README の説明と実際のファイル構成・コマンドが一致していること

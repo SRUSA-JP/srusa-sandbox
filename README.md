@@ -56,7 +56,7 @@ npm run dev
 | [scripts/check-contrast.ts](scripts/check-contrast.ts) | 配色のコントラスト検査 |
 | [src/routes.ts](src/routes.ts) | 画面の一覧・URL・タブ名・使うスキン |
 | [src/pages/](src/pages/) | 画面そのもの |
-| [src/components/](src/components/) | 画面を組み立てる部品（atoms → molecules → organisms → templates） |
+| [src/components/](src/components/) | 画面を組み立てる部品。アトミックデザインの 4 層（atoms → molecules → organisms → templates） |
 | [src/config/](src/config/) | 指標・文言・グラフ設定・色の割り当て・スキン |
 | [src/content/](src/content/) | ページの解説文 |
 | [src/data/](src/data/) | Minecraft 統計の型・検証・読み込み |
@@ -72,7 +72,7 @@ npm run dev
 | 変えたいもの | 編集するファイル |
 | --- | --- |
 | 色 | [src/theme/palette.ts](src/theme/palette.ts) |
-| 書体・余白・角丸・寸法 | [src/theme/tokens.ts](src/theme/tokens.ts) |
+| 文字の大きさ・書体・余白・角丸・線の太さ・寸法 | [src/theme/tokens.ts](src/theme/tokens.ts) |
 | 部品ごとの色の割り当て | [src/config/colors.ts](src/config/colors.ts) |
 | ページごとの見た目（スキン） | [src/config/skins.ts](src/config/skins.ts) |
 | グラフの寸法・軸・ラベル | [src/config/charts.ts](src/config/charts.ts) |
@@ -83,7 +83,11 @@ npm run dev
 
 これらの値は実行時に `--sr-*` というカスタムプロパティとして `<html>` に流し込まれ、
 [src/styles/index.css](src/styles/index.css) の `@theme inline` が Tailwind のトークン名（`bg-surface`、`p-lg` など）に割り当てます。
-コンポーネントでは `p-[12px]` や `bg-[#ffffff]` のような直書きをせず、トークン名のクラスを使ってください。
+コンポーネントでは `text-[13px]` `p-[12px]` `bg-[#ffffff]` のような直書きをせず、`text-sm` `p-lg` `bg-surface` のようにトークン名のクラスを使ってください。
+新しい文字の大きさが必要なら、まず `src/theme/tokens.ts` の `FONT_SIZE` に名前付きで足します。
+
+部品はアトミックデザインの 4 層（atoms → molecules → organisms → templates）で組み、下の層は上の層を参照しません。
+詳しい決まりは [CLAUDE.md](CLAUDE.md) にあります。
 
 配色を変えたら `npm run check:contrast` を通してください（スキン × ライト/ダークの全組み合わせを検査します）。
 
