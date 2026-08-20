@@ -1,0 +1,18 @@
+# Node
+node_modules/
+dist/
+
+# ログ
+*.log
+npm-debug.log*
+
+# ローカル設定と秘密情報
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+
+# エディタ・OS
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,30 @@
+{
+  "name": "srusa-sandbox",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "SRUSA の Minecraft サーバー統計と相関図を 1 つにまとめたビューア（React + TypeScript + Vite + Tailwind CSS）",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run typecheck && npm run check:contrast && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "check:contrast": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-contrast.ts --outfile=node_modules/.cache/check-contrast.mjs && node node_modules/.cache/check-contrast.mjs"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "recharts": "^3.2.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "esbuild": "^0.25.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.9"
+  }
+}
