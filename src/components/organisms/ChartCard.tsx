@@ -36,6 +36,7 @@ export function ChartCard({ title, note, tableRows, tableColumns, csvName, actio
             {hasTable && (
               <Button
                 label={showTable ? TABLE_TEXT.toggle.toChart : TABLE_TEXT.toggle.toTable}
+                icon={showTable ? 'chart' : 'table'}
                 onClick={() => setShowTable((v) => !v)}
               />
             )}

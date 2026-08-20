@@ -13,7 +13,7 @@ export interface MapLegendProps {
 }
 
 const ITEM =
-  'inline-flex cursor-pointer items-center gap-sm rounded-pill border-hairline bg-legend px-lg py-xs';
+  'inline-flex cursor-pointer items-center gap-xs rounded-pill border-hairline px-lg py-xs text-md transition-colors';
 
 /** 分類ごとにまとめた凡例。クリックでその領域を強調する。 */
 export function MapLegend({ regions, theme, highlightedGroupId, onHighlight }: MapLegendProps) {
@@ -39,7 +39,11 @@ export function MapLegend({ regions, theme, highlightedGroupId, onHighlight }: M
                 <button
                   key={region.group.id}
                   type="button"
-                  className={`${ITEM} ${active ? 'border-legend-active' : 'border-legend-line'}`}
+                  className={`${ITEM} ${
+                    active
+                      ? 'border-legend-active bg-selected-subtle'
+                      : 'border-legend-line bg-legend hover:bg-control-hover'
+                  }`}
                   aria-pressed={active}
                   onClick={() => onHighlight(active ? '' : region.group.id)}
                   style={{ fontSize: skinnedFontSize(LEGEND.fontSize), color: style.labelColor }}
@@ -51,7 +55,7 @@ export function MapLegend({ regions, theme, highlightedGroupId, onHighlight }: M
                     borderColor={style.stroke}
                   />
                   {groupLabel(region.group)}
-                  <span className="text-muted">{region.memberIds.length}</span>
+                  <span className="text-subtle">{region.memberIds.length}</span>
                 </button>
               );
             })}

@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import { AppLayout, ChartCard, Note, Picker, ProsePanel } from '../components';
+import { AppLayout, ChartCard, NoticePanel, Note, Picker, ProsePanel } from '../components';
 import { RELATIONSHIPS_CONTENT } from '../content';
 import { joinNotes } from '../lib/display';
 import type { VizTheme } from '../theme/palette';
-import { MAP_TEXT } from '../config/messages';
+import { APP_TEXT, MAP_TEXT } from '../config/messages';
 import { EDGE_MODES, ISSUE_PREVIEW_COUNT, type EdgeMode } from '../map/config';
 import { loadRelationshipData } from '../map/data';
 import { groupTypeLabel, personLabel } from '../map/display';
@@ -69,20 +69,21 @@ export function MapPage({ theme }: MapPageProps) {
         data.relations.length,
         source?.version ?? '',
       )}
+      lead={RELATIONSHIPS_CONTENT.lead}
       messages={
-        <>
-          {RELATIONSHIPS_CONTENT.disclaimer && (
-            <Note tone="error">{RELATIONSHIPS_CONTENT.disclaimer}</Note>
-          )}
-          {source && source.issues.length > 0 && (
-            <Note tone="error">
-              {MAP_TEXT.issues(
-                source.issues.slice(0, ISSUE_PREVIEW_COUNT),
-                Math.max(0, source.issues.length - ISSUE_PREVIEW_COUNT),
-              )}
-            </Note>
-          )}
-        </>
+        source && source.issues.length > 0 ? (
+          <Note tone="error">
+            {MAP_TEXT.issues(
+              source.issues.slice(0, ISSUE_PREVIEW_COUNT),
+              Math.max(0, source.issues.length - ISSUE_PREVIEW_COUNT),
+            )}
+          </Note>
+        ) : undefined
+      }
+      footnotes={
+        RELATIONSHIPS_CONTENT.disclaimer ? (
+          <NoticePanel title={APP_TEXT.disclaimer}>{RELATIONSHIPS_CONTENT.disclaimer}</NoticePanel>
+        ) : undefined
       }
       footer={
         data.view?.notes && data.view.notes.length > 0 ? (
@@ -90,10 +91,6 @@ export function MapPage({ theme }: MapPageProps) {
         ) : undefined
       }
     >
-        <p className="mb-section max-w-[var(--sr-layout-prose-max-width)] leading-base">
-          {RELATIONSHIPS_CONTENT.lead}
-        </p>
-
         <ChartCard
           title={MAP_TEXT.card.map.title}
           note={joinNotes(

@@ -10,7 +10,7 @@ export function KpiTile({ label, value, sub }: KpiTileProps) {
     <div className="flex flex-col gap-xxs">
       <span className="text-sm text-muted">{label}</span>
       <strong className="text-display font-bold tracking-tight">{value}</strong>
-      {sub && <span className="text-sm text-muted">{sub}</span>}
+      {sub && <span className="text-sm text-subtle">{sub}</span>}
     </div>
   );
 }

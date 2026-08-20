@@ -13,13 +13,13 @@ import { OTHER_ENTRY } from './labels';
 /** 画面の外枠（サイト名・タブ・配色の切り替え）。 */
 export const APP_TEXT = {
   /** ブラウザのタブと画面左上に出す名前。 */
-  siteName: 'SRUSA サンドボックス',
+  siteName: 'SRUSA Sandbox',
   /** サイト名の下に出す説明。 */
   siteNote: 'Minecraft サーバーの統計と、メンバーの相関図をまとめた場所です。',
   /** タブ全体の読み上げ名。 */
   navLabel: 'ページ',
-  /** ページ全体にかかる但し書きの見出し。 */
-  disclaimer: 'お知らせ',
+  /** ページ全体にかかる注意書きの見出し。本文の下に出す。 */
+  disclaimer: 'このページについて',
   theme: {
     label: '配色',
     system: '端末に合わせる',
@@ -32,15 +32,12 @@ export const APP_TEXT = {
 export const STATS_TEXT = {
   title: 'Minecraft サーバー統計',
 
-  /** 見出し下のデータ出典。 */
-  source: (params: {
-    generatedOn: string;
-    version: string;
-    loader: string;
-    difficulty: string;
-    file: string;
-  }) =>
-    `${params.generatedOn} 時点 / ${params.version}・${params.loader}・難易度 ${params.difficulty} / ${params.file}`,
+  /**
+   * 見出しの下に出す、ひと目で分かる規模と日付。
+   * バージョンや取得元のような詳細は footer へ回す。
+   */
+  source: (params: { generatedOn: string; players: number }) =>
+    `${params.generatedOn} 時点 / プレイヤー ${formatInt(params.players)} 人`,
 
   /** 取り込んだファイルの表示名。 */
   importedFile: (name: string) => `${name}（読み込み）`,
@@ -146,6 +143,9 @@ export const STATS_TEXT = {
   },
 
   footer: {
+    /** サーバーの構成と、読んでいるファイル。 */
+    dataset: (params: { version: string; loader: string; difficulty: string; file: string }) =>
+      `${params.version}・${params.loader}・難易度 ${params.difficulty} / ${params.file}`,
     source: (path: string, via: string, instance: string) => `取得元: ${path}（${via} / ${instance}）`,
   },
 

@@ -64,10 +64,11 @@ export function DataTable({ rows, columns, csvName = TABLE_TEXT.defaultCsvName, 
       <div className="mb-md flex justify-end">
         <Button
           label={TABLE_TEXT.exportCsv}
+          icon="download"
           onClick={() => downloadCsv(csvName, sorted, cols.map((c) => c.key))}
         />
       </div>
-      <div className="max-h-[var(--sr-layout-table-max-height)] overflow-auto">
+      <div className="max-h-[var(--sr-layout-table-max-height)] overflow-auto overscroll-contain">
         <table className={`${TABLE} [font-variant-numeric:tabular-nums]`}>
           <thead>
             <tr>
@@ -90,7 +91,7 @@ export function DataTable({ rows, columns, csvName = TABLE_TEXT.defaultCsvName, 
           </thead>
           <tbody>
             {sorted.map((row, index) => (
-              <tr key={String(row[cols[0].key] ?? index)}>
+              <tr key={String(row[cols[0].key] ?? index)} className="hover:bg-table-row-hover">
                 {cols.map((col) => (
                   <td key={col.key} className={`${CELL} ${ALIGN[col.align ?? 'right']}`}>
                     {formatCell(row[col.key])}

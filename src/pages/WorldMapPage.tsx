@@ -1,4 +1,5 @@
-import { AppLayout, Note, ProsePanel } from '../components';
+import { AppLayout, NoticePanel, ProsePanel } from '../components';
+import { APP_TEXT } from '../config/messages';
 import { WORLD_MAP_CONTENT } from '../content';
 
 /**
@@ -11,15 +12,13 @@ export function WorldMapPage() {
   return (
     <AppLayout
       title={WORLD_MAP_CONTENT.title}
-      messages={
+      lead={WORLD_MAP_CONTENT.lead}
+      footnotes={
         WORLD_MAP_CONTENT.disclaimer ? (
-          <Note tone="error">{WORLD_MAP_CONTENT.disclaimer}</Note>
+          <NoticePanel title={APP_TEXT.disclaimer}>{WORLD_MAP_CONTENT.disclaimer}</NoticePanel>
         ) : undefined
       }
     >
-      <p className="mb-section max-w-[var(--sr-layout-prose-max-width)] leading-base">
-        {WORLD_MAP_CONTENT.lead}
-      </p>
       <ProsePanel sections={WORLD_MAP_CONTENT.sections} />
     </AppLayout>
   );

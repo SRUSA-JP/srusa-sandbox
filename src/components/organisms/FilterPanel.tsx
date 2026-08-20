@@ -63,8 +63,13 @@ export function FilterPanel({
               value={max}
               onChange={(value) => onBoundsChange({ min, max: value })}
             />
-            <span className="text-sm text-muted">{option.unit.trim()}</span>
-            <Button label={STATS_TEXT.filter.clear} onClick={onClear} disabled={!filtered} />
+            <span className="text-sm text-subtle">{option.unit.trim()}</span>
+            <Button
+              label={STATS_TEXT.filter.clear}
+              icon="reset"
+              onClick={onClear}
+              disabled={!filtered}
+            />
           </>
         }
       />

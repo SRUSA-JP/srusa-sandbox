@@ -4,6 +4,7 @@ export * from './FilterPanel';
 export * from './KpiGrid';
 export * from './MapLegend';
 export * from './MetricScatter';
+export * from './NoticePanel';
 export * from './ProsePanel';
 export * from './RankBarChart';
 export * from './RelationshipMap';

@@ -14,7 +14,7 @@ export interface SectionHeaderProps {
 export function SectionHeader({ title, note, actions }: SectionHeaderProps) {
   return (
     <header className="mb-lg flex flex-wrap items-start justify-between gap-lg">
-      <div>
+      <div className="min-w-0">
         {/* 本文より一段大きい程度に留める（節どうしを浮かせない） */}
         <h2 className="text-lg text-heading">{title}</h2>
         {note && <Note>{note}</Note>}

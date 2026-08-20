@@ -10,6 +10,7 @@ import {
   KpiGrid,
   KpiTile,
   MetricScatter,
+  NoticePanel,
   Note,
   Picker,
   ProsePanel,
@@ -18,6 +19,7 @@ import {
   TrendLineChart,
 } from '../components';
 import { MINECRAFT_CONTENT } from '../content';
+import { APP_TEXT } from '../config/messages';
 import {
   BASIS_OPTIONS,
   BREAKDOWNS,
@@ -31,16 +33,15 @@ import {
   type TrendScope,
 } from '../config';
 import {
+  barChartHeight,
   basisLabel,
   basisNote,
-  breakdownChartHeight,
   breakdownOption,
   joinNotes,
   keepRatable,
   metricColumnLabel,
   metricOption,
   metricsFor,
-  rankingChartHeight,
   seriesOption,
   unitFor,
 } from '../lib/display';
@@ -69,6 +70,7 @@ import {
 } from '../lib/selectors';
 import { downloadJson, type Row } from '../lib/export';
 import { formatDecimal, formatHours } from '../lib/format';
+import { useChartMetrics } from '../hooks/useChartMetrics';
 import type { VizTheme } from '../theme/palette';
 
 export interface StatsPageProps {
@@ -77,6 +79,7 @@ export interface StatsPageProps {
 
 /** Minecraft サーバー統計の画面。 */
 export function StatsPage({ theme }: StatsPageProps) {
+  const chart = useChartMetrics();
   const datasets = useMemo(() => listDatasets(), []);
   const [datasetId, setDatasetId] = useState(datasets[0]?.id ?? '');
   const [doc, setDoc] = useState<StatsDocument | null>(null);
@@ -252,15 +255,10 @@ export function StatsPage({ theme }: StatsPageProps) {
       title={STATS_TEXT.title}
       note={
         doc
-          ? STATS_TEXT.source({
-            generatedOn: doc.generated_on,
-            version: doc.source.minecraft_version,
-            loader: doc.source.loader,
-            difficulty: doc.source.difficulty,
-            file: sourceLabel,
-          })
+          ? STATS_TEXT.source({ generatedOn: doc.generated_on, players: allRows.length })
           : undefined
       }
+      lead={MINECRAFT_CONTENT.lead}
       actions={
         <>
           {datasets.length > 1 && (
@@ -282,9 +280,14 @@ export function StatsPage({ theme }: StatsPageProps) {
               event.target.value = '';
             }}
           />
-          <Button label={STATS_TEXT.action.importJson} onClick={() => fileInput.current?.click()} />
+          <Button
+            label={STATS_TEXT.action.importJson}
+            icon="upload"
+            onClick={() => fileInput.current?.click()}
+          />
           <Button
             label={STATS_TEXT.action.exportSummary}
+            icon="download"
             disabled={!doc}
             onClick={() =>
               doc && downloadJson(STATS_TEXT.file.summary(doc.generated_on), playerRows(doc))
@@ -294,16 +297,28 @@ export function StatsPage({ theme }: StatsPageProps) {
       }
       messages={
         <>
-          {MINECRAFT_CONTENT.disclaimer && <Note tone="error">{MINECRAFT_CONTENT.disclaimer}</Note>}
           {error && <Note tone="error">{STATS_TEXT.error.load(error)}</Note>}
           {mismatches.length > 0 && (
             <Note tone="error">{STATS_TEXT.error.totalsMismatch(mismatches.map((m) => m.field))}</Note>
           )}
         </>
       }
+      footnotes={
+        MINECRAFT_CONTENT.disclaimer ? (
+          <NoticePanel title={APP_TEXT.disclaimer}>{MINECRAFT_CONTENT.disclaimer}</NoticePanel>
+        ) : undefined
+      }
       footer={
         doc && (
           <>
+            <span>
+              {STATS_TEXT.footer.dataset({
+                version: doc.source.minecraft_version,
+                loader: doc.source.loader,
+                difficulty: doc.source.difficulty,
+                file: sourceLabel,
+              })}
+            </span>
             <span>
               {STATS_TEXT.footer.source(
                 doc.source.path,
@@ -316,10 +331,6 @@ export function StatsPage({ theme }: StatsPageProps) {
         )
       }
     >
-        <p className="mb-section max-w-[var(--sr-layout-prose-max-width)] leading-base">
-          {MINECRAFT_CONTENT.lead}
-        </p>
-
         {!doc && !error && datasets.length === 0 && (
           <Note>{STATS_TEXT.empty.noDataset}</Note>
         )}
@@ -327,17 +338,7 @@ export function StatsPage({ theme }: StatsPageProps) {
 
         {doc && (
           <>
-            <FilterPanel
-              metric={filterMetric}
-              onMetricChange={changeFilterMetric}
-              min={filter.min}
-              max={filter.max}
-              onBoundsChange={setFilterBounds}
-              onClear={() => setFilterBounds(null)}
-              shown={rows.length}
-              total={allRows.length}
-            />
-
+            {/* 主役は数字とグラフ。操作（絞り込み）はその手前に 1 つだけ置く */}
             <KpiGrid>
               <KpiTile
                 label={STATS_TEXT.kpi.players}
@@ -351,6 +352,17 @@ export function StatsPage({ theme }: StatsPageProps) {
               />
               <KpiTile label={STATS_TEXT.kpi.deaths} value={STATS_TEXT.kpi.deathsValue(kpi.deaths)} />
             </KpiGrid>
+
+            <FilterPanel
+              metric={filterMetric}
+              onMetricChange={changeFilterMetric}
+              min={filter.min}
+              max={filter.max}
+              onBoundsChange={setFilterBounds}
+              onClear={() => setFilterBounds(null)}
+              shown={rows.length}
+              total={allRows.length}
+            />
 
             <ChartCard
               title={STATS_TEXT.card.ranking.title}
@@ -386,7 +398,7 @@ export function StatsPage({ theme }: StatsPageProps) {
                   data={rankData}
                   theme={theme}
                   unit={unitFor(rankOption.unit, rankBasis)}
-                  height={rankingChartHeight(rankData.length)}
+                  height={barChartHeight(rankData.length, chart.barRow.ranking)}
                 />
               ) : (
                 <Note>{STATS_TEXT.empty.noPlayers}</Note>
@@ -450,7 +462,7 @@ export function StatsPage({ theme }: StatsPageProps) {
                   data={breakdownData}
                   theme={theme}
                   unit={unitFor(currentBreakdown.unit, breakdownBasis)}
-                  height={breakdownChartHeight(breakdownData.length)}
+                  height={barChartHeight(breakdownData.length, chart.barRow.breakdown)}
                 />
               ) : (
                 <Note>{STATS_TEXT.empty.noBreakdown}</Note>

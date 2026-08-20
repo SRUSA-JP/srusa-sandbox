@@ -1,4 +1,4 @@
-import { SECTION, TABLE, TABLE_CELL, TABLE_HEAD_CELL } from '../classes';
+import { PROSE_WIDTH, SECTION, TABLE, TABLE_CELL, TABLE_HEAD_CELL } from '../classes';
 import { SectionHeader } from '../molecules/SectionHeader';
 import type { ProseBlock, ProseSection } from '../../content/schema';
 
@@ -6,17 +6,14 @@ export interface ProsePanelProps {
   sections: ProseSection[];
 }
 
-/** 読み物の 1 行が長くなりすぎないよう、本文だけ幅を絞る。 */
-const PROSE_WIDTH = 'max-w-[var(--sr-layout-prose-max-width)]';
-
 function Block({ block }: { block: ProseBlock }) {
   switch (block.kind) {
     case 'paragraph':
-      return <p className={`${PROSE_WIDTH} leading-base`}>{block.text}</p>;
+      return <p className={`${PROSE_WIDTH} leading-base break-words`}>{block.text}</p>;
 
     case 'list':
       return (
-        <ul className={`${PROSE_WIDTH} grid list-disc gap-xs pl-xxl leading-base`}>
+        <ul className={`${PROSE_WIDTH} grid list-disc gap-xs pl-xl leading-base break-words`}>
           {block.items.map((item) => (
             <li key={item}>{item}</li>
           ))}
@@ -41,7 +38,10 @@ function Block({ block }: { block: ProseBlock }) {
               {block.table.rows.map((row) => (
                 <tr key={row[0]}>
                   {row.map((cell) => (
-                    <td key={cell} className={`${TABLE_CELL} text-left align-top leading-base`}>
+                    <td
+                      key={cell}
+                      className={`${TABLE_CELL} min-w-[var(--sr-layout-prose-cell-min-width)] text-left align-top leading-base`}
+                    >
                       {cell}
                     </td>
                   ))}
