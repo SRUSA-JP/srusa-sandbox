@@ -1,0 +1,143 @@
+/**
+ * Tailwind の入口。
+ *
+ * 色・書体・余白・角丸・寸法の実値はこのファイルに書かない。
+ * すべて theme/cssVariables.ts が実行時に流し込む `--sr-*` を参照する。
+ *   どの部品に何色を使うか → config/colors.ts（PART_COLORS）
+ *   色そのもの             → theme/palette.ts
+ *   書体・余白・寸法       → theme/tokens.ts
+ *   ページごとの差し替え    → config/skins.ts
+ * 値を変えたくなったら、変えるのは上の 4 ファイルのどれか。
+ *
+ * ここがやるのは「実行時の変数を Tailwind のトークン名に割り当てる」ことだけ。
+ * `@theme inline` にしているのは、ユーティリティが変数を経由せず
+ * `var(--sr-*)` を直接出すようにして、実行時の差し替えを効かせるため。
+ */
+@import 'tailwindcss';
+
+@theme inline {
+  /* 書体 */
+  --font-sans: var(--sr-font-family);
+  --font-mono: var(--sr-font-family-numeric);
+
+  /* 文字の大きさ（theme/tokens.ts の FONT_SIZE） */
+  --text-xxs: var(--sr-font-size-xxs);
+  --text-xs: var(--sr-font-size-xs);
+  --text-sm: var(--sr-font-size-sm);
+  --text-md: var(--sr-font-size-md);
+  --text-base: var(--sr-font-size-base);
+  --text-lg: var(--sr-font-size-lg);
+  --text-xl: var(--sr-font-size-xl);
+  --text-display: var(--sr-font-size-display);
+
+  /* 文字の太さ・行の高さ・字間 */
+  --font-weight-normal: var(--sr-font-weight-normal);
+  --font-weight-medium: var(--sr-font-weight-medium);
+  --font-weight-bold: var(--sr-font-weight-bold);
+  --leading-tight: var(--sr-line-height-tight);
+  --leading-base: var(--sr-line-height-base);
+  --tracking-tight: var(--sr-letter-spacing-tight);
+
+  /* 余白（theme/tokens.ts の SPACE） */
+  --spacing-none: var(--sr-space-none);
+  --spacing-xxs: var(--sr-space-xxs);
+  --spacing-xs: var(--sr-space-xs);
+  --spacing-sm: var(--sr-space-sm);
+  --spacing-md: var(--sr-space-md);
+  --spacing-lg: var(--sr-space-lg);
+  --spacing-xl: var(--sr-space-xl);
+  --spacing-xxl: var(--sr-space-xxl);
+  --spacing-xxxl: var(--sr-space-xxxl);
+  --spacing-section: var(--sr-space-section);
+  --spacing-page: var(--sr-space-page);
+
+  /* 角丸（theme/tokens.ts の RADIUS） */
+  --radius-xs: var(--sr-radius-xs);
+  --radius-sm: var(--sr-radius-sm);
+  --radius-md: var(--sr-radius-md);
+  --radius-lg: var(--sr-radius-lg);
+  --radius-pill: var(--sr-radius-pill);
+
+  /* 部品ごとの色（config/colors.ts の PART_COLORS） */
+  --color-page: var(--sr-page-background);
+  --color-surface: var(--sr-surface);
+  --color-raised: var(--sr-surface-raised);
+  --color-ink: var(--sr-page-text);
+  --color-muted: var(--sr-muted-text);
+  --color-divider: var(--sr-divider);
+  --color-danger: var(--sr-error-text);
+  --color-header: var(--sr-header-background);
+  --color-header-ink: var(--sr-header-text);
+  --color-heading: var(--sr-heading-text);
+  --color-control: var(--sr-control-background);
+  --color-control-ink: var(--sr-control-text);
+  --color-control-line: var(--sr-control-border);
+  --color-control-line-hover: var(--sr-control-border-hover);
+  --color-selected: var(--sr-control-selected);
+  --color-selected-ink: var(--sr-control-selected-text);
+  --color-focus: var(--sr-focus-ring);
+  --color-table-line: var(--sr-table-border);
+  --color-table-head: var(--sr-table-header-background);
+  --color-table-head-ink: var(--sr-table-header-text);
+  --color-legend: var(--sr-legend-background);
+  --color-legend-line: var(--sr-legend-border);
+  --color-legend-active: var(--sr-legend-active-border);
+}
+
+/*
+ * 線の太さ。
+ *
+ * Tailwind の `border-2` のような固定値だと、スキンの borderScale
+ * （ドット絵風は 2 倍）が効かない。トークンを直接引くユーティリティにする。
+ */
+@utility border-hairline {
+  border-width: var(--sr-border-hairline);
+}
+@utility border-thick {
+  border-width: var(--sr-border-thick);
+}
+@utility border-b-hairline {
+  border-bottom-width: var(--sr-border-hairline);
+}
+@utility border-b-thick {
+  border-bottom-width: var(--sr-border-thick);
+}
+@utility border-t-hairline {
+  border-top-width: var(--sr-border-hairline);
+}
+
+@layer base {
+  body {
+    background: var(--sr-page-background);
+    color: var(--sr-page-text);
+    font-family: var(--sr-font-family);
+    font-size: var(--sr-font-size-base);
+    line-height: var(--sr-line-height-base);
+  }
+
+  /* キーボード操作の可視化はここに一元化する。個別に outline を消さない */
+  :focus-visible {
+    outline: var(--sr-border-thick) solid var(--sr-focus-ring);
+    outline-offset: var(--sr-border-hairline);
+  }
+
+  /* 棒の右に出る値ラベルは SVG の外へ描くので、切り取らせない */
+  .recharts-surface {
+    overflow: visible;
+  }
+}
+
+/*
+ * ドット絵風のスキン（config/skins.ts の crispEdges）。
+ *
+ * 書体・角丸・線の太さ・色はカスタムプロパティ経由で差し替わるので、
+ * ここでは「輪郭をぼかさない」ことだけを指定する。文字はぼかさないと
+ * 読めなくなるので、図形（棒・線・領域）にだけ効かせる。
+ */
+[data-skin='minecraft'] svg :is(path, rect, line, circle) {
+  shape-rendering: crispEdges;
+}
+
+[data-skin='minecraft'] img {
+  image-rendering: pixelated;
+}
