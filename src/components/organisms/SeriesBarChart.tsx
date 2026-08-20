@@ -9,15 +9,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import {
-  AXIS,
-  BAR,
-  CHART_HEIGHT,
-  CHART_MARGIN,
-  GRID_DASH,
-  LEGEND,
-  VALUE_LABEL,
-} from '../../config/charts';
+import { AXIS, BAR, GRID_DASH, LEGEND, VALUE_LABEL } from '../../config/charts';
+import { useChartMetrics } from '../../hooks/useChartMetrics';
 import { figureColors } from '../../config/colors';
 import { skinnedFontSize, skinnedRadius } from '../../config/skins';
 import type { StackedSeries } from '../../lib/selectors';
@@ -52,9 +45,10 @@ export function SeriesBarChart({
   stacked = true,
   categoryKey = 'name',
   unit = '',
-  height = CHART_HEIGHT.tall,
+  height,
   labelThreshold = VALUE_LABEL.minRatio,
 }: SeriesBarChartProps) {
+  const metrics = useChartMetrics();
   const colors = figureColors(theme);
   const color = colors.series(data.series.map((s) => s.key));
 
@@ -66,8 +60,8 @@ export function SeriesBarChart({
   const minLabelValue = maxTotal * labelThreshold;
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data.rows} margin={CHART_MARGIN.series} barCategoryGap={BAR.categoryGap.series}>
+    <ResponsiveContainer width="100%" height={height ?? metrics.height.tall}>
+      <BarChart data={data.rows} margin={metrics.margin.series} barCategoryGap={BAR.categoryGap.series}>
         <CartesianGrid stroke={colors.grid} strokeDasharray={GRID_DASH} vertical={false} />
         <XAxis
           dataKey={categoryKey}
@@ -76,7 +70,7 @@ export function SeriesBarChart({
           interval={0}
           angle={AXIS.tickAngle}
           textAnchor="end"
-          height={AXIS.tickHeight}
+          height={metrics.axisTickHeight}
         />
         <YAxis
           tickFormatter={formatCompact}

@@ -9,7 +9,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { AXIS, BAR, CHART_HEIGHT, CHART_MARGIN, GRID_DASH } from '../../config/charts';
+import { AXIS, BAR, GRID_DASH } from '../../config/charts';
+import { useChartMetrics } from '../../hooks/useChartMetrics';
 import { figureColors } from '../../config/colors';
 import { skinnedFontSize, skinnedRadius } from '../../config/skins';
 import type { Entry } from '../../lib/selectors';
@@ -26,6 +27,7 @@ export interface RankBarChartProps {
   /** 強調表示するキー（選択中のプレイヤーなど）。他はグレーにはせず彩度そのまま。 */
   highlightKey?: string;
   unit?: string;
+  /** 件数に応じた高さ。省略すると画面幅に合わせた既定の高さ。 */
   height?: number;
   /** 縦棒にする場合は false。 */
   horizontal?: boolean;
@@ -38,19 +40,20 @@ export function RankBarChart({
   color,
   highlightKey,
   unit = '',
-  height = CHART_HEIGHT.compact,
+  height,
   horizontal = true,
 }: RankBarChartProps) {
+  const metrics = useChartMetrics();
   const colors = figureColors(theme);
   const base = color ?? colors.primary;
   const max = data.reduce((acc, e) => Math.max(acc, e.value), 0);
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <ResponsiveContainer width="100%" height={height ?? metrics.height.compact}>
       <BarChart
         data={data}
         layout={horizontal ? 'vertical' : 'horizontal'}
-        margin={CHART_MARGIN.bar}
+        margin={metrics.margin.bar}
         barCategoryGap={horizontal ? BAR.categoryGap.horizontal : BAR.categoryGap.vertical}
       >
         <CartesianGrid
@@ -70,7 +73,7 @@ export function RankBarChart({
             <YAxis
               type="category"
               dataKey="label"
-              width={AXIS.categoryWidth}
+              width={metrics.axisCategoryWidth}
               interval={0}
               stroke={colors.grid}
               tick={{ fill: colors.axis, fontSize: skinnedFontSize(AXIS.fontSize) }}
@@ -86,7 +89,7 @@ export function RankBarChart({
               interval={0}
               angle={AXIS.tickAngle}
               textAnchor="end"
-              height={AXIS.tickHeight}
+              height={metrics.axisTickHeight}
             />
             <YAxis
               type="number"

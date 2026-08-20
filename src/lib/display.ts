@@ -12,7 +12,7 @@
  * このファイルは上を組み合わせるだけで、独自の数値や日本語を持たない。
  * 相関図側の同じ役割は map/display.ts。
  */
-import { BAR_ROW } from '../config/charts';
+import type { BarRowSetting } from '../config/charts';
 import { STATS_TEXT } from '../config/messages';
 import {
   BASIS_OPTIONS,
@@ -122,17 +122,12 @@ export function metricColumnLabel(metric: NumericPlayerRowKey, basis: RateBasis)
  * 寸法
  * ------------------------------------------------------------------ */
 
-/** 件数に応じた横棒グラフの高さ。棒が増えても 1 本の太さを保つ。 */
-function barChartHeight(count: number, setting: { minHeight: number; rowHeight: number }): number {
+/**
+ * 件数に応じた横棒グラフの高さ。棒が増えても 1 本の太さを保つ。
+ *
+ * 1 本あたりの高さは画面の広さで変わるので、設定は呼び出し側が
+ * hooks/useChartMetrics.ts から受け取って渡す。
+ */
+export function barChartHeight(count: number, setting: BarRowSetting): number {
   return Math.max(setting.minHeight, count * setting.rowHeight);
-}
-
-/** プレイヤー比較の高さ。 */
-export function rankingChartHeight(count: number): number {
-  return barChartHeight(count, BAR_ROW.ranking);
-}
-
-/** 内訳の高さ。 */
-export function breakdownChartHeight(count: number): number {
-  return barChartHeight(count, BAR_ROW.breakdown);
 }

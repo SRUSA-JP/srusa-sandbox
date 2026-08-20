@@ -51,7 +51,7 @@ export function RelationshipMap({
     <svg
       viewBox={`0 0 ${Math.round(layout.width)} ${Math.round(layout.height)}`}
       width="100%"
-      className="block h-auto"
+      className="block h-auto min-w-[var(--sr-layout-map-min-width)]"
       role="img"
       aria-label={MAP_TEXT.card.map.ariaLabel}
     >

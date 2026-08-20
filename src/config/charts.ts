@@ -112,14 +112,86 @@ export const TOOLTIP = {
   fontSize: FONT_SIZE.sm,
   borderWidth: BORDER.hairline,
   radius: RADIUS.md,
-  padding: { y: SPACE.sm, x: 10 },
+  padding: { y: SPACE.sm, x: SPACE.lg },
   /** 行の間隔。 */
   rowGap: SPACE.xxs,
   /** 行の中（ドットと文字）の間隔。 */
-  itemGap: SPACE.sm,
+  itemGap: SPACE.xs,
   /** 系列色のドット。 */
-  swatch: { size: SPACE.md, radius: RADIUS.xs },
+  swatch: { size: SPACE.xs, radius: RADIUS.xs },
 } as const;
 
 /** 目盛り線。実線のまま描く（破線にすると数字と干渉する）。 */
 export const GRID_DASH = '0';
+
+/* ------------------------------------------------------------------ *
+ * 狭い画面
+ *
+ * スマートフォンでは、軸のラベル列や枠の余白がグラフ本体を押し潰す。
+ * 「狭いときはこの値に差し替える」だけをここに置き、判断は
+ * hooks/useChartMetrics.ts が行う。境目は theme/tokens.ts の BREAKPOINT。
+ * ------------------------------------------------------------------ */
+
+/** 狭い画面での差し替え値。 */
+export const COMPACT = {
+  height: { compact: 260, base: 280, tall: 320 },
+  /** 横棒グラフのラベル列。名前が長いと折り返さず切れるので、広く取りすぎない。 */
+  axisCategoryWidth: 88,
+  /** 斜めのカテゴリ名に取る高さ。 */
+  axisTickHeight: 56,
+  /** 棒 1 本あたりの行の高さ。 */
+  barRowHeight: { ranking: 22, breakdown: 26 },
+  /** 枠の内側の余白。値ラベルの分だけ右を空ける。 */
+  margin: {
+    bar: { top: SPACE.xs, right: 32, bottom: SPACE.xs, left: SPACE.xs },
+    series: { top: SPACE.lg, right: SPACE.xs, bottom: 48, left: SPACE.xs },
+    line: { top: SPACE.lg, right: SPACE.md, bottom: SPACE.md, left: SPACE.xs },
+    scatter: { top: SPACE.lg, right: SPACE.md, bottom: 40, left: SPACE.xs },
+  },
+} as const;
+
+/** グラフ枠の内側の余白。 */
+export interface ChartMargin {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+/** 件数に応じて高さを伸ばす横棒グラフの設定。 */
+export interface BarRowSetting {
+  minHeight: number;
+  rowHeight: number;
+}
+
+/** 画面の広さに応じたグラフの寸法。コンポーネントはこの形だけを見る。 */
+export interface ChartMetrics {
+  height: { compact: number; base: number; tall: number };
+  axisCategoryWidth: number;
+  axisTickHeight: number;
+  barRow: { ranking: BarRowSetting; breakdown: BarRowSetting };
+  margin: { bar: ChartMargin; series: ChartMargin; line: ChartMargin; scatter: ChartMargin };
+}
+
+/** 広さから寸法を決める唯一の入口。 */
+export function chartMetrics(compact: boolean): ChartMetrics {
+  if (!compact) {
+    return {
+      height: CHART_HEIGHT,
+      axisCategoryWidth: AXIS.categoryWidth,
+      axisTickHeight: AXIS.tickHeight,
+      barRow: BAR_ROW,
+      margin: CHART_MARGIN,
+    };
+  }
+  return {
+    height: COMPACT.height,
+    axisCategoryWidth: COMPACT.axisCategoryWidth,
+    axisTickHeight: COMPACT.axisTickHeight,
+    barRow: {
+      ranking: { ...BAR_ROW.ranking, rowHeight: COMPACT.barRowHeight.ranking },
+      breakdown: { ...BAR_ROW.breakdown, rowHeight: COMPACT.barRowHeight.breakdown },
+    },
+    margin: COMPACT.margin,
+  };
+}

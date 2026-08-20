@@ -9,7 +9,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { AXIS, CHART_HEIGHT, CHART_MARGIN, GRID_DASH, LEGEND, LINE, VALUE_LABEL } from '../../config/charts';
+import { AXIS, GRID_DASH, LEGEND, LINE, VALUE_LABEL } from '../../config/charts';
+import { useChartMetrics } from '../../hooks/useChartMetrics';
 import { figureColors } from '../../config/colors';
 import { skinnedFontSize } from '../../config/skins';
 import type { StackedSeries } from '../../lib/selectors';
@@ -35,16 +36,17 @@ export function TrendLineChart({
   theme,
   categoryKey = 'date',
   unit = '',
-  height = CHART_HEIGHT.base,
+  height,
   showValueLabels = true,
 }: TrendLineChartProps) {
+  const metrics = useChartMetrics();
   const colors = figureColors(theme);
   const color = colors.series(data.series.map((s) => s.key));
   const multiSeries = data.series.length > 1;
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data.rows} margin={CHART_MARGIN.line}>
+    <ResponsiveContainer width="100%" height={height ?? metrics.height.base}>
+      <LineChart data={data.rows} margin={metrics.margin.line}>
         <CartesianGrid stroke={colors.grid} strokeDasharray={GRID_DASH} vertical={false} />
         <XAxis
           dataKey={categoryKey}

@@ -9,7 +9,8 @@ import {
   YAxis,
   ZAxis,
 } from 'recharts';
-import { AXIS, CHART_HEIGHT, CHART_MARGIN, GRID_DASH, SCATTER, VALUE_LABEL } from '../../config/charts';
+import { AXIS, GRID_DASH, SCATTER, VALUE_LABEL } from '../../config/charts';
+import { useChartMetrics } from '../../hooks/useChartMetrics';
 import { figureColors } from '../../config/colors';
 import { skinnedFontSize } from '../../config/skins';
 import type { ScatterPoint } from '../../lib/selectors';
@@ -42,13 +43,14 @@ export function MetricScatter({
   xUnit = '',
   yUnit = '',
   showValueLabels = true,
-  height = CHART_HEIGHT.base,
+  height,
 }: MetricScatterProps) {
+  const metrics = useChartMetrics();
   const colors = figureColors(theme);
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <ScatterChart margin={CHART_MARGIN.scatter}>
+    <ResponsiveContainer width="100%" height={height ?? metrics.height.base}>
+      <ScatterChart margin={metrics.margin.scatter}>
         <CartesianGrid stroke={colors.grid} strokeDasharray={GRID_DASH} />
         <XAxis
           type="number"
