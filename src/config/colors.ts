@@ -22,6 +22,7 @@ import { cssVar } from '../theme/tokens';
 import {
   CONTRAST_MIN_TEXT,
   chartText,
+  ensureContrast,
   colorScale,
   cursorFill,
   mutedFill,
@@ -41,40 +42,76 @@ import {
  * 画面に出る色はすべてこのどれかに属する。部品は色ではなく役割を指す。
  */
 export type ColorRole =
+  /* --- 面 --- */
   /** ページの地。 */
   | 'background'
   /** カード・グラフの面。 */
   | 'surface'
   /** ボタンや入力欄など、面から一段持ち上げるもの。 */
   | 'raised'
+  /** 表の見出し行など、面から一段沈めるもの。 */
+  | 'sunken'
+  /** 指したときに敷く面。 */
+  | 'hover'
+  /** ツールチップなど、面の上に浮かせるもの。 */
+  | 'overlay'
+  /* --- 線 --- */
   /** 枠線・区切り線。 */
   | 'border'
+  /** 強調したい枠線。 */
+  | 'borderStrong'
+  /** グラフの目盛り線。 */
+  | 'grid'
+  /* --- 文字 --- */
   /** 本文の文字。 */
   | 'text'
   /** 補足の文字。 */
   | 'muted'
+  /** 件数や単位など、添え物の文字。 */
+  | 'subtle'
+  /* --- 強調 --- */
   /** 選択状態・強調。 */
   | 'accent'
+  /** 指したときの強調色。 */
+  | 'accentHover'
+  /** 強調色を薄く敷いた面。 */
+  | 'accentSubtle'
   /** 強調色の上に載る文字。 */
   | 'onAccent'
+  /* --- 状態 --- */
   /** エラー表示。 */
-  | 'danger'
-  /** グラフの目盛り線。 */
-  | 'grid';
+  | 'danger';
 
-/** 役割 → 色。役割ごとの実際の色はここだけが決める。 */
-function roleColors(theme: VizTheme): Record<ColorRole, string> {
+/**
+ * 役割 → 色。役割ごとの実際の色はここだけが決める。
+ *
+ * 文字の 3 段は、そのまま返さず「いちばん条件の厳しい面」でも読める色まで
+ * 寄せてから返す。厳しいのは、明るい配色なら最も暗い面、暗い配色なら最も
+ * 明るい面で、どちらも「指したときの面」がそれにあたる。
+ *
+ * こうしておくと、スキンが地の色を差し替えても（config/skins.ts）、
+ * 手で色を選び直さずにコントラスト基準を保てる。
+ */
+export function roleColors(theme: VizTheme): Record<ColorRole, string> {
+  const readable = (color: string) => ensureContrast(color, theme.surfaceHover, CONTRAST_MIN_TEXT);
   return {
     background: theme.background,
     surface: theme.surface,
     raised: theme.surfaceRaised,
+    sunken: theme.surfaceSunken,
+    hover: theme.surfaceHover,
+    overlay: theme.surfaceOverlay,
     border: theme.border,
-    text: theme.textPrimary,
-    muted: theme.textSecondary,
+    borderStrong: theme.borderStrong,
+    grid: theme.grid,
+    text: readable(theme.textPrimary),
+    muted: readable(theme.textSecondary),
+    subtle: readable(theme.textTertiary),
     accent: theme.accent,
+    accentHover: theme.accentHover,
+    accentSubtle: theme.accentSubtle,
     onAccent: readableTextOn(theme.accent, theme, CONTRAST_MIN_TEXT),
     danger: theme.danger,
-    grid: theme.grid,
   };
 }
 
@@ -95,33 +132,43 @@ export const PART_COLORS: Record<string, ColorRole> = {
   'page-background': 'background',
   'page-text': 'text',
   'muted-text': 'muted',
+  'subtle-text': 'subtle',
   divider: 'border',
   'error-text': 'danger',
 
-  /* 面（カード・グラフの下地と、そこから一段持ち上げる面） */
+  /* 面（奥から手前へ、そして沈む方向） */
   surface: 'surface',
   'surface-raised': 'raised',
-
-  /* 画面上部の帯（見出しと操作の並び） */
-  'header-background': 'background',
-  'header-text': 'text',
+  'surface-sunken': 'sunken',
+  'surface-hover': 'hover',
+  'surface-overlay': 'overlay',
+  'surface-overlay-border': 'borderStrong',
 
   /* 見出し */
   'heading-text': 'text',
 
   /* 操作部品（プルダウン・ボタン・数値入力） */
   'control-background': 'raised',
+  'control-background-hover': 'hover',
   'control-text': 'text',
   'control-border': 'border',
-  'control-border-hover': 'accent',
+  'control-border-hover': 'accentHover',
   'control-selected': 'accent',
   'control-selected-text': 'onAccent',
+  'control-selected-subtle': 'accentSubtle',
   'focus-ring': 'accent',
+
+  /* タブ */
+  'tab-text': 'muted',
+  'tab-text-active': 'text',
+  'tab-marker': 'accent',
+  'tab-background-active': 'accentSubtle',
 
   /* 表 */
   'table-border': 'border',
-  'table-header-background': 'surface',
+  'table-header-background': 'sunken',
   'table-header-text': 'muted',
+  'table-row-hover': 'hover',
 
   /* 相関図の凡例 */
   'legend-background': 'raised',

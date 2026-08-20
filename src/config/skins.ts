@@ -11,7 +11,7 @@
  * config/colors.ts。
  */
 import { BORDER, FONT_FAMILY, FONT_SIZE, RADIUS, cssVar } from '../theme/tokens';
-import type { VizTheme } from '../theme/palette';
+import { withBackground, type VizTheme } from '../theme/palette';
 
 export interface SkinFont {
   /** 本文と UI の書体。 */
@@ -152,12 +152,11 @@ export function applySkin(theme: VizTheme, skin: Skin): VizTheme {
     [categorical[0], categorical[index]] = [categorical[index], categorical[0]];
   }
 
+  const based = background ? withBackground(theme, background) : theme;
   return {
-    ...theme,
-    accent: accent ?? theme.accent,
-    /* 面も地に合わせる。グラフの下地と記事の地の色を同じにするため */
-    background: background ?? theme.background,
-    surface: background ?? theme.surface,
+    ...based,
+    accent: accent ?? based.accent,
+    accentHover: accent ?? based.accentHover,
     categorical,
   };
 }

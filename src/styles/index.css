@@ -59,26 +59,50 @@
   --radius-pill: var(--sr-radius-pill);
 
   /* 部品ごとの色（config/colors.ts の PART_COLORS） */
+
+  /* 面 */
   --color-page: var(--sr-page-background);
   --color-surface: var(--sr-surface);
   --color-raised: var(--sr-surface-raised);
+  --color-sunken: var(--sr-surface-sunken);
+  --color-hover: var(--sr-surface-hover);
+  --color-overlay: var(--sr-surface-overlay);
+  --color-overlay-line: var(--sr-surface-overlay-border);
+
+  /* 文字 */
   --color-ink: var(--sr-page-text);
   --color-muted: var(--sr-muted-text);
-  --color-divider: var(--sr-divider);
-  --color-danger: var(--sr-error-text);
-  --color-header: var(--sr-header-background);
-  --color-header-ink: var(--sr-header-text);
+  --color-subtle: var(--sr-subtle-text);
   --color-heading: var(--sr-heading-text);
+  --color-danger: var(--sr-error-text);
+
+  /* 線 */
+  --color-divider: var(--sr-divider);
+
+  /* 操作部品 */
   --color-control: var(--sr-control-background);
+  --color-control-hover: var(--sr-control-background-hover);
   --color-control-ink: var(--sr-control-text);
   --color-control-line: var(--sr-control-border);
   --color-control-line-hover: var(--sr-control-border-hover);
   --color-selected: var(--sr-control-selected);
   --color-selected-ink: var(--sr-control-selected-text);
+  --color-selected-subtle: var(--sr-control-selected-subtle);
   --color-focus: var(--sr-focus-ring);
+
+  /* タブ */
+  --color-tab: var(--sr-tab-text);
+  --color-tab-active: var(--sr-tab-text-active);
+  --color-tab-marker: var(--sr-tab-marker);
+  --color-tab-active-bg: var(--sr-tab-background-active);
+
+  /* 表 */
   --color-table-line: var(--sr-table-border);
   --color-table-head: var(--sr-table-header-background);
   --color-table-head-ink: var(--sr-table-header-text);
+  --color-table-row-hover: var(--sr-table-row-hover);
+
+  /* 凡例 */
   --color-legend: var(--sr-legend-background);
   --color-legend-line: var(--sr-legend-border);
   --color-legend-active: var(--sr-legend-active-border);

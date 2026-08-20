@@ -11,6 +11,7 @@ import {
 } from '../src/theme/palette';
 import { GROUP_TYPE_SETTINGS } from '../src/map/config';
 import { SKINS, applySkin } from '../src/config/skins';
+import { roleColors } from '../src/config/colors';
 import { edgeStyle, nodeStyle, regionStyle } from '../src/map/display';
 
 /** 検査する配色の組み合わせ（スキン × ライト / ダーク）。 */
@@ -36,6 +37,37 @@ for (const { label, theme } of cases) {
   check('ツールチップ 本文 / 背景', tip.textColor, tip.background, CONTRAST_MIN_TEXT);
   check('軸ラベル / グラフ面', chartText(theme), theme.surface, CONTRAST_MIN_TEXT);
   check('主要文字 / グラフ面', chartText(theme, 'primary'), theme.surface, CONTRAST_MIN_TEXT);
+
+  /*
+   * 画面部品の色は config/colors.ts の役割を通して決まるので、テーマの生の値
+   * ではなく役割の色を検査する（実際に画面へ出るのはこちら）。
+   * 文字は 3 段とも、文字が載りうる面すべてに対して基準を満たすこと。
+   * 段の違いは強さの表現であって、コントラストを下げる口実にしない。
+   */
+  const role = roleColors(theme);
+  const surfaces: Array<[string, string]> = [
+    ['ページの地', role.background],
+    ['カードの面', role.surface],
+    ['持ち上げた面', role.raised],
+    ['沈めた面', role.sunken],
+    ['指したときの面', role.hover],
+    ['浮かせた面', role.overlay],
+    ['強調を薄く敷いた面', role.accentSubtle],
+  ];
+  const texts: Array<[string, string]> = [
+    ['本文', role.text],
+    ['補足', role.muted],
+    ['添え物', role.subtle],
+  ];
+  for (const [surfaceName, surface] of surfaces) {
+    for (const [textName, color] of texts) {
+      check(`${textName} / ${surfaceName}`, color, surface, CONTRAST_MIN_TEXT);
+    }
+  }
+  check('エラーの文字 / カードの面', role.danger, role.surface, CONTRAST_MIN_TEXT);
+  check('強調色の上の文字', role.onAccent, role.accent, CONTRAST_MIN_TEXT);
+  check('強調色 / カードの面', role.accent, role.surface, CONTRAST_MIN_LARGE);
+  check('指したときの強調色 / カードの面', role.accentHover, role.surface, CONTRAST_MIN_LARGE);
   theme.categorical.forEach((color, i) => {
     check(`系列${i + 1} ドット / ツールチップ背景`, tip.seriesColor(color), tip.background, CONTRAST_MIN_LARGE);
     check(`系列${i + 1} 上の値ラベル`, readableTextOn(color, theme), color, CONTRAST_MIN_TEXT);

@@ -11,56 +11,113 @@ export type ThemeMode = 'light' | 'dark';
  * 画面で使う色の全て。
  *
  * グラフだけでなく、ページ背景・カード・枠線・ボタンの色もここが持つ。
- * CSS 側は theme/cssVariables.ts が流し込むカスタムプロパティを参照するだけで、
- * 色の定義を持たない。
+ * Tailwind 側は theme/cssVariables.ts が流し込むカスタムプロパティを
+ * 参照するだけで、色の定義を持たない。
+ *
+ * 並びは「面 → 線 → 文字 → 強調 → 状態 → 系列」の順。
+ * どれも実際に使う場所があるものだけを置く（使い道の無い色は作らない）。
  */
 export interface VizTheme {
   mode: ThemeMode;
-  /** ページの地の色。 */
+
+  /* --- 面。奥から手前へ、そして沈む方向 --- */
+  /** ページの地の色。いちばん奥。 */
   background: string;
-  /** カード・グラフの下地。文字色のコントラストはこの面を基準に判定する。 */
+  /** カード・グラフの面。文字色のコントラストはこの面を基準に判定する。 */
   surface: string;
-  /** ボタンや入力欄の面。 */
+  /** ボタンや入力欄など、面から一段持ち上げるもの。 */
   surfaceRaised: string;
+  /** 表の見出し行など、面から一段沈めるもの。 */
+  surfaceSunken: string;
+  /** 指したときに敷く面（ボタン・タブ・表の行）。 */
+  surfaceHover: string;
+  /** ツールチップなど、面の上に浮かせるもの。 */
+  surfaceOverlay: string;
+
+  /* --- 線 --- */
   /** 枠線・区切り線。 */
   border: string;
-  textPrimary: string;
-  textSecondary: string;
-  /** 選択状態・強調に使う色。 */
-  accent: string;
-  /** エラー表示。 */
-  danger: string;
+  /** 強調したい枠線（浮いているものの輪郭）。 */
+  borderStrong: string;
   /** グラフの目盛り線。 */
   grid: string;
+
+  /* --- 文字。3 段とも背景に対して AA を満たす --- */
+  /** 本文・見出し。 */
+  textPrimary: string;
+  /** 補足・ラベル・軸。 */
+  textSecondary: string;
+  /** 件数や単位など、拾い読みされる添え物。 */
+  textTertiary: string;
+
+  /* --- 強調 --- */
+  /** 選択状態・強調に使う色。 */
+  accent: string;
+  /** 指したときの強調色。 */
+  accentHover: string;
+  /** 強調色を薄く敷いた面（選択中のタブなど）。 */
+  accentSubtle: string;
+
+  /* --- 状態 --- */
+  /** エラー表示。 */
+  danger: string;
+
   /** カテゴリ系列の色。順番に使う（9 色目は作らず「その他」に畳む）。 */
   categorical: string[];
 }
 
+/**
+ * 明るい配色。
+ *
+ * 地は少し暖かい灰色に寄せ、面を白にして「紙の上のカード」に見せる。
+ * 文字は 3 段とも白地に対して 4.5:1 以上（段の違いは強さの表現であって、
+ * コントラスト基準を下げる口実にはしない）。
+ */
 export const LIGHT_THEME: VizTheme = {
   mode: 'light',
-  background: '#fcfcfb',
+  background: '#fbfbfa',
   surface: '#ffffff',
   surfaceRaised: '#ffffff',
-  border: '#e6e4de',
-  textPrimary: '#0b0b0b',
-  textSecondary: '#52514e',
+  surfaceSunken: '#f6f6f4',
+  surfaceHover: '#f1f1ee',
+  surfaceOverlay: '#ffffff',
+  border: '#e4e3de',
+  borderStrong: '#cbcac3',
+  grid: '#e4e3de',
+  textPrimary: '#141412',
+  textSecondary: '#55554f',
+  textTertiary: '#6d6d66',
   accent: '#2a78d6',
+  accentHover: '#1f5fae',
+  accentSubtle: '#eaf1fb',
   danger: '#c8322f',
-  grid: '#e6e4de',
   categorical: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#4a3aa7', '#e34948'],
 };
 
+/**
+ * 暗い配色。
+ *
+ * 手前にあるものほど明るくする（影が使えないので、明度が奥行きを表す）。
+ * 文字は真っ白にせず、わずかに落として長時間見てもまぶしくないようにする。
+ */
 export const DARK_THEME: VizTheme = {
   mode: 'dark',
   background: '#131312',
   surface: '#1a1a19',
-  surfaceRaised: '#222221',
+  surfaceRaised: '#232322',
+  surfaceSunken: '#151514',
+  surfaceHover: '#2b2b29',
+  surfaceOverlay: '#262624',
   border: '#333331',
-  textPrimary: '#ffffff',
-  textSecondary: '#c3c2b7',
-  accent: '#3987e5',
-  danger: '#e66767',
+  borderStrong: '#474743',
   grid: '#333331',
+  textPrimary: '#f4f4ef',
+  textSecondary: '#c3c2b7',
+  textTertiary: '#a3a299',
+  accent: '#3987e5',
+  accentHover: '#63a1ec',
+  accentSubtle: '#182838',
+  danger: '#e66767',
   categorical: ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'],
 };
 
@@ -228,14 +285,46 @@ export interface TooltipSurfaceStyle {
 }
 
 export function tooltipSurface(theme: VizTheme): TooltipSurfaceStyle {
-  /* 面の上にもう一段重ねるので、背景をわずかに持ち上げて境界を出す */
-  const background = mix(theme.surface, theme.mode === 'dark' ? ABSOLUTE_TEXT[0] : ABSOLUTE_TEXT[1], 0.04);
+  /* 面の上に浮くものなので、専用の面と強めの枠線で境界を出す */
+  const background = theme.surfaceOverlay;
   return {
     background,
-    border: theme.grid,
+    border: theme.borderStrong,
     titleColor: readableTextOn(background, theme, CONTRAST_MIN_TEXT),
     textColor: readableTextOn(background, theme, CONTRAST_MIN_TEXT),
     seriesColor: (color) => ensureContrast(color, background, CONTRAST_MIN_LARGE),
+  };
+}
+
+/**
+ * 地の色を差し替えて、面の family を組み直す。
+ *
+ * スキン（config/skins.ts）が地の色を上書きしたときに使う。面ごとに
+ * 決め打ちの色を持たせると、地だけ緑に変えたときに表の見出しや
+ * ホバーの面だけ元の灰色が残ってしまう。
+ *
+ * 明暗どちらでも「手前＝明るい / 沈む＝暗い」で揃える。影が使えないので、
+ * 奥行きは明度だけで表す。
+ */
+export function withBackground(theme: VizTheme, background: string): VizTheme {
+  const lighter = (amount: number) => mix(background, ABSOLUTE_TEXT[0], amount);
+  const darker = (amount: number) => mix(background, ABSOLUTE_TEXT[1], amount);
+  const dark = theme.mode === 'dark';
+  /** 手前へ持ち上げる方向。どちらの配色でも「手前ほど明るい」。 */
+  const raise = lighter;
+  /** 目立たせる方向。明るい配色では暗く、暗い配色では明るくすると差が出る。 */
+  const emphasize = dark ? lighter : darker;
+
+  return {
+    ...theme,
+    background,
+    /* 地とカードの面は同じにして、記事とグラフを地続きに見せる */
+    surface: background,
+    surfaceRaised: raise(dark ? 0.06 : 0.5),
+    /* 沈める方向は、どちらの配色でも暗い側 */
+    surfaceSunken: darker(0.04),
+    surfaceHover: emphasize(0.07),
+    surfaceOverlay: raise(dark ? 0.08 : 0.6),
   };
 }
 
