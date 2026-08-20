@@ -16,6 +16,9 @@ srusa-portal では MkDocs のページに iframe で埋め込んでいました
 配色は画面右上で「端末に合わせる / 明るい / 暗い」から選べます（選択はブラウザに保存されます）。
 Minecraft のページはドット絵風のスキン（書体・直角・太い線・緑のテーマ色）で表示されます。
 
+スマートフォンでも見られます。狭い画面ではグラフの寸法と余白が切り替わり、
+相関図と表は枠の中で横スクロールします。
+
 ## 技術スタック
 
 - React 19 + TypeScript 5.9
@@ -54,6 +57,7 @@ npm run dev
 | [data/](data/) | ビルド時に取り込む JSON。Minecraft の集計と相関図のデータ |
 | [public/images/](public/images/) | ワールドマップのレンダリング結果 |
 | [scripts/check-contrast.ts](scripts/check-contrast.ts) | 配色のコントラスト検査 |
+| [src/hooks/](src/hooks/) | 画面の切り替えと、画面幅の問い合わせ |
 | [src/routes.ts](src/routes.ts) | 画面の一覧・URL・タブ名・使うスキン |
 | [src/pages/](src/pages/) | 画面そのもの |
 | [src/components/](src/components/) | 画面を組み立てる部品。アトミックデザインの 4 層（atoms → molecules → organisms → templates） |
@@ -87,7 +91,9 @@ npm run dev
 新しい文字の大きさが必要なら、まず `src/theme/tokens.ts` の `FONT_SIZE` に名前付きで足します。
 
 部品はアトミックデザインの 4 層（atoms → molecules → organisms → templates）で組み、下の層は上の層を参照しません。
-詳しい決まりは [CLAUDE.md](CLAUDE.md) にあります。
+
+見た目の決まり（文字の大きさの段、余白の目盛り、色の役割、ページの並び、レスポンシブの境目）は [DESIGN.md](DESIGN.md)、
+実装の決まりは [CLAUDE.md](CLAUDE.md) にあります。
 
 配色を変えたら `npm run check:contrast` を通してください（スキン × ライト/ダークの全組み合わせを検査します）。
 

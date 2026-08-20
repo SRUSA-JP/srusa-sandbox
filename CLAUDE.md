@@ -51,7 +51,7 @@ src/
   main.tsx                # 入口。初回描画の前にトークンを流し込む
   App.tsx                 # 画面の切り替えとスキン・配色の結びつけ
   routes.ts               # 画面の一覧・URL・タブ名・使うスキン
-  hooks/useHashRoute.ts   # ハッシュによる画面切り替え
+  hooks/                  # ハッシュによる画面切り替え、画面幅の問い合わせ
   pages/                  # 画面そのもの（StatsPage / WorldMapPage / MapPage）
   components/             # アトミックデザイン（atoms → molecules → organisms → templates）
     classes.ts            # 部品をまたいで共有する Tailwind クラスの組み合わせ
@@ -72,6 +72,10 @@ src/
 
 1. **画面はアトミックデザインの層で組む**（下の層は上の層を知らない）
 2. **見た目の値は一元管理する**（コンポーネントに色・px・文字列を直書きしない）
+
+見た目そのものの決まり（文字の大きさの段、余白の目盛り、色の役割、ページの並び、
+レスポンシブの境目）は [DESIGN.md](DESIGN.md) にまとめてある。
+画面を触る前にそちらも読むこと。
 
 ### アトミックデザイン
 
@@ -114,6 +118,8 @@ src/
 | 相関図の配置・ノード・領域 | [src/map/config.ts](src/map/config.ts) |
 | ページの解説文 | [src/content/](src/content/) |
 | タブ名・URL | [src/routes.ts](src/routes.ts) |
+
+どの値をどう使い分けるかは [DESIGN.md](DESIGN.md) に書いてある。
 
 #### 書いてよい形 / いけない形
 
