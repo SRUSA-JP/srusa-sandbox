@@ -25,7 +25,7 @@ export function Picker<T extends string>({
 }: PickerProps<T>) {
   const select = (
     <select
-      className={`${CONTROL} ${CONTROL_HOVER}`}
+      className={`${CONTROL} ${CONTROL_HOVER} max-w-full`}
       value={value}
       aria-label={label}
       onChange={(event) => onChange(event.target.value as T)}
@@ -39,7 +39,7 @@ export function Picker<T extends string>({
   );
 
   return showLabel ? (
-    <label className={FIELD}>
+    <label className={`${FIELD} min-w-0`}>
       {label}
       {select}
     </label>
