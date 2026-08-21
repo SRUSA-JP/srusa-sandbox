@@ -5,7 +5,7 @@
  * このファイルだけが決める。画面の中身は pages/ にあり、
  * どの ID にどの画面を割り当てるかは App.tsx が持つ。
  */
-import { DEFAULT_SKIN, MINECRAFT_SKIN, skinFor, type Skin } from './config/skins';
+import { MINECRAFT_SKIN, skinFor, type Skin } from './config/skins';
 
 export type RouteId = 'stats' | 'world-map' | 'relationships';
 
@@ -27,7 +27,8 @@ export const ROUTES: Route[] = [
     label: 'ワールドマップ',
     skinId: MINECRAFT_SKIN.id,
   },
-  { id: 'relationships', path: '#/relationships', label: '相関図', skinId: DEFAULT_SKIN.id },
+  /* 相関図も Minecraft のページと同じドット絵風にする（サイト全体の雰囲気を揃えるため） */
+  { id: 'relationships', path: '#/relationships', label: '相関図', skinId: MINECRAFT_SKIN.id },
 ];
 
 /** ハッシュが無い・知らないときに出す画面。 */
