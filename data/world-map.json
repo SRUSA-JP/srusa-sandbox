@@ -1,0 +1,21 @@
+{
+  "source": "BlueMap lowres LOD1",
+  "maps": [
+    {
+      "id": "overworld",
+      "image": "world-map/overworld.png",
+      "bounds": {
+        "minX": -702,
+        "minZ": -1024,
+        "maxX": 1025,
+        "maxZ": 1025
+      },
+      "pixels": {
+        "width": 1727,
+        "height": 2049
+      },
+      "blocksPerPixel": 1,
+      "bytes": 1240285
+    }
+  ]
+}
