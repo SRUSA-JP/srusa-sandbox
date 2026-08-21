@@ -170,12 +170,16 @@ export function StatsPage({ theme }: StatsPageProps) {
 
   const allRows = useMemo(() => (doc ? playerRows(doc) : []), [doc]);
   const filterRange = useMemo(() => metricRange(allRows, filterMetric), [allRows, filterMetric]);
-  const filter: PlayerFilter = {
-    metric: filterMetric,
-    min: filterBounds?.min ?? filterRange.min,
-    max: filterBounds?.max ?? filterRange.max,
-  };
-  const rows = useMemo(() => filterRows(allRows, filter), [allRows, filter.metric, filter.min, filter.max]);
+  /* 中身が同じなら同じ値を返す。毎回作り直すと、これを見ている計算がすべてやり直しになる */
+  const filter: PlayerFilter = useMemo(
+    () => ({
+      metric: filterMetric,
+      min: filterBounds?.min ?? filterRange.min,
+      max: filterBounds?.max ?? filterRange.max,
+    }),
+    [filterMetric, filterBounds, filterRange],
+  );
+  const rows = useMemo(() => filterRows(allRows, filter), [allRows, filter]);
   const playerNames = useMemo(() => rows.map((row) => row.name), [rows]);
   const filtered = rows.length !== allRows.length;
   const mismatches = useMemo(() => (doc ? checkTotals(doc) : []), [doc]);

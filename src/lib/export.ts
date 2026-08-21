@@ -27,9 +27,11 @@ export function download(filename: string, content: string, mime: string): void 
   URL.revokeObjectURL(url);
 }
 
+/** Excel が UTF-8 と判定できるように先頭へ付ける印。 */
+const UTF8_BOM = '\ufeff';
+
 export function downloadCsv(filename: string, rows: Row[], columns?: string[]): void {
-  // Excel が UTF-8 と判定できるように BOM を付ける。
-  download(filename, `﻿${toCsv(rows, columns)}`, 'text/csv');
+  download(filename, `${UTF8_BOM}${toCsv(rows, columns)}`, 'text/csv');
 }
 
 export function downloadJson(filename: string, value: unknown): void {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { applySkin, type Skin } from '../config/skins';
 import { applyDesignTokens } from './cssVariables';
 import { DARK_THEME, LIGHT_THEME, type ThemeMode, type VizTheme } from './palette';
@@ -20,6 +20,13 @@ const DARK_QUERY = '(prefers-color-scheme: dark)';
 function systemMode(): ThemeMode {
   if (typeof window === 'undefined') return 'light';
   return window.matchMedia(DARK_QUERY).matches ? 'dark' : 'light';
+}
+
+/** OS の配色設定の変化を購読する。 */
+function subscribeSystemMode(onChange: () => void): () => void {
+  const media = window.matchMedia(DARK_QUERY);
+  media.addEventListener('change', onChange);
+  return () => media.removeEventListener('change', onChange);
 }
 
 /** 前回選んだ配色。保存が無い・壊れている場合は OS 設定に従う。 */
@@ -56,17 +63,13 @@ export interface AppTheme {
  */
 export function useAppTheme(skin: Skin): AppTheme {
   const [preference, setStoredPreference] = useState<ThemePreference>(storedPreference);
-  const [mode, setMode] = useState<ThemeMode>(() => resolveMode(preference));
 
-  /* OS 設定に従っている間は、その切り替えにも追随する */
-  useEffect(() => {
-    setMode(resolveMode(preference));
-    if (preference !== 'system') return;
-    const media = window.matchMedia(DARK_QUERY);
-    const update = () => setMode(systemMode());
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
-  }, [preference]);
+  /*
+   * OS の設定はブラウザ側の状態なので、自前で持たずに購読する
+   * （効果の中で状態を書き戻すと、初回に余分な再描画が挟まってちらつく）。
+   */
+  const system = useSyncExternalStore(subscribeSystemMode, systemMode, () => 'light' as ThemeMode);
+  const mode: ThemeMode = preference === 'system' ? system : preference;
 
   /*
    * 切り替えは「いま見えている配色の逆」にする。端末の設定に従っている間も、
