@@ -207,10 +207,13 @@ export const WORLD_MAP_TEXT = {
 
   card: {
     title: '2D マップ',
-    note: '真上から見た地図です。掴んで動かすと移動、拡大すると 1 画素が 1 ブロックとして見えます。',
+    note: '真上から見た地図です。掴んで動かすと移動、拡大すると 1 画素が 1 ブロックとして見えます。タップ / クリックすると、その場所の座標を固定します。',
     /** 読み上げと、画像が出ないときの説明。 */
     alt: (world: string) => `${world}を真上から見た地図`,
   },
+
+  /** 複数の地図があるときの切り替え。 */
+  mapPicker: '地図',
 
   /** 地図の規模。見出しの下に出す。 */
   summary: (world: string, width: number, height: number, bytes: number) =>
@@ -218,8 +221,12 @@ export const WORLD_MAP_TEXT = {
 
   /** 指している場所の座標。 */
   pointer: (x: number, z: number) => `X ${formatInt(x)} / Z ${formatInt(z)}`,
+  /** タップ / クリックで固定した座標。 */
+  pinned: (x: number, z: number) => `固定 X ${formatInt(x)} / Z ${formatInt(z)}`,
   /** 指していないときに出す、画面の中心の座標。 */
   center: (x: number, z: number) => `中心 X ${formatInt(x)} / Z ${formatInt(z)}`,
+  /** 対応する次元の座標（例: ネザーはオーバーワールドの 1/8）。 */
+  correlation: (world: string, x: number, z: number) => `${world}: X ${formatInt(x)} / Z ${formatInt(z)}`,
 
   /**
    * 3D の見た目を写真で見せる節。

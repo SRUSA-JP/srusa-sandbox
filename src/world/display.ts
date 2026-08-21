@@ -5,6 +5,7 @@
  * コンポーネントは戻り値を属性に渡すだけで、自分で計算しない。
  */
 import { WORLD_MAP } from '../config/worldMap';
+import { WORLD_LABELS } from '../config/labels';
 import { WORLD_MAP_TEXT } from '../config/messages';
 import { figureColors } from '../config/colors';
 import type { Point } from '../lib/viewport';
@@ -73,7 +74,52 @@ export function markStyle(theme: VizTheme, scale: number) {
   };
 }
 
+/** 指している/固定している座標。 */
+export interface PointerState {
+  block: BlockPoint;
+  /** タップ / クリックで固定したものか（指しているだけなら false）。 */
+  pinned: boolean;
+}
+
 /** 画面下に出す座標の表示。指していないときは、いま見ている中心を出す。 */
-export function coordinateStatus(block: BlockPoint | null, center: BlockPoint): string {
-  return block ? WORLD_MAP_TEXT.pointer(block.x, block.z) : WORLD_MAP_TEXT.center(center.x, center.z);
+export function coordinateStatus(pointer: PointerState | null, center: BlockPoint): string {
+  if (!pointer) return WORLD_MAP_TEXT.center(center.x, center.z);
+  return pointer.pinned
+    ? WORLD_MAP_TEXT.pinned(pointer.block.x, pointer.block.z)
+    : WORLD_MAP_TEXT.pointer(pointer.block.x, pointer.block.z);
+}
+
+/** ある次元の座標を、対応する次元の座標に変換した結果。 */
+export interface CorrelatedPoint {
+  /** 対応する次元の地図 ID（config/labels.ts の WORLD_LABELS で名前を引く）。 */
+  mapId: string;
+  block: BlockPoint;
+}
+
+/**
+ * 座標を対応する次元の座標に変換する。
+ *
+ * オーバーワールドなら登録された次元すべてへ、それ以外の次元ならオーバーワールドへ変換する。
+ * 対応が無い次元（ジ・エンドなど）は空配列を返す。計算だけで済むので、対応する地図の画像が
+ * まだ用意できていなくても座標は出せる。
+ */
+export function correlatedPoints(mapId: string, block: BlockPoint): CorrelatedPoint[] {
+  if (mapId === WORLD_MAP.overworldId) {
+    return Object.entries(WORLD_MAP.correlations).map(([id, ratio]) => ({
+      mapId: id,
+      block: { x: Math.floor(block.x / ratio), z: Math.floor(block.z / ratio) },
+    }));
+  }
+  const ratio = WORLD_MAP.correlations[mapId];
+  if (ratio === undefined) return [];
+  return [
+    { mapId: WORLD_MAP.overworldId, block: { x: Math.floor(block.x * ratio), z: Math.floor(block.z * ratio) } },
+  ];
+}
+
+/** 対応する次元の座標を、画面に出す文言の並びにする。 */
+export function correlationLines(mapId: string, block: BlockPoint): string[] {
+  return correlatedPoints(mapId, block).map((entry) =>
+    WORLD_MAP_TEXT.correlation(WORLD_LABELS[entry.mapId] ?? entry.mapId, entry.block.x, entry.block.z),
+  );
 }

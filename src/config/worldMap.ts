@@ -35,4 +35,14 @@ export const WORLD_MAP = {
   markLabelOffset: 16,
   /** 出す目印。いまは原点（初期スポーン地点）だけ。 */
   marks: [{ id: 'spawn', x: 0, z: 0 }] as WorldMark[],
+  /** 座標の変換の基準にする次元の ID。 */
+  overworldId: 'overworld',
+  /**
+   * 次元の 1 ブロックが、オーバーワールドの何ブロックに当たるか。
+   *
+   * ネザーはポータルの仕様で 8 倍（ネザー 1 ブロック = オーバーワールド 8 ブロック）。
+   * ツワイライトフォレストはオーバーワールドと同じ座標に生成される（1 倍）。
+   * ここに無い次元（ジ・エンドなど）は対応する座標を出さない。
+   */
+  correlations: { nether: 8, twilightforest: 1 } as Record<string, number>,
 } as const;
