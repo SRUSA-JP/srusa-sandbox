@@ -80,7 +80,7 @@
     { "id": "tsuyudaku", "onlineName": "tsuyudaku", "attributes": ["不明"], "nicknames": [] },
     { "id": "masaya", "onlineName": "masaya", "attributes": ["shion組"], "nicknames": [] },
     { "id": "uobaa", "onlineName": "uobaa", "attributes": ["大学"], "nicknames": [] },
-    { "id": "motoki", "onlineName": "motoki", "attributes": ["K社"], "nicknames": [] },
+    { "id": "akarino", "onlineName": "akarino", "attributes": ["K社"], "nicknames": [] },
     { "id": "hinomaro", "onlineName": "hinomaro", "attributes": [], "nicknames": [] },
     { "id": "rai", "onlineName": "rai", "attributes": [], "nicknames": [] },
     { "id": "igarashi", "onlineName": "igarashi", "attributes": ["shion組"], "nicknames": [] },
@@ -131,7 +131,7 @@
     { "source": "panndasanngou", "target": "starrytear", "type": "friend" },
     { "source": "panndasanngou", "target": "bashita", "type": "friend" },
     { "source": "panndasanngou", "target": "tagosaku", "type": "friend" },
-    { "source": "motoki", "target": "hinomaro", "type": "friend" },
+    { "source": "akarino", "target": "hinomaro", "type": "friend" },
     { "source": "panndasanngou", "target": "rai", "type": "friend" },
     { "source": "zawao", "target": "rai", "type": "friend" }
   ],
