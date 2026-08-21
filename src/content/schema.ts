@@ -16,7 +16,19 @@ export type ProseBlock =
   | { kind: 'paragraph'; text: string }
   | { kind: 'list'; items: string[] }
   | { kind: 'table'; table: ProseTable }
-  | { kind: 'image'; src: string; alt: string; caption?: string };
+  | {
+      kind: 'image';
+      src: string;
+      alt: string;
+      caption?: string;
+      /**
+       * 画像の上に出す札（「スクリーンショット」など）。
+       *
+       * 操作できる図と、撮っただけの画像が同じページに並ぶので、
+       * どちらなのかを画像自身に持たせて取り違えを防ぐ。
+       */
+      tag?: string;
+    };
 
 export interface ProseSection {
   /** 節の見出し。 */
