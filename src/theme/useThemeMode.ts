@@ -1,0 +1,92 @@
+import { useCallback, useLayoutEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { applySkin, type Skin } from '../config/skins';
+import { applyDesignTokens } from './cssVariables';
+import { DARK_THEME, LIGHT_THEME, type ThemeMode, type VizTheme } from './palette';
+
+/**
+ * 配色の選び方。
+ *
+ * `system` は OS の設定に従う（切り替えにも追随する）。
+ * 利用者が明示的に選んだときだけ light / dark に固定する。
+ */
+export type ThemePreference = 'system' | 'light' | 'dark';
+
+/** 選んだ配色の保存先。キーの定義はこのファイルだけが持つ。 */
+const STORAGE_KEY = 'srusa-sandbox.theme';
+
+const DARK_QUERY = '(prefers-color-scheme: dark)';
+
+/** OS の配色設定。 */
+function systemMode(): ThemeMode {
+  if (typeof window === 'undefined') return 'light';
+  return window.matchMedia(DARK_QUERY).matches ? 'dark' : 'light';
+}
+
+/** OS の配色設定の変化を購読する。 */
+function subscribeSystemMode(onChange: () => void): () => void {
+  const media = window.matchMedia(DARK_QUERY);
+  media.addEventListener('change', onChange);
+  return () => media.removeEventListener('change', onChange);
+}
+
+/** 前回選んだ配色。保存が無い・壊れている場合は OS 設定に従う。 */
+export function storedPreference(): ThemePreference {
+  if (typeof window === 'undefined') return 'system';
+  const saved = window.localStorage.getItem(STORAGE_KEY);
+  return saved === 'light' || saved === 'dark' ? saved : 'system';
+}
+
+/** 選び方と OS 設定から、実際に使う配色を決める唯一の入口。 */
+export function resolveMode(preference: ThemePreference): ThemeMode {
+  return preference === 'system' ? systemMode() : preference;
+}
+
+/** 配色とスキンから、実際に使うテーマを組み立てる唯一の入口。 */
+export function buildTheme(mode: ThemeMode, skin: Skin): VizTheme {
+  return applySkin(mode === 'dark' ? DARK_THEME : LIGHT_THEME, skin);
+}
+
+export interface AppTheme {
+  theme: VizTheme;
+  /** いま表示している配色。端末の設定に従っている場合はその結果。 */
+  mode: ThemeMode;
+  /** 明るい ⇄ 暗いを入れ替える。一度押すと端末の設定には戻らない。 */
+  toggle: () => void;
+}
+
+/**
+ * 表示中のテーマ。
+ *
+ * 利用者が選んだ配色（無ければ OS 設定）と、そのページのスキン
+ * （config/skins.ts）を重ねて組み立てる。色とトークンは CSS カスタム
+ * プロパティとして流し込むので、Tailwind 側に実値を書く必要がない。
+ */
+export function useAppTheme(skin: Skin): AppTheme {
+  const [preference, setStoredPreference] = useState<ThemePreference>(storedPreference);
+
+  /*
+   * OS の設定はブラウザ側の状態なので、自前で持たずに購読する
+   * （効果の中で状態を書き戻すと、初回に余分な再描画が挟まってちらつく）。
+   */
+  const system = useSyncExternalStore(subscribeSystemMode, systemMode, () => 'light' as ThemeMode);
+  const mode: ThemeMode = preference === 'system' ? system : preference;
+
+  /*
+   * 切り替えは「いま見えている配色の逆」にする。端末の設定に従っている間も、
+   * 押した瞬間に見えている色から反転するので、押し心地が予想どおりになる。
+   */
+  const toggle = useCallback(() => {
+    const next: ThemePreference = mode === 'dark' ? 'light' : 'dark';
+    setStoredPreference(next);
+    window.localStorage.setItem(STORAGE_KEY, next);
+  }, [mode]);
+
+  const theme = useMemo(() => buildTheme(mode, skin), [mode, skin]);
+
+  /* 描画のあとに色が変わると一瞬ちらつくので、レイアウト確定前に流し込む */
+  useLayoutEffect(() => {
+    applyDesignTokens(theme, skin);
+  }, [theme, skin]);
+
+  return { theme, mode, toggle };
+}
