@@ -42,11 +42,15 @@ npm run dev
 
 | コマンド | 内容 |
 | --- | --- |
-| `npm run dev` | 開発サーバーを起動する |
-| `npm run build` | 型検査とコントラスト検査を通してから `dist/` に出力する |
+| `npm run dev` | 開発サーバーを起動する（`--host` 付き。同じ Wi-Fi のスマホからも開ける） |
+| `npm run build` | 型検査 → ESLint → コントラスト検査を通してから `dist/` に出力する |
 | `npm run preview` | ビルド成果物をローカルで確認する |
 | `npm run typecheck` | 型検査だけを実行する |
+| `npm run lint` | ESLint を実行する |
 | `npm run check:contrast` | 配色が WCAG のコントラスト比を満たすか検査する |
+
+`main` への push と Pull Request では、GitHub Actions が同じ検査を実行します
+（[.github/workflows/ci.yml](.github/workflows/ci.yml)）。
 
 `npm run build` の成果物は相対パス（`base: './'`）で出力するので、静的ホスティングのサブディレクトリにそのまま置けます。
 
@@ -57,6 +61,8 @@ npm run dev
 | [data/](data/) | ビルド時に取り込む JSON。Minecraft の集計と相関図のデータ |
 | [public/images/](public/images/) | ワールドマップのレンダリング結果 |
 | [scripts/check-contrast.ts](scripts/check-contrast.ts) | 配色のコントラスト検査 |
+| [.claude/](.claude/) | Claude Code の共有設定とスラッシュコマンド |
+| [.github/workflows/ci.yml](.github/workflows/ci.yml) | push と Pull Request で走る検査 |
 | [src/hooks/](src/hooks/) | 画面の切り替えと、画面幅の問い合わせ |
 | [src/routes.ts](src/routes.ts) | 画面の一覧・URL・タブ名・使うスキン |
 | [src/pages/](src/pages/) | 画面そのもの |

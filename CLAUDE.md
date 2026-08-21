@@ -30,14 +30,30 @@ srusa-portal 側は MkDocs のページに iframe で埋め込む前提だった
 
 ```bash
 npm install
-npm run dev             # 開発サーバー（http://localhost:5173/）
-npm run build           # 型検査 → コントラスト検査 → dist/ に出力
+npm run dev             # 開発サーバー（--host 付き。スマホ実機からも開ける）
+npm run build           # 型検査 → ESLint → コントラスト検査 → dist/ に出力
 npm run preview         # ビルド成果物のプレビュー
 npm run typecheck       # tsc --noEmit
+npm run lint            # ESLint
 npm run check:contrast  # 配色の WCAG コントラスト検査
 ```
 
 配色・スキン・コントラストのしきい値を変えたら、必ず `npm run check:contrast` を通すこと。
+
+### スラッシュコマンド
+
+[.claude/commands/](.claude/commands/) に置いてある。中身はこのファイルと DESIGN.md を参照するだけなので、
+決まりを変えたらコマンド側を直す必要はない。
+
+| コマンド | 内容 |
+| --- | --- |
+| `/check` | 型・ESLint・配色・実値の直書き・層の向きをまとめて検査する |
+| `/commit` | `/check` を通してから、変更を論理単位に分けてコミットする |
+| `/preview` | ビルドしてプレビューを起動する（スマホ実機の確認込み） |
+
+`.claude/settings.json` は共有する権限設定（読み取り系と `git add` / `git commit` は許可、
+`push` / `checkout` / `reset --hard` / `rm -rf` は拒否）。
+`.claude/settings.local.json` は個人用なのでコミットしない。
 
 ## ディレクトリ方針
 
@@ -47,6 +63,8 @@ data/                     # ビルド時に取り込む JSON（アプリの入�
   srusa-relationship-vX.Y.json
 public/images/            # ワールドマップのレンダリング結果など
 scripts/check-contrast.ts # 配色の検査
+.claude/                  # 共有の権限設定とスラッシュコマンド
+.github/workflows/ci.yml  # push と Pull Request で走る検査
 src/
   main.tsx                # 入口。初回描画の前にトークンを流し込む
   App.tsx                 # 画面の切り替えとスキン・配色の結びつけ
@@ -214,7 +232,7 @@ src/
 
 ## 変更時の確認
 
-- `npm run build`（型検査とコントラスト検査を含む）が通ること
+- `npm run build`（型検査・ESLint・コントラスト検査を含む）が通ること。`/check` で一括実行できる
 - 追加した部品が正しい層（atoms / molecules / organisms / templates）に置かれ、
   下の層から上の層を import していないこと
 - 色コード・px・日本語の文字列を直書きしていないこと。次の検索で何も出ないこと
