@@ -1,0 +1,11 @@
+# Netlify の公開設定。
+# 画面側の設定と二重管理にならないよう、ここを唯一の定義にする。
+# 公開先: https://srusa-sandbox.netlify.app/
+
+[build]
+  # 型検査・ESLint・配色のコントラスト検査を通してから出力する
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
