@@ -8,6 +8,19 @@ export interface PersonNodeProps {
   state: NodeState;
   nameMode: string;
   onSelect?: (personId: string) => void;
+  /**
+   * 掴んで動かす操作。渡すとノードがつまめるようになる。
+   *
+   * 位置をどう動かすかは呼び出し側（organisms/RelationshipMap.tsx）が決める。
+   * ここは受け取ったものをそのまま SVG に渡すだけで、座標の計算を持たない。
+   */
+  pointer?: {
+    onPointerDown: (event: React.PointerEvent<SVGGElement>) => void;
+    onPointerMove: (event: React.PointerEvent<SVGGElement>) => void;
+    onPointerUp: (event: React.PointerEvent<SVGGElement>) => void;
+  };
+  /** いま掴まれているか。カーソルの見た目だけに使う。 */
+  grabbed?: boolean;
 }
 
 /** アイコンの中身。画像・イニシャル・人型のどれをどの寸法で描くかは display.ts が決める。 */
@@ -68,18 +81,33 @@ function AvatarContentShape({
 }
 
 /** 人物 1 人分のノード。1 人につき 1 つだけ描く。 */
-export function PersonNode({ placement, theme, state, nameMode, onSelect }: PersonNodeProps) {
+export function PersonNode({
+  placement,
+  theme,
+  state,
+  nameMode,
+  onSelect,
+  pointer,
+  grabbed = false,
+}: PersonNodeProps) {
   const style = nodeStyle(theme, state);
   const label = personLabel(placement.person, nameMode);
   const clipId = `avatar-clip-${placement.person.id}`;
+  const interactive = Boolean(onSelect || pointer);
+
+  /*
+   * 掴めるノードは grab / grabbing、押すだけなら pointer。
+   * 「動かせる」ことはカーソルでしか伝わらないので、状態ごとに変える。
+   */
+  const cursor = pointer ? (grabbed ? 'cursor-grabbing' : 'cursor-grab') : onSelect ? 'cursor-pointer' : '';
 
   return (
     <g
       transform={`translate(${placement.x} ${placement.y})`}
-      onClick={onSelect ? () => onSelect(placement.person.id) : undefined}
-      style={onSelect ? { cursor: 'pointer' } : undefined}
-      role={onSelect ? 'button' : undefined}
-      tabIndex={onSelect ? 0 : undefined}
+      className={cursor}
+      {...pointer}
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
       onKeyDown={
         onSelect
           ? (event) => {

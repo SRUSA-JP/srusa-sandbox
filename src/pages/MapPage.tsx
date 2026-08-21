@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { AppLayout, ChartCard, NoticePanel, Note, Picker, ProsePanel } from '../components';
+import { useCallback, useMemo, useState } from 'react';
+import { AppLayout, Button, ChartCard, NoticePanel, Note, Picker, ProsePanel } from '../components';
 import { RELATIONSHIPS_CONTENT } from '../content';
 import { joinNotes } from '../lib/display';
 import type { VizTheme } from '../theme/palette';
@@ -7,7 +7,8 @@ import { APP_TEXT, MAP_TEXT } from '../config/messages';
 import { EDGE_MODES, ISSUE_PREVIEW_COUNT, type EdgeMode } from '../map/config';
 import { loadRelationshipData } from '../map/data';
 import { groupTypeLabel, personLabel } from '../map/display';
-import { buildLayout } from '../map/layout';
+import { buildLayout, withPositions } from '../map/layout';
+import type { Point } from '../map/geometry';
 import { MapLegend } from '../components/organisms/MapLegend';
 import { RelationshipMap } from '../components/organisms/RelationshipMap';
 
@@ -24,7 +25,18 @@ export function MapPage({ theme }: MapPageProps) {
   const [highlightedGroupId, setHighlightedGroupId] = useState('');
   const [edgeMode, setEdgeMode] = useState<EdgeMode>('all');
 
-  const layout = useMemo(() => (data ? buildLayout(data) : null), [data]);
+  /*
+   * 掴んで動かした人の座標。動かした人だけを持ち、それ以外は buildLayout の結果を使う。
+   * 全員ぶんを持つと、データが増えたときに古い座標が残って追随しなくなる。
+   */
+  const [positions, setPositions] = useState<Record<string, Point>>({});
+
+  const base = useMemo(() => (data ? buildLayout(data) : null), [data]);
+  const layout = useMemo(() => (base ? withPositions(base, positions) : null), [base, positions]);
+
+  const movePerson = useCallback((personId: string, x: number, y: number) => {
+    setPositions((previous) => ({ ...previous, [personId]: { x, y } }));
+  }, []);
 
   const edges = useMemo(() => {
     if (!layout) return [];
@@ -123,18 +135,25 @@ export function MapPage({ theme }: MapPageProps) {
             </>
           }
         >
-          {/* 横に長い図は、この枠の中だけでスクロールさせる */}
-          <div className="overflow-x-auto overflow-y-hidden">
-            <RelationshipMap
-              layout={layout}
-              theme={theme}
-              centerId={centerId}
-              highlightedGroupId={highlightedGroupId}
-              edges={edges}
-              nameMode={nameMode}
-              onSelectPerson={setCenterId}
-            />
-          </div>
+          <RelationshipMap
+            layout={layout}
+            theme={theme}
+            centerId={centerId}
+            highlightedGroupId={highlightedGroupId}
+            edges={edges}
+            nameMode={nameMode}
+            onSelectPerson={setCenterId}
+            onMovePerson={movePerson}
+            actions={
+              Object.keys(positions).length > 0 ? (
+                <Button
+                  label={MAP_TEXT.resetPositions}
+                  icon="reset"
+                  onClick={() => setPositions({})}
+                />
+              ) : undefined
+            }
+          />
         </ChartCard>
 
         <ChartCard title={MAP_TEXT.card.legend.title} note={MAP_TEXT.card.legend.note}>
