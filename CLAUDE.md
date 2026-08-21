@@ -36,6 +36,7 @@ npm run preview         # ビルド成果物のプレビュー
 npm run typecheck       # tsc --noEmit
 npm run lint            # ESLint
 npm run check:contrast  # 配色の WCAG コントラスト検査
+npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（BlueMap の出力が要る）
 ```
 
 配色・スキン・コントラストのしきい値を変えたら、必ず `npm run check:contrast` を通すこと。
@@ -61,17 +62,21 @@ npm run check:contrast  # 配色の WCAG コントラスト検査
 data/                     # ビルド時に取り込む JSON（アプリの入力）
   minecraft-stats-YYYYMMDD.json
   srusa-relationship-vX.Y.json
-public/images/            # ワールドマップのレンダリング結果など
+  world-map.json          # ワールドマップの範囲と縮尺（build:world-map が作る）
+public/images/            # BlueMap の 3D 表示のスクリーンショット
+public/world-map/         # 貼り合わせた 2D のワールドマップ（build:world-map が作る）
 public/icons/             # アプリのアイコン（タブ・ホーム画面）
 netlify.toml              # 公開設定（https://srusa-sandbox.netlify.app/）
 scripts/check-contrast.ts # 配色の検査
+scripts/build-world-map.ts # BlueMap の 2D タイルの貼り合わせ
+scripts/png.ts            # PNG の読み書き（画像ライブラリを入れないための最小実装）
 .claude/                  # 共有の権限設定とスラッシュコマンド
 .github/workflows/ci.yml  # push と Pull Request で走る検査
 src/
   main.tsx                # 入口。初回描画の前にトークンを流し込む
   App.tsx                 # 画面の切り替えとスキン・配色の結びつけ
   routes.ts               # 画面の一覧・URL・タブ名・使うスキン
-  hooks/                  # ハッシュによる画面切り替え、画面幅の問い合わせ
+  hooks/                  # ハッシュによる画面切り替え、画面幅の問い合わせ、掴んで動かす・拡大縮小
   pages/                  # 画面そのもの（StatsPage / WorldMapPage / MapPage）
   components/             # アトミックデザイン（atoms → molecules → organisms → templates）
     classes.ts            # 部品をまたいで共有する Tailwind クラスの組み合わせ
@@ -79,7 +84,8 @@ src/
   content/                # ページの解説文（元は MkDocs の Markdown）
   data/                   # Minecraft 統計の型・検証・読み込み
   map/                    # 相関図の型・検証・配置計算・見た目の決定
-  lib/                    # 集計・整形・書き出しの純関数
+  world/                  # ワールドマップの型・検証・座標変換
+  lib/                    # 集計・整形・書き出しの純関数（拡大縮小・移動の計算を含む）
   theme/                  # 配色・デザイントークン・CSS 変数の流し込み
   styles/index.css        # Tailwind の入口とトークンの割り当て
 ```
@@ -110,8 +116,8 @@ src/
 | 層 | 役割 | 置いてあるもの |
 | --- | --- | --- |
 | `atoms/` | これ以上分けられない部品。単体では意味を持たない | Button / Picker / NumberField / Segmented / Note / Swatch |
-| `molecules/` | atoms を組み合わせた小さなまとまり | SectionHeader / KpiTile / ChartTooltip / PersonNode / RelationEdge / GroupRegion |
-| `organisms/` | それだけで意味を持つ塊。データを受け取って見せる | ChartCard / DataTable / FilterPanel / KpiGrid / MapLegend / ProsePanel / 各グラフ / RelationshipMap |
+| `molecules/` | atoms を組み合わせた小さなまとまり | SectionHeader / KpiTile / ChartTooltip / PersonNode / RelationEdge / GroupRegion / ViewportControls |
+| `organisms/` | それだけで意味を持つ塊。データを受け取って見せる | ChartCard / DataTable / FilterPanel / KpiGrid / MapLegend / ProsePanel / 各グラフ / RelationshipMap / WorldMapViewer / ViewportFrame |
 | `templates/` | 画面の骨格。何を出すかは知らず、並べ方だけを決める | AppLayout（画面 1 枚）/ AppShell（サイト全体の枠） |
 
 画面そのもの（どのデータをどの organism に渡すか）は [src/pages/](src/pages/) にあり、components には置かない。
@@ -141,6 +147,8 @@ src/
 | 画面の文言 | [src/config/messages.ts](src/config/messages.ts) |
 | データ ID の日本語名 | [src/config/labels.ts](src/config/labels.ts) |
 | 相関図の配置・ノード・領域 | [src/map/config.ts](src/map/config.ts) |
+| ワールドマップの目印 | [src/config/worldMap.ts](src/config/worldMap.ts) |
+| 拡大縮小・移動の操作 | [src/config/viewport.ts](src/config/viewport.ts) |
 | ページの解説文 | [src/content/](src/content/) |
 | タブ名・URL | [src/routes.ts](src/routes.ts) |
 | サイト名・説明・アイコン（タブとホーム画面） | [src/config/pwa.ts](src/config/pwa.ts) |
@@ -172,6 +180,9 @@ src/
 [src/styles/index.css](src/styles/index.css) の `@theme inline` が、その変数を Tailwind のトークン名に割り当てる。
 
 - 接頭辞 `--sr-` は必須。Tailwind の `--color-*` `--spacing-*` `--radius-*` と衝突させない
+- **`--spacing-*` にキーワードと同じ名前を割り当てない。** Tailwind v4 は余白の名前を
+  `max-w-*` `min-w-*` `rounded-*` にも配る。`--spacing-none` を定義すると
+  `max-w-none`（＝上限なし）が `max-width: 0` に化けて、その要素が消える
 - クラスは `bg-surface` `text-muted` `p-lg` `rounded-md` のようにトークン名で書く。`p-[12px]` や `bg-[#fff]` は書かない
 - Tailwind に無い寸法（表の高さなど）は `max-h-[var(--sr-layout-table-max-height)]` の形で変数を引く
 - 線の太さはスキンで倍率が変わるので、`border-2` ではなく `border-hairline` / `border-thick`（`@utility` で定義）を使う
@@ -202,7 +213,8 @@ src/
 ### データ
 
 - `data/` の JSON は `import.meta.glob` でビルド時に取り込む。Vite 固有の記述は
-  [src/data/datasets.ts](src/data/datasets.ts) と [src/map/data.ts](src/map/data.ts) だけに閉じ込める
+  [src/data/datasets.ts](src/data/datasets.ts)、[src/map/data.ts](src/map/data.ts)、
+  [src/world/data.ts](src/world/data.ts) だけに閉じ込める
 - 統計 JSON を `data/` に足せば、コードを変えずにデータセットの選択肢と推移グラフの点が増える
 - 外部から来た JSON は必ず `parse.ts` の検証を通す。壊れたデータで画面が落ちないようにする
 
@@ -243,6 +255,14 @@ src/
 - `npm run build`（型検査・ESLint・コントラスト検査を含む）が通ること。`/check` で一括実行できる
 - 追加した部品が正しい層（atoms / molecules / organisms / templates）に置かれ、
   下の層から上の層を import していないこと
+- **ウィンドウからはみ出していないこと**（DESIGN.md「ウィンドウからはみ出さない」）。
+  狭い画面にして、ページ全体に横スクロールが出ないことを確かめる。
+  大きな図は `ViewportFrame` に入れ、`flex` / `grid` の子には `min-w-0` を付ける
+
+  ```js
+  document.documentElement.scrollWidth <= document.documentElement.clientWidth
+  ```
+
 - 色コード・px・日本語の文字列を直書きしていないこと。次の検索で何も出ないこと
 
   ```shell
