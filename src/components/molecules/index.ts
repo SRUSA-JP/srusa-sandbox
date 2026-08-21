@@ -4,3 +4,4 @@ export * from './KpiTile';
 export * from './PersonNode';
 export * from './RelationEdge';
 export * from './SectionHeader';
+export * from './ViewportControls';
