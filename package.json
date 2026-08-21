@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "check:contrast": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-contrast.ts --outfile=node_modules/.cache/check-contrast.mjs && node node_modules/.cache/check-contrast.mjs",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build:world-map": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/build-world-map.ts --outfile=node_modules/.cache/build-world-map.mjs && node node_modules/.cache/build-world-map.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",
