@@ -1,6 +1,12 @@
 # srusa-sandbox
 
-SRUSA の **Minecraft サーバー統計** と **メンバー相関図** を 1 つにまとめた Web アプリです。
+**公開先: <https://srusa-sandbox.netlify.app/>**
+
+SRUSA の**試験用コンテンツを公開しているサイト**です。
+まだ形の定まっていないものを、実際に触れる状態で置いて試す場所として使います。
+現在は Minecraft サーバーの統計と、メンバーの相関図があります。
+
+掲載内容・タブ構成・公開範囲はいずれも検討中で、予告なく変わったり消えたりします。
 
 コンテンツとビューアの実装は [srusa-portal](../srusa-portal) から移植しました。
 srusa-portal では MkDocs のページに iframe で埋め込んでいましたが、こちらは単体で動く SPA として作り直しています。
@@ -18,6 +24,7 @@ Minecraft のページはドット絵風のスキン（書体・直角・太い�
 
 スマートフォンでも見られます。狭い画面ではグラフの寸法と余白が切り替わり、
 相関図と表は枠の中で横スクロールします。
+ホーム画面に追加すると、アドレスバーのないアプリとして開けます（PWA のマニフェストを配信しています）。
 
 ## 技術スタック
 
@@ -61,6 +68,9 @@ npm run dev
 | [data/](data/) | ビルド時に取り込む JSON。Minecraft の集計と相関図のデータ |
 | [public/images/](public/images/) | ワールドマップのレンダリング結果 |
 | [scripts/check-contrast.ts](scripts/check-contrast.ts) | 配色のコントラスト検査 |
+| [public/icons/](public/icons/) | アプリのアイコン（タブ・ホーム画面） |
+| [src/config/pwa.ts](src/config/pwa.ts) | ホーム画面に追加したときの名前・説明・アイコン・配色 |
+| [netlify.toml](netlify.toml) | 公開設定（ビルドコマンドと出力先） |
 | [.claude/](.claude/) | Claude Code の共有設定とスラッシュコマンド |
 | [.github/workflows/ci.yml](.github/workflows/ci.yml) | push と Pull Request で走る検査 |
 | [src/hooks/](src/hooks/) | 画面の切り替えと、画面幅の問い合わせ |
@@ -108,6 +118,16 @@ npm run dev
 - `data/` に `minecraft-stats-YYYYMMDD.json` を追加すると、コードを変えずにデータセットの選択肢と「日付ごとの推移」の点が増えます
 - 画面右上の「JSON を読み込む」からも手元のファイルを読み込めます。読み込んだファイルはブラウザ内でのみ処理され、どこへも送信されません
 - 相関図は `data/srusa-relationship-vX.Y.json` のうち、いちばん新しいバージョンを読みます
+
+## 公開
+
+`main` に push すると Netlify が `npm run build` を実行して公開します
+（設定は [netlify.toml](netlify.toml)）。ビルドには型検査・ESLint・配色のコントラスト検査が
+含まれるので、これらが落ちると公開もされません。
+
+ページのタイトル・説明・アイコン・マニフェストは `index.html` に直接書かず、
+[src/config/pwa.ts](src/config/pwa.ts) と [src/config/messages.ts](src/config/messages.ts) の値から
+[vite.config.ts](vite.config.ts) のプラグインが組み立てます。画面に出る名前と食い違わないようにするためです。
 
 ## 注意
 

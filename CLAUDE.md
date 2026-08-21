@@ -62,6 +62,8 @@ data/                     # ビルド時に取り込む JSON（アプリの入�
   minecraft-stats-YYYYMMDD.json
   srusa-relationship-vX.Y.json
 public/images/            # ワールドマップのレンダリング結果など
+public/icons/             # アプリのアイコン（タブ・ホーム画面）
+netlify.toml              # 公開設定（https://srusa-sandbox.netlify.app/）
 scripts/check-contrast.ts # 配色の検査
 .claude/                  # 共有の権限設定とスラッシュコマンド
 .github/workflows/ci.yml  # push と Pull Request で走る検査
@@ -83,6 +85,11 @@ src/
 ```
 
 新しい画面を足すときは `src/routes.ts` に 1 行足し、`src/App.tsx` の `PAGES` に対応を追加する。
+
+`index.html` にタイトル・説明・アイコン・配色を直接書かないこと。
+[src/config/pwa.ts](src/config/pwa.ts) と [src/config/messages.ts](src/config/messages.ts) の値から、
+[vite.config.ts](vite.config.ts) のプラグインが `<head>` と `manifest.webmanifest` を組み立てる。
+画面に出る名前・説明と食い違わないようにするため。
 
 ## 設計方針
 
@@ -136,6 +143,7 @@ src/
 | 相関図の配置・ノード・領域 | [src/map/config.ts](src/map/config.ts) |
 | ページの解説文 | [src/content/](src/content/) |
 | タブ名・URL | [src/routes.ts](src/routes.ts) |
+| サイト名・説明・アイコン（タブとホーム画面） | [src/config/pwa.ts](src/config/pwa.ts) |
 
 どの値をどう使い分けるかは [DESIGN.md](DESIGN.md) に書いてある。
 
