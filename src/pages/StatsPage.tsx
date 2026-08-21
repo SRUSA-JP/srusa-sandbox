@@ -6,13 +6,16 @@ import {
   AppLayout,
   Button,
   ChartCard,
+  DiscoveryBoard,
   FilterPanel,
   KpiGrid,
   KpiTile,
   MetricScatter,
+  MinecraftHero,
   NoticePanel,
   Note,
   Picker,
+  PlayerStatusGallery,
   ProsePanel,
   RankBarChart,
   SeriesBarChart,
@@ -68,6 +71,7 @@ import {
   type RateBasis,
   type Snapshot,
 } from '../lib/selectors';
+import { playerStatuses, serverDiscoveries, serverInventory } from '../lib/statsExperience';
 import { downloadJson, type Row } from '../lib/export';
 import { formatDecimal, formatHours } from '../lib/format';
 import { useChartMetrics } from '../hooks/useChartMetrics';
@@ -199,9 +203,14 @@ export function StatsPage({ theme }: StatsPageProps) {
       playtime: rows.reduce((acc, row) => acc + row.playtime_hours, 0),
       distance: rows.reduce((acc, row) => acc + row.distance_km, 0),
       deaths: rows.reduce((acc, row) => acc + row.deaths, 0),
+      blocksMined: rows.reduce((acc, row) => acc + row.blocks_mined, 0),
+      mobKills: rows.reduce((acc, row) => acc + row.mob_kills, 0),
     }),
     [rows],
   );
+  const inventoryRecords = useMemo(() => (doc ? serverInventory(doc) : []), [doc]);
+  const discoveries = useMemo(() => (doc ? serverDiscoveries(doc) : []), [doc]);
+  const statusCards = useMemo(() => (doc ? playerStatuses(doc) : []), [doc]);
 
   const rankOption = metricOption(rankMetric);
   const scatterXOption = metricOption(scatterX);
@@ -342,7 +351,8 @@ export function StatsPage({ theme }: StatsPageProps) {
 
         {doc && (
           <>
-            {/* 主役は数字とグラフ。操作（絞り込み）はその手前に 1 つだけ置く */}
+            <MinecraftHero text={STATS_TEXT.experience.hero} records={inventoryRecords} theme={theme} />
+
             <KpiGrid>
               <KpiTile
                 label={STATS_TEXT.kpi.players}
@@ -355,7 +365,30 @@ export function StatsPage({ theme }: StatsPageProps) {
                 value={`${formatDecimal(kpi.distance)}${metricOption('distance_km').unit}`}
               />
               <KpiTile label={STATS_TEXT.kpi.deaths} value={STATS_TEXT.kpi.deathsValue(kpi.deaths)} />
+              <KpiTile
+                label={STATS_TEXT.kpi.blocksMined}
+                value={`${formatDecimal(kpi.blocksMined)}${metricOption('blocks_mined').unit}`}
+              />
+              <KpiTile
+                label={STATS_TEXT.kpi.mobKills}
+                value={`${formatDecimal(kpi.mobKills)}${metricOption('mob_kills').unit}`}
+              />
             </KpiGrid>
+
+            <DiscoveryBoard
+              discoveries={discoveries}
+              text={STATS_TEXT.experience.discovery}
+              theme={theme}
+            />
+
+            <PlayerStatusGallery
+              players={statusCards}
+              text={{
+                ...STATS_TEXT.experience.playstyle,
+                achievementTitles: STATS_TEXT.experience.achievement.titles,
+              }}
+              theme={theme}
+            />
 
             <FilterPanel
               metric={filterMetric}
