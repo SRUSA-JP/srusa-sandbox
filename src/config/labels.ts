@@ -6,6 +6,19 @@
  * 表示名を直したいときはこのファイルだけを編集する。
  */
 
+/** BlueMap のマップ名の日本語ラベル。 */
+export const WORLD_LABELS: Record<string, string> = {
+  overworld: 'オーバーワールド',
+  nether: 'ネザー',
+  end: 'ジ・エンド',
+  twilightforest: 'ツワイライトフォレスト',
+};
+
+/** ワールドマップに置く目印の日本語ラベル（config/worldMap.ts の marks）。 */
+export const WORLD_MARK_LABELS: Record<string, string> = {
+  spawn: '原点 (0, 0)',
+};
+
 /** 移動手段の日本語ラベル。 */
 export const MOVEMENT_LABELS: Record<string, string> = {
   walk: '徒歩',

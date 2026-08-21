@@ -187,11 +187,21 @@ function placePeople(rows: Cluster[][]): PersonPlacement[] {
   return placements;
 }
 
+/**
+ * グループの領域がノードの外側に取る余白。
+ *
+ * 入れ子の内側ほど詰めることで、大学の中に研究室が入っているように見せる。
+ * 位置を差し替えて描き直すとき（withPositions）にも同じ値が要るので関数にする。
+ */
+function regionPadding(type: string): number {
+  const depth = groupTypeSetting(type).depth;
+  return Math.max(REGION.padding - depth * REGION.nestedPaddingStep, REGION.nestedPaddingStep);
+}
+
 function buildRegions(groups: Group[], placements: PersonPlacement[]): RegionPlacement[] {
   const regions = groups.map((group) => {
     const members = placements.filter((placement) => placement.person.attributes.includes(group.name));
-    const depth = groupTypeSetting(group.type).depth;
-    const padding = Math.max(REGION.padding - depth * REGION.nestedPaddingStep, REGION.nestedPaddingStep);
+    const padding = regionPadding(group.type);
     const polygon = enclosingPolygon(
       members.map((member) => ({ x: member.x, y: member.y })),
       padding,
@@ -377,4 +387,43 @@ export function buildLayout(data: RelationshipData): MapLayout {
   const byId = new Map(people.map((placement) => [placement.person.id, placement]));
 
   return { width, height, people, regions, edges: buildEdges(data.relations, byId), byId };
+}
+
+/**
+ * 人物の位置を差し替えた図を作り直す。
+ *
+ * 画面上で人を掴んで動かしたときに使う。動かした人だけ座標を差し替え、
+ * グループの領域と関係線はその結果から求め直す。こうしないと、人だけが
+ * 動いて領域が置き去りになり、所属の関係が読めなくなる。
+ *
+ * 元の layout は変更しない（純関数）。差し替えが無ければそのまま返す。
+ */
+export function withPositions(layout: MapLayout, positions: Record<string, Point>): MapLayout {
+  if (Object.keys(positions).length === 0) return layout;
+
+  const people = layout.people.map((placement) => {
+    const moved = positions[placement.person.id];
+    return moved ? { ...placement, x: moved.x, y: moved.y } : placement;
+  });
+  const byId = new Map(people.map((placement) => [placement.person.id, placement]));
+
+  const regions = layout.regions
+    .map((region) => {
+      const points = region.memberIds
+        .map((id) => byId.get(id))
+        .filter((placement): placement is PersonPlacement => placement !== undefined)
+        .map((placement) => ({ x: placement.x, y: placement.y }));
+      const polygon = enclosingPolygon(points, regionPadding(region.group.type));
+      return { ...region, polygon, area: polygonArea(polygon) };
+    })
+    .sort((a, b) => b.area - a.area);
+
+  const edges = layout.edges.map((edge) => {
+    const from = byId.get(edge.relation.source);
+    const to = byId.get(edge.relation.target);
+    if (!from || !to) return edge;
+    return { relation: edge.relation, from: { x: from.x, y: from.y }, to: { x: to.x, y: to.y } };
+  });
+
+  return { ...layout, people, byId, regions, edges };
 }

@@ -1,4 +1,4 @@
-import { PROSE_WIDTH, SECTION, TABLE, TABLE_CELL, TABLE_HEAD_CELL } from '../classes';
+import { PROSE_WIDTH, SECTION, TABLE, TABLE_CELL, TABLE_HEAD_CELL, TAG } from '../classes';
 import { SectionHeader } from '../molecules/SectionHeader';
 import type { ProseBlock, ProseSection } from '../../content/schema';
 
@@ -55,6 +55,7 @@ function Block({ block }: { block: ProseBlock }) {
     case 'image':
       return (
         <figure className="grid gap-xs">
+          {block.tag && <span className={TAG}>{block.tag}</span>}
           <img
             src={`${import.meta.env.BASE_URL}${block.src}`}
             alt={block.alt}

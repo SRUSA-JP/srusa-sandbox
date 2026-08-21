@@ -38,8 +38,13 @@
   --leading-base: var(--sr-line-height-base);
   --tracking-tight: var(--sr-letter-spacing-tight);
 
-  /* 余白（theme/tokens.ts の SPACE） */
-  --spacing-none: var(--sr-space-none);
+  /*
+   * 余白（theme/tokens.ts の SPACE）。
+   *
+   * `none` という名前の段は作らないこと。Tailwind v4 は `--spacing-*` の名前を
+   * `max-w-*` `min-w-*` `rounded-*` などにも配るため、`--spacing-none` を定義すると
+   * `max-w-none`（＝上限なし）が `max-width: 0` に化けて要素が消える。
+   */
   --spacing-xxs: var(--sr-space-xxs);
   --spacing-xs: var(--sr-space-xs);
   --spacing-sm: var(--sr-space-sm);

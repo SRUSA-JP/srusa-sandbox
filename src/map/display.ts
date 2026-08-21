@@ -15,8 +15,27 @@ import { CONTRAST_MIN_LARGE, CONTRAST_MIN_TEXT, ensureContrast, withAlpha, type 
 import { figureColors } from '../config/colors';
 import { skinnedFontSize } from '../config/skins';
 import { MAP_TEXT } from '../config/messages';
-import { AVATAR, EDGE, NODE, REGION, groupTypeSetting } from './config';
+import { AVATAR, CANVAS, EDGE, NODE, REGION, groupTypeSetting } from './config';
 import type { Group, Person, Relation } from './schema';
+
+/* ------------------------------------------------------------------ *
+ * 配置
+ * ------------------------------------------------------------------ */
+
+/**
+ * 掴んで動かした人物を、図の中に留める。
+ *
+ * 図の外へ出すと、表示枠が図の大きさまでしか動かせないぶん二度と掴めなくなる。
+ * 縁の余白（CANVAS.padding）の内側までを置ける範囲とする。
+ */
+export function clampToCanvas(
+  canvas: { width: number; height: number },
+  point: { x: number; y: number },
+): { x: number; y: number } {
+  const limit = (value: number, length: number) =>
+    Math.min(Math.max(value, CANVAS.padding), Math.max(CANVAS.padding, length - CANVAS.padding));
+  return { x: limit(point.x, canvas.width), y: limit(point.y, canvas.height) };
+}
 
 /* ------------------------------------------------------------------ *
  * 文言

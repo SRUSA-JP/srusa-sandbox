@@ -60,5 +60,12 @@ export const TABLE_CELL = 'border-b-hairline border-table-line px-lg py-sm';
 /** 表の見出しセル。 */
 export const TABLE_HEAD_CELL = 'bg-table-head font-medium text-table-head-ink';
 
+/**
+ * 内容の種類を示す小さな札（「スクリーンショット」など）。
+ * 面から一段沈めて、本文より弱く見えるようにする。
+ */
+export const TAG =
+  'inline-flex w-fit items-center rounded-sm border-hairline border-divider bg-sunken px-xs py-xxs text-xs text-muted';
+
 /** 読み物の 1 行の最大幅。1 行が長すぎると視線が戻る場所を見失う。 */
 export const PROSE_WIDTH = 'max-w-[var(--sr-layout-prose-max-width)]';

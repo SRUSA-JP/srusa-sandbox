@@ -59,3 +59,13 @@ export function prettifyId(id: string): string {
 export function labelFor(id: string, dictionary: Record<string, string>): string {
   return dictionary[stripNamespace(id)] ?? prettifyId(id);
 }
+
+/**
+ * バイト数を MB で読ませる。
+ *
+ * 画面に出るのは「載せられる大きさか」を判断するための数なので、
+ * 1024 進法で MB まで丸め、小数 1 桁に切り上げる。
+ */
+export function formatMegabytes(bytes: number): string {
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}

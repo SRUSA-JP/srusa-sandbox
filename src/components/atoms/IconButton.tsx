@@ -1,4 +1,4 @@
-import { CONTROL_HOVER, CONTROL_SQUARE } from '../classes';
+import { CONTROL_DISABLED, CONTROL_HOVER, CONTROL_SQUARE } from '../classes';
 import { Icon, type IconName } from './Icon';
 
 export interface IconButtonProps {
@@ -9,6 +9,8 @@ export interface IconButtonProps {
    */
   label: string;
   onClick: () => void;
+  /** これ以上その向きに動かせないときなど、押しても何も起きないとき。 */
+  disabled?: boolean;
 }
 
 /**
@@ -18,13 +20,14 @@ export interface IconButtonProps {
  * （配色の切り替えなど）。迷ったら文字のある Button を使うこと。
  * 上下左右の余白は Button と揃えてあるので、並べても高さがずれない。
  */
-export function IconButton({ icon, label, onClick }: IconButtonProps) {
+export function IconButton({ icon, label, onClick, disabled = false }: IconButtonProps) {
   return (
     <button
       type="button"
-      className={`${CONTROL_SQUARE} ${CONTROL_HOVER} inline-flex items-center justify-center`}
+      className={`${CONTROL_SQUARE} ${CONTROL_HOVER} ${CONTROL_DISABLED} inline-flex items-center justify-center`}
       aria-label={label}
       title={label}
+      disabled={disabled}
       onClick={onClick}
     >
       <Icon name={icon} />

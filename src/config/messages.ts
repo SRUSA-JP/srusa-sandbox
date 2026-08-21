@@ -7,7 +7,7 @@
  *
  * 値を含む文は関数にして、数値の整形は lib/format.ts に任せる。
  */
-import { formatInt } from '../lib/format';
+import { formatInt, formatMegabytes } from '../lib/format';
 import { OTHER_ENTRY } from './labels';
 
 /** 画面の外枠（サイト名・タブ・配色の切り替え）。 */
@@ -36,6 +36,24 @@ export const APP_TEXT = {
     toDark: '暗い配色に切り替える',
     toLight: '明るい配色に切り替える',
   },
+} as const;
+
+/**
+ * 掴んで動かす・拡大縮小できる図（ワールドマップ・相関図）で共通の文言。
+ *
+ * 操作の説明は「押すとどうなるか」で書く。絵だけのボタンなので、
+ * これが読み上げでの唯一の説明になる。
+ */
+export const VIEWPORT_TEXT = {
+  zoomIn: '拡大する',
+  zoomOut: '縮小する',
+  fit: '全体が入る大きさに戻す',
+  /** いまの拡大率。 */
+  zoom: (percent: number) => `${formatInt(percent)}%`,
+  /** 操作の仕方。図の下に小さく置く。 */
+  help: '掴んで動かす / Ctrl（⌘）を押しながらホイールで拡大縮小 / ダブルクリックで拡大',
+  /** キーボードだけで操作する人向けの説明。読み上げ用。 */
+  keyboardHelp: '矢印キーで移動、+ と - で拡大縮小、0 で全体表示',
 } as const;
 
 /** グラフの中に出る共通の文言。 */
@@ -181,6 +199,40 @@ export const STATS_TEXT = {
   },
 } as const;
 
+/** ワールドマップ（BlueMap の 2D 出力）。 */
+export const WORLD_MAP_TEXT = {
+  /** 地図データがまだ無いとき。 */
+  noData:
+    '地図データ（data/world-map.json）がありません。BlueMap でレンダリングしてから `npm run build:world-map` を実行してください。',
+
+  card: {
+    title: '2D マップ',
+    note: '真上から見た地図です。掴んで動かすと移動、拡大すると 1 画素が 1 ブロックとして見えます。',
+    /** 読み上げと、画像が出ないときの説明。 */
+    alt: (world: string) => `${world}を真上から見た地図`,
+  },
+
+  /** 地図の規模。見出しの下に出す。 */
+  summary: (world: string, width: number, height: number, bytes: number) =>
+    `${world} / ${formatInt(width)} × ${formatInt(height)} ブロック（${formatMegabytes(bytes)}）`,
+
+  /** 指している場所の座標。 */
+  pointer: (x: number, z: number) => `X ${formatInt(x)} / Z ${formatInt(z)}`,
+  /** 指していないときに出す、画面の中心の座標。 */
+  center: (x: number, z: number) => `中心 X ${formatInt(x)} / Z ${formatInt(z)}`,
+
+  /**
+   * 3D の見た目を写真で見せる節。
+   * 地図そのものと取り違えられないよう、必ずスクリーンショットだと明記する。
+   */
+  screenshot: {
+    /** 各画像に付ける札。 */
+    tag: 'スクリーンショット',
+    /** 何を写したものかの説明。 */
+    note: '下の 2 枚は操作できません。BlueMap の 3D 表示を撮った画像です。',
+  },
+} as const;
+
 /** 相関図。 */
 export const MAP_TEXT = {
   /** データが読めなかったとき。 */
@@ -202,12 +254,16 @@ export const MAP_TEXT = {
     edges: '関係線',
   },
 
+  /** 掴んで動かした配置を元に戻すボタン。 */
+  resetPositions: '配置を戻す',
+
   card: {
     map: {
       title: '相関図',
       note: [
         '所属の組み合わせが同じ人をまとめて配置し、各グループをその所属者を囲う領域として描いています。',
         '複数の所属は領域の重なりで表れます。',
+        '人を掴んで動かすと配置を変えられます（領域と関係線も追従します）。押すとその人が中心になります。',
       ].join(''),
       center: (name: string) => `中心人物: ${name}`,
       ariaLabel: 'SRUSA の相関図',

@@ -10,3 +10,5 @@ export * from './RankBarChart';
 export * from './RelationshipMap';
 export * from './SeriesBarChart';
 export * from './TrendLineChart';
+export * from './ViewportFrame';
+export * from './WorldMapViewer';

@@ -16,8 +16,8 @@ srusa-portal では MkDocs のページに iframe で埋め込んでいました
 | 画面 | URL | 内容 |
 | --- | --- | --- |
 | Minecraft 統計 | `#/minecraft` | プレイヤー比較・内訳・系列比較・日付ごとの推移・2指標の関係の 5 グラフ。絞り込み、表への切り替え、CSV / JSON 書き出し |
-| ワールドマップ | `#/minecraft/world-map` | BlueMap でレンダリングしたオーバーワールドの画像と、配信方法の検討メモ |
-| 相関図 | `#/relationships` | メンバーのつながりと所属を 1 枚にまとめた SVG の図。中心人物・グループの強調・関係線の切り替え |
+| ワールドマップ | `#/minecraft/world-map` | BlueMap の 2D 出力を掴んで動かせる地図。3D はスクリーンショットで掲載 |
+| 相関図 | `#/relationships` | メンバーのつながりと所属を 1 枚にまとめた SVG の図。掴んで動かす・拡大縮小・人物の移動、中心人物・グループの強調・関係線の切り替え |
 
 配色は最初は端末の設定に従い、画面右上のボタンで明るい ⇄ 暗いを切り替えられます（選択はブラウザに保存されます）。
 Minecraft のページはドット絵風のスキン（書体・直角・太い線・緑のテーマ色）で表示されます。
@@ -55,6 +55,7 @@ npm run dev
 | `npm run typecheck` | 型検査だけを実行する |
 | `npm run lint` | ESLint を実行する |
 | `npm run check:contrast` | 配色が WCAG のコントラスト比を満たすか検査する |
+| `npm run build:world-map` | BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（下の「ワールドマップを作り直すとき」） |
 
 `main` への push と Pull Request では、GitHub Actions が同じ検査を実行します
 （[.github/workflows/ci.yml](.github/workflows/ci.yml)）。
@@ -65,9 +66,12 @@ npm run dev
 
 | パス | 内容 |
 | --- | --- |
-| [data/](data/) | ビルド時に取り込む JSON。Minecraft の集計と相関図のデータ |
-| [public/images/](public/images/) | ワールドマップのレンダリング結果 |
+| [data/](data/) | ビルド時に取り込む JSON。Minecraft の集計、相関図のデータ、ワールドマップの範囲 |
+| [public/images/](public/images/) | BlueMap の 3D 表示のスクリーンショット |
+| [public/world-map/](public/world-map/) | 貼り合わせた 2D のワールドマップ（`npm run build:world-map` が作る） |
 | [scripts/check-contrast.ts](scripts/check-contrast.ts) | 配色のコントラスト検査 |
+| [scripts/build-world-map.ts](scripts/build-world-map.ts) | BlueMap の 2D タイルの貼り合わせ |
+| [scripts/png.ts](scripts/png.ts) | PNG の読み書き（依存を増やさないための最小実装） |
 | [public/icons/](public/icons/) | アプリのアイコン（タブ・ホーム画面） |
 | [src/config/pwa.ts](src/config/pwa.ts) | ホーム画面に追加したときの名前・説明・アイコン・配色 |
 | [netlify.toml](netlify.toml) | 公開設定（ビルドコマンドと出力先） |
@@ -81,7 +85,8 @@ npm run dev
 | [src/content/](src/content/) | ページの解説文 |
 | [src/data/](src/data/) | Minecraft 統計の型・検証・読み込み |
 | [src/map/](src/map/) | 相関図の型・検証・配置計算・見た目の決定 |
-| [src/lib/](src/lib/) | 集計・整形・書き出しの純関数 |
+| [src/world/](src/world/) | ワールドマップの型・検証・座標変換 |
+| [src/lib/](src/lib/) | 集計・整形・書き出しの純関数（拡大縮小・移動の計算を含む） |
 | [src/theme/](src/theme/) | 配色・デザイントークン・CSS 変数の流し込み |
 | [src/styles/index.css](src/styles/index.css) | Tailwind の入口。実行時の変数を Tailwind のトークン名に割り当てる |
 
@@ -100,6 +105,8 @@ npm run dev
 | 画面の文言 | [src/config/messages.ts](src/config/messages.ts) |
 | データ ID の日本語名 | [src/config/labels.ts](src/config/labels.ts) |
 | 相関図の配置・ノード・領域 | [src/map/config.ts](src/map/config.ts) |
+| ワールドマップの目印 | [src/config/worldMap.ts](src/config/worldMap.ts) |
+| 拡大縮小・移動の操作（刻み幅・拡大の上下限） | [src/config/viewport.ts](src/config/viewport.ts) |
 
 これらの値は実行時に `--sr-*` というカスタムプロパティとして `<html>` に流し込まれ、
 [src/styles/index.css](src/styles/index.css) の `@theme inline` が Tailwind のトークン名（`bg-surface`、`p-lg` など）に割り当てます。
@@ -112,6 +119,27 @@ npm run dev
 実装の決まりは [CLAUDE.md](CLAUDE.md) にあります。
 
 配色を変えたら `npm run check:contrast` を通してください（スキン × ライト/ダークの全組み合わせを検査します）。
+
+## ワールドマップを作り直すとき
+
+地図の実体は BlueMap の出力から作ります。BlueMap の 3D タイル（オーバーワールドだけで 308 MB）は
+このリポジトリに持たず、真上から見た 2D タイル（3 MB）だけを 1 枚の PNG（1.2 MB）に貼り合わせて置きます。
+
+```shell
+# 1. srusa-portal でワールドをレンダリングする（Java 25 が要る）
+cd ../srusa-portal/bluemap && ./render.sh
+
+# 2. このリポジトリで 2D の地図を作り直す
+cd -
+npm run build:world-map
+```
+
+`public/world-map/<マップ名>.png` と、範囲・縮尺を書いた [data/world-map.json](data/world-map.json) が更新されます。
+BlueMap の出力が別の場所にあるときは `npm run build:world-map -- --source <パス> --map overworld` で指定します。
+
+3D の見た目はページに載せられないので、BlueMap の 3D 表示を撮った画像を `public/images/` に置き、
+[src/content/worldMap.ts](src/content/worldMap.ts) の節に追記します。
+操作できる地図と取り違えられないよう、画像には必ず `tag` を付けます。
 
 ## データを差し替えるとき
 
