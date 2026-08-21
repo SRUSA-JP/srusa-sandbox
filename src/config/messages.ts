@@ -14,8 +14,16 @@ import { OTHER_ENTRY } from './labels';
 export const APP_TEXT = {
   /** ブラウザのタブと画面左上に出す名前。 */
   siteName: 'SRUSA Sandbox',
+  /** ホーム画面に追加したときなど、短く出す名前。 */
+  shortName: 'SRUSA',
   /** サイト名の下に出す説明。 */
-  siteNote: 'Minecraft サーバーの統計と、メンバーの相関図をまとめた場所です。',
+  siteNote: 'SRUSA の試験用コンテンツを公開している場所です。Minecraft サーバーの統計と、メンバーの相関図があります。',
+  /**
+   * 検索結果やホーム画面に出る説明。
+   * 画面に出る siteNote と役割が違う（こちらは中身を見ずに読まれる）ので別に持つ。
+   */
+  siteDescription:
+    'SRUSA の試験用コンテンツを公開しているサイトです。Minecraft サーバーの統計と、メンバーの相関図を置いています。掲載内容と公開範囲は検討中です。',
   /** タブ全体の読み上げ名。 */
   navLabel: 'ページ',
   /** ページ全体にかかる注意書きの見出し。本文の下に出す。 */
@@ -28,6 +36,15 @@ export const APP_TEXT = {
     toDark: '暗い配色に切り替える',
     toLight: '明るい配色に切り替える',
   },
+} as const;
+
+/** グラフの中に出る共通の文言。 */
+export const CHART_TEXT = {
+  /**
+   * 積み上げ棒グラフのツールチップに添える合計。
+   * 積み上げの中に数字を書かない代わりに、ここで全体の大きさを読ませる。
+   */
+  stackTotal: '合計',
 } as const;
 
 /** 統計ビューア。 */

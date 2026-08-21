@@ -63,6 +63,20 @@ function loadSkinFont(skin: Skin): void {
 }
 
 /**
+ * ブラウザの枠（スマートフォンのアドレスバーなど）の色を、表示中の地の色に合わせる。
+ *
+ * 合わせないと、ホーム画面から開いたときに枠だけ別の色で残って浮く。
+ * 初回描画用の控えは vite.config.ts が index.html へ差し込む。
+ */
+function applyBrowserThemeColor(theme: VizTheme): void {
+  if (typeof document === 'undefined') return;
+  const meta =
+    document.querySelector<HTMLMetaElement>('meta[name="theme-color"]') ??
+    document.head.appendChild(Object.assign(document.createElement('meta'), { name: 'theme-color' }));
+  meta.content = theme.background;
+}
+
+/**
  * 文書にテーマ・トークン・スキンを適用する。
  *
  * `color-scheme` も合わせて設定し、スクロールバーやフォーム部品の
@@ -88,4 +102,5 @@ export function applyDesignTokens(
   }
   root.style.colorScheme = theme.mode;
   root.dataset.skin = skin.id;
+  applyBrowserThemeColor(theme);
 }
