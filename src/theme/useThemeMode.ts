@@ -41,8 +41,10 @@ export function buildTheme(mode: ThemeMode, skin: Skin): VizTheme {
 
 export interface AppTheme {
   theme: VizTheme;
-  preference: ThemePreference;
-  setPreference: (preference: ThemePreference) => void;
+  /** いま表示している配色。端末の設定に従っている場合はその結果。 */
+  mode: ThemeMode;
+  /** 明るい ⇄ 暗いを入れ替える。一度押すと端末の設定には戻らない。 */
+  toggle: () => void;
 }
 
 /**
@@ -66,11 +68,15 @@ export function useAppTheme(skin: Skin): AppTheme {
     return () => media.removeEventListener('change', update);
   }, [preference]);
 
-  const setPreference = useCallback((next: ThemePreference) => {
+  /*
+   * 切り替えは「いま見えている配色の逆」にする。端末の設定に従っている間も、
+   * 押した瞬間に見えている色から反転するので、押し心地が予想どおりになる。
+   */
+  const toggle = useCallback(() => {
+    const next: ThemePreference = mode === 'dark' ? 'light' : 'dark';
     setStoredPreference(next);
-    if (next === 'system') window.localStorage.removeItem(STORAGE_KEY);
-    else window.localStorage.setItem(STORAGE_KEY, next);
-  }, []);
+    window.localStorage.setItem(STORAGE_KEY, next);
+  }, [mode]);
 
   const theme = useMemo(() => buildTheme(mode, skin), [mode, skin]);
 
@@ -79,5 +85,5 @@ export function useAppTheme(skin: Skin): AppTheme {
     applyDesignTokens(theme, skin);
   }, [theme, skin]);
 
-  return { theme, preference, setPreference };
+  return { theme, mode, toggle };
 }

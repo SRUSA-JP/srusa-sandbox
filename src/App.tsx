@@ -30,16 +30,11 @@ export function App() {
    */
   setActiveSkin(skin);
 
-  const { theme, preference, setPreference } = useAppTheme(skin);
+  const { theme, mode, toggle } = useAppTheme(skin);
   const Page = PAGES[route.id];
 
   return (
-    <AppShell
-      route={route}
-      onNavigate={navigate}
-      preference={preference}
-      onPreferenceChange={setPreference}
-    >
+    <AppShell route={route} onNavigate={navigate} mode={mode} onToggleTheme={toggle}>
       <Page theme={theme} />
     </AppShell>
   );

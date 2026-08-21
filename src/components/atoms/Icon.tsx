@@ -13,8 +13,7 @@ export type IconName =
   | 'chart'
   | 'reset'
   | 'light'
-  | 'dark'
-  | 'device';
+  | 'dark';
 
 /**
  * アイコンの図形。
@@ -47,8 +46,6 @@ const PATHS: Record<IconName, string[]> = {
   ],
   /** 暗い配色。 */
   dark: ['M20 14.3A8.5 8.5 0 0 1 9.7 4 8.5 8.5 0 1 0 20 14.3z'],
-  /** 端末の設定に合わせる。 */
-  device: ['M3.5 5.5h17v10h-17z', 'M9 20.5h6', 'M12 15.5v5'],
 };
 
 export interface IconProps {
