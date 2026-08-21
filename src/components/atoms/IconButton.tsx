@@ -1,4 +1,4 @@
-import { CONTROL, CONTROL_HOVER } from '../classes';
+import { CONTROL_HOVER, CONTROL_SQUARE } from '../classes';
 import { Icon, type IconName } from './Icon';
 
 export interface IconButtonProps {
@@ -22,7 +22,7 @@ export function IconButton({ icon, label, onClick }: IconButtonProps) {
   return (
     <button
       type="button"
-      className={`${CONTROL} ${CONTROL_HOVER} inline-flex items-center justify-center px-sm`}
+      className={`${CONTROL_SQUARE} ${CONTROL_HOVER} inline-flex items-center justify-center`}
       aria-label={label}
       title={label}
       onClick={onClick}

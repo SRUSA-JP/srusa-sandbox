@@ -10,13 +10,23 @@
  */
 
 /**
- * 操作部品（ボタン・プルダウン）。
+ * 操作部品の箱。ボタン・プルダウン・入力欄が共通で持つ面・枠・高さ。
  *
- * 上下の余白（`py-sm`）と本文の行の高さで、指で押せる高さ（44px 以上）になる。
- * 余白を詰めるときは、この高さを割らないか確かめること。
+ * **高さはここだけが決める。** 高さ ＝ 上下の余白 × 2 ＋ 文字の行の高さ ＋ 枠線 × 2。
+ * 本文の行の高さ（1.6）をそのまま使うと縦に伸びてしまうので、操作部品だけ
+ * `leading-tight` にして、文字の大きさから素直に高さが決まるようにする。
+ * いまの組み合わせで約 35px（WCAG 2.2 の触れる大きさの下限 24px は満たす）。
+ *
+ * 左右の余白は中身によって変わるので、ここには入れない。使う側が足す。
  */
-export const CONTROL =
-  'cursor-pointer rounded-md border-hairline border-control-line bg-control px-lg py-sm text-md text-control-ink transition-colors';
+export const CONTROL_BOX =
+  'rounded-md border-hairline border-control-line bg-control py-xs text-md leading-tight text-control-ink transition-colors';
+
+/** 文字が入る操作部品（ボタン・プルダウン）。 */
+export const CONTROL = `${CONTROL_BOX} cursor-pointer px-lg`;
+
+/** 絵だけの操作部品。左右の余白を詰めて、縦横がだいたい同じ大きさになるようにする。 */
+export const CONTROL_SQUARE = `${CONTROL_BOX} cursor-pointer px-xs`;
 
 /** 絵と文字を横に並べるとき（ボタンの中身）。 */
 export const CONTROL_ROW = 'inline-flex items-center gap-xs';
@@ -32,9 +42,8 @@ export const CONTROL_DISABLED =
 /** 見出し付きの入力欄（「下限 [___]」のような並び）。 */
 export const FIELD = 'inline-flex items-center gap-xs text-md text-muted';
 
-/** 入力欄そのもの。 */
-export const FIELD_INPUT =
-  'w-[var(--sr-layout-number-input-width)] rounded-md border-hairline border-control-line bg-control px-md py-sm text-md text-control-ink';
+/** 入力欄そのもの。ボタンやプルダウンと同じ高さに揃える。 */
+export const FIELD_INPUT = `${CONTROL_BOX} w-[var(--sr-layout-number-input-width)] px-md`;
 
 /** 節（グラフ 1 枚 = 記事の 1 節）。枠で囲わず、余白だけで区切る。 */
 export const SECTION = 'mb-section';
