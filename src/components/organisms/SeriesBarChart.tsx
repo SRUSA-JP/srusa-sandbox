@@ -12,6 +12,7 @@ import {
 import { AXIS, BAR, GRID_DASH, LEGEND, VALUE_LABEL } from '../../config/charts';
 import { useChartMetrics } from '../../hooks/useChartMetrics';
 import { figureColors } from '../../config/colors';
+import { CHART_TEXT } from '../../config/messages';
 import { skinnedFontSize, skinnedRadius } from '../../config/skins';
 import type { StackedSeries } from '../../lib/selectors';
 import { formatValue, formatWithUnit } from '../../lib/display';
@@ -28,16 +29,17 @@ export interface SeriesBarChartProps {
   categoryKey?: string;
   unit?: string;
   height?: number;
-  /**
-   * 積み上げ時に値ラベルを出す下限（棒全体の最大値に対する比率）。
-   * 細いセグメントに数字が重なるのを防ぐ。
-   */
-  labelThreshold?: number;
 }
 
 /**
  * 複数系列の棒グラフ（積み上げ / 横並び）。
+ *
  * 系列の色は登録順で固定するので、系列を絞っても残りの色は変わらない。
+ *
+ * 積み上げのときは、セグメントの中に数字を書かない。細い帯に数字が重なって
+ * 読めないうえ、色の面の上に載るので文字色も安定しない。積み上げで読み取れる
+ * のは「全体の大きさ」と「割合」までにして、正確な値はツールチップに任せる。
+ * 横並びのときは棒の上に余白があるので、そのまま数字を出す。
  */
 export function SeriesBarChart({
   data,
@@ -46,18 +48,10 @@ export function SeriesBarChart({
   categoryKey = 'name',
   unit = '',
   height,
-  labelThreshold = VALUE_LABEL.minRatio,
 }: SeriesBarChartProps) {
   const metrics = useChartMetrics();
   const colors = figureColors(theme);
   const color = colors.series(data.series.map((s) => s.key));
-
-  /* 積み上げの各セグメントに数字を置くので、細すぎる分だけ間引く基準を作る */
-  const maxTotal = data.rows.reduce((acc, row) => {
-    const total = data.series.reduce((sum, s) => sum + Number(row[s.key] ?? 0), 0);
-    return Math.max(acc, total);
-  }, 0);
-  const minLabelValue = maxTotal * labelThreshold;
 
   return (
     <ResponsiveContainer width="100%" height={height ?? metrics.height.tall}>
@@ -79,19 +73,24 @@ export function SeriesBarChart({
         />
         <Tooltip
           cursor={{ fill: colors.cursor }}
-          content={({ active, payload, label }) =>
-            active && payload?.length ? (
-              <ChartTooltip
-                theme={theme}
-                title={String(label)}
-                rows={payload.map((item) => ({
-                  label: String(item.name),
-                  value: formatWithUnit(Number(item.value), unit),
-                  color: typeof item.color === 'string' ? item.color : undefined,
-                }))}
-              />
-            ) : null
-          }
+          content={({ active, payload, label }) => {
+            if (!active || !payload?.length) return null;
+            const rows = payload.map((item) => ({
+              label: String(item.name),
+              value: formatWithUnit(Number(item.value), unit),
+              color: typeof item.color === 'string' ? item.color : undefined,
+            }));
+            /* 積み上げは中に数字を書かないので、全体の大きさはここで読ませる */
+            if (stacked && rows.length > 1) {
+              const total = payload.reduce((sum, item) => sum + Number(item.value ?? 0), 0);
+              rows.push({
+                label: CHART_TEXT.stackTotal,
+                value: formatWithUnit(total, unit),
+                color: undefined,
+              });
+            }
+            return <ChartTooltip theme={theme} title={String(label)} rows={rows} />;
+          }}
         />
         <Legend
           wrapperStyle={{ color: colors.axis, fontSize: skinnedFontSize(LEGEND.fontSize), paddingTop: LEGEND.paddingTop }}
@@ -113,19 +112,16 @@ export function SeriesBarChart({
             }
             isAnimationActive={false}
           >
-            <LabelList
-              dataKey={series.key}
-              position={stacked ? 'center' : 'top'}
-              /* 積み上げは色面の上に載るので、その塗りに対して読める色を都度求める */
-              fill={stacked ? colors.labelOn(color(series.key)) : colors.axis}
-              fontSize={skinnedFontSize(VALUE_LABEL.fontSize)}
-              formatter={(value) => {
-                const numeric = Number(value);
-                if (!numeric) return '';
-                if (stacked && numeric < minLabelValue) return '';
-                return formatValue(numeric);
-              }}
-            />
+            {/* 積み上げの中には数字を置かない（詳しい値はツールチップで見せる） */}
+            {!stacked && (
+              <LabelList
+                dataKey={series.key}
+                position="top"
+                fill={colors.axis}
+                fontSize={skinnedFontSize(VALUE_LABEL.fontSize)}
+                formatter={(value) => (Number(value) ? formatValue(Number(value)) : '')}
+              />
+            )}
           </Bar>
         ))}
       </BarChart>

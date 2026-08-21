@@ -53,11 +53,6 @@ export const VALUE_LABEL = {
   captionFontSize: FONT_SIZE.xxs,
   /** ラベルと図形の距離。 */
   offset: SPACE.md,
-  /**
-   * 積み上げでラベルを出す下限（棒全体の最大値に対する比率）。
-   * 細いセグメントに数字が重なるのを防ぐ。
-   */
-  minRatio: 0.06,
 } as const;
 
 /** 凡例。 */
