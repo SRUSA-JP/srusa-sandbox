@@ -9,6 +9,7 @@
 | --- | --- |
 | 色 | [src/theme/palette.ts](src/theme/palette.ts) |
 | アイコン・タイトル・説明（タブとホーム画面） | [src/config/pwa.ts](src/config/pwa.ts) |
+| プレイヤー仮アイコンの色 | [src/config/playerIcons.ts](src/config/playerIcons.ts) |
 | 文字の大きさ・余白・角丸・線・寸法 | [src/theme/tokens.ts](src/theme/tokens.ts) |
 | 部品ごとの色の割り当て | [src/config/colors.ts](src/config/colors.ts) |
 | ページごとの見た目（スキン） | [src/config/skins.ts](src/config/skins.ts) |
@@ -194,6 +195,19 @@ styles/index.css   Tailwind のトークン（bg-table-head など）
   絵そのものは読み上げから外し、意味は隣の文字が持つ。
   文字を置けない場所（配色の切り替え）だけ絵だけのボタンにし、
   読み上げ用の説明を必ず付ける。説明は状態ではなく**押すと何になるか**で書く
+- **Minecraft のプレイヤー仮アイコン**: プレイヤー名から固定生成する 8 × 8 のピクセル顔として扱う。
+  色は [src/config/playerIcons.ts](src/config/playerIcons.ts) に置き、部品は
+  [src/components/molecules/PlayerIconPlaceholder.tsx](src/components/molecules/PlayerIconPlaceholder.tsx) に閉じ込める。
+  人物カードや切替スロットのような意味のあるまとまりは organisms 側で組み立てる。
+- **Discovery / Inventory 風スロット**: 記録や実績は、横長カードだけでなく正方形に近いスロットとして並べてよい。
+  広い画面では列数を増やし、狭い画面では `auto-fit` と `minmax()` で自然に折り返す。
+  スロット内のアイテム風アイコンは装飾ではなく、採掘・移動・死亡・戦闘などの意味と対応させる。
+- **Minecraft 風テクスチャ**: 公式テクスチャ画像は同梱せず、ピクセル状の面・グリッド・凹凸を CSS で作る。
+  石やインベントリ枠の質感は [src/lib/minecraftTextures.ts](src/lib/minecraftTextures.ts) に閉じ込め、
+  コンポーネント側に色や影の実値を散らさない。
+- **Minecraft 統計ページの密度**: トップはゲーム画面の HUD / Inventory として見せるため、
+  Hero・Overview・Discovery・Filter の間は `section` ではなく `xxl` 程度に詰める。
+  説明文は最初に大きく挟まず、下部の読み物に回して、初期表示で主役の統計画面がすぐ見えるようにする。
 
 ---
 
@@ -270,6 +284,26 @@ Tailwind の `sm:` `md:` と同じ値に揃えてある
 
 グラフの寸法を切り替える判断は `useChartMetrics()` の 1 か所だけにある。
 コンポーネントは「今の画面に合った値」を受け取るだけで、幅を見ない。
+
+### 相関図
+
+相関図は、人物・所属・関係を同時に読むための地図として扱う。
+主役は「誰がどこに属し、誰とつながっているか」で、装飾よりも重なりの少なさを優先する。
+
+- **人物ノード**: 1 人につき 1 ノードだけを描く。同じ人物を所属ごとに複製しない。
+  複数の所属は、ノードの複製ではなくグループ領域の重なりで表す
+- **グループ領域**: 所属者を囲う面として描き、面積が大きい領域を奥、小さい領域を手前に置く。
+  大学・研究室・学校などの入れ子は、領域の重なりとラベルで読む
+- **関係線**: 人物の位置を読ませる補助線。常に主張しすぎない色と太さにし、
+  強調時だけ線・関連ノード・領域のコントラストを上げる
+- **中心人物と強調**: 中心人物や選択中グループは、色だけでなく太さ・面・表示順でも区別する。
+  状態を色だけに頼らない
+- **操作**: 図は `ViewportFrame` に入れ、枠の中で掴んで動かす・拡大縮小する。
+  人物ノードだけは個別に動かせるが、動かした後の領域と関係線は現在位置から再計算する
+- **責務の分け方**: 配置は [src/map/layout.ts](src/map/layout.ts)、見た目の判断は
+  [src/map/display.ts](src/map/display.ts)、描画部品は
+  `GroupRegion` / `PersonNode` / `RelationEdge` / `RelationshipMap` に分ける。
+  コンポーネント内で分類色・線幅・ラベル文言を直接決めない
 
 ---
 
