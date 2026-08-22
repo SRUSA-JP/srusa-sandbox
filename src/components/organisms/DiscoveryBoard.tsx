@@ -21,31 +21,35 @@ export function DiscoveryBoard({ discoveries, text, theme }: DiscoveryBoardProps
   return (
     <section className={SECTION}>
       <SectionHeader title={text.title} note={text.note} />
-      <div className="grid gap-lg md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-md grid-cols-[repeat(auto-fit,minmax(160px,1fr))]">
         {discoveries.map((discovery) => {
           const color = theme.categorical[discovery.colorIndex % theme.categorical.length] ?? theme.accent;
           const ink = readableTextOn(color, theme);
           return (
             <article
               key={discovery.key}
-              className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-md border-thick border-divider bg-surface p-lg"
+              className="flex aspect-square min-w-0 flex-col justify-between border-thick border-divider bg-surface p-md"
             >
-              <div
-                className="grid size-[var(--sr-space-section)] place-items-center border-thick font-bold"
-                style={{ backgroundColor: color, borderColor: color, color: ink }}
-                aria-hidden
-              >
-                {discovery.icon}
-              </div>
-              <div className="min-w-0">
+              <div className="flex items-start justify-between gap-sm">
                 <p
-                  className="mb-xxs inline-flex border-hairline px-xs py-xxs text-xs font-bold"
+                  className="min-w-0 border-hairline px-xs py-xxs text-xs font-bold leading-tight"
                   style={{ borderColor: color, backgroundColor: withAlpha(color, 0.14), color }}
                 >
                   {discovery.kind === 'outlier' ? text.anomaly : text.kinds[discovery.kind]}
                 </p>
+                <div
+                  className="grid size-[var(--sr-space-xxl)] shrink-0 place-items-center border-thick text-sm font-bold"
+                  style={{ backgroundColor: color, borderColor: color, color: ink }}
+                  aria-hidden
+                >
+                  {discovery.icon}
+                </div>
+              </div>
+              <div className="min-w-0">
                 <h3 className="truncate text-lg font-bold leading-tight text-heading">{discovery.player}</h3>
-                <p className="font-mono text-display font-bold leading-tight text-heading">{discovery.value}</p>
+                <p className="truncate font-mono text-lg font-bold leading-tight text-heading">
+                  {discovery.value}
+                </p>
                 <p className="text-sm text-muted">{discovery.metric}</p>
               </div>
             </article>
