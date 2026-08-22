@@ -296,7 +296,7 @@ export function playerStatuses(doc: StatsDocument, limit = 6): PlayerStatus[] {
         rarest: rare.id,
         rarestRank: rankMaps.get(rare.id)?.get(player.name) ?? 1,
         playtimeHours: player.playtime.hours,
-        scores: normalized.slice(0, 5),
+        scores: normalized,
       };
     })
     .sort((a, b) => b.playtimeHours - a.playtimeHours)
