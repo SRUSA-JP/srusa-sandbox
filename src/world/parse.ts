@@ -29,6 +29,11 @@ function requireString(value: unknown, field: string): string {
   return value;
 }
 
+function optionalString(value: unknown, field: string): string | undefined {
+  if (value === undefined) return undefined;
+  return requireString(value, field);
+}
+
 function requireNumber(value: unknown, field: string): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
     throw new WorldMapDataError(DATA_TEXT.notNumber, field);
@@ -52,6 +57,7 @@ function parseMap(raw: unknown, index: number): WorldMap {
   const pixels = requireRecord(record.pixels, `${field}.pixels`);
   return {
     id: requireString(record.id, `${field}.id`),
+    label: optionalString(record.label, `${field}.label`),
     image: requireString(record.image, `${field}.image`),
     bounds: parseBounds(record.bounds, `${field}.bounds`),
     pixels: {

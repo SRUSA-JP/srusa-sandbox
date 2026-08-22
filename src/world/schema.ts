@@ -16,6 +16,8 @@ export interface WorldBounds {
 export interface WorldMap {
   /** BlueMap のマップ名（overworld / nether など）。 */
   id: string;
+  /** 画面に出す表示名。未指定なら id をそのまま使う。 */
+  label?: string;
   /** public/ からの相対パス。 */
   image: string;
   bounds: WorldBounds;

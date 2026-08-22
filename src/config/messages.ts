@@ -282,6 +282,10 @@ export const WORLD_MAP_TEXT = {
     alt: (world: string) => `${world}を真上から見た地図`,
   },
 
+  picker: {
+    map: '表示する地図',
+  },
+
   /** 地図の規模。見出しの下に出す。 */
   summary: (world: string, width: number, height: number, bytes: number) =>
     `${world} / ${formatInt(width)} × ${formatInt(height)} ブロック（${formatMegabytes(bytes)}）`,

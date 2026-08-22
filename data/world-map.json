@@ -2,8 +2,9 @@
   "source": "BlueMap lowres LOD1",
   "maps": [
     {
-      "id": "overworld",
-      "image": "world-map/overworld.png",
+      "id": "overworld-current",
+      "label": "既存ワールド",
+      "image": "world-map/overworld-current.png",
       "bounds": {
         "minX": -702,
         "minZ": -1024,
@@ -16,6 +17,57 @@
       },
       "blocksPerPixel": 1,
       "bytes": 1240285
+    },
+    {
+      "id": "overworld-20260822-0715",
+      "label": "オーバーワールド（2026-08-22 07:15）",
+      "image": "world-map/overworld-20260822-0715.png",
+      "bounds": {
+        "minX": -1024,
+        "minZ": -1024,
+        "maxX": 1025,
+        "maxZ": 1025
+      },
+      "pixels": {
+        "width": 2049,
+        "height": 2049
+      },
+      "blocksPerPixel": 1,
+      "bytes": 1369646
+    },
+    {
+      "id": "end",
+      "label": "エンド（2026-08-22 07:15）",
+      "image": "world-map/end.png",
+      "bounds": {
+        "minX": -4062,
+        "minZ": -862,
+        "maxX": 245,
+        "maxZ": 1602
+      },
+      "pixels": {
+        "width": 4307,
+        "height": 2464
+      },
+      "blocksPerPixel": 1,
+      "bytes": 281308
+    },
+    {
+      "id": "twilightforest",
+      "label": "黄昏の森（2026-08-22 07:15）",
+      "image": "world-map/twilightforest.png",
+      "bounds": {
+        "minX": -2206,
+        "minZ": -510,
+        "maxX": 418,
+        "maxZ": 2242
+      },
+      "pixels": {
+        "width": 2624,
+        "height": 2752
+      },
+      "blocksPerPixel": 1,
+      "bytes": 3137263
     }
   ]
 }
