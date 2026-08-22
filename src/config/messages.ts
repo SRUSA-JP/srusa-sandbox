@@ -155,6 +155,9 @@ export const STATS_TEXT = {
       title: 'PLAYER STATUS',
       note: '複数の統計を組み合わせて、プレイヤーごとの遊び方をスコア化しています。',
       level: (level: number) => `Lv. ${formatInt(level)}`,
+      skinAlt: (name: string) => `${name} の Minecraft スキン`,
+      selectPlayer: 'プレイヤー切替',
+      selectPlayerAlt: (name: string) => `${name} のステータスを見る`,
       primary: 'PRIMARY STYLE',
       rarest: 'RAREST STAT',
       styles: {
