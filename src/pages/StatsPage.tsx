@@ -271,7 +271,6 @@ export function StatsPage({ theme }: StatsPageProps) {
           ? STATS_TEXT.source({ generatedOn: doc.generated_on, players: allRows.length })
           : undefined
       }
-      lead={MINECRAFT_CONTENT.lead}
       actions={
         <>
           {datasets.length > 1 && (
@@ -351,7 +350,14 @@ export function StatsPage({ theme }: StatsPageProps) {
 
         {doc && (
           <>
-            <MinecraftHero text={STATS_TEXT.experience.hero} records={inventoryRecords} theme={theme} />
+            <MinecraftHero
+              text={STATS_TEXT.experience.hero}
+              records={inventoryRecords}
+              theme={theme}
+              activePlayers={kpi.players}
+              totalPlayers={allRows.length}
+              seasonLevel={Math.max(1, Math.round(kpi.playtime / 24))}
+            />
 
             <KpiGrid>
               <KpiTile

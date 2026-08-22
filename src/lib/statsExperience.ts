@@ -77,6 +77,14 @@ function diamondOres(player: NamedPlayer): number {
   return sumKeys(player.production.mined, DIAMOND_ORES);
 }
 
+function totalActivity(players: NamedPlayer[], key: string): number {
+  return players.reduce((acc, player) => acc + (player.activity[key] ?? 0), 0);
+}
+
+function totalProduction(players: NamedPlayer[], key: 'items_used'): number {
+  return players.reduce((acc, player) => acc + player.production[key], 0);
+}
+
 function playerByName(players: NamedPlayer[], name: string): NamedPlayer | undefined {
   return players.find((player) => player.name === name);
 }
@@ -86,32 +94,67 @@ export function serverInventory(doc: StatsDocument): InventoryRecord[] {
   const diamonds = players.reduce((acc, player) => acc + diamondOres(player), 0);
   return [
     {
-      key: 'playtime',
-      label: 'PLAY TIME',
+      key: 'ranking',
+      label: 'TIME',
       value: `${formatCompactNumber(doc.totals.playtime_hours)}h`,
       icon: 'XP',
       colorIndex: 5,
     },
     {
-      key: 'blocks',
+      key: 'mining',
       label: 'MINED',
       value: formatCompactNumber(doc.totals.blocks_mined),
       icon: 'PX',
       colorIndex: 3,
     },
     {
-      key: 'distance',
+      key: 'records',
+      label: 'DIA',
+      value: formatCompactNumber(diamonds),
+      icon: 'DI',
+      colorIndex: 2,
+    },
+    {
+      key: 'travel',
       label: 'TRAVEL',
       value: `${formatCompactNumber(doc.totals.distance_km)}km`,
       icon: 'CP',
       colorIndex: 0,
     },
     {
-      key: 'diamonds',
-      label: 'DIAMOND',
-      value: formatCompactNumber(diamonds),
-      icon: 'DI',
-      colorIndex: 2,
+      key: 'collection',
+      label: 'CRAFT',
+      value: formatCompactNumber(doc.totals.items_crafted),
+      icon: 'CH',
+      colorIndex: 4,
+    },
+    {
+      key: 'building',
+      label: 'USE',
+      value: formatCompactNumber(totalProduction(players, 'items_used')),
+      icon: 'BR',
+      colorIndex: 6,
+    },
+    {
+      key: 'farming',
+      label: 'BRED',
+      value: formatCompactNumber(totalActivity(players, 'animals_bred')),
+      icon: 'WH',
+      colorIndex: 1,
+    },
+    {
+      key: 'deaths',
+      label: 'DEATHS',
+      value: formatCompactNumber(doc.totals.deaths),
+      icon: 'SK',
+      colorIndex: 7,
+    },
+    {
+      key: 'achievements',
+      label: 'ADV',
+      value: formatCompactNumber(doc.totals.advancements),
+      icon: 'EY',
+      colorIndex: 0,
     },
   ];
 }
