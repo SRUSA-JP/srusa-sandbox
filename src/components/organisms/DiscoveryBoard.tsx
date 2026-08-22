@@ -1,6 +1,6 @@
 import type { Discovery, DiscoveryKind } from '../../lib/statsExperience';
-import { readableTextOn, withAlpha, type VizTheme } from '../../theme/palette';
-import { SECTION } from '../classes';
+import { slotSurface } from '../../lib/minecraftTextures';
+import { readableTextOn, type VizTheme } from '../../theme/palette';
 import { SectionHeader } from '../molecules/SectionHeader';
 
 export interface DiscoveryBoardText {
@@ -19,42 +19,42 @@ export interface DiscoveryBoardProps {
 /** 自動抽出した面白い記録を、実績スロットのように並べる。 */
 export function DiscoveryBoard({ discoveries, text, theme }: DiscoveryBoardProps) {
   return (
-    <section className={SECTION}>
+    <section className="mb-xxl">
       <SectionHeader title={text.title} note={text.note} />
-      <div className="grid gap-md grid-cols-[repeat(auto-fit,minmax(160px,1fr))]">
-        {discoveries.map((discovery) => {
-          const color = theme.categorical[discovery.colorIndex % theme.categorical.length] ?? theme.accent;
-          const ink = readableTextOn(color, theme);
-          return (
-            <article
-              key={discovery.key}
-              className="flex aspect-square min-w-0 flex-col justify-between border-thick border-divider bg-surface p-md"
-            >
-              <div className="flex items-start justify-between gap-sm">
-                <p
-                  className="min-w-0 border-hairline px-xs py-xxs text-xs font-bold leading-tight"
-                  style={{ borderColor: color, backgroundColor: withAlpha(color, 0.14), color }}
-                >
-                  {discovery.kind === 'outlier' ? text.anomaly : text.kinds[discovery.kind]}
-                </p>
-                <div
-                  className="grid size-[var(--sr-space-xxl)] shrink-0 place-items-center border-thick text-sm font-bold"
-                  style={{ backgroundColor: color, borderColor: color, color: ink }}
-                  aria-hidden
-                >
-                  {discovery.icon}
+      <div className="border-thick border-divider bg-sunken p-xs" style={slotSurface(theme)}>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(112px,1fr))] gap-xxs">
+          {discoveries.map((discovery) => {
+            const color = theme.categorical[discovery.colorIndex % theme.categorical.length] ?? theme.accent;
+            const ink = readableTextOn(color, theme);
+            return (
+              <article
+                key={discovery.key}
+                className="grid aspect-square min-w-0 grid-rows-[minmax(0,1fr)_auto] border-thick border-divider bg-surface p-xxs"
+                style={slotSurface(theme)}
+                aria-label={`${discovery.kind === 'outlier' ? text.anomaly : text.kinds[discovery.kind]}: ${
+                  discovery.player
+                } ${discovery.value} ${discovery.metric}`}
+              >
+                <div className="grid min-h-0 place-items-center">
+                  <div
+                    className="grid size-[calc(var(--sr-space-xxl)*1.35)] place-items-center border-thick text-md font-bold"
+                    style={{ ...slotSurface(theme, color), borderColor: color, color: ink }}
+                    aria-hidden
+                  >
+                    {discovery.icon}
+                  </div>
                 </div>
-              </div>
-              <div className="min-w-0">
-                <h3 className="truncate text-lg font-bold leading-tight text-heading">{discovery.player}</h3>
-                <p className="truncate font-mono text-lg font-bold leading-tight text-heading">
-                  {discovery.value}
-                </p>
-                <p className="text-sm text-muted">{discovery.metric}</p>
-              </div>
-            </article>
-          );
-        })}
+
+                <div className="min-w-0 border-t-hairline border-divider pt-xxs">
+                  <p className="truncate font-mono text-md font-bold leading-tight text-heading">
+                    {discovery.value}
+                  </p>
+                  <p className="truncate text-xs font-bold leading-tight text-muted">{discovery.player}</p>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
