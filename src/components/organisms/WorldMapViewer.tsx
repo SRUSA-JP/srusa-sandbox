@@ -27,8 +27,9 @@ export interface WorldMapViewerProps {
 export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
   const panZoom = usePanZoom(map.pixels.width, map.pixels.height, WORLD_MAP_ZOOM);
   const [pointed, setPointed] = useState<BlockPoint | null>(null);
+  const [selected, setSelected] = useState<BlockPoint | null>(null);
 
-  const world = WORLD_LABELS[map.id] ?? map.id;
+  const world = map.label ?? WORLD_LABELS[map.id] ?? map.id;
   const area = visibleArea(panZoom.view, panZoom.box);
   const center = blockAt(map, { x: (area.from.x + area.to.x) / 2, y: (area.from.y + area.to.y) / 2 });
   const mark = markStyle(theme, panZoom.view.scale);
@@ -37,7 +38,7 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
     <ViewportFrame
       panZoom={panZoom}
       label={WORLD_MAP_TEXT.card.alt(world)}
-      status={coordinateStatus(pointed, center)}
+      status={coordinateStatus(pointed, center, selected)}
     >
       <div
         className="relative origin-top-left"
@@ -50,6 +51,11 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
           const point = panZoom.toContentPoint(event.clientX, event.clientY);
           const block = blockAt(map, point);
           setPointed(isInside(map, block) ? block : null);
+        }}
+        onClick={(event) => {
+          const point = panZoom.toContentPoint(event.clientX, event.clientY);
+          const block = blockAt(map, point);
+          setSelected(isInside(map, block) ? block : null);
         }}
         onPointerLeave={() => setPointed(null)}
       >
@@ -97,6 +103,24 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
               </g>
             );
           })}
+          {selected && isInside(map, selected) && (
+            <g transform={`translate(${pixelOf(map, selected).x} ${pixelOf(map, selected).y})`}>
+              <circle
+                r={mark.arm * 0.55}
+                fill="none"
+                stroke={mark.haloColor}
+                strokeWidth={mark.haloWidth}
+                vectorEffect="non-scaling-stroke"
+              />
+              <circle
+                r={mark.arm * 0.55}
+                fill="none"
+                stroke={theme.accent}
+                strokeWidth={mark.strokeWidth}
+                vectorEffect="non-scaling-stroke"
+              />
+            </g>
+          )}
         </svg>
       </div>
     </ViewportFrame>

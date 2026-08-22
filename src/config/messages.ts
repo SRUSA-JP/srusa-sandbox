@@ -292,6 +292,8 @@ export const WORLD_MAP_TEXT = {
 
   /** 指している場所の座標。 */
   pointer: (x: number, z: number) => `X ${formatInt(x)} / Z ${formatInt(z)}`,
+  /** クリックして選んだ場所の座標。 */
+  selected: (x: number, z: number) => `選択 X ${formatInt(x)} / Z ${formatInt(z)}`,
   /** 指していないときに出す、画面の中心の座標。 */
   center: (x: number, z: number) => `中心 X ${formatInt(x)} / Z ${formatInt(z)}`,
 

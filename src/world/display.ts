@@ -73,7 +73,12 @@ export function markStyle(theme: VizTheme, scale: number) {
   };
 }
 
-/** 画面下に出す座標の表示。指していないときは、いま見ている中心を出す。 */
-export function coordinateStatus(block: BlockPoint | null, center: BlockPoint): string {
-  return block ? WORLD_MAP_TEXT.pointer(block.x, block.z) : WORLD_MAP_TEXT.center(center.x, center.z);
+/** 画面下に出す座標の表示。選択、ポインタ、中心の順に優先する。 */
+export function coordinateStatus(
+  pointed: BlockPoint | null,
+  center: BlockPoint,
+  selected: BlockPoint | null = null,
+): string {
+  if (selected) return WORLD_MAP_TEXT.selected(selected.x, selected.z);
+  return pointed ? WORLD_MAP_TEXT.pointer(pointed.x, pointed.z) : WORLD_MAP_TEXT.center(center.x, center.z);
 }
