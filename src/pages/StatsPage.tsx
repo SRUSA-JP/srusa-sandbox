@@ -354,9 +354,6 @@ export function StatsPage({ theme }: StatsPageProps) {
               text={STATS_TEXT.experience.hero}
               records={inventoryRecords}
               theme={theme}
-              activePlayers={kpi.players}
-              totalPlayers={allRows.length}
-              seasonLevel={Math.max(1, Math.round(kpi.playtime / 24))}
             />
 
             <KpiGrid>

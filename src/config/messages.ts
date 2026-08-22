@@ -135,25 +135,6 @@ export const STATS_TEXT = {
       title: 'STATS',
       season: 'Season 2026',
       inventory: 'INV',
-      hud: {
-        activity: 'ACT',
-        players: 'PLAYERS',
-        level: (level: number) => `Lv.${formatInt(level)}`,
-      },
-      hotbar: {
-        label: '切替',
-        slots: [
-          { key: 'ranking', label: 'RANKING', icon: 'SW' },
-          { key: 'mining', label: 'MINING', icon: 'PX' },
-          { key: 'records', label: 'RECORDS', icon: 'DI' },
-          { key: 'travel', label: 'TRAVEL', icon: 'CP' },
-          { key: 'collection', label: 'ITEMS', icon: 'CH' },
-          { key: 'building', label: 'BUILD', icon: 'BR' },
-          { key: 'farming', label: 'FARM', icon: 'WH' },
-          { key: 'deaths', label: 'DEATHS', icon: 'SK' },
-          { key: 'achievements', label: 'ADV', icon: 'EY' },
-        ],
-      },
     },
     overview: 'SERVER OVERVIEW',
     discovery: {
