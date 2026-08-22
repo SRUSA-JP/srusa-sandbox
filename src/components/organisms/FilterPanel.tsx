@@ -1,7 +1,6 @@
 import { METRICS, STATS_TEXT } from '../../config';
 import { metricOption } from '../../lib/display';
 import type { NumericPlayerRowKey } from '../../lib/selectors';
-import { SECTION } from '../classes';
 import { Button, NumberField, Picker } from '../atoms';
 import { SectionHeader } from '../molecules/SectionHeader';
 
@@ -39,7 +38,7 @@ export function FilterPanel({
   const filtered = shown !== total;
 
   return (
-    <section className={SECTION}>
+    <section className="mb-xxl">
       <SectionHeader
         title={STATS_TEXT.filter.title}
         note={STATS_TEXT.filter.note(shown, total)}
