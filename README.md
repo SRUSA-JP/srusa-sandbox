@@ -135,7 +135,9 @@ npm run build:world-map
 ```
 
 `public/world-map/<マップ名>.png` と、範囲・縮尺を書いた [data/world-map.json](data/world-map.json) が更新されます。
-BlueMap の出力が別の場所にあるときは `npm run build:world-map -- --source <パス> --map overworld` で指定します。
+BlueMap の出力が別の場所にあるときは `npm run build:world-map -- --source <パス> --map nether` で指定します。
+ネザーだけ差し替えるときは `cd ../srusa-portal/bluemap && ./render.sh -r nether` のあとに、
+このリポジトリで `npm run build:world-map -- --map nether` を実行します。
 
 3D の見た目はページに載せられないので、BlueMap の 3D 表示を撮った画像を `public/images/` に置き、
 [src/content/worldMap.ts](src/content/worldMap.ts) の節に追記します。
