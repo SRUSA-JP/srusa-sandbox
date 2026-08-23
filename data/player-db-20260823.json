@@ -311,7 +311,7 @@
       "sources": {
         "stats_name": "dekkaishi",
         "daily_name": "dekkaishi",
-        "relationship_id": null,
+        "relationship_id": "dekkaishi",
         "skin_name": "dekkaishi"
       },
       "ids": {
@@ -320,36 +320,6 @@
       "assets": {
         "icon_path": "player-skins/icons/dekkaishi-adc8b5b2-7b2a-48eb-9823-4690d0ccada4-face.png",
         "skin_path": "player-skins/skins/dekkaishi-adc8b5b2-7b2a-48eb-9823-4690d0ccada4.png",
-        "icon_override_path": null,
-        "skin_override_path": null
-      },
-      "relationship": {
-        "attributes": [],
-        "related_ids": []
-      },
-      "data_updated_on": {
-        "stats": "2026-08-23",
-        "daily": "2026-08-23",
-        "skins": "2026-08-23T04:43:50.640Z",
-        "relationship": null
-      }
-    },
-    "dekkaisi": {
-      "username": "dekkaisi",
-      "slug": "dekkaisi",
-      "aliases": [],
-      "sources": {
-        "stats_name": null,
-        "daily_name": null,
-        "relationship_id": "dekkaisi",
-        "skin_name": null
-      },
-      "ids": {
-        "minecraft_uuid": null
-      },
-      "assets": {
-        "icon_path": null,
-        "skin_path": null,
         "icon_override_path": null,
         "skin_override_path": null
       },

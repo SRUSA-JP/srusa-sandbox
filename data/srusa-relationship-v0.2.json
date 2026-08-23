@@ -11,7 +11,7 @@
     { "id": "n", "onlineName": "N", "attributes": ["幼稚園", "小学校", "中学校", "塾"], "nicknames": [] },
     { "id": "mitiglia", "onlineName": "mitiglia", "attributes": ["K高校", "塾"], "nicknames": [] },
     { "id": "natch", "onlineName": "natch", "attributes": ["K高校", "塾"], "nicknames": [] },
-    { "id": "dekkaisi", "onlineName": "dekkaisi", "attributes": ["K高校", "テニス部"], "nicknames": [] },
+    { "id": "dekkaishi", "onlineName": "dekkaishi", "attributes": ["K高校", "テニス部"], "nicknames": [] },
     { "id": "kagyki", "onlineName": "kagyki", "attributes": ["K高校", "塾"], "nicknames": [] },
     { "id": "alias", "onlineName": "alias", "attributes": ["塾", "D大学"], "nicknames": [] },
     { "id": "juniamal", "onlineName": "juniamal", "attributes": ["塾", "M大学"], "nicknames": [] },
