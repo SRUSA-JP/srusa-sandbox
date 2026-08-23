@@ -30,7 +30,7 @@ export interface PlayerPageProps {
 export function PlayerPage({ theme, route }: PlayerPageProps) {
   const [doc, setDoc] = useState<StatsDocument | null>(null);
   const [error, setError] = useState('');
-  const dataset = listDatasets()[0];
+  const dataset = useMemo(() => listDatasets()[0], []);
 
   useEffect(() => {
     if (!dataset) return;

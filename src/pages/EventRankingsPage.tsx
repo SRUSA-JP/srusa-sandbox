@@ -30,7 +30,7 @@ export function EventRankingsPage({ theme }: EventRankingsPageProps) {
   const [error, setError] = useState('');
   const [eventId, setEventId] = useState<EventId>(EVENT_RANKING_DEFAULT_EVENT_ID);
   const [metric, setMetric] = useState<EventMetric>(EVENT_RANKING_DEFAULT_METRIC);
-  const dataset = listDatasets()[0];
+  const dataset = useMemo(() => listDatasets()[0], []);
 
   useEffect(() => {
     if (!dataset) return;
