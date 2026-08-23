@@ -28,6 +28,7 @@ import {
   mutedFill,
   readableTextOn,
   tooltipSurface,
+  withAlpha,
   type TooltipSurfaceStyle,
   type VizTheme,
 } from '../theme/palette';
@@ -202,7 +203,70 @@ export function uiCssVariables(theme: VizTheme): Record<string, string> {
 export const COLOR_SLOTS = {
   /** 単一系列のグラフ・強調表示。 */
   primary: 0,
+  /** プレイヤーデータでトップ級の値を示す色。 */
+  playerTop: 3,
+  /** プレイヤーデータで目立つ値を示す色。 */
+  playerNotable: 1,
 } as const;
+
+export type PlayerDataHighlightLevel = 'normal' | 'notable' | 'top';
+
+export const PLAYER_DATA_HIGHLIGHT = {
+  topRank: 1,
+  notableRank: 3,
+  notableAverageRatio: 1.5,
+  scatterTopShare: 0.82,
+  topFillAlpha: 0.18,
+  notableFillAlpha: 0.12,
+} as const;
+
+export function playerDataHighlightLevel({
+  rank,
+  averageRatio,
+  maxShare,
+}: {
+  rank?: number;
+  averageRatio?: number;
+  maxShare?: number;
+}): PlayerDataHighlightLevel {
+  if (rank !== undefined && rank <= PLAYER_DATA_HIGHLIGHT.topRank) return 'top';
+  if (rank !== undefined && rank <= PLAYER_DATA_HIGHLIGHT.notableRank) return 'notable';
+  if (averageRatio !== undefined && averageRatio >= PLAYER_DATA_HIGHLIGHT.notableAverageRatio) return 'notable';
+  if (maxShare !== undefined && maxShare >= PLAYER_DATA_HIGHLIGHT.scatterTopShare) return 'notable';
+  return 'normal';
+}
+
+export function playerDataHighlightColors(
+  theme: VizTheme,
+  level: PlayerDataHighlightLevel,
+  fallback: string = theme.accent,
+): { border: string; fill: string; bar: string; text: string } {
+  const roles = roleColors(theme);
+  if (level === 'top') {
+    const color = theme.categorical[COLOR_SLOTS.playerTop % theme.categorical.length];
+    return {
+      border: color,
+      fill: withAlpha(color, PLAYER_DATA_HIGHLIGHT.topFillAlpha),
+      bar: color,
+      text: ensureContrast(color, theme.surfaceHover, CONTRAST_MIN_TEXT),
+    };
+  }
+  if (level === 'notable') {
+    const color = theme.categorical[COLOR_SLOTS.playerNotable % theme.categorical.length];
+    return {
+      border: color,
+      fill: withAlpha(color, PLAYER_DATA_HIGHLIGHT.notableFillAlpha),
+      bar: color,
+      text: ensureContrast(color, theme.surfaceHover, CONTRAST_MIN_TEXT),
+    };
+  }
+  return {
+    border: roles.border,
+    fill: roles.sunken,
+    bar: fallback,
+    text: roles.text,
+  };
+}
 
 export interface FigureColors {
   /** 軸・目盛り・凡例・データラベルの文字。 */

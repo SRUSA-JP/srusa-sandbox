@@ -7,12 +7,8 @@ export function stoneTexture(theme: VizTheme): Record<string, string> {
     backgroundImage: [
       `linear-gradient(90deg, ${withAlpha(theme.borderStrong, 0.28)} 1px, transparent 1px)`,
       `linear-gradient(${withAlpha(theme.borderStrong, 0.22)} 1px, transparent 1px)`,
-      `linear-gradient(135deg, ${withAlpha(theme.surfaceRaised, 0.38)} 0 25%, transparent 25% 50%, ${withAlpha(
-        theme.border,
-        0.26,
-      )} 50% 75%, transparent 75%)`,
     ].join(', '),
-    backgroundSize: 'var(--sr-space-xl) var(--sr-space-xl), var(--sr-space-xl) var(--sr-space-xl), var(--sr-space-xxl) var(--sr-space-xxl)',
+    backgroundSize: 'var(--sr-space-xl) var(--sr-space-xl), var(--sr-space-xl) var(--sr-space-xl)',
   };
 }
 

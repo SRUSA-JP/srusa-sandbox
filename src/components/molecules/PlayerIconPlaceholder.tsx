@@ -1,4 +1,4 @@
-import { PLAYER_ICON_COLORS } from '../../config/playerIcons';
+import { PLAYER_ICON_COLORS, PLAYER_ICON_IMAGES } from '../../config/playerIcons';
 import { withAlpha } from '../../theme/palette';
 
 export interface PlayerIconPlaceholderProps {
@@ -95,6 +95,7 @@ function playerIconPixels(name: string, accent: string): string[] {
 
 /** プレイヤー名から固定生成する Minecraft 風の仮アイコン。 */
 export function PlayerIconPlaceholder({ name, accent, alt, size = 'normal' }: PlayerIconPlaceholderProps) {
+  const image = PLAYER_ICON_IMAGES[name];
   const pixels = playerIconPixels(name, accent);
   const sizeClass =
     size === 'large'
@@ -108,11 +109,21 @@ export function PlayerIconPlaceholder({ name, accent, alt, size = 'normal' }: Pl
       role="img"
       aria-label={alt}
     >
-      <div className="grid h-full w-full grid-cols-8 grid-rows-8" aria-hidden>
-        {pixels.map((color, index) => (
-          <span key={`${name}-${index}`} style={{ backgroundColor: color }} />
-        ))}
-      </div>
+      {image ? (
+        <img
+          src={`${import.meta.env.BASE_URL}${image}`}
+          alt=""
+          className="h-full w-full object-cover"
+          draggable={false}
+          aria-hidden
+        />
+      ) : (
+        <div className="grid h-full w-full grid-cols-8 grid-rows-8" aria-hidden>
+          {pixels.map((color, index) => (
+            <span key={`${name}-${index}`} style={{ backgroundColor: color }} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

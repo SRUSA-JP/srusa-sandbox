@@ -8,6 +8,7 @@ export * from './MetricScatter';
 export * from './MinecraftHero';
 export * from './NoticePanel';
 export * from './PlayerStatusGallery';
+export * from './PlayerDailyTimeline';
 export * from './ProsePanel';
 export * from './RankBarChart';
 export * from './RelationshipMap';

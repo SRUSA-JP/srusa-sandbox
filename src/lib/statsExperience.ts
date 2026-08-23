@@ -1,7 +1,7 @@
 import type { NamedPlayer, StatsDocument } from '../data/schema';
 import { toNamedPlayers } from '../data/parse';
 import type { PlayerRow } from './selectors';
-import { playerRows, round } from './selectors';
+import { applyBasis, basisDivisor, perUnit, playerRows, round, type RateBasis } from './selectors';
 
 export type DiscoveryKind =
   | 'playtime'
@@ -37,6 +37,16 @@ export interface PlaystyleScore {
   value: number;
 }
 
+export type PlayerMetricId = 'playtime' | 'distance' | 'deaths' | 'mobKills' | 'blocksMined' | 'advancements';
+
+export interface PlayerStatusMetric {
+  id: PlayerMetricId;
+  value: number;
+  rank: number;
+  percentOfMax: number;
+  averageRatio: number;
+}
+
 export interface PlayerStatus {
   name: string;
   level: number;
@@ -46,6 +56,13 @@ export interface PlayerStatus {
   rarest: PlaystyleId;
   rarestRank: number;
   playtimeHours: number;
+  distanceKm: number;
+  deaths: number;
+  mobKills: number;
+  blocksMined: number;
+  advancements: number;
+  diamondOres: number;
+  metrics: PlayerStatusMetric[];
   scores: PlaystyleScore[];
 }
 
@@ -252,9 +269,53 @@ function rawPlaystyle(player: NamedPlayer): Record<PlaystyleId, number> {
   };
 }
 
-export function playerStatuses(doc: StatsDocument, limit = 6): PlayerStatus[] {
+function applyPlaystyleBasis(scores: Record<PlaystyleId, number>, player: NamedPlayer, basis: RateBasis) {
+  if (basis === 'total') return scores;
+  const divisor = basisDivisor(player.playtime.hours, basis);
+  return Object.fromEntries(
+    (Object.keys(scores) as PlaystyleId[]).map((id) => [id, perUnit(scores[id], divisor)]),
+  ) as Record<PlaystyleId, number>;
+}
+
+function rawMetricValue(player: NamedPlayer, id: PlayerMetricId): number {
+  switch (id) {
+    case 'playtime':
+      return player.playtime.hours;
+    case 'distance':
+      return player.movement.total_km;
+    case 'deaths':
+      return player.deaths.total;
+    case 'mobKills':
+      return player.combat.mob_kills;
+    case 'blocksMined':
+      return player.production.blocks_mined;
+    case 'advancements':
+      return player.advancements.count;
+  }
+}
+
+function metricValue(player: NamedPlayer, id: PlayerMetricId, basis: RateBasis): number {
+  const raw = rawMetricValue(player, id);
+  return id === 'playtime' ? raw : applyBasis(raw, player.playtime.hours, basis);
+}
+
+export function playerStatuses(doc: StatsDocument, limit?: number, basis: RateBasis = 'per_playtime_hour'): PlayerStatus[] {
   const players = toNamedPlayers(doc);
-  const raw = players.map((player) => ({ player, scores: rawPlaystyle(player) }));
+  const raw = players.map((player) => ({ player, scores: applyPlaystyleBasis(rawPlaystyle(player), player, basis) }));
+  const metricIds: PlayerMetricId[] = ['playtime', 'distance', 'blocksMined', 'mobKills', 'deaths', 'advancements'];
+  const metricStats = new Map(
+    metricIds.map((id) => {
+      const values = players.map((player) => metricValue(player, id, basis));
+      const max = Math.max(...values, 1);
+      const average = values.reduce((acc, value) => acc + value, 0) / Math.max(values.length, 1);
+      const ranks = new Map(
+        [...players]
+          .sort((a, b) => metricValue(b, id, basis) - metricValue(a, id, basis))
+          .map((player, index) => [player.name, index + 1]),
+      );
+      return [id, { max, average, ranks }];
+    }),
+  );
   const maxByStyle = Object.fromEntries(
     (['miner', 'builder', 'explorer', 'fighter', 'farmer', 'fisher', 'trader'] as const).map((style) => [
       style,
@@ -274,7 +335,7 @@ export function playerStatuses(doc: StatsDocument, limit = 6): PlayerStatus[] {
     );
   }
 
-  return raw
+  const statuses = raw
     .map(({ player, scores }) => {
       const normalized = (Object.keys(scores) as PlaystyleId[])
         .map((id) => ({ id, value: Math.round((scores[id] / maxByStyle[id]) * 100) }))
@@ -296,11 +357,29 @@ export function playerStatuses(doc: StatsDocument, limit = 6): PlayerStatus[] {
         rarest: rare.id,
         rarestRank: rankMaps.get(rare.id)?.get(player.name) ?? 1,
         playtimeHours: player.playtime.hours,
+        distanceKm: player.movement.total_km,
+        deaths: player.deaths.total,
+        mobKills: player.combat.mob_kills,
+        blocksMined: player.production.blocks_mined,
+        advancements: player.advancements.count,
+        diamondOres: diamondOres(player),
+        metrics: metricIds.map((id) => {
+          const stats = metricStats.get(id);
+          const value = metricValue(player, id, basis);
+          return {
+            id,
+            value,
+            rank: stats?.ranks.get(player.name) ?? 1,
+            percentOfMax: Math.round((value / (stats?.max ?? 1)) * 100),
+            averageRatio: stats && stats.average > 0 ? value / stats.average : 0,
+          };
+        }),
         scores: normalized,
       };
     })
-    .sort((a, b) => b.playtimeHours - a.playtimeHours)
-    .slice(0, limit);
+    .sort((a, b) => (b.scores[0]?.value ?? 0) - (a.scores[0]?.value ?? 0) || b.playtimeHours - a.playtimeHours);
+
+  return typeof limit === 'number' ? statuses.slice(0, limit) : statuses;
 }
 
 export function namedPlayerForStatus(doc: StatsDocument, status: PlayerStatus): NamedPlayer | undefined {

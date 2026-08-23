@@ -135,11 +135,13 @@ export const STATS_TEXT = {
       title: 'STATS',
       season: 'Season 2026',
       inventory: 'INV',
+      display: '表示',
     },
     overview: 'SERVER OVERVIEW',
     discovery: {
       title: 'SERVER DISCOVERY',
       note: '集計値の中から、その日いちばん目立っている記録を自動で拾っています。',
+      display: '表示',
       anomaly: 'ANOMALY FOUND',
       kinds: {
         playtime: 'LONGEST LOGIN',
@@ -158,8 +160,17 @@ export const STATS_TEXT = {
       skinAlt: (name: string) => `${name} の Minecraft スキン`,
       selectPlayer: 'プレイヤー切替',
       selectPlayerAlt: (name: string) => `${name} のステータスを見る`,
+      basis: '評価基準',
       primary: 'PRIMARY STYLE',
       rarest: 'RAREST STAT',
+      metrics: {
+        playtime: 'PLAY',
+        distance: 'TRAVEL',
+        deaths: 'DEATHS',
+        mobKills: 'KILLS',
+        blocksMined: 'MINED',
+        advancements: 'ADV',
+      },
       styles: {
         miner: 'MINER',
         builder: 'BUILDER',
@@ -178,6 +189,16 @@ export const STATS_TEXT = {
         fisher: '水辺の記録だけ妙に濃い釣り人タイプ',
         trader: '村人経済を回して装備と物資を整える商人タイプ',
       },
+    },
+    daily: {
+      title: 'PLAYER DAILY LOG',
+      note: 'バックアップ間の差分から、プレイヤーごとの伸び方を日付別に見ます。',
+      player: 'プレイヤー',
+      metric: '指標',
+      lastActive: '直近活動',
+      total: '期間合計',
+      empty: 'この期間の活動はありません',
+      playerList: 'プレイヤー一覧',
     },
     achievement: {
       title: 'ACHIEVEMENT BOARD',
@@ -207,6 +228,7 @@ export const STATS_TEXT = {
     xAxis: '横軸',
     yAxis: '縦軸',
     trendScope: '表示単位',
+    pointDisplay: '点の表示',
   },
 
   /** 各グラフの見出しと注記。 */
@@ -283,7 +305,17 @@ export const WORLD_MAP_TEXT = {
   },
 
   picker: {
-    map: '表示する地図',
+    view: '表示',
+    map: '版',
+    log: 'ログ',
+  },
+
+  log: {
+    title: '生成ログ',
+    dimension: 'DIM',
+    area: '範囲',
+    pixels: 'PNG',
+    size: 'SIZE',
   },
 
   /** 地図の規模。見出しの下に出す。 */
@@ -296,6 +328,12 @@ export const WORLD_MAP_TEXT = {
   selected: (x: number, z: number) => `選択 X ${formatInt(x)} / Z ${formatInt(z)}`,
   /** 指していないときに出す、画面の中心の座標。 */
   center: (x: number, z: number) => `中心 X ${formatInt(x)} / Z ${formatInt(z)}`,
+  tooltip: {
+    title: '座標',
+    current: (x: number, z: number) => `X ${formatInt(x)} / Z ${formatInt(z)}`,
+    nether: (x: number, z: number) => `ネザー X ${formatInt(x)} / Z ${formatInt(z)}`,
+    overworld: (x: number, z: number) => `通常世界 X ${formatInt(x)} / Z ${formatInt(z)}`,
+  },
 
   /**
    * 3D の見た目を写真で見せる節。

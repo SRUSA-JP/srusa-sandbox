@@ -15,6 +15,7 @@ import {
   NoticePanel,
   Note,
   Picker,
+  PlayerDailyTimeline,
   PlayerStatusGallery,
   ProsePanel,
   RankBarChart,
@@ -72,6 +73,7 @@ import {
   type Snapshot,
 } from '../lib/selectors';
 import { playerStatuses, serverDiscoveries, serverInventory } from '../lib/statsExperience';
+import { loadPlayerDailyDocument } from '../data/playerDaily';
 import { downloadJson, type Row } from '../lib/export';
 import { formatDecimal, formatHours } from '../lib/format';
 import { useChartMetrics } from '../hooks/useChartMetrics';
@@ -80,6 +82,14 @@ import type { VizTheme } from '../theme/palette';
 export interface StatsPageProps {
   theme: VizTheme;
 }
+
+type ScatterPointDisplay = 'icon_name' | 'icon' | 'name';
+
+const SCATTER_POINT_DISPLAY_OPTIONS: Array<{ value: ScatterPointDisplay; label: string }> = [
+  { value: 'icon_name', label: 'アイコン＋名前' },
+  { value: 'icon', label: 'アイコン' },
+  { value: 'name', label: '名前' },
+];
 
 /** Minecraft サーバー統計の画面。 */
 export function StatsPage({ theme }: StatsPageProps) {
@@ -104,14 +114,18 @@ export function StatsPage({ theme }: StatsPageProps) {
   const [breakdownBasis, setBreakdownBasis] = useState<RateBasis>('total');
   const [seriesId, setSeriesId] = useState<SeriesId>('movement');
   const [seriesBasis, setSeriesBasis] = useState<RateBasis>('total');
+  const [statusBasis, setStatusBasis] = useState<RateBasis>('per_playtime_hour');
+  const [statusPlayerName, setStatusPlayerName] = useState('');
   const [scatterX, setScatterX] = useState<NumericPlayerRowKey>('playtime_hours');
   const [scatterY, setScatterY] = useState<NumericPlayerRowKey>('mob_kills');
   const [scatterBasis, setScatterBasis] = useState<RateBasis>('total');
+  const [scatterPointDisplay, setScatterPointDisplay] = useState<ScatterPointDisplay>('icon_name');
   const [trendMetric, setTrendMetric] = useState<NumericPlayerRowKey>('playtime_hours');
   const [trendBasis, setTrendBasis] = useState<RateBasis>('total');
   const [trendScope, setTrendScope] = useState<TrendScope>('total');
   /** 日付ごとの推移に使う全スナップショット。 */
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
+  const statusSection = useRef<HTMLDivElement>(null);
 
   const changeTrendBasis = useCallback((basis: RateBasis) => {
     setTrendBasis(basis);
@@ -128,6 +142,13 @@ export function StatsPage({ theme }: StatsPageProps) {
     setScatterBasis(basis);
     setScatterX((metric) => keepRatable(metric, basis));
     setScatterY((metric) => keepRatable(metric, basis));
+  }, []);
+
+  const jumpToPlayerStatus = useCallback((name: string) => {
+    setStatusPlayerName(name);
+    window.requestAnimationFrame(() => {
+      statusSection.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }, []);
 
   useEffect(() => {
@@ -210,7 +231,8 @@ export function StatsPage({ theme }: StatsPageProps) {
   );
   const inventoryRecords = useMemo(() => (doc ? serverInventory(doc) : []), [doc]);
   const discoveries = useMemo(() => (doc ? serverDiscoveries(doc) : []), [doc]);
-  const statusCards = useMemo(() => (doc ? playerStatuses(doc) : []), [doc]);
+  const statusCards = useMemo(() => (doc ? playerStatuses(doc, undefined, statusBasis) : []), [doc, statusBasis]);
+  const playerDaily = useMemo(() => loadPlayerDailyDocument(), []);
 
   const rankOption = metricOption(rankMetric);
   const scatterXOption = metricOption(scatterX);
@@ -384,11 +406,30 @@ export function StatsPage({ theme }: StatsPageProps) {
               theme={theme}
             />
 
-            <PlayerStatusGallery
-              players={statusCards}
+            <div ref={statusSection}>
+              <PlayerStatusGallery
+                players={statusCards}
+                text={{
+                  ...STATS_TEXT.experience.playstyle,
+                  note: joinNotes(
+                    STATS_TEXT.experience.playstyle.note,
+                    basisNote(statusBasis, STATS_TEXT.basisNote.subject.each),
+                  ),
+                  achievementTitles: STATS_TEXT.experience.achievement.titles,
+                }}
+                theme={theme}
+                basis={statusBasis}
+                onBasisChange={setStatusBasis}
+                selectedName={statusPlayerName}
+                onSelectedNameChange={setStatusPlayerName}
+              />
+            </div>
+
+            <PlayerDailyTimeline
+              doc={playerDaily}
               text={{
-                ...STATS_TEXT.experience.playstyle,
-                achievementTitles: STATS_TEXT.experience.achievement.titles,
+                ...STATS_TEXT.experience.daily,
+                skinAlt: STATS_TEXT.experience.playstyle.skinAlt,
               }}
               theme={theme}
             />
@@ -628,6 +669,12 @@ export function StatsPage({ theme }: StatsPageProps) {
                     options={BASIS_OPTIONS}
                     onChange={changeScatterBasis}
                   />
+                  <Picker
+                    label={STATS_TEXT.picker.pointDisplay}
+                    value={scatterPointDisplay}
+                    options={SCATTER_POINT_DISPLAY_OPTIONS}
+                    onChange={setScatterPointDisplay}
+                  />
                 </>
               }
               tableRows={scatterPoints.map<Row>((point) => ({
@@ -650,6 +697,8 @@ export function StatsPage({ theme }: StatsPageProps) {
                 yLabel={scatterYOption.label}
                 xUnit={unitFor(scatterXOption.unit, scatterBasis)}
                 yUnit={unitFor(scatterYOption.unit, scatterBasis)}
+                pointDisplay={scatterPointDisplay}
+                onPointClick={(point) => jumpToPlayerStatus(point.name)}
               />
             </ChartCard>
           </>
