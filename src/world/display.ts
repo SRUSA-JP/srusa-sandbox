@@ -83,6 +83,16 @@ export function coverage(map: WorldMap): { width: number; height: number } {
   };
 }
 
+/** 画面に出す地図の収録座標範囲。max は実際に含まれる最後のブロック座標にする。 */
+export function coordinateBounds(map: WorldMap): { minX: number; maxX: number; minZ: number; maxZ: number } {
+  return {
+    minX: map.bounds.minX,
+    maxX: map.bounds.maxX - 1,
+    minZ: map.bounds.minZ,
+    maxZ: map.bounds.maxZ - 1,
+  };
+}
+
 /**
  * 目印の見た目。
  *

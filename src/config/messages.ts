@@ -314,14 +314,21 @@ export const WORLD_MAP_TEXT = {
     title: '生成ログ',
     dimension: 'DIM',
     area: '範囲',
+    bounds: '座標',
     pixels: 'PNG',
     size: 'SIZE',
     updated: '更新',
   },
 
   /** 地図の規模。見出しの下に出す。 */
-  summary: (world: string, width: number, height: number, bytes: number) =>
-    `${world} / ${formatInt(width)} × ${formatInt(height)} ブロック（${formatMegabytes(bytes)}）`,
+  summary: (
+    world: string,
+    width: number,
+    height: number,
+    bytes: number,
+    bounds: { minX: number; maxX: number; minZ: number; maxZ: number },
+  ) =>
+    `${world} / ${formatInt(width)} × ${formatInt(height)} ブロック（${formatMegabytes(bytes)}） / X ${formatInt(bounds.minX)}..${formatInt(bounds.maxX)} / Z ${formatInt(bounds.minZ)}..${formatInt(bounds.maxZ)}`,
 
   /** 指している場所の座標。 */
   pointer: (x: number, z: number) => `X ${formatInt(x)} / Z ${formatInt(z)}`,

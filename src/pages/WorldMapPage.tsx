@@ -4,7 +4,7 @@ import { APP_TEXT, WORLD_MAP_TEXT } from '../config/messages';
 import { WORLD_LABELS } from '../config/labels';
 import { WORLD_MAP_CONTENT } from '../content';
 import type { VizTheme } from '../theme/palette';
-import { coverage } from '../world/display';
+import { coordinateBounds, coverage } from '../world/display';
 import { loadWorldMaps } from '../world/data';
 import type { WorldMap } from '../world/schema';
 
@@ -32,6 +32,7 @@ function logRows(maps: WorldMap[]) {
       label: mapLabel(map),
       dimension: WORLD_LABELS[mapDimension(map)] ?? mapDimension(map),
       area: `${size.width} x ${size.height}`,
+      bounds: coordinateBounds(map),
       pixels: `${map.pixels.width} x ${map.pixels.height}`,
       bytes: `${(map.bytes / 1024 / 1024).toFixed(2)} MB`,
       updatedOn: map.updated_on ?? '-',
@@ -53,6 +54,9 @@ function WorldMapLog({ maps }: { maps: WorldMap[] }) {
           </p>
           <p className="font-mono text-muted">
             {WORLD_MAP_TEXT.log.area} {row.area}
+          </p>
+          <p className="font-mono text-muted">
+            {WORLD_MAP_TEXT.log.bounds} X {row.bounds.minX}..{row.bounds.maxX} / Z {row.bounds.minZ}..{row.bounds.maxZ}
           </p>
           <p className="font-mono text-muted">
             {WORLD_MAP_TEXT.log.pixels} {row.pixels}
@@ -97,7 +101,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
       title={WORLD_MAP_CONTENT.title}
       note={
         map && size
-          ? `${WORLD_MAP_TEXT.summary(selectedMapLabel, size.width, size.height, map.bytes)} / 更新 ${map.updated_on ?? document?.generated_on ?? '-'}`
+          ? `${WORLD_MAP_TEXT.summary(selectedMapLabel, size.width, size.height, map.bytes, coordinateBounds(map))} / 更新 ${map.updated_on ?? document?.generated_on ?? '-'}`
           : undefined
       }
       lead={WORLD_MAP_CONTENT.lead}
