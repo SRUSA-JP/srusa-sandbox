@@ -3,6 +3,7 @@ export * from './GroupRegion';
 export * from './KpiTile';
 export * from './PersonNode';
 export * from './PlayerIconPlaceholder';
+export * from './RankingPreviewCard';
 export * from './RelationEdge';
 export * from './SectionHeader';
 export * from './ViewportControls';

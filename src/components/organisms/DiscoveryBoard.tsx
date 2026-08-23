@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DISCOVERY_DEFAULT_DISPLAY_MODE } from '../../config/dataRegistry';
 import type { Discovery, DiscoveryKind } from '../../lib/statsExperience';
 import type { VizTheme } from '../../theme/palette';
 import { Picker } from '../atoms';
@@ -32,7 +33,7 @@ function discoveryTitle(discovery: Discovery, text: DiscoveryBoardText): string 
 
 /** 自動抽出した面白い記録を、読み取りやすい注目リストとして並べる。 */
 export function DiscoveryBoard({ discoveries, text, theme }: DiscoveryBoardProps) {
-  const [mode, setMode] = useState<DiscoveryDisplayMode>('featured');
+  const [mode, setMode] = useState<DiscoveryDisplayMode>(DISCOVERY_DEFAULT_DISPLAY_MODE);
   const featured = discoveries[0];
 
   return (

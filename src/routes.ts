@@ -7,7 +7,7 @@
  */
 import { MINECRAFT_SKIN, skinFor, type Skin } from './config/skins';
 
-export type RouteId = 'stats' | 'world-map' | 'relationships';
+export type RouteId = 'stats' | 'world-map' | 'relationships' | 'events' | 'player';
 
 export interface Route {
   id: RouteId;
@@ -17,6 +17,8 @@ export interface Route {
   label: string;
   /** この画面で使う見た目のプリセット（config/skins.ts）。 */
   skinId: string;
+  /** 動的ページだけが持つ URL パラメータ。 */
+  params?: Record<string, string>;
 }
 
 export const ROUTES: Route[] = [
@@ -29,6 +31,7 @@ export const ROUTES: Route[] = [
   },
   /* 相関図も Minecraft のページと同じドット絵風にする（サイト全体の雰囲気を揃えるため） */
   { id: 'relationships', path: '#/relationships', label: '相関図', skinId: MINECRAFT_SKIN.id },
+  { id: 'events', path: '#/events', label: 'イベント', skinId: MINECRAFT_SKIN.id },
 ];
 
 /** ハッシュが無い・知らないときに出す画面。 */
@@ -37,7 +40,19 @@ export const DEFAULT_ROUTE = ROUTES[0];
 /** URL のハッシュから画面を決める唯一の入口。 */
 export function routeFromHash(hash: string): Route {
   const normalized = hash.replace(/\/$/, '');
-  return ROUTES.find((route) => route.path === normalized) ?? DEFAULT_ROUTE;
+  const known = ROUTES.find((route) => route.path === normalized);
+  if (known) return known;
+  const player = normalized.match(/^#\/players\/(.+)$/);
+  if (player) {
+    return {
+      id: 'player',
+      path: normalized,
+      label: 'プレイヤー紹介',
+      skinId: MINECRAFT_SKIN.id,
+      params: { player: player[1] },
+    };
+  }
+  return DEFAULT_ROUTE;
 }
 
 /** その画面で使うスキン。 */

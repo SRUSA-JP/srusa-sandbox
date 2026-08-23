@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { PLAYER_DAILY_DEFAULT_METRIC, PLAYER_DAILY_RANKING_LIMIT } from '../../config/dataRegistry';
 import {
   lastActivePlayerDailyRow,
   PLAYER_DAILY_CATEGORY_KEY,
@@ -34,6 +35,7 @@ export interface PlayerDailyTimelineProps {
   doc: PlayerDailyDocument;
   text: PlayerDailyTimelineText;
   theme: VizTheme;
+  profileHref?: (name: string) => string;
 }
 
 function metricValue(metric: PlayerDailyMetricKey, value: number): string {
@@ -42,8 +44,12 @@ function metricValue(metric: PlayerDailyMetricKey, value: number): string {
       return formatHours(value);
     case 'distance_km':
       return `${formatDecimal(value)} km`;
+    case 'damage_dealt_hp':
+    case 'damage_taken_hp':
+      return `${formatDecimal(value)} HP`;
     case 'blocks_mined':
     case 'items_crafted':
+    case 'items_used':
     case 'items_picked_up':
     case 'items_dropped':
       return formatCompact(value);
@@ -57,10 +63,10 @@ function periodLabel(from: string, to: string): string {
 }
 
 /** 日付別の増分データを、プレイヤー単位で追えるパーソナルビュー。 */
-export function PlayerDailyTimeline({ doc, text, theme }: PlayerDailyTimelineProps) {
+export function PlayerDailyTimeline({ doc, text, theme, profileHref }: PlayerDailyTimelineProps) {
   const players = useMemo(() => playerDailyNames(doc), [doc]);
   const [selectedPlayer, setSelectedPlayer] = useState(players[0] ?? '');
-  const [metric, setMetric] = useState<PlayerDailyMetricKey>('playtime_hours');
+  const [metric, setMetric] = useState<PlayerDailyMetricKey>(PLAYER_DAILY_DEFAULT_METRIC);
   const effectivePlayer = players.includes(selectedPlayer) ? selectedPlayer : players[0];
   const metricOption = playerDailyMetricOption(metric);
   const totals = effectivePlayer ? playerDailyTotals(doc, effectivePlayer) : null;
@@ -79,12 +85,13 @@ export function PlayerDailyTimeline({ doc, text, theme }: PlayerDailyTimelinePro
   const accent = theme.categorical[Math.max(0, players.indexOf(effectivePlayer)) % theme.categorical.length] ?? theme.accent;
   const topValue = Math.max(...playerTotals.map((entry) => entry.value), 1);
   const averageValue = playerTotals.reduce((sum, entry) => sum + entry.value, 0) / Math.max(playerTotals.length, 1);
+  const href = profileHref?.(effectivePlayer);
 
   return (
     <section className={SECTION}>
       <SectionHeader
         title={text.title}
-        note={text.note}
+        note={`${text.note} 更新 ${doc.generated_on}`}
         actions={
           <>
             <Picker
@@ -108,7 +115,9 @@ export function PlayerDailyTimeline({ doc, text, theme }: PlayerDailyTimelinePro
           <div className="flex min-w-0 items-center gap-md border-thick border-divider bg-surface p-md">
             <PlayerIconPlaceholder name={effectivePlayer} accent={accent} alt={text.skinAlt(effectivePlayer)} size="large" />
             <div className="min-w-0">
-              <h3 className="truncate text-xl font-bold leading-tight text-heading">{effectivePlayer}</h3>
+              <h3 className="truncate text-xl font-bold leading-tight text-heading">
+                {href ? <a href={href} className="hover:underline">{effectivePlayer}</a> : effectivePlayer}
+              </h3>
               <p className="font-mono text-sm font-bold text-muted">
                 {text.total} {metricValue(metric, totals[metric])}
               </p>
@@ -119,7 +128,7 @@ export function PlayerDailyTimeline({ doc, text, theme }: PlayerDailyTimelinePro
           </div>
 
           <div className="grid grid-cols-[repeat(auto-fit,minmax(96px,1fr))] gap-xs">
-            {(['playtime_hours', 'distance_km', 'blocks_mined', 'mob_kills'] as const).map((key) => {
+            {(['playtime_hours', 'distance_km', 'blocks_mined', 'mob_kills', 'items_used', 'chests_opened'] as const).map((key) => {
               const option = playerDailyMetricOption(key);
               const allValues = players.map((player) => playerDailyTotals(doc, player)[key]);
               const rank = [...allValues].sort((a, b) => b - a).findIndex((value) => value === totals[key]) + 1;
@@ -146,7 +155,7 @@ export function PlayerDailyTimeline({ doc, text, theme }: PlayerDailyTimelinePro
               {text.playerList}
             </summary>
             <div className="grid gap-xs border-t-hairline border-divider p-xs">
-              {playerTotals.slice(0, 8).map((entry, index) => {
+              {playerTotals.slice(0, PLAYER_DAILY_RANKING_LIMIT).map((entry, index) => {
                 const rowAccent = theme.categorical[players.indexOf(entry.player) % theme.categorical.length] ?? theme.accent;
                 const selected = entry.player === effectivePlayer;
                 const level = playerDataHighlightLevel({

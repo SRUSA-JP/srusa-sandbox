@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { MINECRAFT_HERO_DEFAULT_DISPLAY_MODE } from '../../config/dataRegistry';
 import type { InventoryRecord } from '../../lib/statsExperience';
 import type { VizTheme } from '../../theme/palette';
 import { Picker } from '../atoms';
@@ -39,7 +40,7 @@ export function MinecraftHero({
   theme,
 }: MinecraftHeroProps) {
   const [selectedKey, setSelectedKey] = useState(records[0]?.key ?? '');
-  const [mode, setMode] = useState<StatsDisplayMode>('overview');
+  const [mode, setMode] = useState<StatsDisplayMode>(MINECRAFT_HERO_DEFAULT_DISPLAY_MODE);
   const selectedRecord = records.find((record) => record.key === selectedKey) ?? records[0];
   const maxValue = Math.max(...records.map(numericValue), 1);
 

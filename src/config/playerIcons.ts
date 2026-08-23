@@ -1,14 +1,4 @@
-import playerSkinManifest from '../../data/player-skins/manifest.json';
-
-interface PlayerSkinManifestEntry {
-  name: string;
-  face_icon_path: string;
-  skin_path: string;
-}
-
-interface PlayerSkinManifest {
-  players: PlayerSkinManifestEntry[];
-}
+import { allPlayerRecords, playerIconPath, playerSkinPath } from '../data/playerDb';
 
 /** プレイヤーアイコンのプレースホルダーに使う色。 */
 export const PLAYER_ICON_COLORS = {
@@ -30,14 +20,16 @@ export const PLAYER_ICON_OVERRIDES: Record<string, string> = {};
 /** スキン本体画像も個別に差し替えたい場合の手動上書き。 */
 export const PLAYER_SKIN_OVERRIDES: Record<string, string> = {};
 
-const manifest = playerSkinManifest as PlayerSkinManifest;
-
-const manifestIconImages: Record<string, string> = Object.fromEntries(
-  manifest.players.map((player) => [player.name, `player-skins/${player.face_icon_path}`]),
+const dbIconImages: Record<string, string> = Object.fromEntries(
+  allPlayerRecords()
+    .map((player) => [player.username, playerIconPath(player.username)] as const)
+    .filter((entry): entry is readonly [string, string] => Boolean(entry[1])),
 );
 
-const manifestSkinImages: Record<string, string> = Object.fromEntries(
-  manifest.players.map((player) => [player.name, `player-skins/${player.skin_path}`]),
+const dbSkinImages: Record<string, string> = Object.fromEntries(
+  allPlayerRecords()
+    .map((player) => [player.username, playerSkinPath(player.username)] as const)
+    .filter((entry): entry is readonly [string, string] => Boolean(entry[1])),
 );
 
 /**
@@ -47,15 +39,15 @@ const manifestSkinImages: Record<string, string> = Object.fromEntries(
  * スキンを再取得して manifest が更新されても、手動上書きはここに残せる。
  */
 export const PLAYER_ICON_IMAGES: Record<string, string> = {
-  ...manifestIconImages,
+  ...dbIconImages,
   ...PLAYER_ICON_OVERRIDES,
 };
 
 export const PLAYER_SKIN_IMAGES: Record<string, string> = {
-  ...manifestSkinImages,
+  ...dbSkinImages,
   ...PLAYER_SKIN_OVERRIDES,
 };
 
 export function playerIconImage(name: string): string | undefined {
-  return PLAYER_ICON_IMAGES[name] ?? PLAYER_ICON_IMAGES[name.toLowerCase()];
+  return PLAYER_ICON_OVERRIDES[name] ?? PLAYER_ICON_IMAGES[name] ?? playerIconPath(name);
 }

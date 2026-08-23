@@ -34,6 +34,7 @@ export interface PlayerStatusGalleryProps {
   onBasisChange: (basis: RateBasis) => void;
   selectedName?: string;
   onSelectedNameChange?: (name: string) => void;
+  profileHref?: (name: string) => string;
 }
 
 const RADAR_CENTER = 60;
@@ -214,6 +215,7 @@ function PlayerStatusCard({
   theme,
   totalPlayers,
   basis,
+  profileHref,
 }: {
   player: PlayerStatus;
   text: PlayerStatusText;
@@ -221,14 +223,18 @@ function PlayerStatusCard({
   theme: VizTheme;
   totalPlayers: number;
   basis: RateBasis;
+  profileHref?: (name: string) => string;
 }) {
+  const href = profileHref?.(player.name);
   return (
     <article className="grid gap-lg border-thick border-divider bg-surface p-lg lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.25fr)]">
       <div className="grid min-w-0 gap-md">
         <div className="flex min-w-0 items-start gap-md">
           <PlayerIconPlaceholder name={player.name} accent={accent} alt={text.skinAlt(player.name)} size="large" />
           <div className="min-w-0">
-            <h3 className="truncate text-2xl font-bold leading-tight text-heading">{player.name}</h3>
+            <h3 className="truncate text-2xl font-bold leading-tight text-heading">
+              {href ? <a href={href} className="hover:underline">{player.name}</a> : player.name}
+            </h3>
             <p className="font-mono text-md font-bold text-muted">{text.achievementTitles[player.title]}</p>
             <p className="mt-xxs text-sm text-muted">{text.level(player.level)}</p>
           </div>
@@ -294,6 +300,7 @@ export function PlayerStatusGallery({
   onBasisChange,
   selectedName,
   onSelectedNameChange,
+  profileHref,
 }: PlayerStatusGalleryProps) {
   const [internalSelectedName, setInternalSelectedName] = useState(players[0]?.name ?? '');
   const activeName = selectedName ?? internalSelectedName;
@@ -321,6 +328,7 @@ export function PlayerStatusGallery({
         theme={theme}
         totalPlayers={players.length}
         basis={basis}
+        profileHref={profileHref}
       />
 
       <div className="mt-lg">

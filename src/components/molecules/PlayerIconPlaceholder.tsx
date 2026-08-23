@@ -1,4 +1,4 @@
-import { PLAYER_ICON_COLORS, PLAYER_ICON_IMAGES } from '../../config/playerIcons';
+import { PLAYER_ICON_COLORS, playerIconImage } from '../../config/playerIcons';
 import { withAlpha } from '../../theme/palette';
 
 export interface PlayerIconPlaceholderProps {
@@ -95,7 +95,7 @@ function playerIconPixels(name: string, accent: string): string[] {
 
 /** プレイヤー名から固定生成する Minecraft 風の仮アイコン。 */
 export function PlayerIconPlaceholder({ name, accent, alt, size = 'normal' }: PlayerIconPlaceholderProps) {
-  const image = PLAYER_ICON_IMAGES[name];
+  const image = playerIconImage(name);
   const pixels = playerIconPixels(name, accent);
   const sizeClass =
     size === 'large'

@@ -1,17 +1,19 @@
 import type { ReactElement } from 'react';
 import { AppShell } from './components';
 import { useHashRoute } from './hooks/useHashRoute';
-import { MapPage, StatsPage, WorldMapPage } from './pages';
-import { skinForRoute, type RouteId } from './routes';
+import { EventRankingsPage, MapPage, PlayerPage, StatsPage, WorldMapPage } from './pages';
+import { skinForRoute, type Route, type RouteId } from './routes';
 import { setActiveSkin } from './config/skins';
 import { useAppTheme } from './theme/useThemeMode';
 import type { VizTheme } from './theme/palette';
 
 /** 画面 ID → 中身。並び順と URL は routes.ts が持つ。 */
-const PAGES: Record<RouteId, (props: { theme: VizTheme }) => ReactElement> = {
+const PAGES: Record<RouteId, (props: { theme: VizTheme; route: Route }) => ReactElement> = {
   stats: StatsPage,
   'world-map': WorldMapPage,
   relationships: MapPage,
+  events: EventRankingsPage,
+  player: PlayerPage,
 };
 
 /**
@@ -35,7 +37,7 @@ export function App() {
 
   return (
     <AppShell route={route} onNavigate={navigate} mode={mode} onToggleTheme={toggle}>
-      <Page theme={theme} />
+      <Page theme={theme} route={route} />
     </AppShell>
   );
 }

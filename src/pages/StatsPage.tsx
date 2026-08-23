@@ -7,6 +7,7 @@ import {
   Button,
   ChartCard,
   DiscoveryBoard,
+  FeaturedItemUseColumns,
   FilterPanel,
   KpiGrid,
   KpiTile,
@@ -29,10 +30,13 @@ import {
   BREAKDOWNS,
   LIMITS,
   PLAYER_COLUMN,
+  SCATTER_POINT_DISPLAY_OPTIONS,
   SERIES_OPTIONS,
+  STATS_DEFAULTS,
   STATS_TEXT,
   TREND_SCOPE_OPTIONS,
   type BreakdownId,
+  type ScatterPointDisplay,
   type SeriesId,
   type TrendScope,
 } from '../config';
@@ -74,6 +78,7 @@ import {
 } from '../lib/selectors';
 import { playerStatuses, serverDiscoveries, serverInventory } from '../lib/statsExperience';
 import { loadPlayerDailyDocument } from '../data/playerDaily';
+import { playerPath } from '../data/playerProfiles';
 import { downloadJson, type Row } from '../lib/export';
 import { formatDecimal, formatHours } from '../lib/format';
 import { useChartMetrics } from '../hooks/useChartMetrics';
@@ -82,14 +87,6 @@ import type { VizTheme } from '../theme/palette';
 export interface StatsPageProps {
   theme: VizTheme;
 }
-
-type ScatterPointDisplay = 'icon_name' | 'icon' | 'name';
-
-const SCATTER_POINT_DISPLAY_OPTIONS: Array<{ value: ScatterPointDisplay; label: string }> = [
-  { value: 'icon_name', label: 'アイコン＋名前' },
-  { value: 'icon', label: 'アイコン' },
-  { value: 'name', label: '名前' },
-];
 
 /** Minecraft サーバー統計の画面。 */
 export function StatsPage({ theme }: StatsPageProps) {
@@ -102,30 +99,29 @@ export function StatsPage({ theme }: StatsPageProps) {
   const fileInput = useRef<HTMLInputElement>(null);
 
   // 全グラフ共通の絞り込み
-  const [filterMetric, setFilterMetric] = useState<NumericPlayerRowKey>('playtime_hours');
+  const [filterMetric, setFilterMetric] = useState<NumericPlayerRowKey>(STATS_DEFAULTS.filterMetric);
   /** 利用者が動かした範囲。null なら指標の全範囲（＝絞り込みなし）。 */
   const [filterBounds, setFilterBounds] = useState<{ min: number; max: number } | null>(null);
 
   // 各グラフのパラメータ
-  const [rankMetric, setRankMetric] = useState<NumericPlayerRowKey>('playtime_hours');
-  const [rankBasis, setRankBasis] = useState<RateBasis>('total');
-  const [breakdown, setBreakdown] = useState<BreakdownId>('kills');
+  const [rankMetric, setRankMetric] = useState<NumericPlayerRowKey>(STATS_DEFAULTS.rankMetric);
+  const [rankBasis, setRankBasis] = useState<RateBasis>(STATS_DEFAULTS.rankBasis);
+  const [breakdown, setBreakdown] = useState<BreakdownId>(STATS_DEFAULTS.breakdown);
   const [breakdownPlayer, setBreakdownPlayer] = useState('');
-  const [breakdownBasis, setBreakdownBasis] = useState<RateBasis>('total');
-  const [seriesId, setSeriesId] = useState<SeriesId>('movement');
-  const [seriesBasis, setSeriesBasis] = useState<RateBasis>('total');
-  const [statusBasis, setStatusBasis] = useState<RateBasis>('per_playtime_hour');
+  const [breakdownBasis, setBreakdownBasis] = useState<RateBasis>(STATS_DEFAULTS.breakdownBasis);
+  const [seriesId, setSeriesId] = useState<SeriesId>(STATS_DEFAULTS.seriesId);
+  const [seriesBasis, setSeriesBasis] = useState<RateBasis>(STATS_DEFAULTS.seriesBasis);
+  const [statusBasis, setStatusBasis] = useState<RateBasis>(STATS_DEFAULTS.statusBasis);
   const [statusPlayerName, setStatusPlayerName] = useState('');
-  const [scatterX, setScatterX] = useState<NumericPlayerRowKey>('playtime_hours');
-  const [scatterY, setScatterY] = useState<NumericPlayerRowKey>('mob_kills');
-  const [scatterBasis, setScatterBasis] = useState<RateBasis>('total');
-  const [scatterPointDisplay, setScatterPointDisplay] = useState<ScatterPointDisplay>('icon_name');
-  const [trendMetric, setTrendMetric] = useState<NumericPlayerRowKey>('playtime_hours');
-  const [trendBasis, setTrendBasis] = useState<RateBasis>('total');
-  const [trendScope, setTrendScope] = useState<TrendScope>('total');
+  const [scatterX, setScatterX] = useState<NumericPlayerRowKey>(STATS_DEFAULTS.scatterX);
+  const [scatterY, setScatterY] = useState<NumericPlayerRowKey>(STATS_DEFAULTS.scatterY);
+  const [scatterBasis, setScatterBasis] = useState<RateBasis>(STATS_DEFAULTS.scatterBasis);
+  const [scatterPointDisplay, setScatterPointDisplay] = useState<ScatterPointDisplay>(STATS_DEFAULTS.scatterPointDisplay);
+  const [trendMetric, setTrendMetric] = useState<NumericPlayerRowKey>(STATS_DEFAULTS.trendMetric);
+  const [trendBasis, setTrendBasis] = useState<RateBasis>(STATS_DEFAULTS.trendBasis);
+  const [trendScope, setTrendScope] = useState<TrendScope>(STATS_DEFAULTS.trendScope);
   /** 日付ごとの推移に使う全スナップショット。 */
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
-  const statusSection = useRef<HTMLDivElement>(null);
 
   const changeTrendBasis = useCallback((basis: RateBasis) => {
     setTrendBasis(basis);
@@ -144,11 +140,8 @@ export function StatsPage({ theme }: StatsPageProps) {
     setScatterY((metric) => keepRatable(metric, basis));
   }, []);
 
-  const jumpToPlayerStatus = useCallback((name: string) => {
-    setStatusPlayerName(name);
-    window.requestAnimationFrame(() => {
-      statusSection.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+  const openPlayerProfile = useCallback((name: string) => {
+    window.location.hash = playerPath(name);
   }, []);
 
   useEffect(() => {
@@ -240,6 +233,10 @@ export function StatsPage({ theme }: StatsPageProps) {
   const trendMetricOption = metricOption(trendMetric);
   const currentBreakdown = breakdownOption(breakdown);
   const currentSeries = seriesOption(seriesId);
+  const statsDataDate = doc?.generated_on ?? '';
+  const trendDataDate = snapshots.length > 0
+    ? `${snapshots[0].label} - ${snapshots[snapshots.length - 1].label}`
+    : statsDataDate;
 
   const rankData = useMemo(
     () => rankBy(rows, rankMetric, { basis: rankBasis }),
@@ -400,13 +397,15 @@ export function StatsPage({ theme }: StatsPageProps) {
               />
             </KpiGrid>
 
+            <FeaturedItemUseColumns theme={theme} />
+
             <DiscoveryBoard
               discoveries={discoveries}
               text={STATS_TEXT.experience.discovery}
               theme={theme}
             />
 
-            <div ref={statusSection}>
+            <div>
               <PlayerStatusGallery
                 players={statusCards}
                 text={{
@@ -422,6 +421,7 @@ export function StatsPage({ theme }: StatsPageProps) {
                 onBasisChange={setStatusBasis}
                 selectedName={statusPlayerName}
                 onSelectedNameChange={setStatusPlayerName}
+                profileHref={playerPath}
               />
             </div>
 
@@ -432,6 +432,7 @@ export function StatsPage({ theme }: StatsPageProps) {
                 skinAlt: STATS_TEXT.experience.playstyle.skinAlt,
               }}
               theme={theme}
+              profileHref={playerPath}
             />
 
             <FilterPanel
@@ -447,7 +448,10 @@ export function StatsPage({ theme }: StatsPageProps) {
 
             <ChartCard
               title={STATS_TEXT.card.ranking.title}
-              note={basisNote(rankBasis, STATS_TEXT.basisNote.subject.each) || STATS_TEXT.card.ranking.note}
+              note={joinNotes(
+                basisNote(rankBasis, STATS_TEXT.basisNote.subject.each) || STATS_TEXT.card.ranking.note,
+                ` 更新 ${statsDataDate}`,
+              )}
               actions={
                 <>
                   <Picker
@@ -496,6 +500,7 @@ export function StatsPage({ theme }: StatsPageProps) {
                     basisNote(breakdownBasis, STATS_TEXT.basisNote.subject.target),
                     formatDecimal(breakdownHours),
                   ),
+                ` 更新 ${statsDataDate}`,
               )}
               actions={
                 <>
@@ -555,6 +560,7 @@ export function StatsPage({ theme }: StatsPageProps) {
               note={joinNotes(
                 currentSeries.note || STATS_TEXT.card.series.note,
                 basisNote(seriesBasis, STATS_TEXT.basisNote.subject.each),
+                ` 更新 ${statsDataDate}`,
               )}
               actions={
                 <>
@@ -598,6 +604,7 @@ export function StatsPage({ theme }: StatsPageProps) {
                 snapshots.length < 2 && STATS_TEXT.card.trend.singleSnapshot,
                 trendScope === 'per_player' && STATS_TEXT.card.trend.perPlayer(LIMITS.trendPlayers),
                 basisNote(trendBasis, STATS_TEXT.basisNote.subject.audience),
+                ` 更新 ${trendDataDate}`,
               )}
               actions={
                 <>
@@ -644,9 +651,12 @@ export function StatsPage({ theme }: StatsPageProps) {
               title={STATS_TEXT.card.scatter.title}
               note={
                 scatterBasis === 'total'
-                  ? STATS_TEXT.card.scatter.note
-                  : STATS_TEXT.card.scatter.bothAxes(
-                      basisNote(scatterBasis, STATS_TEXT.basisNote.subject.each),
+                  ? joinNotes(STATS_TEXT.card.scatter.note, ` 更新 ${statsDataDate}`)
+                  : joinNotes(
+                      STATS_TEXT.card.scatter.bothAxes(
+                        basisNote(scatterBasis, STATS_TEXT.basisNote.subject.each),
+                      ),
+                      ` 更新 ${statsDataDate}`,
                     )
               }
               actions={
@@ -698,7 +708,7 @@ export function StatsPage({ theme }: StatsPageProps) {
                 xUnit={unitFor(scatterXOption.unit, scatterBasis)}
                 yUnit={unitFor(scatterYOption.unit, scatterBasis)}
                 pointDisplay={scatterPointDisplay}
-                onPointClick={(point) => jumpToPlayerStatus(point.name)}
+                onPointClick={(point) => openPlayerProfile(point.name)}
               />
             </ChartCard>
           </>

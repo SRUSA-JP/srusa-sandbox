@@ -144,5 +144,47 @@ export const TREND_SCOPE_OPTIONS: Array<{ value: TrendScope; label: string }> = 
   { value: 'per_player', label: 'プレイヤー別' },
 ];
 
+export type ScatterPointDisplay = 'icon_name' | 'icon' | 'name';
+
+export const SCATTER_POINT_DISPLAY_OPTIONS: Array<{ value: ScatterPointDisplay; label: string }> = [
+  { value: 'icon_name', label: 'アイコン＋名前' },
+  { value: 'icon', label: 'アイコン' },
+  { value: 'name', label: '名前' },
+];
+
+export const STATS_DEFAULTS = {
+  filterMetric: 'playtime_hours',
+  rankMetric: 'playtime_hours',
+  rankBasis: 'total',
+  breakdown: 'kills',
+  breakdownBasis: 'total',
+  seriesId: 'movement',
+  seriesBasis: 'total',
+  statusBasis: 'per_playtime_hour',
+  scatterX: 'playtime_hours',
+  scatterY: 'mob_kills',
+  scatterBasis: 'total',
+  scatterPointDisplay: 'icon_name',
+  trendMetric: 'playtime_hours',
+  trendBasis: 'total',
+  trendScope: 'total',
+} satisfies {
+  filterMetric: NumericPlayerRowKey;
+  rankMetric: NumericPlayerRowKey;
+  rankBasis: RateBasis;
+  breakdown: BreakdownId;
+  breakdownBasis: RateBasis;
+  seriesId: SeriesId;
+  seriesBasis: RateBasis;
+  statusBasis: RateBasis;
+  scatterX: NumericPlayerRowKey;
+  scatterY: NumericPlayerRowKey;
+  scatterBasis: RateBasis;
+  scatterPointDisplay: ScatterPointDisplay;
+  trendMetric: NumericPlayerRowKey;
+  trendBasis: RateBasis;
+  trendScope: TrendScope;
+};
+
 /** 表の左端に置くプレイヤー列。 */
 export const PLAYER_COLUMN = { key: 'player', label: 'プレイヤー', align: 'left' } as const;
