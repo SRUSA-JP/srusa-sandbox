@@ -11,7 +11,7 @@ export const WORLD_LABELS: Record<string, string> = {
   overworld: 'オーバーワールド',
   nether: 'ネザー',
   end: 'ジ・エンド',
-  twilightforest: 'ツワイライトフォレスト',
+  twilightforest: '黄昏の森',
 };
 
 /** ワールドマップに置く目印の日本語ラベル（config/worldMap.ts の marks）。 */

@@ -3,6 +3,7 @@
   "maps": [
     {
       "id": "overworld-current",
+      "dimension": "overworld",
       "label": "既存ワールド",
       "image": "world-map/overworld-current.png",
       "bounds": {
@@ -20,6 +21,7 @@
     },
     {
       "id": "overworld-20260822-0715",
+      "dimension": "overworld",
       "label": "オーバーワールド（2026-08-22 07:15）",
       "image": "world-map/overworld-20260822-0715.png",
       "bounds": {
@@ -37,6 +39,7 @@
     },
     {
       "id": "end",
+      "dimension": "end",
       "label": "エンド（2026-08-22 07:15）",
       "image": "world-map/end.png",
       "bounds": {
@@ -54,6 +57,7 @@
     },
     {
       "id": "twilightforest",
+      "dimension": "twilightforest",
       "label": "黄昏の森（2026-08-22 07:15）",
       "image": "world-map/twilightforest.png",
       "bounds": {

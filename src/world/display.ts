@@ -17,6 +17,27 @@ export interface BlockPoint {
   z: number;
 }
 
+export type CoordinatePairKind = 'nether' | 'overworld';
+
+export interface CoordinatePair {
+  kind: CoordinatePairKind;
+  point: BlockPoint;
+}
+
+function mapDimension(map: WorldMap): string {
+  return map.dimension ?? map.id;
+}
+
+function isNetherMap(map: WorldMap): boolean {
+  const dimension = mapDimension(map).toLowerCase();
+  return dimension.includes('nether');
+}
+
+function isOverworldMap(map: WorldMap): boolean {
+  const dimension = mapDimension(map).toLowerCase();
+  return dimension.includes('overworld');
+}
+
 /** 画像の画素 → ワールドのブロック座標。 */
 export function blockAt(map: WorldMap, point: Point): BlockPoint {
   return {
@@ -31,6 +52,17 @@ export function pixelOf(map: WorldMap, block: BlockPoint): Point {
     x: (block.x - map.bounds.minX) / map.blocksPerPixel,
     y: (block.z - map.bounds.minZ) / map.blocksPerPixel,
   };
+}
+
+/** ネザーと通常世界で対応する座標。Minecraft の 8:1 換算にする。 */
+export function pairedCoordinate(map: WorldMap, block: BlockPoint): CoordinatePair | null {
+  if (isNetherMap(map)) {
+    return { kind: 'overworld', point: { x: block.x * 8, z: block.z * 8 } };
+  }
+  if (isOverworldMap(map)) {
+    return { kind: 'nether', point: { x: Math.floor(block.x / 8), z: Math.floor(block.z / 8) } };
+  }
+  return null;
 }
 
 /** その座標が画像の中に入っているか。 */

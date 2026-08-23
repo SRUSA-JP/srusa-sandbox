@@ -5,7 +5,15 @@ import { WORLD_MAP_ZOOM } from '../../config/viewport';
 import { WORLD_MAP } from '../../config/worldMap';
 import { usePanZoom } from '../../hooks/usePanZoom';
 import { transformStyle, visibleArea } from '../../lib/viewport';
-import { blockAt, coordinateStatus, isInside, markStyle, pixelOf, type BlockPoint } from '../../world/display';
+import {
+  blockAt,
+  coordinateStatus,
+  isInside,
+  markStyle,
+  pairedCoordinate,
+  pixelOf,
+  type BlockPoint,
+} from '../../world/display';
 import type { WorldMap } from '../../world/schema';
 import type { VizTheme } from '../../theme/palette';
 import { ViewportFrame } from './ViewportFrame';
@@ -13,6 +21,14 @@ import { ViewportFrame } from './ViewportFrame';
 export interface WorldMapViewerProps {
   map: WorldMap;
   theme: VizTheme;
+}
+
+interface PointerTooltip {
+  block: BlockPoint;
+  x: number;
+  y: number;
+  maxX: number;
+  maxY: number;
 }
 
 /**
@@ -28,17 +44,39 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
   const panZoom = usePanZoom(map.pixels.width, map.pixels.height, WORLD_MAP_ZOOM);
   const [pointed, setPointed] = useState<BlockPoint | null>(null);
   const [selected, setSelected] = useState<BlockPoint | null>(null);
+  const [tooltip, setTooltip] = useState<PointerTooltip | null>(null);
 
   const world = map.label ?? WORLD_LABELS[map.id] ?? map.id;
   const area = visibleArea(panZoom.view, panZoom.box);
   const center = blockAt(map, { x: (area.from.x + area.to.x) / 2, y: (area.from.y + area.to.y) / 2 });
   const mark = markStyle(theme, panZoom.view.scale);
+  const paired = tooltip ? pairedCoordinate(map, tooltip.block) : null;
+  const tooltipLeft = tooltip ? Math.min(tooltip.x + 12, Math.max(12, tooltip.maxX - 220)) : 0;
+  const tooltipTop = tooltip ? Math.min(tooltip.y + 12, Math.max(12, tooltip.maxY - 96)) : 0;
 
   return (
     <ViewportFrame
       panZoom={panZoom}
       label={WORLD_MAP_TEXT.card.alt(world)}
       status={coordinateStatus(pointed, center, selected)}
+      overlay={
+        tooltip && (
+          <div
+            className="pointer-events-none absolute z-10 grid min-w-[180px] gap-xxs rounded-md border-hairline border-divider bg-surface px-md py-xs font-mono text-sm text-muted tabular-nums"
+            style={{ left: tooltipLeft, top: tooltipTop }}
+          >
+            <strong className="text-xs font-bold text-heading">{WORLD_MAP_TEXT.tooltip.title}</strong>
+            <span>{WORLD_MAP_TEXT.tooltip.current(tooltip.block.x, tooltip.block.z)}</span>
+            {paired && (
+              <span>
+                {paired.kind === 'nether'
+                  ? WORLD_MAP_TEXT.tooltip.nether(paired.point.x, paired.point.z)
+                  : WORLD_MAP_TEXT.tooltip.overworld(paired.point.x, paired.point.z)}
+              </span>
+            )}
+          </div>
+        )
+      }
     >
       <div
         className="relative origin-top-left"
@@ -50,14 +88,30 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
         onPointerMove={(event) => {
           const point = panZoom.toContentPoint(event.clientX, event.clientY);
           const block = blockAt(map, point);
-          setPointed(isInside(map, block) ? block : null);
+          const inside = isInside(map, block);
+          setPointed(inside ? block : null);
+          if (!inside) {
+            setTooltip(null);
+            return;
+          }
+          const frame = event.currentTarget.parentElement?.getBoundingClientRect();
+          setTooltip({
+            block,
+            x: frame ? event.clientX - frame.left : 0,
+            y: frame ? event.clientY - frame.top : 0,
+            maxX: frame?.width ?? 0,
+            maxY: frame?.height ?? 0,
+          });
         }}
         onClick={(event) => {
           const point = panZoom.toContentPoint(event.clientX, event.clientY);
           const block = blockAt(map, point);
           setSelected(isInside(map, block) ? block : null);
         }}
-        onPointerLeave={() => setPointed(null)}
+        onPointerLeave={() => {
+          setPointed(null);
+          setTooltip(null);
+        }}
       >
         <img
           src={`${import.meta.env.BASE_URL}${map.image}`}

@@ -57,6 +57,7 @@ function parseMap(raw: unknown, index: number): WorldMap {
   const pixels = requireRecord(record.pixels, `${field}.pixels`);
   return {
     id: requireString(record.id, `${field}.id`),
+    dimension: optionalString(record.dimension, `${field}.dimension`),
     label: optionalString(record.label, `${field}.label`),
     image: requireString(record.image, `${field}.image`),
     bounds: parseBounds(record.bounds, `${field}.bounds`),
