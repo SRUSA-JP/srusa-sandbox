@@ -1,23 +1,44 @@
 {
+  "generated_on": "2026-08-23",
   "source": "BlueMap lowres LOD1",
   "maps": [
     {
-      "id": "overworld-current",
-      "dimension": "overworld",
-      "label": "既存ワールド",
-      "image": "world-map/overworld-current.png",
+      "id": "end",
+      "dimension": "end",
+      "label": "End",
+      "updated_on": "2026-08-23",
+      "image": "world-map/end.png",
       "bounds": {
-        "minX": -702,
+        "minX": -4062,
+        "minZ": -862,
+        "maxX": 245,
+        "maxZ": 1602
+      },
+      "pixels": {
+        "width": 4307,
+        "height": 2464
+      },
+      "blocksPerPixel": 1,
+      "bytes": 281308
+    },
+    {
+      "id": "overworld",
+      "dimension": "overworld",
+      "label": "Overworld",
+      "updated_on": "2026-08-23",
+      "image": "world-map/overworld.png",
+      "bounds": {
+        "minX": -1024,
         "minZ": -1024,
         "maxX": 1025,
         "maxZ": 1025
       },
       "pixels": {
-        "width": 1727,
+        "width": 2049,
         "height": 2049
       },
       "blocksPerPixel": 1,
-      "bytes": 1240285
+      "bytes": 1369646
     },
     {
       "id": "overworld-20260822-0715",
@@ -38,27 +59,28 @@
       "bytes": 1369646
     },
     {
-      "id": "end",
-      "dimension": "end",
-      "label": "エンド（2026-08-22 07:15）",
-      "image": "world-map/end.png",
+      "id": "overworld-current",
+      "dimension": "overworld",
+      "label": "既存ワールド",
+      "image": "world-map/overworld-current.png",
       "bounds": {
-        "minX": -4062,
-        "minZ": -862,
-        "maxX": 245,
-        "maxZ": 1602
+        "minX": -702,
+        "minZ": -1024,
+        "maxX": 1025,
+        "maxZ": 1025
       },
       "pixels": {
-        "width": 4307,
-        "height": 2464
+        "width": 1727,
+        "height": 2049
       },
       "blocksPerPixel": 1,
-      "bytes": 281308
+      "bytes": 1240285
     },
     {
       "id": "twilightforest",
       "dimension": "twilightforest",
-      "label": "黄昏の森（2026-08-22 07:15）",
+      "label": "Twilight Forest",
+      "updated_on": "2026-08-23",
       "image": "world-map/twilightforest.png",
       "bounds": {
         "minX": -2206,

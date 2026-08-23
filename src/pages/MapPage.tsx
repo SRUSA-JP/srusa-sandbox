@@ -1,29 +1,67 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { AppLayout, Button, ChartCard, NoticePanel, Note, Picker, ProsePanel } from '../components';
 import { RELATIONSHIPS_CONTENT } from '../content';
 import { joinNotes } from '../lib/display';
+import { playerPath } from '../data/playerProfiles';
 import type { VizTheme } from '../theme/palette';
 import { APP_TEXT, MAP_TEXT } from '../config/messages';
+import { RELATIONSHIP_MAP_DEFAULT_EDGE_MODE } from '../config/dataRegistry';
 import { EDGE_MODES, ISSUE_PREVIEW_COUNT, type EdgeMode } from '../map/config';
 import { loadRelationshipData } from '../map/data';
 import { groupTypeLabel, personLabel } from '../map/display';
 import { buildLayout, withPositions } from '../map/layout';
+import { parseRelationshipData } from '../map/parse';
 import type { Point } from '../map/geometry';
+import type { RelationshipData } from '../map/schema';
 import { MapLegend } from '../components/organisms/MapLegend';
 import { RelationshipMap } from '../components/organisms/RelationshipMap';
+import { CONTROL, CONTROL_HOVER, CONTROL_ROW } from '../components/classes';
 
 export interface MapPageProps {
   theme: VizTheme;
 }
 
+interface RelationshipWorkspaceExport {
+  schemaVersion: 'srusa-relationship-workspace-v1';
+  exportedAt: string;
+  data: RelationshipData;
+  layout: {
+    positions: Record<string, Point>;
+    centerPersonId: string;
+    highlightedGroupId: string;
+    edgeMode: EdgeMode;
+  };
+}
+
+function isPoint(value: unknown): value is Point {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as Point).x === 'number' &&
+    Number.isFinite((value as Point).x) &&
+    typeof (value as Point).y === 'number' &&
+    Number.isFinite((value as Point).y)
+  );
+}
+
+function importedPositions(raw: unknown): Record<string, Point> {
+  if (typeof raw !== 'object' || raw === null) return {};
+  return Object.fromEntries(
+    Object.entries(raw).filter((entry): entry is [string, Point] => isPoint(entry[1])),
+  );
+}
+
 /** SRUSA の相関図の画面。 */
 export function MapPage({ theme }: MapPageProps) {
   const source = useMemo(() => loadRelationshipData(), []);
-  const data = source?.data ?? null;
+  const [customData, setCustomData] = useState<RelationshipData | null>(null);
+  const data = customData ?? source?.data ?? null;
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [centerId, setCenterId] = useState(data?.view?.centerPersonId ?? data?.project.defaultCenterPersonId ?? '');
   const [highlightedGroupId, setHighlightedGroupId] = useState('');
-  const [edgeMode, setEdgeMode] = useState<EdgeMode>('all');
+  const [edgeMode, setEdgeMode] = useState<EdgeMode>(RELATIONSHIP_MAP_DEFAULT_EDGE_MODE);
+  const [importMessage, setImportMessage] = useState('');
 
   /*
    * 掴んで動かした人の座標。動かした人だけを持ち、それ以外は buildLayout の結果を使う。
@@ -36,6 +74,73 @@ export function MapPage({ theme }: MapPageProps) {
 
   const movePerson = useCallback((personId: string, x: number, y: number) => {
     setPositions((previous) => ({ ...previous, [personId]: { x, y } }));
+  }, []);
+
+  const exportWorkspace = useCallback(() => {
+    if (!data) return;
+    const payload: RelationshipWorkspaceExport = {
+      schemaVersion: 'srusa-relationship-workspace-v1',
+      exportedAt: new Date().toISOString(),
+      data,
+      layout: {
+        positions,
+        centerPersonId: centerId,
+        highlightedGroupId,
+        edgeMode,
+      },
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `srusa-relationship-layout-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }, [centerId, data, edgeMode, highlightedGroupId, positions]);
+
+  const importWorkspace = useCallback(async (file: File) => {
+    try {
+      const raw = JSON.parse(await file.text()) as unknown;
+      const wrapped = raw as Partial<RelationshipWorkspaceExport>;
+      const candidate = wrapped.schemaVersion === 'srusa-relationship-workspace-v1' ? wrapped.data : raw;
+      const parsed = parseRelationshipData(candidate);
+      setCustomData(parsed.data);
+
+      const nextPositions =
+        wrapped.schemaVersion === 'srusa-relationship-workspace-v1'
+          ? importedPositions(wrapped.layout?.positions)
+          : {};
+      const nextCenter =
+        wrapped.schemaVersion === 'srusa-relationship-workspace-v1'
+          ? wrapped.layout?.centerPersonId
+          : parsed.data.view?.centerPersonId ?? parsed.data.project.defaultCenterPersonId;
+      const fallbackCenter = parsed.data.project.defaultCenterPersonId || parsed.data.people[0]?.id || '';
+      const validCenter = nextCenter && parsed.data.people.some((person) => person.id === nextCenter)
+        ? nextCenter
+        : fallbackCenter;
+      const nextEdgeMode = wrapped.layout?.edgeMode;
+      const validEdgeMode: EdgeMode =
+        wrapped.schemaVersion === 'srusa-relationship-workspace-v1' &&
+        EDGE_MODES.some((mode) => mode.value === nextEdgeMode)
+          ? nextEdgeMode as EdgeMode
+          : 'all';
+
+      setPositions(nextPositions);
+      setCenterId(validCenter);
+      setHighlightedGroupId(
+        wrapped.schemaVersion === 'srusa-relationship-workspace-v1'
+          ? wrapped.layout?.highlightedGroupId ?? ''
+          : '',
+      );
+      setEdgeMode(validEdgeMode);
+      setImportMessage(
+        parsed.issues.length > 0
+          ? `インポートしました。不整合 ${parsed.issues.length} 件を読み込み時に補正しています。`
+          : 'インポートしました。',
+      );
+    } catch (error) {
+      setImportMessage(error instanceof Error ? `インポートできませんでした: ${error.message}` : 'インポートできませんでした。');
+    }
   }, []);
 
   const edges = useMemo(() => {
@@ -132,9 +237,31 @@ export function MapPage({ theme }: MapPageProps) {
                 options={EDGE_MODES.map((mode) => ({ value: mode.value, label: mode.label }))}
                 onChange={setEdgeMode}
               />
+              {centerPerson && (
+                <a
+                  href={playerPath(personLabel(centerPerson, nameMode))}
+                  className={`${CONTROL} ${CONTROL_ROW} ${CONTROL_HOVER}`}
+                >
+                  {MAP_TEXT.picker.profile}
+                </a>
+              )}
+              <Button label="エクスポート" icon="download" onClick={exportWorkspace} />
+              <Button label="インポート" icon="upload" onClick={() => fileInputRef.current?.click()} />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0];
+                  if (file) void importWorkspace(file);
+                  event.currentTarget.value = '';
+                }}
+              />
             </>
           }
         >
+          {importMessage && <Note>{importMessage}</Note>}
           <RelationshipMap
             layout={layout}
             theme={theme}

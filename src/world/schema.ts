@@ -20,6 +20,8 @@ export interface WorldMap {
   dimension?: string;
   /** 画面に出す表示名。未指定なら id をそのまま使う。 */
   label?: string;
+  /** この地図画像を書き出した日。 */
+  updated_on?: string;
   /** public/ からの相対パス。 */
   image: string;
   bounds: WorldBounds;
@@ -32,6 +34,8 @@ export interface WorldMap {
 }
 
 export interface WorldMapDocument {
+  /** このメタデータを書き出した日。 */
+  generated_on?: string;
   /** どのツールのどの出力から作ったか。 */
   source: string;
   maps: WorldMap[];

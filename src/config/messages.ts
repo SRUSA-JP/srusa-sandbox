@@ -316,6 +316,7 @@ export const WORLD_MAP_TEXT = {
     area: '範囲',
     pixels: 'PNG',
     size: 'SIZE',
+    updated: '更新',
   },
 
   /** 地図の規模。見出しの下に出す。 */
@@ -366,6 +367,7 @@ export const MAP_TEXT = {
     groupOption: (name: string, type: string, members: number) =>
       `${name}（${type}・${formatInt(members)}人）`,
     edges: '関係線',
+    profile: '紹介ページ',
   },
 
   /** 掴んで動かした配置を元に戻すボタン。 */

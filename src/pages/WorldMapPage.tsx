@@ -34,6 +34,7 @@ function logRows(maps: WorldMap[]) {
       area: `${size.width} x ${size.height}`,
       pixels: `${map.pixels.width} x ${map.pixels.height}`,
       bytes: `${(map.bytes / 1024 / 1024).toFixed(2)} MB`,
+      updatedOn: map.updated_on ?? '-',
     };
   });
 }
@@ -58,6 +59,9 @@ function WorldMapLog({ maps }: { maps: WorldMap[] }) {
           </p>
           <p className="font-mono text-muted">
             {WORLD_MAP_TEXT.log.size} {row.bytes}
+          </p>
+          <p className="font-mono text-muted">
+            {WORLD_MAP_TEXT.log.updated} {row.updatedOn}
           </p>
         </div>
       ))}
@@ -93,7 +97,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
       title={WORLD_MAP_CONTENT.title}
       note={
         map && size
-          ? WORLD_MAP_TEXT.summary(selectedMapLabel, size.width, size.height, map.bytes)
+          ? `${WORLD_MAP_TEXT.summary(selectedMapLabel, size.width, size.height, map.bytes)} / 更新 ${map.updated_on ?? document?.generated_on ?? '-'}`
           : undefined
       }
       lead={WORLD_MAP_CONTENT.lead}

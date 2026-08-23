@@ -59,6 +59,7 @@ function parseMap(raw: unknown, index: number): WorldMap {
     id: requireString(record.id, `${field}.id`),
     dimension: optionalString(record.dimension, `${field}.dimension`),
     label: optionalString(record.label, `${field}.label`),
+    updated_on: optionalString(record.updated_on, `${field}.updated_on`),
     image: requireString(record.image, `${field}.image`),
     bounds: parseBounds(record.bounds, `${field}.bounds`),
     pixels: {
@@ -75,6 +76,7 @@ export function parseWorldMapDocument(raw: unknown): WorldMapDocument {
   const maps = record.maps;
   if (!Array.isArray(maps)) throw new WorldMapDataError(DATA_TEXT.notArray, 'maps');
   return {
+    generated_on: optionalString(record.generated_on, 'generated_on'),
     source: requireString(record.source, 'source'),
     maps: maps.map(parseMap),
   };
