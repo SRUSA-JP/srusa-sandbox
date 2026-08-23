@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit",
     "check:contrast": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-contrast.ts --outfile=node_modules/.cache/check-contrast.mjs && node node_modules/.cache/check-contrast.mjs",
     "lint": "eslint .",
+    "build:item-rankings": "node scripts/build-featured-used-items.mjs",
+    "build:player-daily": "node scripts/build-player-daily-summary.mjs",
     "build:world-map": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/build-world-map.ts --outfile=node_modules/.cache/build-world-map.mjs && node node_modules/.cache/build-world-map.mjs"
   },
   "dependencies": {

@@ -1,0 +1,2755 @@
+{
+  "schema_version": "player-db-v1",
+  "generated_on": "2026-08-23",
+  "primary_key": "username",
+  "sources": {
+    "stats": "data/minecraft-stats-20260823.json",
+    "daily": "data/player-daily-summary-20260823.json",
+    "skins": "data/player-skins/manifest.json",
+    "relationship": "data/srusa-relationship-v0.2.json"
+  },
+  "players": {
+    "akarino": {
+      "username": "akarino",
+      "slug": "akarino",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "akarino",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K社"
+        ],
+        "related_ids": [
+          "hinomaro"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "alias": {
+      "username": "alias",
+      "slug": "alias",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "alias",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "塾",
+          "D大学"
+        ],
+        "related_ids": [
+          "tomy",
+          "godmankimaster"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "arata": {
+      "username": "arata",
+      "slug": "arata",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "arata",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "mitiglia"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "ashlynx": {
+      "username": "ashlynx",
+      "slug": "ashlynx",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "ashlynx",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学",
+          "Y研究室"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "bashita": {
+      "username": "bashita",
+      "slug": "bashita",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "bashita",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "panndasanngou"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "Boi0331": {
+      "username": "Boi0331",
+      "slug": "boi0331",
+      "aliases": [],
+      "sources": {
+        "stats_name": "Boi0331",
+        "daily_name": "Boi0331",
+        "relationship_id": null,
+        "skin_name": "Boi0331"
+      },
+      "ids": {
+        "minecraft_uuid": "334aec82-5f1c-4d18-98ac-d98222b49256"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/Boi0331-334aec82-5f1c-4d18-98ac-d98222b49256-face.png",
+        "skin_path": "player-skins/skins/Boi0331-334aec82-5f1c-4d18-98ac-d98222b49256.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "chara": {
+      "username": "chara",
+      "slug": "chara",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "chara",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "J大学"
+        ],
+        "related_ids": [
+          "mitiglia"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "creata": {
+      "username": "creata",
+      "slug": "creata",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "creata",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "shion組"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "daisuke": {
+      "username": "daisuke",
+      "slug": "daisuke",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "daisuke",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "dekkaishi": {
+      "username": "dekkaishi",
+      "slug": "dekkaishi",
+      "aliases": [],
+      "sources": {
+        "stats_name": "dekkaishi",
+        "daily_name": "dekkaishi",
+        "relationship_id": null,
+        "skin_name": "dekkaishi"
+      },
+      "ids": {
+        "minecraft_uuid": "adc8b5b2-7b2a-48eb-9823-4690d0ccada4"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/dekkaishi-adc8b5b2-7b2a-48eb-9823-4690d0ccada4-face.png",
+        "skin_path": "player-skins/skins/dekkaishi-adc8b5b2-7b2a-48eb-9823-4690d0ccada4.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "dekkaisi": {
+      "username": "dekkaisi",
+      "slug": "dekkaisi",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "dekkaisi",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校",
+          "テニス部"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "detkent": {
+      "username": "detkent",
+      "slug": "detkent",
+      "aliases": [],
+      "sources": {
+        "stats_name": "detkent",
+        "daily_name": "detkent",
+        "relationship_id": "detkent",
+        "skin_name": "detkent"
+      },
+      "ids": {
+        "minecraft_uuid": "3c75ef33-6b26-424f-a220-49062ca0120a"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/detkent-3c75ef33-6b26-424f-a220-49062ca0120a-face.png",
+        "skin_path": "player-skins/skins/detkent-3c75ef33-6b26-424f-a220-49062ca0120a.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学",
+          "Y研究室"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "deula": {
+      "username": "deula",
+      "slug": "deula",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "deula",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "不明"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "doraibaaa": {
+      "username": "doraibaaa",
+      "slug": "doraibaaa",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "doraibaaa",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "panndasanngou"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "edaoni": {
+      "username": "edaoni",
+      "slug": "edaoni",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "edaoni",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "shion組"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "ekisyo": {
+      "username": "ekisyo",
+      "slug": "ekisyo",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "ekisyo",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "erly": {
+      "username": "erly",
+      "slug": "erly",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "erly",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "テニス部"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "gaburichan": {
+      "username": "gaburichan",
+      "slug": "gaburichan",
+      "aliases": [],
+      "sources": {
+        "stats_name": "gaburichan",
+        "daily_name": "gaburichan",
+        "relationship_id": "gaburichan",
+        "skin_name": "gaburichan"
+      },
+      "ids": {
+        "minecraft_uuid": "b9e1d79f-ba6c-4330-83f5-42b67295237c"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/gaburichan-b9e1d79f-ba6c-4330-83f5-42b67295237c-face.png",
+        "skin_path": "player-skins/skins/gaburichan-b9e1d79f-ba6c-4330-83f5-42b67295237c.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "godmankimaster": {
+      "username": "godmankimaster",
+      "slug": "godmankimaster",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "godmankimaster",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "alias"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "gomakusa": {
+      "username": "gomakusa",
+      "slug": "gomakusa",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "gomakusa",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学",
+          "S研究室"
+        ],
+        "related_ids": [
+          "tera",
+          "yosshi"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "gottigoti": {
+      "username": "gottigoti",
+      "slug": "gottigoti",
+      "aliases": [],
+      "sources": {
+        "stats_name": "gottigoti",
+        "daily_name": "gottigoti",
+        "relationship_id": "gotti",
+        "skin_name": "gottigoti"
+      },
+      "ids": {
+        "minecraft_uuid": "e435448d-f1d7-4245-825f-7c36154ed9c4"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/gottigoti-e435448d-f1d7-4245-825f-7c36154ed9c4-face.png",
+        "skin_path": "player-skins/skins/gottigoti-e435448d-f1d7-4245-825f-7c36154ed9c4.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学"
+        ],
+        "related_ids": [
+          "yotsugi"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "gurando0302": {
+      "username": "gurando0302",
+      "slug": "gurando0302",
+      "aliases": [],
+      "sources": {
+        "stats_name": "gurando0302",
+        "daily_name": "gurando0302",
+        "relationship_id": "gurando",
+        "skin_name": "gurando0302"
+      },
+      "ids": {
+        "minecraft_uuid": "229bf00b-15ce-4f97-a0e6-691e7b311a27"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/gurando0302-229bf00b-15ce-4f97-a0e6-691e7b311a27-face.png",
+        "skin_path": "player-skins/skins/gurando0302-229bf00b-15ce-4f97-a0e6-691e7b311a27.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学",
+          "S研究室"
+        ],
+        "related_ids": [
+          "monmonmomomo"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "hide8": {
+      "username": "hide8",
+      "slug": "hide8",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "hide8",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "panndasanngou"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "hika": {
+      "username": "hika",
+      "slug": "hika",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "hika",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "hinomaro": {
+      "username": "hinomaro",
+      "slug": "hinomaro",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "hinomaro",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "akarino"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "hutaba": {
+      "username": "hutaba",
+      "slug": "hutaba",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "hutaba",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学"
+        ],
+        "related_ids": [
+          "j-line"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "igarashi": {
+      "username": "igarashi",
+      "slug": "igarashi",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "igarashi",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "shion組"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "ikefy": {
+      "username": "ikefy",
+      "slug": "ikefy",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "ikefy",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "ネット友"
+        ],
+        "related_ids": [
+          "shintani"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "iori": {
+      "username": "iori",
+      "slug": "iori",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "iori",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "不明"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "j-line": {
+      "username": "j-line",
+      "slug": "j-line",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "j-line",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学"
+        ],
+        "related_ids": [
+          "hutaba"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "juniamal": {
+      "username": "juniamal",
+      "slug": "juniamal",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "juniamal",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "塾",
+          "M大学"
+        ],
+        "related_ids": [
+          "sungo"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "kagyki": {
+      "username": "kagyki",
+      "slug": "kagyki",
+      "aliases": [],
+      "sources": {
+        "stats_name": "kagyki",
+        "daily_name": "kagyki",
+        "relationship_id": "kagyki",
+        "skin_name": "kagyki"
+      },
+      "ids": {
+        "minecraft_uuid": "53880e45-5b8f-4f53-b6b3-341cca768b1f"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/kagyki-53880e45-5b8f-4f53-b6b3-341cca768b1f-face.png",
+        "skin_path": "player-skins/skins/kagyki-53880e45-5b8f-4f53-b6b3-341cca768b1f.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校",
+          "塾"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "katsuwo": {
+      "username": "katsuwo",
+      "slug": "katsuwo",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "katsuwo",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "不明"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "Kenshi_www": {
+      "username": "Kenshi_www",
+      "slug": "kenshi_www",
+      "aliases": [],
+      "sources": {
+        "stats_name": "Kenshi_www",
+        "daily_name": "Kenshi_www",
+        "relationship_id": null,
+        "skin_name": "Kenshi_www"
+      },
+      "ids": {
+        "minecraft_uuid": "c14e0c8f-0a99-4969-8c5d-46a4d68ed187"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/Kenshi_www-c14e0c8f-0a99-4969-8c5d-46a4d68ed187-face.png",
+        "skin_path": "player-skins/skins/Kenshi_www-c14e0c8f-0a99-4969-8c5d-46a4d68ed187.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "kreis": {
+      "username": "kreis",
+      "slug": "kreis",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "kreis",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "高校"
+        ],
+        "related_ids": [
+          "rik"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "lixlix": {
+      "username": "lixlix",
+      "slug": "lixlix",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "lixlix",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校",
+          "テニス部"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "loli-js": {
+      "username": "loli-js",
+      "slug": "loli-js",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "loli-js",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校",
+          "shion組"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "mark": {
+      "username": "mark",
+      "slug": "mark",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "mark",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "ゴルフ"
+        ],
+        "related_ids": [
+          "yumili"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "masaya": {
+      "username": "masaya",
+      "slug": "masaya",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "masaya",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "shion組"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "mashu": {
+      "username": "mashu",
+      "slug": "mashu",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "mashu",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "不明"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "Mitigli4": {
+      "username": "Mitigli4",
+      "slug": "mitigli4",
+      "aliases": [],
+      "sources": {
+        "stats_name": "Mitigli4",
+        "daily_name": "Mitigli4",
+        "relationship_id": "mitiglia",
+        "skin_name": "Mitigli4"
+      },
+      "ids": {
+        "minecraft_uuid": "e4bc1710-6c8e-4b39-a304-9c3e6b4dbb32"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/Mitigli4-e4bc1710-6c8e-4b39-a304-9c3e6b4dbb32-face.png",
+        "skin_path": "player-skins/skins/Mitigli4-e4bc1710-6c8e-4b39-a304-9c3e6b4dbb32.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校",
+          "塾"
+        ],
+        "related_ids": [
+          "chara",
+          "arata"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "mitiglia": {
+      "username": "mitiglia",
+      "slug": "mitiglia",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "mitiglia",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校",
+          "塾"
+        ],
+        "related_ids": [
+          "chara",
+          "arata"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "monmonmomomo": {
+      "username": "monmonmomomo",
+      "slug": "monmonmomomo",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "monmonmomomo",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "gurando"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "N": {
+      "username": "N",
+      "slug": "n",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "n",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "幼稚園",
+          "小学校",
+          "中学校",
+          "塾"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "nabe": {
+      "username": "nabe",
+      "slug": "nabe",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "nabe",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学",
+          "M研究室"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "natch_1105": {
+      "username": "natch_1105",
+      "slug": "natch_1105",
+      "aliases": [],
+      "sources": {
+        "stats_name": "natch_1105",
+        "daily_name": "natch_1105",
+        "relationship_id": "natch",
+        "skin_name": "natch_1105"
+      },
+      "ids": {
+        "minecraft_uuid": "1cff829d-24b5-4e08-ba89-67c2e03a5a1d"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/natch_1105-1cff829d-24b5-4e08-ba89-67c2e03a5a1d-face.png",
+        "skin_path": "player-skins/skins/natch_1105-1cff829d-24b5-4e08-ba89-67c2e03a5a1d.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校",
+          "塾"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "nekketsu": {
+      "username": "nekketsu",
+      "slug": "nekketsu",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "nekketsu",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K社"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "nodoamenn": {
+      "username": "nodoamenn",
+      "slug": "nodoamenn",
+      "aliases": [],
+      "sources": {
+        "stats_name": "nodoamenn",
+        "daily_name": "nodoamenn",
+        "relationship_id": "nodoame",
+        "skin_name": "nodoamenn"
+      },
+      "ids": {
+        "minecraft_uuid": "2c867e44-f404-418f-885e-66f79eda3475"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/nodoamenn-2c867e44-f404-418f-885e-66f79eda3475-face.png",
+        "skin_path": "player-skins/skins/nodoamenn-2c867e44-f404-418f-885e-66f79eda3475.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学",
+          "Y研究室",
+          "K高校",
+          "塾"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "nomu": {
+      "username": "nomu",
+      "slug": "nomu",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "nomu",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学",
+          "M研究室"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "noto": {
+      "username": "noto",
+      "slug": "noto",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "noto",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "shion組"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "OCTBEE": {
+      "username": "OCTBEE",
+      "slug": "octbee",
+      "aliases": [],
+      "sources": {
+        "stats_name": "OCTBEE",
+        "daily_name": "OCTBEE",
+        "relationship_id": "octbee",
+        "skin_name": "OCTBEE"
+      },
+      "ids": {
+        "minecraft_uuid": "990aeb07-e61d-4dd3-8156-13a2e8610db0"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/OCTBEE-990aeb07-e61d-4dd3-8156-13a2e8610db0-face.png",
+        "skin_path": "player-skins/skins/OCTBEE-990aeb07-e61d-4dd3-8156-13a2e8610db0.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "幼稚園",
+          "小学校",
+          "中学校",
+          "塾"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "ogurei": {
+      "username": "ogurei",
+      "slug": "ogurei",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "ogurei",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学",
+          "M研究室"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "okomekami": {
+      "username": "okomekami",
+      "slug": "okomekami",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "okomekami",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "shion組"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "osizu": {
+      "username": "osizu",
+      "slug": "osizu",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "osizu",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "小学校",
+          "中学校"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "panndasanngou": {
+      "username": "panndasanngou",
+      "slug": "panndasanngou",
+      "aliases": [
+        "panda"
+      ],
+      "sources": {
+        "stats_name": "panndasanngou",
+        "daily_name": "panndasanngou",
+        "relationship_id": "panndasanngou",
+        "skin_name": "panndasanngou"
+      },
+      "ids": {
+        "minecraft_uuid": "3d11d800-946e-4dfd-a439-621800a0f12a"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/panndasanngou-3d11d800-946e-4dfd-a439-621800a0f12a-face.png",
+        "skin_path": "player-skins/skins/panndasanngou-3d11d800-946e-4dfd-a439-621800a0f12a.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学"
+        ],
+        "related_ids": [
+          "zawao",
+          "un",
+          "doraibaaa",
+          "hide8",
+          "ryo",
+          "starrytear",
+          "bashita",
+          "tagosaku",
+          "rai"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "pitan": {
+      "username": "pitan",
+      "slug": "pitan",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "pitan",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "shion"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "rai": {
+      "username": "rai",
+      "slug": "rai",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "rai",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "panndasanngou",
+          "zawao"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "rik": {
+      "username": "rik",
+      "slug": "rik",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "rik",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学",
+          "S研究室"
+        ],
+        "related_ids": [
+          "kreis"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "ryo": {
+      "username": "ryo",
+      "slug": "ryo",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "ryo",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "panndasanngou"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "shintani": {
+      "username": "shintani",
+      "slug": "shintani",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "shintani",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学"
+        ],
+        "related_ids": [
+          "ikefy"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "shion": {
+      "username": "shion",
+      "slug": "shion",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "shion",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校",
+          "shion組",
+          "塾"
+        ],
+        "related_ids": [
+          "pitan"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "shounenn": {
+      "username": "shounenn",
+      "slug": "shounenn",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "shounenn",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校"
+        ],
+        "related_ids": [
+          "boi-no-tomodachi"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "sohei": {
+      "username": "sohei",
+      "slug": "sohei",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "sohei",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校",
+          "塾"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "starrytear": {
+      "username": "starrytear",
+      "slug": "starrytear",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "starrytear",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学"
+        ],
+        "related_ids": [
+          "panndasanngou"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "sukmkms": {
+      "username": "sukmkms",
+      "slug": "sukmkms",
+      "aliases": [],
+      "sources": {
+        "stats_name": "sukmkms",
+        "daily_name": "sukmkms",
+        "relationship_id": null,
+        "skin_name": "sukmkms"
+      },
+      "ids": {
+        "minecraft_uuid": "96073485-c515-4c1d-a947-0d8e937b90f1"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/sukmkms-96073485-c515-4c1d-a947-0d8e937b90f1-face.png",
+        "skin_path": "player-skins/skins/sukmkms-96073485-c515-4c1d-a947-0d8e937b90f1.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "sungo": {
+      "username": "sungo",
+      "slug": "sungo",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "sungo",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "juniamal"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "tagosaku": {
+      "username": "tagosaku",
+      "slug": "tagosaku",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "tagosaku",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "panndasanngou"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "taraba01414": {
+      "username": "taraba01414",
+      "slug": "taraba01414",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "taraba01414",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "tera": {
+      "username": "tera",
+      "slug": "tera",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "tera",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "gomakusa"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "tibepianegt46": {
+      "username": "tibepianegt46",
+      "slug": "tibepianegt46",
+      "aliases": [],
+      "sources": {
+        "stats_name": "tibepianegt46",
+        "daily_name": "tibepianegt46",
+        "relationship_id": null,
+        "skin_name": "tibepianegt46"
+      },
+      "ids": {
+        "minecraft_uuid": "fda7763c-0217-41ab-af21-ded135c927c2"
+      },
+      "assets": {
+        "icon_path": "player-skins/icons/tibepianegt46-fda7763c-0217-41ab-af21-ded135c927c2-face.png",
+        "skin_path": "player-skins/skins/tibepianegt46-fda7763c-0217-41ab-af21-ded135c927c2.png",
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "tomy": {
+      "username": "tomy",
+      "slug": "tomy",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "tomy",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "D大学"
+        ],
+        "related_ids": [
+          "alias"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "tsuyudaku": {
+      "username": "tsuyudaku",
+      "slug": "tsuyudaku",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "tsuyudaku",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "不明"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "ume": {
+      "username": "ume",
+      "slug": "ume",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "ume",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "un": {
+      "username": "un",
+      "slug": "un",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "un",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "ネット友"
+        ],
+        "related_ids": [
+          "panndasanngou"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "uobaa": {
+      "username": "uobaa",
+      "slug": "uobaa",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "uobaa",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "大学"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "volbox": {
+      "username": "volbox",
+      "slug": "volbox",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "volbox",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学",
+          "Y研究室"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "yamada": {
+      "username": "yamada",
+      "slug": "yamada",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "yamada",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "中学校"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "yosshi": {
+      "username": "yosshi",
+      "slug": "yosshi",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "yosshi",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "gomakusa"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "yotsugi": {
+      "username": "yotsugi",
+      "slug": "yotsugi",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "yotsugi",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [],
+        "related_ids": [
+          "gotti"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "yuichiro": {
+      "username": "yuichiro",
+      "slug": "yuichiro",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "yuichiro",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "不明"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "yumili": {
+      "username": "yumili",
+      "slug": "yumili",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "yumili",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "小学校"
+        ],
+        "related_ids": [
+          "mark"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "zap": {
+      "username": "zap",
+      "slug": "zap",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "zap",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "K高校",
+          "shion組"
+        ],
+        "related_ids": []
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    },
+    "zawao": {
+      "username": "zawao",
+      "slug": "zawao",
+      "aliases": [],
+      "sources": {
+        "stats_name": null,
+        "daily_name": null,
+        "relationship_id": "zawao",
+        "skin_name": null
+      },
+      "ids": {
+        "minecraft_uuid": null
+      },
+      "assets": {
+        "icon_path": null,
+        "skin_path": null,
+        "icon_override_path": null,
+        "skin_override_path": null
+      },
+      "relationship": {
+        "attributes": [
+          "M大学"
+        ],
+        "related_ids": [
+          "panndasanngou",
+          "rai"
+        ]
+      },
+      "data_updated_on": {
+        "stats": "2026-08-23",
+        "daily": "2026-08-23",
+        "skins": "2026-08-23T04:43:50.640Z",
+        "relationship": null
+      }
+    }
+  }
+}
