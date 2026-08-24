@@ -12,7 +12,23 @@ export type DiscoveryKind =
   | 'diamonds'
   | 'outlier';
 
-export type PlaystyleId = 'miner' | 'builder' | 'explorer' | 'fighter' | 'farmer' | 'fisher' | 'trader';
+/**
+ * 遊び方の一覧と、レーダーチャートの軸を並べる順番。
+ *
+ * ここが軸の順番の唯一の定義。プレイヤーごとに軸が入れ替わると
+ * 「どの角が戦闘か」を覚え直すことになるため、順番は常に固定する。
+ */
+export const PLAYSTYLE_IDS = [
+  'miner',
+  'builder',
+  'explorer',
+  'fighter',
+  'farmer',
+  'fisher',
+  'trader',
+] as const;
+
+export type PlaystyleId = (typeof PLAYSTYLE_IDS)[number];
 
 export interface InventoryRecord {
   key: string;
@@ -35,6 +51,8 @@ export interface Discovery {
 export interface PlaystyleScore {
   id: PlaystyleId;
   value: number;
+  /** そのプレイヤーの中での順位（1 が最も高い）。軸を固定しても強弱が分かるようにする。 */
+  rank: number;
 }
 
 export type PlayerMetricId = 'playtime' | 'distance' | 'deaths' | 'mobKills' | 'blocksMined' | 'advancements';
@@ -317,10 +335,7 @@ export function playerStatuses(doc: StatsDocument, limit?: number, basis: RateBa
     }),
   );
   const maxByStyle = Object.fromEntries(
-    (['miner', 'builder', 'explorer', 'fighter', 'farmer', 'fisher', 'trader'] as const).map((style) => [
-      style,
-      Math.max(...raw.map((entry) => entry.scores[style]), 1),
-    ]),
+    PLAYSTYLE_IDS.map((style) => [style, Math.max(...raw.map((entry) => entry.scores[style]), 1)]),
   ) as Record<PlaystyleId, number>;
 
   const rankMaps = new Map<PlaystyleId, Map<string, number>>();
@@ -337,9 +352,14 @@ export function playerStatuses(doc: StatsDocument, limit?: number, basis: RateBa
 
   const statuses = raw
     .map(({ player, scores }) => {
-      const normalized = (Object.keys(scores) as PlaystyleId[])
-        .map((id) => ({ id, value: Math.round((scores[id] / maxByStyle[id]) * 100) }))
-        .sort((a, b) => b.value - a.value);
+      /* 強い順に並べたうえで順位を持たせる。軸を固定して描くときも順位だけは残る */
+      const normalized: PlaystyleScore[] = PLAYSTYLE_IDS.map((id) => ({
+        id,
+        value: Math.round((scores[id] / maxByStyle[id]) * 100),
+        rank: 0,
+      }))
+        .sort((a, b) => b.value - a.value)
+        .map((score, index) => ({ ...score, rank: index + 1 }));
       const primary = normalized[0]?.id ?? 'explorer';
       const rare = normalized.find((score) => rankMaps.get(score.id)?.get(player.name) === 1) ?? normalized[0];
       const title: PlaystyleId | 'diamond' | 'fallen' =

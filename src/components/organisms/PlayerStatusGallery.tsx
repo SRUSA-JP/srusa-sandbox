@@ -3,7 +3,7 @@ import { BASIS_OPTIONS } from '../../config';
 import { playerDataHighlightColors, playerDataHighlightLevel } from '../../config/colors';
 import type { PlayerMetricId, PlayerStatus, PlayerStatusMetric, PlaystyleId } from '../../lib/statsExperience';
 import type { RateBasis } from '../../lib/selectors';
-import { unitFor } from '../../lib/display';
+import { playstyleAxisOrder, unitFor } from '../../lib/display';
 import { formatCompact, formatDecimal, formatHours, formatInt } from '../../lib/format';
 import { withAlpha, type VizTheme } from '../../theme/palette';
 import { SECTION } from '../classes';
@@ -75,13 +75,15 @@ function PlaystyleRadar({
   accent: string;
   theme: VizTheme;
 }) {
-  const points = player.scores
+  /* 軸はプレイヤーによらず同じ順番。強弱は形と順位の数字で読ませる */
+  const axisScores = playstyleAxisOrder(player.scores);
+  const points = axisScores
     .map((score, index) => {
-      const point = radarPoint(index, player.scores.length, (score.value / 100) * RADAR_RADIUS);
+      const point = radarPoint(index, axisScores.length, (score.value / 100) * RADAR_RADIUS);
       return `${point.x},${point.y}`;
     })
     .join(' ');
-  const ariaLabel = player.scores
+  const ariaLabel = axisScores
     .map((score) => `${text.styles[score.id]} ${score.value}`)
     .join(' / ');
 
@@ -91,16 +93,16 @@ function PlaystyleRadar({
         {RADAR_RINGS.map((ring) => (
           <polygon
             key={ring}
-            points={radarPoints(player.scores.length, RADAR_RADIUS * ring)}
+            points={radarPoints(axisScores.length, RADAR_RADIUS * ring)}
             fill="none"
             stroke={theme.border}
             strokeWidth="0.8"
             vectorEffect="non-scaling-stroke"
           />
         ))}
-        {player.scores.map((score, index) => {
-          const axis = radarPoint(index, player.scores.length, RADAR_RADIUS);
-          const label = radarPoint(index, player.scores.length, RADAR_LABEL_RADIUS);
+        {axisScores.map((score, index) => {
+          const axis = radarPoint(index, axisScores.length, RADAR_RADIUS);
+          const label = radarPoint(index, axisScores.length, RADAR_LABEL_RADIUS);
           const anchor = radarLabelAnchor(label.x);
           return (
             <g key={score.id}>
@@ -122,7 +124,7 @@ function PlaystyleRadar({
                 fontSize="5.4"
                 fontWeight="650"
               >
-                <tspan>{index + 1}</tspan>
+                <tspan>{score.rank}</tspan>
                 <tspan dx="1.5">{text.styles[score.id]}</tspan>
               </text>
             </g>
@@ -135,8 +137,8 @@ function PlaystyleRadar({
           strokeWidth="2"
           vectorEffect="non-scaling-stroke"
         />
-        {player.scores.map((score, index) => {
-          const point = radarPoint(index, player.scores.length, (score.value / 100) * RADAR_RADIUS);
+        {axisScores.map((score, index) => {
+          const point = radarPoint(index, axisScores.length, (score.value / 100) * RADAR_RADIUS);
           return <circle key={score.id} cx={point.x} cy={point.y} r="1.8" fill={accent} />;
         })}
       </svg>
@@ -270,7 +272,7 @@ function PlayerStatusCard({
               {text.styles[player.rarest]} #{player.rarestRank}
             </p>
           </div>
-            {player.scores.map((score, index) => (
+            {player.scores.map((score) => (
               <div key={score.id} className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-sm text-sm">
                 <span className="truncate font-bold text-muted">{text.styles[score.id]}</span>
                 <span className="font-mono font-bold text-heading">{score.value}</span>
@@ -279,7 +281,7 @@ function PlayerStatusCard({
                     className="block h-full"
                     style={{
                       width: `${score.value}%`,
-                      backgroundColor: index === 0 ? accent : withAlpha(accent, 0.52),
+                      backgroundColor: score.rank === 1 ? accent : withAlpha(accent, 0.52),
                     }}
                   />
                 </span>

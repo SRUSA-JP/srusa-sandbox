@@ -28,6 +28,7 @@ import {
 } from '../config/metrics';
 import type { NumericPlayerRowKey, RateBasis } from './selectors';
 import { formatDecimal, formatInt } from './format';
+import { PLAYSTYLE_IDS, type PlaystyleScore } from './statsExperience';
 
 /* ------------------------------------------------------------------ *
  * 値の表示
@@ -130,4 +131,21 @@ export function metricColumnLabel(metric: NumericPlayerRowKey, basis: RateBasis)
  */
 export function barChartHeight(count: number, setting: BarRowSetting): number {
   return Math.max(setting.minHeight, count * setting.rowHeight);
+}
+
+/* ------------------------------------------------------------------ *
+ * 遊び方のレーダーチャート
+ * ------------------------------------------------------------------ */
+
+/**
+ * レーダーチャートの軸に並べる順番。
+ *
+ * PlayerStatus.scores は「強い順」で持っている（一覧と代表値のため）。
+ * そのまま角に割り当てるとプレイヤーごとに軸が入れ替わり、
+ * 「右上が戦闘」といった読み方ができない。ここで必ず固定順に並べ直す。
+ */
+export function playstyleAxisOrder(scores: PlaystyleScore[]): PlaystyleScore[] {
+  return PLAYSTYLE_IDS.map((id) => scores.find((score) => score.id === id)).filter(
+    (score): score is PlaystyleScore => Boolean(score),
+  );
 }
