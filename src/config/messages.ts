@@ -10,6 +10,19 @@
 import { formatInt, formatMegabytes } from '../lib/format';
 import { OTHER_ENTRY } from './labels';
 
+/**
+ * 最低限の認証（合言葉）の画面。
+ *
+ * クライアント側だけの確認だと分かるように、文言でも「本物の認証ではない」ことを
+ * ごまかさない（config/auth.ts 参照）。
+ */
+export const AUTH_TEXT = {
+  note: '合言葉を知っている人だけ見られるようにしています。',
+  label: '合言葉',
+  submit: '入る',
+  error: '合言葉が違います。',
+} as const;
+
 /** 画面の外枠（サイト名・タブ・配色の切り替え）。 */
 export const APP_TEXT = {
   /** ブラウザのタブと画面左上に出す名前。 */

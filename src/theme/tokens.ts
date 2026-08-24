@@ -171,6 +171,8 @@ export const LAYOUT = {
   numberInputWidth: '7em',
   /** 読み物の表のセルの最小幅（文字数で決めるので ch）。狭い画面で 1 文字ずつ折り返さないため。 */
   proseCellMinWidth: '16ch',
+  /** 合言葉の入力フォームの最大幅。 */
+  authFormWidth: 320,
 } as const;
 
 /**

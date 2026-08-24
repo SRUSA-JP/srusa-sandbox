@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { AppShell } from './components';
+import { AppShell, PasswordGate } from './components';
 import { useHashRoute } from './hooks/useHashRoute';
 import { MapPage, StatsPage, WorldMapPage } from './pages';
 import { skinForRoute, type RouteId } from './routes';
@@ -19,6 +19,7 @@ const PAGES: Record<RouteId, (props: { theme: VizTheme }) => ReactElement> = {
  *
  * 画面の切り替え（routes.ts）と、その画面の見た目（config/skins.ts）と
  * 配色（theme/）を結びつけるだけで、画面の中身には関わらない。
+ * PasswordGate が合言葉を通すまで、その先（AppShell とページ）は描かない。
  */
 export function App() {
   const { route, navigate } = useHashRoute();
@@ -34,8 +35,10 @@ export function App() {
   const Page = PAGES[route.id];
 
   return (
-    <AppShell route={route} onNavigate={navigate} mode={mode} onToggleTheme={toggle}>
-      <Page theme={theme} />
-    </AppShell>
+    <PasswordGate>
+      <AppShell route={route} onNavigate={navigate} mode={mode} onToggleTheme={toggle}>
+        <Page theme={theme} />
+      </AppShell>
+    </PasswordGate>
   );
 }
