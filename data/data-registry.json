@@ -1,12 +1,12 @@
 {
-  "version": "20260823",
+  "version": "20260824",
   "paths": {
     "minecraftStats": "data/minecraft-stats-20260823.json",
-    "playerDataByDate": "data/player-data-by-date-20260823.json",
-    "playerDailySummary": "data/player-daily-summary-20260823.json",
-    "playerDailySummaryCsv": "data/player-daily-summary-20260823.csv",
+    "playerDataByDate": "data/player-data-by-date-20260824.json",
+    "playerDailySummary": "data/player-daily-summary-20260824.json",
+    "playerDailySummaryCsv": "data/player-daily-summary-20260824.csv",
     "playerDb": "data/player-db-20260823.json",
-    "playerFeaturedUsedItems": "data/player-featured-used-items-20260823.json",
+    "playerFeaturedUsedItems": "data/player-featured-used-items-20260824.json",
     "playerSkinsManifest": "data/player-skins/manifest.json",
     "worldMapMetadata": "data/world-map.json",
     "worldMapImageDir": "world-map",

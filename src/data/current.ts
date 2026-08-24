@@ -1,5 +1,5 @@
-import featuredUsedItemsJson from '../../data/player-featured-used-items-20260823.json';
-import playerDailySummaryJson from '../../data/player-daily-summary-20260823.json';
+import featuredUsedItemsJson from '../../data/player-featured-used-items-20260824.json';
+import playerDailySummaryJson from '../../data/player-daily-summary-20260824.json';
 import playerDbJson from '../../data/player-db-20260823.json';
 import dataRegistry from '../../data/data-registry.json';
 

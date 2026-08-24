@@ -1,0 +1,4089 @@
+{
+  "generated_on": "2026-08-24",
+  "source": "data/player-data-by-date-20260824.json stat_categories.used",
+  "snapshot": {
+    "date": "2026-08-24",
+    "items": {
+      "minecraft:diamond_pickaxe": {
+        "id": "minecraft:diamond_pickaxe",
+        "label": "ダイヤのツルハシ",
+        "note": "ダイヤのツルハシを使った回数",
+        "total": 40103,
+        "ranking": [
+          {
+            "player": "nodoamenn",
+            "value": 19105
+          },
+          {
+            "player": "kagyki",
+            "value": 15098
+          },
+          {
+            "player": "natch_1105",
+            "value": 1968
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 1099
+          },
+          {
+            "player": "Boi0331",
+            "value": 745
+          },
+          {
+            "player": "OCTBEE",
+            "value": 515
+          },
+          {
+            "player": "Mitigli4",
+            "value": 464
+          },
+          {
+            "player": "gurando0302",
+            "value": 434
+          },
+          {
+            "player": "panndasanngou",
+            "value": 422
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 253
+          }
+        ]
+      },
+      "minecraft:stone_pickaxe": {
+        "id": "minecraft:stone_pickaxe",
+        "label": "石のツルハシ",
+        "note": "石のツルハシを使った回数",
+        "total": 19845,
+        "ranking": [
+          {
+            "player": "kagyki",
+            "value": 5419
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 3950
+          },
+          {
+            "player": "detkent",
+            "value": 2672
+          },
+          {
+            "player": "dekkaishi",
+            "value": 1615
+          },
+          {
+            "player": "Mitigli4",
+            "value": 1428
+          },
+          {
+            "player": "Boi0331",
+            "value": 1362
+          },
+          {
+            "player": "nodoamenn",
+            "value": 1077
+          },
+          {
+            "player": "natch_1105",
+            "value": 873
+          },
+          {
+            "player": "OCTBEE",
+            "value": 640
+          },
+          {
+            "player": "sukmkms",
+            "value": 319
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 282
+          },
+          {
+            "player": "gurando0302",
+            "value": 161
+          },
+          {
+            "player": "panndasanngou",
+            "value": 39
+          },
+          {
+            "player": "gottigoti",
+            "value": 8
+          }
+        ]
+      },
+      "minecraft:iron_pickaxe": {
+        "id": "minecraft:iron_pickaxe",
+        "label": "鉄のツルハシ",
+        "note": "鉄のツルハシを使った回数",
+        "total": 19073,
+        "ranking": [
+          {
+            "player": "tibepianegt46",
+            "value": 6576
+          },
+          {
+            "player": "detkent",
+            "value": 2236
+          },
+          {
+            "player": "Mitigli4",
+            "value": 2175
+          },
+          {
+            "player": "nodoamenn",
+            "value": 1848
+          },
+          {
+            "player": "dekkaishi",
+            "value": 1554
+          },
+          {
+            "player": "Boi0331",
+            "value": 1065
+          },
+          {
+            "player": "kagyki",
+            "value": 1045
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 651
+          },
+          {
+            "player": "gurando0302",
+            "value": 542
+          },
+          {
+            "player": "sukmkms",
+            "value": 403
+          },
+          {
+            "player": "gottigoti",
+            "value": 272
+          },
+          {
+            "player": "OCTBEE",
+            "value": 258
+          },
+          {
+            "player": "gaburichan",
+            "value": 228
+          },
+          {
+            "player": "natch_1105",
+            "value": 176
+          },
+          {
+            "player": "panndasanngou",
+            "value": 44
+          }
+        ]
+      },
+      "twilightforest:fiery_pickaxe": {
+        "id": "twilightforest:fiery_pickaxe",
+        "label": "炎のツルハシ",
+        "note": "Twilight Forest の炎のツルハシを使った回数",
+        "total": 8787,
+        "ranking": [
+          {
+            "player": "Mitigli4",
+            "value": 8662
+          },
+          {
+            "player": "natch_1105",
+            "value": 125
+          }
+        ]
+      },
+      "twilightforest:ironwood_pickaxe": {
+        "id": "twilightforest:ironwood_pickaxe",
+        "label": "鉄木のツルハシ",
+        "note": "Twilight Forest の鉄木のツルハシを使った回数",
+        "total": 1697,
+        "ranking": [
+          {
+            "player": "Mitigli4",
+            "value": 1043
+          },
+          {
+            "player": "panndasanngou",
+            "value": 492
+          },
+          {
+            "player": "nodoamenn",
+            "value": 162
+          }
+        ]
+      },
+      "minecraft:stone_sword": {
+        "id": "minecraft:stone_sword",
+        "label": "石の剣",
+        "note": "石の剣を使った回数",
+        "total": 22282,
+        "ranking": [
+          {
+            "player": "natch_1105",
+            "value": 6069
+          },
+          {
+            "player": "detkent",
+            "value": 5218
+          },
+          {
+            "player": "kagyki",
+            "value": 4274
+          },
+          {
+            "player": "Boi0331",
+            "value": 1698
+          },
+          {
+            "player": "dekkaishi",
+            "value": 1479
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 1470
+          },
+          {
+            "player": "Mitigli4",
+            "value": 1182
+          },
+          {
+            "player": "nodoamenn",
+            "value": 706
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 87
+          },
+          {
+            "player": "gurando0302",
+            "value": 66
+          },
+          {
+            "player": "gottigoti",
+            "value": 33
+          }
+        ]
+      },
+      "minecraft:diamond_sword": {
+        "id": "minecraft:diamond_sword",
+        "label": "ダイヤの剣",
+        "note": "ダイヤの剣を使った回数",
+        "total": 17562,
+        "ranking": [
+          {
+            "player": "nodoamenn",
+            "value": 6682
+          },
+          {
+            "player": "kagyki",
+            "value": 5141
+          },
+          {
+            "player": "natch_1105",
+            "value": 3540
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 788
+          },
+          {
+            "player": "detkent",
+            "value": 531
+          },
+          {
+            "player": "dekkaishi",
+            "value": 465
+          },
+          {
+            "player": "Mitigli4",
+            "value": 294
+          },
+          {
+            "player": "gurando0302",
+            "value": 121
+          }
+        ]
+      },
+      "minecraft:iron_sword": {
+        "id": "minecraft:iron_sword",
+        "label": "鉄の剣",
+        "note": "鉄の剣を使った回数",
+        "total": 7474,
+        "ranking": [
+          {
+            "player": "detkent",
+            "value": 3174
+          },
+          {
+            "player": "dekkaishi",
+            "value": 1469
+          },
+          {
+            "player": "nodoamenn",
+            "value": 628
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 608
+          },
+          {
+            "player": "natch_1105",
+            "value": 290
+          },
+          {
+            "player": "gurando0302",
+            "value": 272
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 257
+          },
+          {
+            "player": "kagyki",
+            "value": 251
+          },
+          {
+            "player": "Boi0331",
+            "value": 247
+          },
+          {
+            "player": "gaburichan",
+            "value": 233
+          },
+          {
+            "player": "Mitigli4",
+            "value": 43
+          },
+          {
+            "player": "sukmkms",
+            "value": 2
+          }
+        ]
+      },
+      "twilightforest:fiery_sword": {
+        "id": "twilightforest:fiery_sword",
+        "label": "炎の剣",
+        "note": "Twilight Forest の炎の剣を使った回数",
+        "total": 1196,
+        "ranking": [
+          {
+            "player": "Mitigli4",
+            "value": 749
+          },
+          {
+            "player": "detkent",
+            "value": 447
+          }
+        ]
+      },
+      "minecraft:stone_axe": {
+        "id": "minecraft:stone_axe",
+        "label": "石の斧",
+        "note": "石の斧を使った回数",
+        "total": 10826,
+        "ranking": [
+          {
+            "player": "kagyki",
+            "value": 2425
+          },
+          {
+            "player": "natch_1105",
+            "value": 2055
+          },
+          {
+            "player": "Mitigli4",
+            "value": 1985
+          },
+          {
+            "player": "Boi0331",
+            "value": 1441
+          },
+          {
+            "player": "detkent",
+            "value": 1033
+          },
+          {
+            "player": "nodoamenn",
+            "value": 618
+          },
+          {
+            "player": "sukmkms",
+            "value": 536
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 236
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 200
+          },
+          {
+            "player": "dekkaishi",
+            "value": 112
+          },
+          {
+            "player": "gurando0302",
+            "value": 85
+          },
+          {
+            "player": "panndasanngou",
+            "value": 70
+          },
+          {
+            "player": "OCTBEE",
+            "value": 21
+          },
+          {
+            "player": "gottigoti",
+            "value": 9
+          }
+        ]
+      },
+      "minecraft:iron_axe": {
+        "id": "minecraft:iron_axe",
+        "label": "鉄の斧",
+        "note": "鉄の斧を使った回数",
+        "total": 6839,
+        "ranking": [
+          {
+            "player": "kagyki",
+            "value": 1725
+          },
+          {
+            "player": "gaburichan",
+            "value": 1612
+          },
+          {
+            "player": "nodoamenn",
+            "value": 1125
+          },
+          {
+            "player": "Mitigli4",
+            "value": 652
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 308
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 283
+          },
+          {
+            "player": "OCTBEE",
+            "value": 242
+          },
+          {
+            "player": "sukmkms",
+            "value": 238
+          },
+          {
+            "player": "gurando0302",
+            "value": 172
+          },
+          {
+            "player": "panndasanngou",
+            "value": 165
+          },
+          {
+            "player": "detkent",
+            "value": 163
+          },
+          {
+            "player": "Boi0331",
+            "value": 154
+          }
+        ]
+      },
+      "minecraft:diamond_axe": {
+        "id": "minecraft:diamond_axe",
+        "label": "ダイヤの斧",
+        "note": "ダイヤの斧を使った回数",
+        "total": 5661,
+        "ranking": [
+          {
+            "player": "nodoamenn",
+            "value": 2391
+          },
+          {
+            "player": "kagyki",
+            "value": 1297
+          },
+          {
+            "player": "Boi0331",
+            "value": 1000
+          },
+          {
+            "player": "gaburichan",
+            "value": 540
+          },
+          {
+            "player": "panndasanngou",
+            "value": 235
+          },
+          {
+            "player": "natch_1105",
+            "value": 119
+          },
+          {
+            "player": "OCTBEE",
+            "value": 61
+          },
+          {
+            "player": "Mitigli4",
+            "value": 18
+          }
+        ]
+      },
+      "twilightforest:diamond_minotaur_axe": {
+        "id": "twilightforest:diamond_minotaur_axe",
+        "label": "ミノタウロスの斧",
+        "note": "Twilight Forest のミノタウロスの斧を使った回数",
+        "total": 1911,
+        "ranking": [
+          {
+            "player": "nodoamenn",
+            "value": 1911
+          }
+        ]
+      },
+      "twilightforest:knightmetal_axe": {
+        "id": "twilightforest:knightmetal_axe",
+        "label": "ナイトメタルの斧",
+        "note": "Twilight Forest のナイトメタルの斧を使った回数",
+        "total": 1312,
+        "ranking": [
+          {
+            "player": "kagyki",
+            "value": 1305
+          },
+          {
+            "player": "nodoamenn",
+            "value": 7
+          }
+        ]
+      },
+      "minecraft:stone_shovel": {
+        "id": "minecraft:stone_shovel",
+        "label": "石のシャベル",
+        "note": "石のシャベルを使った回数",
+        "total": 6524,
+        "ranking": [
+          {
+            "player": "detkent",
+            "value": 1320
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 1298
+          },
+          {
+            "player": "Boi0331",
+            "value": 1282
+          },
+          {
+            "player": "kagyki",
+            "value": 1180
+          },
+          {
+            "player": "dekkaishi",
+            "value": 653
+          },
+          {
+            "player": "Mitigli4",
+            "value": 317
+          },
+          {
+            "player": "natch_1105",
+            "value": 295
+          },
+          {
+            "player": "panndasanngou",
+            "value": 131
+          },
+          {
+            "player": "nodoamenn",
+            "value": 48
+          }
+        ]
+      },
+      "minecraft:iron_shovel": {
+        "id": "minecraft:iron_shovel",
+        "label": "鉄のシャベル",
+        "note": "鉄のシャベルを使った回数",
+        "total": 5667,
+        "ranking": [
+          {
+            "player": "tibepianegt46",
+            "value": 2746
+          },
+          {
+            "player": "gaburichan",
+            "value": 945
+          },
+          {
+            "player": "Boi0331",
+            "value": 614
+          },
+          {
+            "player": "nodoamenn",
+            "value": 373
+          },
+          {
+            "player": "kagyki",
+            "value": 227
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 216
+          },
+          {
+            "player": "OCTBEE",
+            "value": 212
+          },
+          {
+            "player": "detkent",
+            "value": 188
+          },
+          {
+            "player": "gurando0302",
+            "value": 146
+          }
+        ]
+      },
+      "minecraft:torch": {
+        "id": "minecraft:torch",
+        "label": "松明",
+        "note": "松明を使った/置いた回数に近い値",
+        "total": 15894,
+        "ranking": [
+          {
+            "player": "tibepianegt46",
+            "value": 3267
+          },
+          {
+            "player": "kagyki",
+            "value": 3237
+          },
+          {
+            "player": "nodoamenn",
+            "value": 1893
+          },
+          {
+            "player": "dekkaishi",
+            "value": 1780
+          },
+          {
+            "player": "natch_1105",
+            "value": 1655
+          },
+          {
+            "player": "Mitigli4",
+            "value": 1194
+          },
+          {
+            "player": "detkent",
+            "value": 996
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 488
+          },
+          {
+            "player": "gurando0302",
+            "value": 365
+          },
+          {
+            "player": "Boi0331",
+            "value": 270
+          },
+          {
+            "player": "sukmkms",
+            "value": 214
+          },
+          {
+            "player": "panndasanngou",
+            "value": 197
+          },
+          {
+            "player": "gaburichan",
+            "value": 162
+          },
+          {
+            "player": "OCTBEE",
+            "value": 114
+          },
+          {
+            "player": "gottigoti",
+            "value": 62
+          }
+        ]
+      },
+      "minecraft:dirt": {
+        "id": "minecraft:dirt",
+        "label": "土",
+        "note": "土を使った/置いた回数に近い値",
+        "total": 10224,
+        "ranking": [
+          {
+            "player": "Boi0331",
+            "value": 2354
+          },
+          {
+            "player": "nodoamenn",
+            "value": 1855
+          },
+          {
+            "player": "kagyki",
+            "value": 1577
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 1338
+          },
+          {
+            "player": "Mitigli4",
+            "value": 815
+          },
+          {
+            "player": "detkent",
+            "value": 718
+          },
+          {
+            "player": "gaburichan",
+            "value": 411
+          },
+          {
+            "player": "natch_1105",
+            "value": 389
+          },
+          {
+            "player": "dekkaishi",
+            "value": 354
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 270
+          },
+          {
+            "player": "panndasanngou",
+            "value": 47
+          },
+          {
+            "player": "gottigoti",
+            "value": 39
+          },
+          {
+            "player": "OCTBEE",
+            "value": 26
+          },
+          {
+            "player": "sukmkms",
+            "value": 16
+          },
+          {
+            "player": "gurando0302",
+            "value": 15
+          }
+        ]
+      },
+      "minecraft:cobblestone": {
+        "id": "minecraft:cobblestone",
+        "label": "丸石",
+        "note": "丸石を使った/置いた回数に近い値",
+        "total": 6479,
+        "ranking": [
+          {
+            "player": "tibepianegt46",
+            "value": 1780
+          },
+          {
+            "player": "kagyki",
+            "value": 940
+          },
+          {
+            "player": "detkent",
+            "value": 789
+          },
+          {
+            "player": "Mitigli4",
+            "value": 746
+          },
+          {
+            "player": "Boi0331",
+            "value": 520
+          },
+          {
+            "player": "nodoamenn",
+            "value": 437
+          },
+          {
+            "player": "dekkaishi",
+            "value": 424
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 343
+          },
+          {
+            "player": "natch_1105",
+            "value": 249
+          },
+          {
+            "player": "OCTBEE",
+            "value": 138
+          },
+          {
+            "player": "gurando0302",
+            "value": 58
+          },
+          {
+            "player": "panndasanngou",
+            "value": 35
+          },
+          {
+            "player": "gaburichan",
+            "value": 14
+          },
+          {
+            "player": "sukmkms",
+            "value": 6
+          }
+        ]
+      },
+      "minecraft:stone_bricks": {
+        "id": "minecraft:stone_bricks",
+        "label": "石レンガ",
+        "note": "石レンガを使った/置いた回数に近い値",
+        "total": 2513,
+        "ranking": [
+          {
+            "player": "nodoamenn",
+            "value": 1924
+          },
+          {
+            "player": "kagyki",
+            "value": 282
+          },
+          {
+            "player": "Boi0331",
+            "value": 196
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 79
+          },
+          {
+            "player": "natch_1105",
+            "value": 21
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 5
+          },
+          {
+            "player": "dekkaishi",
+            "value": 3
+          },
+          {
+            "player": "Mitigli4",
+            "value": 3
+          }
+        ]
+      },
+      "minecraft:cobbled_deepslate": {
+        "id": "minecraft:cobbled_deepslate",
+        "label": "深層岩の丸石",
+        "note": "深層岩の丸石を使った/置いた回数に近い値",
+        "total": 2283,
+        "ranking": [
+          {
+            "player": "kagyki",
+            "value": 896
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 737
+          },
+          {
+            "player": "Mitigli4",
+            "value": 173
+          },
+          {
+            "player": "panndasanngou",
+            "value": 162
+          },
+          {
+            "player": "nodoamenn",
+            "value": 101
+          },
+          {
+            "player": "gurando0302",
+            "value": 59
+          },
+          {
+            "player": "sukmkms",
+            "value": 57
+          },
+          {
+            "player": "dekkaishi",
+            "value": 48
+          },
+          {
+            "player": "natch_1105",
+            "value": 19
+          },
+          {
+            "player": "OCTBEE",
+            "value": 17
+          },
+          {
+            "player": "detkent",
+            "value": 11
+          },
+          {
+            "player": "gaburichan",
+            "value": 3
+          }
+        ]
+      },
+      "minecraft:netherrack": {
+        "id": "minecraft:netherrack",
+        "label": "ネザーラック",
+        "note": "ネザーラックを使った/置いた回数に近い値",
+        "total": 2062,
+        "ranking": [
+          {
+            "player": "kagyki",
+            "value": 1140
+          },
+          {
+            "player": "Mitigli4",
+            "value": 469
+          },
+          {
+            "player": "nodoamenn",
+            "value": 241
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 160
+          },
+          {
+            "player": "Boi0331",
+            "value": 36
+          },
+          {
+            "player": "dekkaishi",
+            "value": 16
+          }
+        ]
+      },
+      "minecraft:chest": {
+        "id": "minecraft:chest",
+        "label": "チェスト",
+        "note": "チェストを使った/置いた回数に近い値",
+        "total": 424,
+        "ranking": [
+          {
+            "player": "nodoamenn",
+            "value": 174
+          },
+          {
+            "player": "Mitigli4",
+            "value": 58
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 42
+          },
+          {
+            "player": "Boi0331",
+            "value": 26
+          },
+          {
+            "player": "gaburichan",
+            "value": 26
+          },
+          {
+            "player": "natch_1105",
+            "value": 25
+          },
+          {
+            "player": "kagyki",
+            "value": 20
+          },
+          {
+            "player": "detkent",
+            "value": 11
+          },
+          {
+            "player": "OCTBEE",
+            "value": 11
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 9
+          },
+          {
+            "player": "dekkaishi",
+            "value": 7
+          },
+          {
+            "player": "gurando0302",
+            "value": 7
+          },
+          {
+            "player": "panndasanngou",
+            "value": 5
+          },
+          {
+            "player": "sukmkms",
+            "value": 3
+          }
+        ]
+      },
+      "minecraft:ladder": {
+        "id": "minecraft:ladder",
+        "label": "はしご",
+        "note": "はしごを使った/置いた回数に近い値",
+        "total": 511,
+        "ranking": [
+          {
+            "player": "nodoamenn",
+            "value": 408
+          },
+          {
+            "player": "Boi0331",
+            "value": 32
+          },
+          {
+            "player": "natch_1105",
+            "value": 15
+          },
+          {
+            "player": "kagyki",
+            "value": 14
+          },
+          {
+            "player": "detkent",
+            "value": 13
+          },
+          {
+            "player": "gaburichan",
+            "value": 11
+          },
+          {
+            "player": "dekkaishi",
+            "value": 9
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 9
+          }
+        ]
+      },
+      "minecraft:rail": {
+        "id": "minecraft:rail",
+        "label": "レール",
+        "note": "レールを使った/置いた回数に近い値",
+        "total": 377,
+        "ranking": [
+          {
+            "player": "kagyki",
+            "value": 372
+          },
+          {
+            "player": "nodoamenn",
+            "value": 4
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 1
+          }
+        ]
+      },
+      "minecraft:wheat_seeds": {
+        "id": "minecraft:wheat_seeds",
+        "label": "小麦の種",
+        "note": "小麦の種を使った/植えた回数に近い値",
+        "total": 8225,
+        "ranking": [
+          {
+            "player": "detkent",
+            "value": 2608
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 1633
+          },
+          {
+            "player": "Boi0331",
+            "value": 1275
+          },
+          {
+            "player": "kagyki",
+            "value": 901
+          },
+          {
+            "player": "dekkaishi",
+            "value": 762
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 431
+          },
+          {
+            "player": "natch_1105",
+            "value": 272
+          },
+          {
+            "player": "Mitigli4",
+            "value": 236
+          },
+          {
+            "player": "nodoamenn",
+            "value": 107
+          }
+        ]
+      },
+      "minecraft:potato": {
+        "id": "minecraft:potato",
+        "label": "じゃがいも",
+        "note": "じゃがいもを使った/植えた回数に近い値",
+        "total": 2442,
+        "ranking": [
+          {
+            "player": "kagyki",
+            "value": 1475
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 294
+          },
+          {
+            "player": "gurando0302",
+            "value": 241
+          },
+          {
+            "player": "Boi0331",
+            "value": 171
+          },
+          {
+            "player": "Mitigli4",
+            "value": 126
+          },
+          {
+            "player": "natch_1105",
+            "value": 97
+          },
+          {
+            "player": "dekkaishi",
+            "value": 38
+          }
+        ]
+      },
+      "minecraft:carrot": {
+        "id": "minecraft:carrot",
+        "label": "にんじん",
+        "note": "にんじんを使った/植えた回数に近い値",
+        "total": 1596,
+        "ranking": [
+          {
+            "player": "tibepianegt46",
+            "value": 806
+          },
+          {
+            "player": "Boi0331",
+            "value": 216
+          },
+          {
+            "player": "kagyki",
+            "value": 191
+          },
+          {
+            "player": "nodoamenn",
+            "value": 181
+          },
+          {
+            "player": "gurando0302",
+            "value": 100
+          },
+          {
+            "player": "dekkaishi",
+            "value": 61
+          },
+          {
+            "player": "natch_1105",
+            "value": 33
+          },
+          {
+            "player": "panndasanngou",
+            "value": 4
+          },
+          {
+            "player": "Mitigli4",
+            "value": 2
+          },
+          {
+            "player": "detkent",
+            "value": 1
+          },
+          {
+            "player": "gaburichan",
+            "value": 1
+          }
+        ]
+      },
+      "minecraft:sweet_berries": {
+        "id": "minecraft:sweet_berries",
+        "label": "スイートベリー",
+        "note": "スイートベリーを使った/植えた回数に近い値",
+        "total": 1466,
+        "ranking": [
+          {
+            "player": "nodoamenn",
+            "value": 748
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 306
+          },
+          {
+            "player": "gaburichan",
+            "value": 134
+          },
+          {
+            "player": "Mitigli4",
+            "value": 112
+          },
+          {
+            "player": "natch_1105",
+            "value": 70
+          },
+          {
+            "player": "detkent",
+            "value": 37
+          },
+          {
+            "player": "kagyki",
+            "value": 34
+          },
+          {
+            "player": "dekkaishi",
+            "value": 9
+          },
+          {
+            "player": "Boi0331",
+            "value": 7
+          },
+          {
+            "player": "sukmkms",
+            "value": 7
+          },
+          {
+            "player": "panndasanngou",
+            "value": 2
+          }
+        ]
+      },
+      "minecraft:bread": {
+        "id": "minecraft:bread",
+        "label": "パン",
+        "note": "パンを使った/食べた回数に近い値",
+        "total": 1522,
+        "ranking": [
+          {
+            "player": "detkent",
+            "value": 316
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 313
+          },
+          {
+            "player": "dekkaishi",
+            "value": 174
+          },
+          {
+            "player": "Boi0331",
+            "value": 141
+          },
+          {
+            "player": "Mitigli4",
+            "value": 120
+          },
+          {
+            "player": "kagyki",
+            "value": 115
+          },
+          {
+            "player": "nodoamenn",
+            "value": 115
+          },
+          {
+            "player": "gaburichan",
+            "value": 52
+          },
+          {
+            "player": "gurando0302",
+            "value": 49
+          },
+          {
+            "player": "natch_1105",
+            "value": 46
+          },
+          {
+            "player": "panndasanngou",
+            "value": 37
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 34
+          },
+          {
+            "player": "gottigoti",
+            "value": 8
+          },
+          {
+            "player": "OCTBEE",
+            "value": 2
+          }
+        ]
+      },
+      "minecraft:baked_potato": {
+        "id": "minecraft:baked_potato",
+        "label": "ベイクドポテト",
+        "note": "ベイクドポテトを使った/食べた回数に近い値",
+        "total": 1774,
+        "ranking": [
+          {
+            "player": "kagyki",
+            "value": 1005
+          },
+          {
+            "player": "Mitigli4",
+            "value": 165
+          },
+          {
+            "player": "Boi0331",
+            "value": 123
+          },
+          {
+            "player": "nodoamenn",
+            "value": 119
+          },
+          {
+            "player": "natch_1105",
+            "value": 99
+          },
+          {
+            "player": "detkent",
+            "value": 64
+          },
+          {
+            "player": "dekkaishi",
+            "value": 59
+          },
+          {
+            "player": "gaburichan",
+            "value": 48
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 47
+          },
+          {
+            "player": "gurando0302",
+            "value": 44
+          },
+          {
+            "player": "gottigoti",
+            "value": 1
+          }
+        ]
+      },
+      "minecraft:bow": {
+        "id": "minecraft:bow",
+        "label": "弓",
+        "note": "弓を使った回数",
+        "total": 4854,
+        "ranking": [
+          {
+            "player": "nodoamenn",
+            "value": 2620
+          },
+          {
+            "player": "dekkaishi",
+            "value": 526
+          },
+          {
+            "player": "natch_1105",
+            "value": 489
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 416
+          },
+          {
+            "player": "Boi0331",
+            "value": 322
+          },
+          {
+            "player": "kagyki",
+            "value": 322
+          },
+          {
+            "player": "Mitigli4",
+            "value": 159
+          }
+        ]
+      },
+      "minecraft:shield": {
+        "id": "minecraft:shield",
+        "label": "盾",
+        "note": "盾を使った回数",
+        "total": 859,
+        "ranking": [
+          {
+            "player": "natch_1105",
+            "value": 207
+          },
+          {
+            "player": "dekkaishi",
+            "value": 205
+          },
+          {
+            "player": "kagyki",
+            "value": 165
+          },
+          {
+            "player": "nodoamenn",
+            "value": 150
+          },
+          {
+            "player": "sukmkms",
+            "value": 40
+          },
+          {
+            "player": "Mitigli4",
+            "value": 36
+          },
+          {
+            "player": "detkent",
+            "value": 28
+          },
+          {
+            "player": "Boi0331",
+            "value": 13
+          },
+          {
+            "player": "gurando0302",
+            "value": 11
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 4
+          }
+        ]
+      },
+      "minecraft:snowball": {
+        "id": "minecraft:snowball",
+        "label": "雪玉",
+        "note": "雪玉を使った/投げた回数に近い値",
+        "total": 1513,
+        "ranking": [
+          {
+            "player": "tibepianegt46",
+            "value": 410
+          },
+          {
+            "player": "Boi0331",
+            "value": 314
+          },
+          {
+            "player": "natch_1105",
+            "value": 208
+          },
+          {
+            "player": "nodoamenn",
+            "value": 131
+          },
+          {
+            "player": "gaburichan",
+            "value": 125
+          },
+          {
+            "player": "kagyki",
+            "value": 118
+          },
+          {
+            "player": "gurando0302",
+            "value": 76
+          },
+          {
+            "player": "Mitigli4",
+            "value": 69
+          },
+          {
+            "player": "dekkaishi",
+            "value": 31
+          },
+          {
+            "player": "panndasanngou",
+            "value": 31
+          }
+        ]
+      },
+      "minecraft:spyglass": {
+        "id": "minecraft:spyglass",
+        "label": "望遠鏡",
+        "note": "望遠鏡を使った回数",
+        "total": 1427,
+        "ranking": [
+          {
+            "player": "gaburichan",
+            "value": 1427
+          }
+        ]
+      },
+      "minecraft:shears": {
+        "id": "minecraft:shears",
+        "label": "ハサミ",
+        "note": "ハサミを使った回数",
+        "total": 1718,
+        "ranking": [
+          {
+            "player": "tibepianegt46",
+            "value": 992
+          },
+          {
+            "player": "Boi0331",
+            "value": 215
+          },
+          {
+            "player": "kagyki",
+            "value": 203
+          },
+          {
+            "player": "OCTBEE",
+            "value": 115
+          },
+          {
+            "player": "gaburichan",
+            "value": 88
+          },
+          {
+            "player": "nodoamenn",
+            "value": 82
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 11
+          },
+          {
+            "player": "panndasanngou",
+            "value": 9
+          },
+          {
+            "player": "detkent",
+            "value": 2
+          },
+          {
+            "player": "dekkaishi",
+            "value": 1
+          }
+        ]
+      },
+      "minecraft:bucket": {
+        "id": "minecraft:bucket",
+        "label": "バケツ",
+        "note": "空のバケツを使った回数",
+        "total": 2209,
+        "ranking": [
+          {
+            "player": "tibepianegt46",
+            "value": 901
+          },
+          {
+            "player": "kagyki",
+            "value": 520
+          },
+          {
+            "player": "nodoamenn",
+            "value": 343
+          },
+          {
+            "player": "Boi0331",
+            "value": 128
+          },
+          {
+            "player": "natch_1105",
+            "value": 107
+          },
+          {
+            "player": "dekkaishi",
+            "value": 88
+          },
+          {
+            "player": "detkent",
+            "value": 49
+          },
+          {
+            "player": "Mitigli4",
+            "value": 26
+          },
+          {
+            "player": "sukmkms",
+            "value": 23
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 14
+          },
+          {
+            "player": "OCTBEE",
+            "value": 6
+          },
+          {
+            "player": "panndasanngou",
+            "value": 4
+          }
+        ]
+      },
+      "minecraft:water_bucket": {
+        "id": "minecraft:water_bucket",
+        "label": "水バケツ",
+        "note": "水入りバケツを使った回数",
+        "total": 1305,
+        "ranking": [
+          {
+            "player": "tibepianegt46",
+            "value": 486
+          },
+          {
+            "player": "nodoamenn",
+            "value": 289
+          },
+          {
+            "player": "kagyki",
+            "value": 220
+          },
+          {
+            "player": "dekkaishi",
+            "value": 85
+          },
+          {
+            "player": "Boi0331",
+            "value": 82
+          },
+          {
+            "player": "natch_1105",
+            "value": 63
+          },
+          {
+            "player": "detkent",
+            "value": 36
+          },
+          {
+            "player": "Mitigli4",
+            "value": 24
+          },
+          {
+            "player": "Kenshi_www",
+            "value": 14
+          },
+          {
+            "player": "OCTBEE",
+            "value": 5
+          },
+          {
+            "player": "panndasanngou",
+            "value": 1
+          }
+        ]
+      },
+      "minecraft:lava_bucket": {
+        "id": "minecraft:lava_bucket",
+        "label": "溶岩バケツ",
+        "note": "溶岩入りバケツを使った回数。溶岩が何マス流れたかではありません。",
+        "total": 643,
+        "ranking": [
+          {
+            "player": "tibepianegt46",
+            "value": 381
+          },
+          {
+            "player": "kagyki",
+            "value": 198
+          },
+          {
+            "player": "nodoamenn",
+            "value": 28
+          },
+          {
+            "player": "sukmkms",
+            "value": 22
+          },
+          {
+            "player": "detkent",
+            "value": 9
+          },
+          {
+            "player": "natch_1105",
+            "value": 5
+          }
+        ]
+      },
+      "minecraft:flint_and_steel": {
+        "id": "minecraft:flint_and_steel",
+        "label": "火打石と打ち金",
+        "note": "火打石と打ち金を使った回数",
+        "total": 830,
+        "ranking": [
+          {
+            "player": "tibepianegt46",
+            "value": 636
+          },
+          {
+            "player": "sukmkms",
+            "value": 80
+          },
+          {
+            "player": "nodoamenn",
+            "value": 61
+          },
+          {
+            "player": "Mitigli4",
+            "value": 29
+          },
+          {
+            "player": "panndasanngou",
+            "value": 8
+          },
+          {
+            "player": "Boi0331",
+            "value": 7
+          },
+          {
+            "player": "detkent",
+            "value": 7
+          },
+          {
+            "player": "dekkaishi",
+            "value": 1
+          },
+          {
+            "player": "kagyki",
+            "value": 1
+          }
+        ]
+      },
+      "twilightforest:cicada": {
+        "id": "twilightforest:cicada",
+        "label": "セミ",
+        "note": "セミを使った/置いた回数に近い値",
+        "total": 17,
+        "ranking": [
+          {
+            "player": "Mitigli4",
+            "value": 8
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 7
+          },
+          {
+            "player": "Boi0331",
+            "value": 1
+          },
+          {
+            "player": "nodoamenn",
+            "value": 1
+          }
+        ]
+      },
+      "twilightforest:twilight_oak_planks": {
+        "id": "twilightforest:twilight_oak_planks",
+        "label": "黄昏のオーク板材",
+        "note": "Twilight Forest の黄昏のオーク板材を使った/置いた回数に近い値",
+        "total": 1815,
+        "ranking": [
+          {
+            "player": "detkent",
+            "value": 887
+          },
+          {
+            "player": "Mitigli4",
+            "value": 792
+          },
+          {
+            "player": "Boi0331",
+            "value": 82
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 37
+          },
+          {
+            "player": "nodoamenn",
+            "value": 9
+          },
+          {
+            "player": "kagyki",
+            "value": 7
+          },
+          {
+            "player": "dekkaishi",
+            "value": 1
+          }
+        ]
+      },
+      "twilightforest:twilight_oak_slab": {
+        "id": "twilightforest:twilight_oak_slab",
+        "label": "黄昏のオークハーフ",
+        "note": "Twilight Forest の黄昏のオークハーフブロックを使った/置いた回数に近い値",
+        "total": 603,
+        "ranking": [
+          {
+            "player": "Mitigli4",
+            "value": 553
+          },
+          {
+            "player": "nodoamenn",
+            "value": 44
+          },
+          {
+            "player": "Boi0331",
+            "value": 6
+          }
+        ]
+      }
+    }
+  },
+  "daily_deltas": [
+    {
+      "from": "2026-08-16",
+      "to": "2026-08-17",
+      "items": {
+        "minecraft:diamond_pickaxe": [
+          {
+            "player": "nodoamenn",
+            "value": 622
+          },
+          {
+            "player": "panndasanngou",
+            "value": 325
+          },
+          {
+            "player": "kagyki",
+            "value": 64
+          }
+        ],
+        "minecraft:stone_pickaxe": [
+          {
+            "player": "detkent",
+            "value": 91
+          },
+          {
+            "player": "natch_1105",
+            "value": 58
+          },
+          {
+            "player": "Mitigli4",
+            "value": 25
+          },
+          {
+            "player": "Boi0331",
+            "value": 3
+          },
+          {
+            "player": "kagyki",
+            "value": 2
+          }
+        ],
+        "minecraft:iron_pickaxe": [
+          {
+            "player": "dekkaishi",
+            "value": 223
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 173
+          },
+          {
+            "player": "gaburichan",
+            "value": 111
+          },
+          {
+            "player": "natch_1105",
+            "value": 110
+          },
+          {
+            "player": "kagyki",
+            "value": 107
+          },
+          {
+            "player": "detkent",
+            "value": 20
+          }
+        ],
+        "twilightforest:fiery_pickaxe": [],
+        "twilightforest:ironwood_pickaxe": [
+          {
+            "player": "Mitigli4",
+            "value": 33
+          }
+        ],
+        "minecraft:stone_sword": [
+          {
+            "player": "kagyki",
+            "value": 953
+          },
+          {
+            "player": "Mitigli4",
+            "value": 857
+          },
+          {
+            "player": "nodoamenn",
+            "value": 510
+          },
+          {
+            "player": "dekkaishi",
+            "value": 330
+          },
+          {
+            "player": "natch_1105",
+            "value": 120
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 66
+          },
+          {
+            "player": "detkent",
+            "value": 8
+          }
+        ],
+        "minecraft:diamond_sword": [
+          {
+            "player": "kagyki",
+            "value": 58
+          }
+        ],
+        "minecraft:iron_sword": [
+          {
+            "player": "dekkaishi",
+            "value": 509
+          },
+          {
+            "player": "gaburichan",
+            "value": 122
+          },
+          {
+            "player": "detkent",
+            "value": 114
+          },
+          {
+            "player": "Boi0331",
+            "value": 1
+          }
+        ],
+        "twilightforest:fiery_sword": [],
+        "minecraft:stone_axe": [
+          {
+            "player": "natch_1105",
+            "value": 169
+          },
+          {
+            "player": "Mitigli4",
+            "value": 87
+          },
+          {
+            "player": "detkent",
+            "value": 68
+          },
+          {
+            "player": "Boi0331",
+            "value": 16
+          }
+        ],
+        "minecraft:iron_axe": [
+          {
+            "player": "kagyki",
+            "value": 134
+          },
+          {
+            "player": "gaburichan",
+            "value": 6
+          }
+        ],
+        "minecraft:diamond_axe": [
+          {
+            "player": "nodoamenn",
+            "value": 530
+          },
+          {
+            "player": "Boi0331",
+            "value": 88
+          },
+          {
+            "player": "panndasanngou",
+            "value": 51
+          }
+        ],
+        "twilightforest:diamond_minotaur_axe": [],
+        "twilightforest:knightmetal_axe": [
+          {
+            "player": "kagyki",
+            "value": 12
+          },
+          {
+            "player": "nodoamenn",
+            "value": 7
+          }
+        ],
+        "minecraft:stone_shovel": [],
+        "minecraft:iron_shovel": [],
+        "minecraft:torch": [
+          {
+            "player": "Mitigli4",
+            "value": 261
+          },
+          {
+            "player": "natch_1105",
+            "value": 241
+          },
+          {
+            "player": "nodoamenn",
+            "value": 219
+          },
+          {
+            "player": "dekkaishi",
+            "value": 162
+          },
+          {
+            "player": "detkent",
+            "value": 141
+          },
+          {
+            "player": "gaburichan",
+            "value": 125
+          },
+          {
+            "player": "kagyki",
+            "value": 81
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 29
+          },
+          {
+            "player": "panndasanngou",
+            "value": 2
+          }
+        ],
+        "minecraft:dirt": [
+          {
+            "player": "kagyki",
+            "value": 46
+          },
+          {
+            "player": "detkent",
+            "value": 41
+          },
+          {
+            "player": "natch_1105",
+            "value": 38
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 27
+          },
+          {
+            "player": "Boi0331",
+            "value": 17
+          },
+          {
+            "player": "dekkaishi",
+            "value": 12
+          },
+          {
+            "player": "Mitigli4",
+            "value": 10
+          },
+          {
+            "player": "nodoamenn",
+            "value": 9
+          }
+        ],
+        "minecraft:cobblestone": [
+          {
+            "player": "Mitigli4",
+            "value": 63
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 61
+          },
+          {
+            "player": "detkent",
+            "value": 19
+          },
+          {
+            "player": "kagyki",
+            "value": 13
+          },
+          {
+            "player": "nodoamenn",
+            "value": 12
+          },
+          {
+            "player": "dekkaishi",
+            "value": 8
+          },
+          {
+            "player": "natch_1105",
+            "value": 3
+          },
+          {
+            "player": "gaburichan",
+            "value": 1
+          }
+        ],
+        "minecraft:stone_bricks": [
+          {
+            "player": "nodoamenn",
+            "value": 16
+          }
+        ],
+        "minecraft:cobbled_deepslate": [
+          {
+            "player": "kagyki",
+            "value": 67
+          },
+          {
+            "player": "natch_1105",
+            "value": 12
+          },
+          {
+            "player": "dekkaishi",
+            "value": 11
+          },
+          {
+            "player": "panndasanngou",
+            "value": 3
+          }
+        ],
+        "minecraft:netherrack": [],
+        "minecraft:chest": [
+          {
+            "player": "nodoamenn",
+            "value": 23
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 3
+          },
+          {
+            "player": "Boi0331",
+            "value": 2
+          },
+          {
+            "player": "natch_1105",
+            "value": 1
+          }
+        ],
+        "minecraft:ladder": [
+          {
+            "player": "nodoamenn",
+            "value": 3
+          }
+        ],
+        "minecraft:rail": [],
+        "minecraft:wheat_seeds": [
+          {
+            "player": "detkent",
+            "value": 222
+          },
+          {
+            "player": "dekkaishi",
+            "value": 105
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 14
+          },
+          {
+            "player": "natch_1105",
+            "value": 9
+          }
+        ],
+        "minecraft:potato": [
+          {
+            "player": "kagyki",
+            "value": 247
+          },
+          {
+            "player": "natch_1105",
+            "value": 35
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 33
+          },
+          {
+            "player": "dekkaishi",
+            "value": 9
+          }
+        ],
+        "minecraft:carrot": [
+          {
+            "player": "dekkaishi",
+            "value": 60
+          },
+          {
+            "player": "Boi0331",
+            "value": 37
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 12
+          },
+          {
+            "player": "kagyki",
+            "value": 9
+          },
+          {
+            "player": "natch_1105",
+            "value": 5
+          },
+          {
+            "player": "Mitigli4",
+            "value": 2
+          },
+          {
+            "player": "detkent",
+            "value": 1
+          },
+          {
+            "player": "gaburichan",
+            "value": 1
+          }
+        ],
+        "minecraft:sweet_berries": [
+          {
+            "player": "gaburichan",
+            "value": 28
+          },
+          {
+            "player": "detkent",
+            "value": 4
+          },
+          {
+            "player": "dekkaishi",
+            "value": 3
+          }
+        ],
+        "minecraft:bread": [
+          {
+            "player": "nodoamenn",
+            "value": 35
+          },
+          {
+            "player": "gaburichan",
+            "value": 30
+          },
+          {
+            "player": "detkent",
+            "value": 26
+          },
+          {
+            "player": "kagyki",
+            "value": 20
+          },
+          {
+            "player": "dekkaishi",
+            "value": 10
+          },
+          {
+            "player": "natch_1105",
+            "value": 4
+          },
+          {
+            "player": "Mitigli4",
+            "value": 1
+          }
+        ],
+        "minecraft:baked_potato": [
+          {
+            "player": "kagyki",
+            "value": 79
+          },
+          {
+            "player": "nodoamenn",
+            "value": 60
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 42
+          },
+          {
+            "player": "Mitigli4",
+            "value": 30
+          },
+          {
+            "player": "dekkaishi",
+            "value": 25
+          },
+          {
+            "player": "gaburichan",
+            "value": 22
+          },
+          {
+            "player": "natch_1105",
+            "value": 17
+          },
+          {
+            "player": "detkent",
+            "value": 3
+          }
+        ],
+        "minecraft:bow": [
+          {
+            "player": "nodoamenn",
+            "value": 510
+          },
+          {
+            "player": "Mitigli4",
+            "value": 159
+          },
+          {
+            "player": "dekkaishi",
+            "value": 134
+          },
+          {
+            "player": "Boi0331",
+            "value": 22
+          }
+        ],
+        "minecraft:shield": [
+          {
+            "player": "dekkaishi",
+            "value": 137
+          },
+          {
+            "player": "kagyki",
+            "value": 65
+          },
+          {
+            "player": "natch_1105",
+            "value": 38
+          },
+          {
+            "player": "Mitigli4",
+            "value": 8
+          },
+          {
+            "player": "detkent",
+            "value": 3
+          },
+          {
+            "player": "nodoamenn",
+            "value": 2
+          }
+        ],
+        "minecraft:snowball": [
+          {
+            "player": "natch_1105",
+            "value": 23
+          },
+          {
+            "player": "dekkaishi",
+            "value": 16
+          },
+          {
+            "player": "Mitigli4",
+            "value": 13
+          },
+          {
+            "player": "kagyki",
+            "value": 2
+          }
+        ],
+        "minecraft:spyglass": [
+          {
+            "player": "gaburichan",
+            "value": 370
+          }
+        ],
+        "minecraft:shears": [],
+        "minecraft:bucket": [
+          {
+            "player": "kagyki",
+            "value": 65
+          },
+          {
+            "player": "nodoamenn",
+            "value": 45
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 7
+          },
+          {
+            "player": "detkent",
+            "value": 1
+          }
+        ],
+        "minecraft:water_bucket": [
+          {
+            "player": "kagyki",
+            "value": 57
+          },
+          {
+            "player": "nodoamenn",
+            "value": 44
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 7
+          },
+          {
+            "player": "detkent",
+            "value": 2
+          }
+        ],
+        "minecraft:lava_bucket": [],
+        "minecraft:flint_and_steel": [
+          {
+            "player": "Mitigli4",
+            "value": 11
+          },
+          {
+            "player": "nodoamenn",
+            "value": 1
+          },
+          {
+            "player": "panndasanngou",
+            "value": 1
+          }
+        ],
+        "twilightforest:cicada": [
+          {
+            "player": "tibepianegt46",
+            "value": 1
+          }
+        ],
+        "twilightforest:twilight_oak_planks": [
+          {
+            "player": "kagyki",
+            "value": 7
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 4
+          }
+        ],
+        "twilightforest:twilight_oak_slab": []
+      }
+    },
+    {
+      "from": "2026-08-17",
+      "to": "2026-08-22T07:15:00+09:00",
+      "items": {
+        "minecraft:diamond_pickaxe": [
+          {
+            "player": "kagyki",
+            "value": 6080
+          },
+          {
+            "player": "nodoamenn",
+            "value": 4970
+          },
+          {
+            "player": "natch_1105",
+            "value": 1170
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 1059
+          },
+          {
+            "player": "Boi0331",
+            "value": 157
+          },
+          {
+            "player": "Mitigli4",
+            "value": 16
+          }
+        ],
+        "minecraft:stone_pickaxe": [
+          {
+            "player": "tibepianegt46",
+            "value": 474
+          },
+          {
+            "player": "natch_1105",
+            "value": 440
+          },
+          {
+            "player": "Boi0331",
+            "value": 229
+          },
+          {
+            "player": "detkent",
+            "value": 211
+          }
+        ],
+        "minecraft:iron_pickaxe": [
+          {
+            "player": "tibepianegt46",
+            "value": 950
+          },
+          {
+            "player": "Boi0331",
+            "value": 777
+          },
+          {
+            "player": "gaburichan",
+            "value": 24
+          },
+          {
+            "player": "natch_1105",
+            "value": 13
+          }
+        ],
+        "twilightforest:fiery_pickaxe": [
+          {
+            "player": "Mitigli4",
+            "value": 8551
+          }
+        ],
+        "twilightforest:ironwood_pickaxe": [
+          {
+            "player": "Mitigli4",
+            "value": 21
+          }
+        ],
+        "minecraft:stone_sword": [
+          {
+            "player": "natch_1105",
+            "value": 4893
+          },
+          {
+            "player": "detkent",
+            "value": 3736
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 1125
+          },
+          {
+            "player": "kagyki",
+            "value": 1030
+          },
+          {
+            "player": "Boi0331",
+            "value": 836
+          },
+          {
+            "player": "Mitigli4",
+            "value": 322
+          },
+          {
+            "player": "nodoamenn",
+            "value": 14
+          }
+        ],
+        "minecraft:diamond_sword": [
+          {
+            "player": "nodoamenn",
+            "value": 3558
+          },
+          {
+            "player": "kagyki",
+            "value": 1385
+          },
+          {
+            "player": "Mitigli4",
+            "value": 294
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 82
+          },
+          {
+            "player": "natch_1105",
+            "value": 28
+          }
+        ],
+        "minecraft:iron_sword": [
+          {
+            "player": "nodoamenn",
+            "value": 609
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 489
+          },
+          {
+            "player": "natch_1105",
+            "value": 290
+          },
+          {
+            "player": "kagyki",
+            "value": 251
+          },
+          {
+            "player": "Boi0331",
+            "value": 110
+          },
+          {
+            "player": "detkent",
+            "value": 72
+          },
+          {
+            "player": "gaburichan",
+            "value": 4
+          }
+        ],
+        "twilightforest:fiery_sword": [
+          {
+            "player": "Mitigli4",
+            "value": 660
+          }
+        ],
+        "minecraft:stone_axe": [
+          {
+            "player": "natch_1105",
+            "value": 241
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 52
+          },
+          {
+            "player": "detkent",
+            "value": 43
+          }
+        ],
+        "minecraft:iron_axe": [
+          {
+            "player": "gaburichan",
+            "value": 251
+          },
+          {
+            "player": "Boi0331",
+            "value": 154
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 130
+          }
+        ],
+        "minecraft:diamond_axe": [
+          {
+            "player": "nodoamenn",
+            "value": 591
+          },
+          {
+            "player": "gaburichan",
+            "value": 540
+          },
+          {
+            "player": "Boi0331",
+            "value": 424
+          }
+        ],
+        "twilightforest:diamond_minotaur_axe": [],
+        "twilightforest:knightmetal_axe": [
+          {
+            "player": "kagyki",
+            "value": 1211
+          }
+        ],
+        "minecraft:stone_shovel": [
+          {
+            "player": "detkent",
+            "value": 786
+          },
+          {
+            "player": "Boi0331",
+            "value": 75
+          }
+        ],
+        "minecraft:iron_shovel": [
+          {
+            "player": "Boi0331",
+            "value": 230
+          },
+          {
+            "player": "gaburichan",
+            "value": 101
+          },
+          {
+            "player": "detkent",
+            "value": 43
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 4
+          }
+        ],
+        "minecraft:torch": [
+          {
+            "player": "kagyki",
+            "value": 1452
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 784
+          },
+          {
+            "player": "natch_1105",
+            "value": 624
+          },
+          {
+            "player": "Mitigli4",
+            "value": 267
+          },
+          {
+            "player": "nodoamenn",
+            "value": 123
+          },
+          {
+            "player": "Boi0331",
+            "value": 95
+          },
+          {
+            "player": "detkent",
+            "value": 25
+          }
+        ],
+        "minecraft:dirt": [
+          {
+            "player": "Boi0331",
+            "value": 637
+          },
+          {
+            "player": "detkent",
+            "value": 338
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 169
+          },
+          {
+            "player": "kagyki",
+            "value": 139
+          },
+          {
+            "player": "natch_1105",
+            "value": 21
+          },
+          {
+            "player": "nodoamenn",
+            "value": 7
+          },
+          {
+            "player": "Mitigli4",
+            "value": 6
+          },
+          {
+            "player": "gaburichan",
+            "value": 4
+          }
+        ],
+        "minecraft:cobblestone": [
+          {
+            "player": "Boi0331",
+            "value": 378
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 201
+          },
+          {
+            "player": "natch_1105",
+            "value": 127
+          },
+          {
+            "player": "nodoamenn",
+            "value": 67
+          },
+          {
+            "player": "kagyki",
+            "value": 29
+          },
+          {
+            "player": "detkent",
+            "value": 1
+          },
+          {
+            "player": "Mitigli4",
+            "value": 1
+          }
+        ],
+        "minecraft:stone_bricks": [
+          {
+            "player": "nodoamenn",
+            "value": 633
+          },
+          {
+            "player": "kagyki",
+            "value": 76
+          }
+        ],
+        "minecraft:cobbled_deepslate": [
+          {
+            "player": "kagyki",
+            "value": 461
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 212
+          },
+          {
+            "player": "natch_1105",
+            "value": 1
+          }
+        ],
+        "minecraft:netherrack": [
+          {
+            "player": "tibepianegt46",
+            "value": 93
+          },
+          {
+            "player": "kagyki",
+            "value": 43
+          },
+          {
+            "player": "Boi0331",
+            "value": 36
+          },
+          {
+            "player": "nodoamenn",
+            "value": 11
+          }
+        ],
+        "minecraft:chest": [
+          {
+            "player": "nodoamenn",
+            "value": 24
+          },
+          {
+            "player": "Boi0331",
+            "value": 8
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 8
+          },
+          {
+            "player": "natch_1105",
+            "value": 7
+          },
+          {
+            "player": "detkent",
+            "value": 3
+          },
+          {
+            "player": "kagyki",
+            "value": 2
+          },
+          {
+            "player": "Mitigli4",
+            "value": 2
+          }
+        ],
+        "minecraft:ladder": [
+          {
+            "player": "nodoamenn",
+            "value": 160
+          },
+          {
+            "player": "natch_1105",
+            "value": 11
+          },
+          {
+            "player": "detkent",
+            "value": 4
+          }
+        ],
+        "minecraft:rail": [
+          {
+            "player": "kagyki",
+            "value": 372
+          },
+          {
+            "player": "nodoamenn",
+            "value": 4
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 1
+          }
+        ],
+        "minecraft:wheat_seeds": [
+          {
+            "player": "detkent",
+            "value": 438
+          },
+          {
+            "player": "natch_1105",
+            "value": 154
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 150
+          },
+          {
+            "player": "Boi0331",
+            "value": 67
+          },
+          {
+            "player": "nodoamenn",
+            "value": 58
+          },
+          {
+            "player": "kagyki",
+            "value": 14
+          }
+        ],
+        "minecraft:potato": [
+          {
+            "player": "kagyki",
+            "value": 220
+          },
+          {
+            "player": "Mitigli4",
+            "value": 126
+          },
+          {
+            "player": "natch_1105",
+            "value": 36
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 12
+          }
+        ],
+        "minecraft:carrot": [
+          {
+            "player": "tibepianegt46",
+            "value": 417
+          },
+          {
+            "player": "Boi0331",
+            "value": 103
+          },
+          {
+            "player": "nodoamenn",
+            "value": 35
+          },
+          {
+            "player": "kagyki",
+            "value": 29
+          },
+          {
+            "player": "natch_1105",
+            "value": 2
+          }
+        ],
+        "minecraft:sweet_berries": [
+          {
+            "player": "nodoamenn",
+            "value": 40
+          },
+          {
+            "player": "natch_1105",
+            "value": 4
+          },
+          {
+            "player": "kagyki",
+            "value": 3
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 2
+          }
+        ],
+        "minecraft:bread": [
+          {
+            "player": "tibepianegt46",
+            "value": 41
+          },
+          {
+            "player": "Boi0331",
+            "value": 39
+          },
+          {
+            "player": "Mitigli4",
+            "value": 6
+          },
+          {
+            "player": "nodoamenn",
+            "value": 1
+          }
+        ],
+        "minecraft:baked_potato": [
+          {
+            "player": "kagyki",
+            "value": 322
+          },
+          {
+            "player": "Mitigli4",
+            "value": 82
+          },
+          {
+            "player": "natch_1105",
+            "value": 57
+          },
+          {
+            "player": "nodoamenn",
+            "value": 56
+          },
+          {
+            "player": "detkent",
+            "value": 50
+          },
+          {
+            "player": "Boi0331",
+            "value": 48
+          }
+        ],
+        "minecraft:bow": [
+          {
+            "player": "nodoamenn",
+            "value": 391
+          },
+          {
+            "player": "natch_1105",
+            "value": 259
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 138
+          },
+          {
+            "player": "Boi0331",
+            "value": 27
+          },
+          {
+            "player": "kagyki",
+            "value": 13
+          }
+        ],
+        "minecraft:shield": [
+          {
+            "player": "natch_1105",
+            "value": 75
+          },
+          {
+            "player": "kagyki",
+            "value": 71
+          },
+          {
+            "player": "Boi0331",
+            "value": 13
+          },
+          {
+            "player": "Mitigli4",
+            "value": 1
+          }
+        ],
+        "minecraft:snowball": [
+          {
+            "player": "gaburichan",
+            "value": 24
+          },
+          {
+            "player": "natch_1105",
+            "value": 2
+          },
+          {
+            "player": "nodoamenn",
+            "value": 1
+          }
+        ],
+        "minecraft:spyglass": [
+          {
+            "player": "gaburichan",
+            "value": 56
+          }
+        ],
+        "minecraft:shears": [
+          {
+            "player": "kagyki",
+            "value": 199
+          },
+          {
+            "player": "Boi0331",
+            "value": 151
+          },
+          {
+            "player": "gaburichan",
+            "value": 45
+          },
+          {
+            "player": "detkent",
+            "value": 1
+          }
+        ],
+        "minecraft:bucket": [
+          {
+            "player": "tibepianegt46",
+            "value": 321
+          },
+          {
+            "player": "kagyki",
+            "value": 251
+          },
+          {
+            "player": "Boi0331",
+            "value": 66
+          },
+          {
+            "player": "nodoamenn",
+            "value": 51
+          },
+          {
+            "player": "detkent",
+            "value": 22
+          },
+          {
+            "player": "natch_1105",
+            "value": 20
+          },
+          {
+            "player": "Mitigli4",
+            "value": 8
+          }
+        ],
+        "minecraft:water_bucket": [
+          {
+            "player": "tibepianegt46",
+            "value": 98
+          },
+          {
+            "player": "kagyki",
+            "value": 91
+          },
+          {
+            "player": "nodoamenn",
+            "value": 48
+          },
+          {
+            "player": "Boi0331",
+            "value": 19
+          },
+          {
+            "player": "detkent",
+            "value": 15
+          },
+          {
+            "player": "Mitigli4",
+            "value": 7
+          },
+          {
+            "player": "natch_1105",
+            "value": 5
+          }
+        ],
+        "minecraft:lava_bucket": [
+          {
+            "player": "tibepianegt46",
+            "value": 209
+          },
+          {
+            "player": "kagyki",
+            "value": 107
+          },
+          {
+            "player": "detkent",
+            "value": 6
+          },
+          {
+            "player": "natch_1105",
+            "value": 5
+          }
+        ],
+        "minecraft:flint_and_steel": [
+          {
+            "player": "tibepianegt46",
+            "value": 116
+          },
+          {
+            "player": "nodoamenn",
+            "value": 18
+          }
+        ],
+        "twilightforest:cicada": [
+          {
+            "player": "tibepianegt46",
+            "value": 2
+          }
+        ],
+        "twilightforest:twilight_oak_planks": [
+          {
+            "player": "Boi0331",
+            "value": 80
+          }
+        ],
+        "twilightforest:twilight_oak_slab": [
+          {
+            "player": "Boi0331",
+            "value": 6
+          }
+        ]
+      }
+    },
+    {
+      "from": "2026-08-22T07:15:00+09:00",
+      "to": "2026-08-23",
+      "items": {
+        "minecraft:diamond_pickaxe": [
+          {
+            "player": "nodoamenn",
+            "value": 3622
+          },
+          {
+            "player": "kagyki",
+            "value": 1492
+          },
+          {
+            "player": "Boi0331",
+            "value": 588
+          },
+          {
+            "player": "natch_1105",
+            "value": 248
+          }
+        ],
+        "minecraft:stone_pickaxe": [
+          {
+            "player": "tibepianegt46",
+            "value": 81
+          },
+          {
+            "player": "detkent",
+            "value": 1
+          }
+        ],
+        "minecraft:iron_pickaxe": [
+          {
+            "player": "tibepianegt46",
+            "value": 516
+          },
+          {
+            "player": "detkent",
+            "value": 262
+          }
+        ],
+        "twilightforest:fiery_pickaxe": [
+          {
+            "player": "Mitigli4",
+            "value": 111
+          }
+        ],
+        "twilightforest:ironwood_pickaxe": [],
+        "minecraft:stone_sword": [
+          {
+            "player": "detkent",
+            "value": 1067
+          },
+          {
+            "player": "natch_1105",
+            "value": 346
+          },
+          {
+            "player": "Boi0331",
+            "value": 66
+          }
+        ],
+        "minecraft:diamond_sword": [
+          {
+            "player": "kagyki",
+            "value": 2458
+          },
+          {
+            "player": "natch_1105",
+            "value": 1462
+          },
+          {
+            "player": "nodoamenn",
+            "value": 1143
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 706
+          }
+        ],
+        "minecraft:iron_sword": [
+          {
+            "player": "detkent",
+            "value": 2126
+          },
+          {
+            "player": "gaburichan",
+            "value": 20
+          },
+          {
+            "player": "Boi0331",
+            "value": 5
+          }
+        ],
+        "twilightforest:fiery_sword": [
+          {
+            "player": "Mitigli4",
+            "value": 89
+          }
+        ],
+        "minecraft:stone_axe": [
+          {
+            "player": "natch_1105",
+            "value": 9
+          }
+        ],
+        "minecraft:iron_axe": [
+          {
+            "player": "detkent",
+            "value": 92
+          }
+        ],
+        "minecraft:diamond_axe": [
+          {
+            "player": "nodoamenn",
+            "value": 118
+          },
+          {
+            "player": "natch_1105",
+            "value": 91
+          },
+          {
+            "player": "Boi0331",
+            "value": 34
+          }
+        ],
+        "twilightforest:diamond_minotaur_axe": [
+          {
+            "player": "nodoamenn",
+            "value": 223
+          }
+        ],
+        "twilightforest:knightmetal_axe": [
+          {
+            "player": "kagyki",
+            "value": 70
+          }
+        ],
+        "minecraft:stone_shovel": [],
+        "minecraft:iron_shovel": [
+          {
+            "player": "tibepianegt46",
+            "value": 15
+          },
+          {
+            "player": "detkent",
+            "value": 4
+          }
+        ],
+        "minecraft:torch": [
+          {
+            "player": "detkent",
+            "value": 262
+          },
+          {
+            "player": "natch_1105",
+            "value": 258
+          },
+          {
+            "player": "nodoamenn",
+            "value": 250
+          },
+          {
+            "player": "kagyki",
+            "value": 188
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 172
+          },
+          {
+            "player": "Boi0331",
+            "value": 15
+          }
+        ],
+        "minecraft:dirt": [
+          {
+            "player": "detkent",
+            "value": 38
+          },
+          {
+            "player": "Boi0331",
+            "value": 28
+          },
+          {
+            "player": "nodoamenn",
+            "value": 18
+          },
+          {
+            "player": "natch_1105",
+            "value": 2
+          }
+        ],
+        "minecraft:cobblestone": [
+          {
+            "player": "tibepianegt46",
+            "value": 124
+          },
+          {
+            "player": "natch_1105",
+            "value": 74
+          },
+          {
+            "player": "detkent",
+            "value": 63
+          },
+          {
+            "player": "Mitigli4",
+            "value": 52
+          },
+          {
+            "player": "kagyki",
+            "value": 3
+          }
+        ],
+        "minecraft:stone_bricks": [
+          {
+            "player": "nodoamenn",
+            "value": 134
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 63
+          },
+          {
+            "player": "natch_1105",
+            "value": 21
+          }
+        ],
+        "minecraft:cobbled_deepslate": [
+          {
+            "player": "tibepianegt46",
+            "value": 175
+          },
+          {
+            "player": "nodoamenn",
+            "value": 36
+          }
+        ],
+        "minecraft:netherrack": [
+          {
+            "player": "kagyki",
+            "value": 127
+          },
+          {
+            "player": "Mitigli4",
+            "value": 1
+          }
+        ],
+        "minecraft:chest": [
+          {
+            "player": "natch_1105",
+            "value": 6
+          },
+          {
+            "player": "nodoamenn",
+            "value": 3
+          },
+          {
+            "player": "detkent",
+            "value": 2
+          },
+          {
+            "player": "kagyki",
+            "value": 2
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 2
+          }
+        ],
+        "minecraft:ladder": [
+          {
+            "player": "nodoamenn",
+            "value": 3
+          }
+        ],
+        "minecraft:rail": [],
+        "minecraft:wheat_seeds": [
+          {
+            "player": "natch_1105",
+            "value": 18
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 3
+          }
+        ],
+        "minecraft:potato": [
+          {
+            "player": "natch_1105",
+            "value": 2
+          }
+        ],
+        "minecraft:carrot": [
+          {
+            "player": "nodoamenn",
+            "value": 61
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 22
+          },
+          {
+            "player": "Boi0331",
+            "value": 13
+          }
+        ],
+        "minecraft:sweet_berries": [
+          {
+            "player": "nodoamenn",
+            "value": 78
+          }
+        ],
+        "minecraft:bread": [
+          {
+            "player": "natch_1105",
+            "value": 12
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 7
+          }
+        ],
+        "minecraft:baked_potato": [
+          {
+            "player": "kagyki",
+            "value": 170
+          },
+          {
+            "player": "Mitigli4",
+            "value": 28
+          },
+          {
+            "player": "detkent",
+            "value": 11
+          },
+          {
+            "player": "natch_1105",
+            "value": 1
+          }
+        ],
+        "minecraft:bow": [
+          {
+            "player": "nodoamenn",
+            "value": 1009
+          },
+          {
+            "player": "kagyki",
+            "value": 273
+          },
+          {
+            "player": "tibepianegt46",
+            "value": 259
+          },
+          {
+            "player": "natch_1105",
+            "value": 164
+          },
+          {
+            "player": "Boi0331",
+            "value": 46
+          }
+        ],
+        "minecraft:shield": [
+          {
+            "player": "nodoamenn",
+            "value": 35
+          },
+          {
+            "player": "natch_1105",
+            "value": 12
+          },
+          {
+            "player": "detkent",
+            "value": 6
+          }
+        ],
+        "minecraft:snowball": [
+          {
+            "player": "Mitigli4",
+            "value": 2
+          }
+        ],
+        "minecraft:spyglass": [
+          {
+            "player": "gaburichan",
+            "value": 15
+          }
+        ],
+        "minecraft:shears": [
+          {
+            "player": "Boi0331",
+            "value": 49
+          }
+        ],
+        "minecraft:bucket": [
+          {
+            "player": "tibepianegt46",
+            "value": 264
+          },
+          {
+            "player": "kagyki",
+            "value": 36
+          },
+          {
+            "player": "nodoamenn",
+            "value": 25
+          },
+          {
+            "player": "natch_1105",
+            "value": 8
+          },
+          {
+            "player": "detkent",
+            "value": 1
+          }
+        ],
+        "minecraft:water_bucket": [
+          {
+            "player": "tibepianegt46",
+            "value": 169
+          },
+          {
+            "player": "kagyki",
+            "value": 30
+          },
+          {
+            "player": "nodoamenn",
+            "value": 20
+          },
+          {
+            "player": "natch_1105",
+            "value": 5
+          }
+        ],
+        "minecraft:lava_bucket": [
+          {
+            "player": "tibepianegt46",
+            "value": 95
+          },
+          {
+            "player": "kagyki",
+            "value": 7
+          }
+        ],
+        "minecraft:flint_and_steel": [
+          {
+            "player": "tibepianegt46",
+            "value": 58
+          },
+          {
+            "player": "Mitigli4",
+            "value": 6
+          },
+          {
+            "player": "nodoamenn",
+            "value": 3
+          }
+        ],
+        "twilightforest:cicada": [
+          {
+            "player": "Mitigli4",
+            "value": 4
+          }
+        ],
+        "twilightforest:twilight_oak_planks": [],
+        "twilightforest:twilight_oak_slab": []
+      }
+    },
+    {
+      "from": "2026-08-23",
+      "to": "2026-08-24",
+      "items": {
+        "minecraft:diamond_pickaxe": [
+          {
+            "player": "kagyki",
+            "value": 2888
+          },
+          {
+            "player": "nodoamenn",
+            "value": 2488
+          },
+          {
+            "player": "natch_1105",
+            "value": 550
+          }
+        ],
+        "minecraft:stone_pickaxe": [],
+        "minecraft:iron_pickaxe": [
+          {
+            "player": "dekkaishi",
+            "value": 314
+          },
+          {
+            "player": "detkent",
+            "value": 126
+          }
+        ],
+        "twilightforest:fiery_pickaxe": [
+          {
+            "player": "natch_1105",
+            "value": 125
+          }
+        ],
+        "twilightforest:ironwood_pickaxe": [],
+        "minecraft:stone_sword": [
+          {
+            "player": "dekkaishi",
+            "value": 330
+          },
+          {
+            "player": "natch_1105",
+            "value": 264
+          }
+        ],
+        "minecraft:diamond_sword": [
+          {
+            "player": "natch_1105",
+            "value": 2050
+          },
+          {
+            "player": "nodoamenn",
+            "value": 602
+          },
+          {
+            "player": "kagyki",
+            "value": 557
+          },
+          {
+            "player": "detkent",
+            "value": 531
+          },
+          {
+            "player": "dekkaishi",
+            "value": 465
+          }
+        ],
+        "minecraft:iron_sword": [
+          {
+            "player": "detkent",
+            "value": 862
+          },
+          {
+            "player": "dekkaishi",
+            "value": 392
+          }
+        ],
+        "twilightforest:fiery_sword": [
+          {
+            "player": "detkent",
+            "value": 447
+          }
+        ],
+        "minecraft:stone_axe": [
+          {
+            "player": "dekkaishi",
+            "value": 80
+          }
+        ],
+        "minecraft:iron_axe": [
+          {
+            "player": "detkent",
+            "value": 71
+          }
+        ],
+        "minecraft:diamond_axe": [
+          {
+            "player": "nodoamenn",
+            "value": 36
+          },
+          {
+            "player": "natch_1105",
+            "value": 28
+          }
+        ],
+        "twilightforest:diamond_minotaur_axe": [
+          {
+            "player": "nodoamenn",
+            "value": 505
+          }
+        ],
+        "twilightforest:knightmetal_axe": [
+          {
+            "player": "kagyki",
+            "value": 12
+          }
+        ],
+        "minecraft:stone_shovel": [],
+        "minecraft:iron_shovel": [
+          {
+            "player": "detkent",
+            "value": 109
+          }
+        ],
+        "minecraft:torch": [
+          {
+            "player": "kagyki",
+            "value": 339
+          },
+          {
+            "player": "natch_1105",
+            "value": 338
+          },
+          {
+            "player": "detkent",
+            "value": 224
+          },
+          {
+            "player": "dekkaishi",
+            "value": 223
+          },
+          {
+            "player": "nodoamenn",
+            "value": 164
+          }
+        ],
+        "minecraft:dirt": [
+          {
+            "player": "nodoamenn",
+            "value": 1609
+          },
+          {
+            "player": "dekkaishi",
+            "value": 40
+          },
+          {
+            "player": "detkent",
+            "value": 24
+          },
+          {
+            "player": "natch_1105",
+            "value": 10
+          }
+        ],
+        "minecraft:cobblestone": [
+          {
+            "player": "kagyki",
+            "value": 250
+          },
+          {
+            "player": "detkent",
+            "value": 148
+          }
+        ],
+        "minecraft:stone_bricks": [
+          {
+            "player": "nodoamenn",
+            "value": 9
+          },
+          {
+            "player": "dekkaishi",
+            "value": 3
+          }
+        ],
+        "minecraft:cobbled_deepslate": [
+          {
+            "player": "kagyki",
+            "value": 39
+          }
+        ],
+        "minecraft:netherrack": [
+          {
+            "player": "kagyki",
+            "value": 671
+          },
+          {
+            "player": "dekkaishi",
+            "value": 16
+          }
+        ],
+        "minecraft:chest": [
+          {
+            "player": "natch_1105",
+            "value": 3
+          },
+          {
+            "player": "nodoamenn",
+            "value": 2
+          },
+          {
+            "player": "dekkaishi",
+            "value": 1
+          }
+        ],
+        "minecraft:ladder": [],
+        "minecraft:rail": [],
+        "minecraft:wheat_seeds": [
+          {
+            "player": "dekkaishi",
+            "value": 129
+          },
+          {
+            "player": "natch_1105",
+            "value": 51
+          },
+          {
+            "player": "nodoamenn",
+            "value": 49
+          }
+        ],
+        "minecraft:potato": [
+          {
+            "player": "kagyki",
+            "value": 247
+          }
+        ],
+        "minecraft:carrot": [
+          {
+            "player": "nodoamenn",
+            "value": 24
+          },
+          {
+            "player": "natch_1105",
+            "value": 3
+          }
+        ],
+        "minecraft:sweet_berries": [],
+        "minecraft:bread": [
+          {
+            "player": "dekkaishi",
+            "value": 68
+          },
+          {
+            "player": "detkent",
+            "value": 24
+          },
+          {
+            "player": "natch_1105",
+            "value": 7
+          }
+        ],
+        "minecraft:baked_potato": [
+          {
+            "player": "kagyki",
+            "value": 178
+          }
+        ],
+        "minecraft:bow": [
+          {
+            "player": "nodoamenn",
+            "value": 441
+          },
+          {
+            "player": "dekkaishi",
+            "value": 265
+          },
+          {
+            "player": "natch_1105",
+            "value": 35
+          },
+          {
+            "player": "kagyki",
+            "value": 13
+          }
+        ],
+        "minecraft:shield": [
+          {
+            "player": "natch_1105",
+            "value": 69
+          },
+          {
+            "player": "dekkaishi",
+            "value": 63
+          },
+          {
+            "player": "detkent",
+            "value": 7
+          }
+        ],
+        "minecraft:snowball": [
+          {
+            "player": "natch_1105",
+            "value": 4
+          }
+        ],
+        "minecraft:spyglass": [],
+        "minecraft:shears": [
+          {
+            "player": "nodoamenn",
+            "value": 76
+          }
+        ],
+        "minecraft:bucket": [
+          {
+            "player": "natch_1105",
+            "value": 32
+          },
+          {
+            "player": "nodoamenn",
+            "value": 18
+          },
+          {
+            "player": "kagyki",
+            "value": 16
+          },
+          {
+            "player": "detkent",
+            "value": 7
+          }
+        ],
+        "minecraft:water_bucket": [
+          {
+            "player": "nodoamenn",
+            "value": 17
+          },
+          {
+            "player": "detkent",
+            "value": 7
+          },
+          {
+            "player": "natch_1105",
+            "value": 4
+          }
+        ],
+        "minecraft:lava_bucket": [
+          {
+            "player": "kagyki",
+            "value": 2
+          }
+        ],
+        "minecraft:flint_and_steel": [
+          {
+            "player": "detkent",
+            "value": 4
+          },
+          {
+            "player": "nodoamenn",
+            "value": 3
+          }
+        ],
+        "twilightforest:cicada": [],
+        "twilightforest:twilight_oak_planks": [],
+        "twilightforest:twilight_oak_slab": []
+      }
+    }
+  ]
+}
