@@ -5,6 +5,7 @@
   "type": "module",
   "description": "SRUSA の Minecraft サーバー統計と相関図を 1 つにまとめたビューア（React + TypeScript + Vite + Tailwind CSS）",
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
     "dev": "vite --host",
     "build": "npm run typecheck && npm run lint && npm run check:contrast && vite build",
     "preview": "vite preview",
