@@ -56,6 +56,7 @@ npm run dev
 | `npm run lint` | ESLint を実行する |
 | `npm run check:contrast` | 配色が WCAG のコントラスト比を満たすか検査する |
 | `npm run build:world-map` | BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（下の「ワールドマップを作り直すとき」） |
+| `npm run sync:data` | `../aws_minecraft` と BlueMap の出力からデータを取り込む（下の「データを差し替えるとき」） |
 
 `main` への push と Pull Request では、GitHub Actions が同じ検査を実行します
 （[.github/workflows/ci.yml](.github/workflows/ci.yml)）。
@@ -69,6 +70,7 @@ npm run dev
 | [data/](data/) | ビルド時に取り込む JSON。Minecraft の集計、相関図のデータ、ワールドマップの範囲 |
 | [public/images/](public/images/) | BlueMap の 3D 表示のスクリーンショット |
 | [public/world-map/](public/world-map/) | 貼り合わせた 2D のワールドマップ（`npm run build:world-map` が作る） |
+| [scripts/sync-data.mjs](scripts/sync-data.mjs) | `../aws_minecraft` と BlueMap の出力からのデータ取り込み |
 | [scripts/check-contrast.ts](scripts/check-contrast.ts) | 配色のコントラスト検査 |
 | [scripts/build-world-map.ts](scripts/build-world-map.ts) | BlueMap の 2D タイルの貼り合わせ |
 | [scripts/png.ts](scripts/png.ts) | PNG の読み書き（依存を増やさないための最小実装） |
@@ -145,11 +147,47 @@ BlueMap の出力が別の場所にあるときは `npm run build:world-map -- -
 
 ## データを差し替えるとき
 
+元データは 2 か所にあります。`npm run sync:data` が、取り込みから派生 JSON の作り直しまでをまとめて行います。
+
+```shell
+npm run sync:data                              # 全部
+npm run sync:data -- map                       # マップだけ
+npm run sync:data -- map --dimension overworld # オーバーワールドだけ
+npm run sync:data -- stats daily               # 統計と日別だけ
+npm run sync:data -- --list                    # 取り込める元データを見るだけ
+npm run sync:data -- --dry-run                 # 何をするかだけ出す
+```
+
+| 対象 | 何が入るか | 出どころ |
+| --- | --- | --- |
+| `stats` | Minecraft 統計 JSON | `../aws_minecraft/data/` |
+| `daily` | 日別データ。取り込み後に派生 JSON を作り直す | `../aws_minecraft/data/` |
+| `logs` | サーバーログの日別集計 | `../aws_minecraft/data/` |
+| `skins` | スキンとアイコン（`public/player-skins/`） | `../aws_minecraft/data/` |
+| `map` | ワールドマップの PNG と範囲 JSON | `../srusa-portal/bluemap/web/` |
+
+取り込むと [data/data-registry.json](data/data-registry.json) の指し先と
+[src/data/current.ts](src/data/current.ts) の import が新しい日付に揃います。
+取り込み元のほうが古い日付のときは差し替えません。
+
+**統計 JSON は取り込むときに伏せ字にします。** 元データはプレイヤーの UUID、EC2 のインスタンス ID、
+AWS アカウント、リージョン、サーバー上のパスを生で持っているので、手でコピーして持ち込まないでください。
+伏せ忘れがあれば書き出す前に止まります。
+
+ワールドを描き直すときは先に `../srusa-portal/bluemap/render.sh` を実行します（下の節）。
+レンダリングには Java が要るため、`sync:data` からは呼びません。
+
+その他:
+
 - `data/` に `minecraft-stats-YYYYMMDD.json` を追加すると、コードを変えずにデータセットの選択肢と「日付ごとの推移」の点が増えます
 - 画面右上の「JSON を読み込む」からも手元のファイルを読み込めます。読み込んだファイルはブラウザ内でのみ処理され、どこへも送信されません
 - 相関図は `data/srusa-relationship-vX.Y.json` のうち、いちばん新しいバージョンを読みます
+- `player-db-*.json` はこのリポジトリでは作れません。`../aws_minecraft` 側で作り直して置きます
 
 ## 公開
+
+作業は `main` では行いません（`.githooks/pre-commit` が `main` への直接コミットを止めます）。
+作業用ブランチでコミットし、`main` へはマージで入れます。
 
 `main` に push すると Netlify が `npm run build` を実行して公開します
 （設定は [netlify.toml](netlify.toml)）。ビルドには型検査・ESLint・配色のコントラスト検査が

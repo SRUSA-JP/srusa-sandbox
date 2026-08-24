@@ -37,7 +37,37 @@ npm run typecheck       # tsc --noEmit
 npm run lint            # ESLint
 npm run check:contrast  # 配色の WCAG コントラスト検査
 npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（BlueMap の出力が要る）
+npm run sync:data       # ../aws_minecraft と BlueMap の出力からデータを取り込む
 ```
+
+### データの取り込み
+
+`npm run sync:data` が、元データの取り込みから派生 JSON の作り直しまでをまとめて行う。
+
+```bash
+npm run sync:data                              # 全部
+npm run sync:data -- map                       # マップだけ
+npm run sync:data -- map --dimension overworld # オーバーワールドだけ
+npm run sync:data -- stats daily               # 統計と日別だけ
+npm run sync:data -- --list                    # 取り込める元データを見るだけ
+npm run sync:data -- --dry-run                 # 何をするかだけ出す
+```
+
+| 対象 | 何が入るか | 出どころ |
+| --- | --- | --- |
+| `stats` | Minecraft 統計 JSON | `../aws_minecraft/data/` |
+| `daily` | 日別データ。取り込み後に派生 JSON を作り直す | `../aws_minecraft/data/` |
+| `logs` | サーバーログの日別集計 | `../aws_minecraft/data/` |
+| `skins` | スキンとアイコン（`public/player-skins/`） | `../aws_minecraft/data/` |
+| `map` | ワールドマップの PNG と範囲 JSON | `../srusa-portal/bluemap/web/` |
+
+- 取り込み先・伏せ字の規則・マップの一覧は [data/data-registry.json](data/data-registry.json) が持つ
+- **統計 JSON は取り込むときに必ず伏せ字にする。** 元データはプレイヤーの UUID、
+  EC2 のインスタンス ID、AWS アカウント、リージョン、サーバー上のパスを生で持っている。
+  伏せ忘れがあれば書き出す前に止まる（`redaction.forbiddenPatterns`）
+- ワールドを描き直すには先に `../srusa-portal/bluemap/render.sh`（Java が要る）を実行する。
+  レンダリングはこのコマンドの外
+- `player-db-*.json` はこのリポジトリでは作れない。`../aws_minecraft` 側で作り直して置く
 
 配色・スキン・コントラストのしきい値を変えたら、必ず `npm run check:contrast` を通すこと。
 
@@ -67,9 +97,11 @@ public/images/            # BlueMap の 3D 表示のスクリーンショット
 public/world-map/         # 貼り合わせた 2D のワールドマップ（build:world-map が作る）
 public/icons/             # アプリのアイコン（タブ・ホーム画面）
 netlify.toml              # 公開設定（https://srusa-sandbox.netlify.app/）
+scripts/sync-data.mjs     # ../aws_minecraft と BlueMap の出力からのデータ取り込み
 scripts/check-contrast.ts # 配色の検査
 scripts/build-world-map.ts # BlueMap の 2D タイルの貼り合わせ
 scripts/png.ts            # PNG の読み書き（画像ライブラリを入れないための最小実装）
+.githooks/pre-commit      # main への直接コミットを止める git フック
 .claude/                  # 共有の権限設定とスラッシュコマンド
 .github/workflows/ci.yml  # push と Pull Request で走る検査
 src/
@@ -222,6 +254,7 @@ src/
 
 ユーザーの明示的な指示がない限り、以下を**実行しない**。
 
+- `main` ブランチでの編集・コミット（下の「main ブランチは保護する」）
 - `git commit` / `git push`（`--force` は指示があっても再確認する）
 - `git checkout` / `git switch` によるブランチ切替・ファイルの復元
 - `git reset --hard` / `git clean` / `git stash drop` / `git rm`
@@ -229,6 +262,31 @@ src/
 - リベース・ブランチ削除・タグ削除など履歴を書き換える操作
 
 迷ったら実行せず、必ずユーザーに確認する。
+
+## main ブランチは保護する
+
+**`main` では作業しない。** 編集・コミットは必ず作業用ブランチ（`edit` など）で行い、
+`main` へはマージで入れる。うっかり `main` で作業してしまう事故を防ぐため、
+git 側でもコミットを止めてある。
+
+| 仕組み | 場所 | 内容 |
+| --- | --- | --- |
+| pre-commit フック | [.githooks/pre-commit](.githooks/pre-commit) | `main` / `master` でのコミットを拒否する |
+| フックの有効化 | `package.json` の `prepare` | `npm install` のたびに `core.hooksPath` を `.githooks` に向ける |
+| 迂回の禁止 | `.claude/settings.json` の `deny` | `git commit --no-verify` と `core.hooksPath` の変更を拒否する |
+
+初回だけ手で有効にするなら次を実行する（`npm install` 済みなら不要）。
+
+```bash
+git config core.hooksPath .githooks
+```
+
+作業を始める前に、必ず今のブランチを確かめる。`main` にいたら作業用ブランチへ移る
+（ブランチの切替はユーザーの指示があるときだけ行う）。
+
+```bash
+git rev-parse --abbrev-ref HEAD
+```
 
 ## コミット規則
 
@@ -247,7 +305,8 @@ src/
 - 作業前に README とこのファイル、既存の差分を確認する
 - 団体、活動、日程、場所、連絡先などの事実を推測で補わない。不明なものは TODO として明示する
 - 個人情報の扱いに注意する。相関図のデータは頭文字表記で、統計 JSON の UUID と AWS 情報は伏字になっている。
-  この匿名化を弱める変更をしない
+  この匿名化を弱める変更をしない。伏字は `npm run sync:data` が取り込み時にかけるので、
+  統計 JSON を手でコピーして持ち込まない
 - token、secret、credential、private key、個人用 `.env` を追加しない
 
 ## 変更時の確認
