@@ -4,7 +4,7 @@ import { WORLD_MAP_TEXT } from '../../config/messages';
 import { WORLD_MAP_ZOOM } from '../../config/viewport';
 import { WORLD_MAP } from '../../config/worldMap';
 import { usePanZoom } from '../../hooks/usePanZoom';
-import { transformStyle, visibleArea } from '../../lib/viewport';
+import { toScreen, transformStyle, visibleArea } from '../../lib/viewport';
 import {
   blockAt,
   coordinateStatus,
@@ -12,6 +12,7 @@ import {
   markStyle,
   pairedCoordinate,
   pixelOf,
+  tooltipPlacement,
   type BlockPoint,
 } from '../../world/display';
 import type { WorldMap } from '../../world/schema';
@@ -25,10 +26,16 @@ export interface WorldMapViewerProps {
 
 interface PointerTooltip {
   block: BlockPoint;
+  /**
+   * 指の操作で出した吹き出しか。
+   *
+   * マウスは離れれば消せばよいが、指はタップの直後に必ず離れる（pointerleave が来る）。
+   * そこで消すと一瞬しか読めないので、指で出したものは地図に貼り付けたまま残す。
+   */
+  pinned: boolean;
+  /** カーソル追従のときの位置（表示枠の左上が原点の px）。 */
   x: number;
   y: number;
-  maxX: number;
-  maxY: number;
 }
 
 /**
@@ -51,8 +58,16 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
   const center = blockAt(map, { x: (area.from.x + area.to.x) / 2, y: (area.from.y + area.to.y) / 2 });
   const mark = markStyle(theme, panZoom.view.scale);
   const paired = tooltip ? pairedCoordinate(map, tooltip.block) : null;
-  const tooltipLeft = tooltip ? Math.min(tooltip.x + 12, Math.max(12, tooltip.maxX - 220)) : 0;
-  const tooltipTop = tooltip ? Math.min(tooltip.y + 12, Math.max(12, tooltip.maxY - 96)) : 0;
+  /*
+   * 貼り付けた吹き出しは、指の位置ではなくブロックの位置を基準に置き直す。
+   * こうすると地図を動かしても、示している場所から吹き出しが離れない。
+   */
+  const anchor = tooltip
+    ? tooltip.pinned
+      ? toScreen(panZoom.view, pixelOf(map, tooltip.block))
+      : { x: tooltip.x, y: tooltip.y }
+    : null;
+  const placement = anchor ? tooltipPlacement(anchor, panZoom.box) : null;
 
   return (
     <ViewportFrame
@@ -62,8 +77,8 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
       overlay={
         tooltip && (
           <div
-            className="pointer-events-none absolute z-10 grid min-w-[180px] gap-xxs rounded-md border-hairline border-divider bg-surface px-md py-xs font-mono text-sm text-muted tabular-nums"
-            style={{ left: tooltipLeft, top: tooltipTop }}
+            className="pointer-events-none absolute z-10 grid min-w-[var(--sr-layout-tooltip-min-width)] gap-xxs rounded-md border-hairline border-divider bg-surface px-md py-xs font-mono text-sm text-muted tabular-nums"
+            style={{ left: placement?.x ?? 0, top: placement?.y ?? 0 }}
           >
             <strong className="text-xs font-bold text-heading">{WORLD_MAP_TEXT.tooltip.title}</strong>
             <span>{WORLD_MAP_TEXT.tooltip.current(tooltip.block.x, tooltip.block.z)}</span>
@@ -85,7 +100,18 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
           height: map.pixels.height,
           transform: transformStyle(panZoom.view),
         }}
+        onPointerDown={(event) => {
+          /*
+           * 指とペンは「触れた場所」を貼り付ける。掴んで動かすあいだ pointermove は
+           * 表示枠（capture 先）へ流れてこの要素には届かないので、押した時点で決める。
+           */
+          if (event.pointerType === 'mouse') return;
+          const block = blockAt(map, panZoom.toContentPoint(event.clientX, event.clientY));
+          setPointed(isInside(map, block) ? block : null);
+          setTooltip(isInside(map, block) ? { block, pinned: true, x: 0, y: 0 } : null);
+        }}
         onPointerMove={(event) => {
+          if (event.pointerType !== 'mouse') return;
           const point = panZoom.toContentPoint(event.clientX, event.clientY);
           const block = blockAt(map, point);
           const inside = isInside(map, block);
@@ -97,10 +123,9 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
           const frame = event.currentTarget.parentElement?.getBoundingClientRect();
           setTooltip({
             block,
+            pinned: false,
             x: frame ? event.clientX - frame.left : 0,
             y: frame ? event.clientY - frame.top : 0,
-            maxX: frame?.width ?? 0,
-            maxY: frame?.height ?? 0,
           });
         }}
         onClick={(event) => {
@@ -109,6 +134,11 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
           setSelected(isInside(map, block) ? block : null);
         }}
         onPointerLeave={() => {
+          /*
+           * 貼り付けた吹き出しはここで消さない。指はタップのたびに離れるため、
+           * 消してしまうと一瞬しか読めなくなる。次に別の場所へ触れるまで残す。
+           */
+          if (tooltip?.pinned) return;
           setPointed(null);
           setTooltip(null);
         }}

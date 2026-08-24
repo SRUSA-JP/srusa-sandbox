@@ -165,6 +165,8 @@ export const LAYOUT = {
   viewportHeight: 640,
   /** 狭い画面での表示枠の高さ。境目は BREAKPOINT.compact。 */
   viewportCompactHeight: 420,
+  /** 図に重ねる吹き出しの最小幅。座標が桁変わりしても幅が跳ねないようにする。 */
+  tooltipMinWidth: 180,
   /** アイコンなどの小さな四角。 */
   swatchSize: 12,
   /** 数値入力欄の幅（文字数で決めるので em）。 */

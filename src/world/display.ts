@@ -115,6 +115,20 @@ export function markStyle(theme: VizTheme, scale: number) {
   };
 }
 
+/**
+ * 座標の吹き出しを表示枠のどこに置くか（枠の左上が原点の px）。
+ *
+ * 指やカーソルの右下へずらしつつ、枠からはみ出さないところまで戻す。
+ * 狭い画面ほど端に寄りやすいので、この寄せ直しが無いと吹き出しが切れる。
+ */
+export function tooltipPlacement(anchor: Point, box: { width: number; height: number }): Point {
+  const { offset, edgeMargin, width, height } = WORLD_MAP.tooltip;
+  return {
+    x: Math.min(anchor.x + offset, Math.max(edgeMargin, box.width - width)),
+    y: Math.min(anchor.y + offset, Math.max(edgeMargin, box.height - height)),
+  };
+}
+
 /** 画面下に出す座標の表示。選択、ポインタ、中心の順に優先する。 */
 export function coordinateStatus(
   pointed: BlockPoint | null,

@@ -127,6 +127,11 @@ export function toContent(view: Viewport, point: Point): Point {
   return { x: (point.x - view.x) / view.scale, y: (point.y - view.y) / view.scale };
 }
 
+/** 内容座標を画面座標（表示枠の左上が原点）にする。toContent の逆。 */
+export function toScreen(view: Viewport, point: Point): Point {
+  return { x: point.x * view.scale + view.x, y: point.y * view.scale + view.y };
+}
+
 /** 内容が表示枠のどの範囲に見えているか（内容座標）。 */
 export function visibleArea(view: Viewport, box: Size): { from: Point; to: Point } {
   return {
