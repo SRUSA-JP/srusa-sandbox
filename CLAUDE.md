@@ -45,12 +45,13 @@ npm run sync:data       # ../aws_minecraft と BlueMap の出力からデータ�
 `npm run sync:data` が、元データの取り込みから派生 JSON の作り直しまでをまとめて行う。
 
 ```bash
-npm run sync:data                              # 全部
-npm run sync:data -- map                       # マップだけ
-npm run sync:data -- map --dimension overworld # オーバーワールドだけ
-npm run sync:data -- stats daily               # 統計と日別だけ
-npm run sync:data -- --list                    # 取り込める元データを見るだけ
-npm run sync:data -- --dry-run                 # 何をするかだけ出す
+npm run sync:data                 # 全部
+npm run sync:data -- 2d           # 2D の地図を全部作り直す（map と同じ）
+npm run sync:data -- overworld    # オーバーワールドだけ
+npm run sync:data -- nether end   # ネザーとエンドだけ
+npm run sync:data -- stats daily  # 統計と日別だけ
+npm run sync:data -- --list       # 取り込める元データを見るだけ
+npm run sync:data -- --dry-run    # 何をするかだけ出す
 ```
 
 | 対象 | 何が入るか | 出どころ |
@@ -59,7 +60,8 @@ npm run sync:data -- --dry-run                 # 何をするかだけ出す
 | `daily` | 日別データ。取り込み後に派生 JSON を作り直す | `../aws_minecraft/data/` |
 | `logs` | サーバーログの日別集計 | `../aws_minecraft/data/` |
 | `skins` | スキンとアイコン（`public/player-skins/`） | `../aws_minecraft/data/` |
-| `map` | ワールドマップの PNG と範囲 JSON | `../srusa-portal/bluemap/web/` |
+| `map` / `2d` | ワールドマップ（2D）の PNG と範囲 JSON | `../srusa-portal/bluemap/web/` |
+| 地図の名前 | その 1 枚だけ（`overworld` / `nether` / `end` / `twilightforest`） | `../srusa-portal/bluemap/web/` |
 
 - 取り込み先・伏せ字の規則・マップの一覧は [data/data-registry.json](data/data-registry.json) が持つ
 - **統計 JSON は取り込むときに必ず伏せ字にする。** 元データはプレイヤーの UUID、

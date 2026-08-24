@@ -38,8 +38,16 @@ const TARGETS = {
   daily: 'プレイヤー日別データと、そこから作る派生 JSON',
   logs: 'サーバーログの日別集計',
   skins: 'プレイヤーのスキンとアイコン',
-  map: 'ワールドマップの PNG と範囲 JSON',
+  map: 'ワールドマップ（2D）の PNG と範囲 JSON',
 };
+
+/**
+ * map の別名。
+ *
+ * このリポジトリが持つ地図は BlueMap の真上から見た 2D だけで、3D は写真として
+ * public/images/ に置いている。「2d」と打っても同じ場所に着くようにしておく。
+ */
+const MAP_ALIASES = ['2d', '2D'];
 
 /**
  * ../aws_minecraft から持ってくる、日付つきのファイル。
@@ -95,12 +103,23 @@ function parseArgs(argv) {
     else if (arg.startsWith('-')) throw new Error(`知らない引数: ${arg}`);
     else if (arg === 'all') options.targets.push(...Object.keys(TARGETS));
     else if (arg in TARGETS) options.targets.push(arg);
-    else throw new Error(`知らない対象: ${arg}（${Object.keys(TARGETS).join(' / ')} のどれか）`);
+    else if (MAP_ALIASES.includes(arg)) options.targets.push('map');
+    else if (registry.worldMaps.includes(arg)) {
+      /* `overworld` のようにマップ名だけを書いたら、その 1 枚だけを作り直す */
+      options.targets.push('map');
+      options.dimensions.push(arg);
+    } else {
+      throw new Error(
+        `知らない対象: ${arg}\n` +
+          `  まとまり: ${Object.keys(TARGETS).join(' / ')} / all\n` +
+          `  地図 1 枚: ${registry.worldMaps.join(' / ')}`,
+      );
+    }
   }
 
   if (options.targets.length === 0) options.targets = Object.keys(TARGETS);
   if (options.dimensions.length > 0 && !options.targets.includes('map')) {
-    throw new Error('--dimension は map を対象にしたときだけ使える');
+    throw new Error('--dimension は map（2d）を対象にしたときだけ使える');
   }
   for (const dimension of options.dimensions) {
     if (!registry.worldMaps.includes(dimension)) {
@@ -115,13 +134,16 @@ function help() {
 
 対象（省略すると全部）:
 ${Object.entries(TARGETS)
-  .map(([id, note]) => `  ${id.padEnd(6)} ${note}`)
+  .map(([id, note]) => `  ${id.padEnd(14)} ${note}`)
   .join('\n')}
-  all    上の全部
+  ${'2d'.padEnd(14)} map と同じ（この地図は 2D だけ。3D は public/images/ の写真）
+  ${'all'.padEnd(14)} 上の全部
+
+地図は名前だけでも指定できる（その 1 枚だけを作り直す）:
+${registry.worldMaps.map((id) => `  ${id}`).join('\n')}
 
 オプション:
-  --dimension <名前>  map で作り直すマップを絞る。複数指定できる
-                      （${registry.worldMaps.join(' / ')}）
+  --dimension <名前>  作り直す地図を絞る。複数指定できる
   --source <パス>     取り込み元（既定 ${registry.paths.awsDataSource}）
   --bluemap <パス>    BlueMap の出力（既定 ${registry.paths.blueMapSource}）
   --list              取り込める元データと、いま使っているファイルを並べる
@@ -129,8 +151,10 @@ ${Object.entries(TARGETS)
   -h, --help          この説明
 
 例:
-  npm run sync:data -- map --dimension overworld
-  npm run sync:data -- stats daily
+  npm run sync:data -- overworld       # オーバーワールドだけ作り直す
+  npm run sync:data -- 2d              # 2D の地図を全部作り直す
+  npm run sync:data -- nether end      # ネザーとエンドだけ
+  npm run sync:data -- stats daily     # 統計と日別だけ
   npm run sync:data -- --list`);
 }
 
