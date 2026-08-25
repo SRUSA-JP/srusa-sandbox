@@ -216,3 +216,14 @@ export const EDGE_MODES = [
 ] as const;
 
 export type EdgeMode = (typeof EDGE_MODES)[number]['value'];
+
+/** 相関図の配置アルゴリズム。 */
+export const LAYOUT_MODES = [
+  { value: 'cluster', label: '所属クラスタ' },
+  { value: 'force', label: '力学' },
+  { value: 'radial', label: '放射状' },
+  { value: 'layered', label: '階層' },
+  { value: 'circular', label: '円形' },
+] as const;
+
+export type LayoutMode = (typeof LAYOUT_MODES)[number]['value'];

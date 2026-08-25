@@ -9,7 +9,7 @@
  * これにより「複数の所属は領域の重なりで表す」「研究室は大学の内側に入る」が
  * レイアウトの副作用として自然に成立する。
  */
-import { CANVAS, CLUSTER, groupTypeSetting, NODE, REGION, SATELLITE, UNASSIGNED } from './config';
+import { CANVAS, CLUSTER, groupTypeSetting, NODE, REGION, SATELLITE, UNASSIGNED, type LayoutMode } from './config';
 import { centroid, enclosingPolygon, pointInPolygon, polygonArea, type Point } from './geometry';
 import type { Group, Person, Relation, RelationshipData } from './schema';
 
@@ -185,6 +185,179 @@ function placePeople(rows: Cluster[][]): PersonPlacement[] {
     originY += rowHeight + CLUSTER.gap;
   }
   return placements;
+}
+
+function relationDegree(relations: Relation[]): Map<string, number> {
+  const degree = new Map<string, number>();
+  for (const relation of relations) {
+    degree.set(relation.source, (degree.get(relation.source) ?? 0) + 1);
+    degree.set(relation.target, (degree.get(relation.target) ?? 0) + 1);
+  }
+  return degree;
+}
+
+function relationNeighbors(relations: Relation[]): Map<string, string[]> {
+  const neighbors = new Map<string, Set<string>>();
+  for (const relation of relations) {
+    const source = neighbors.get(relation.source) ?? new Set<string>();
+    const target = neighbors.get(relation.target) ?? new Set<string>();
+    source.add(relation.target);
+    target.add(relation.source);
+    neighbors.set(relation.source, source);
+    neighbors.set(relation.target, target);
+  }
+  return new Map([...neighbors.entries()].map(([id, values]) => [id, [...values].sort()]));
+}
+
+function primaryAttribute(person: Person): string {
+  return person.attributes[0] ?? '';
+}
+
+function sortedPeople(data: RelationshipData): Person[] {
+  const degree = relationDegree(data.relations);
+  return [...data.people].sort(
+    (a, b) =>
+      primaryAttribute(a).localeCompare(primaryAttribute(b), 'ja') ||
+      (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) ||
+      a.id.localeCompare(b.id),
+  );
+}
+
+function placeCircular(data: RelationshipData): PersonPlacement[] {
+  const people = sortedPeople(data);
+  const radius = Math.max(260, (people.length * NODE.gapX) / (Math.PI * 2));
+  return people.map((person, index) => {
+    const angle = -Math.PI / 2 + (Math.PI * 2 * index) / Math.max(people.length, 1);
+    return {
+      person,
+      x: Math.cos(angle) * radius,
+      y: Math.sin(angle) * radius,
+      groupIds: [],
+    };
+  });
+}
+
+function placeRadial(data: RelationshipData, centerId: string): PersonPlacement[] {
+  const neighbors = relationNeighbors(data.relations);
+  const distance = new Map<string, number>([[centerId, 0]]);
+  const queue = [centerId];
+  for (let index = 0; index < queue.length; index += 1) {
+    const id = queue[index];
+    for (const next of neighbors.get(id) ?? []) {
+      if (distance.has(next)) continue;
+      distance.set(next, (distance.get(id) ?? 0) + 1);
+      queue.push(next);
+    }
+  }
+
+  const people = [...data.people].sort((a, b) => {
+    const layerA = distance.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+    const layerB = distance.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+    return layerA - layerB || primaryAttribute(a).localeCompare(primaryAttribute(b), 'ja') || a.id.localeCompare(b.id);
+  });
+  const byLayer = new Map<number, Person[]>();
+  for (const person of people) {
+    const layer = Math.min(distance.get(person.id) ?? 4, 4);
+    const list = byLayer.get(layer) ?? [];
+    list.push(person);
+    byLayer.set(layer, list);
+  }
+
+  const placements: PersonPlacement[] = [];
+  for (const [layer, members] of [...byLayer.entries()].sort((a, b) => a[0] - b[0])) {
+    if (layer === 0) {
+      members.forEach((person, index) => placements.push({ person, x: index * NODE.gapX, y: 0, groupIds: [] }));
+      continue;
+    }
+    const radius = layer * 190;
+    members.forEach((person, index) => {
+      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / Math.max(members.length, 1);
+      placements.push({ person, x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, groupIds: [] });
+    });
+  }
+  return placements;
+}
+
+function placeLayered(data: RelationshipData): PersonPlacement[] {
+  const groupsByName = new Map(data.groups.map((group) => [group.name, group]));
+  const degree = relationDegree(data.relations);
+  const layers = new Map<string, Person[]>();
+  for (const person of data.people) {
+    const group = groupsByName.get(primaryAttribute(person));
+    const key = group ? `${groupTypeSetting(group.type).order}-${group.type}` : '999-unassigned';
+    const list = layers.get(key) ?? [];
+    list.push(person);
+    layers.set(key, list);
+  }
+
+  const placements: PersonPlacement[] = [];
+  let y = 0;
+  for (const [, members] of [...layers.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+    const sorted = [...members].sort((a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) || a.id.localeCompare(b.id));
+    const rowWidth = (sorted.length - 1) * NODE.gapX;
+    sorted.forEach((person, index) => placements.push({ person, x: index * NODE.gapX - rowWidth / 2, y, groupIds: [] }));
+    y += NODE.gapY * 1.35;
+  }
+  return placements;
+}
+
+function placeForce(data: RelationshipData): PersonPlacement[] {
+  const people = sortedPeople(data);
+  const positions = new Map(placeCircular(data).map((placement) => [placement.person.id, { x: placement.x, y: placement.y }]));
+  const area = Math.max(people.length, 1) * NODE.gapX * NODE.gapY * 2.4;
+  const k = Math.sqrt(area / Math.max(people.length, 1));
+  let temperature = Math.max(160, Math.sqrt(area) / 8);
+
+  for (let iteration = 0; iteration < 180; iteration += 1) {
+    const delta = new Map(people.map((person) => [person.id, { x: 0, y: 0 }]));
+
+    for (let i = 0; i < people.length; i += 1) {
+      for (let j = i + 1; j < people.length; j += 1) {
+        const a = positions.get(people[i].id)!;
+        const b = positions.get(people[j].id)!;
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distance = Math.max(1, Math.hypot(dx, dy));
+        const force = (k * k) / distance;
+        const x = (dx / distance) * force;
+        const y = (dy / distance) * force;
+        delta.get(people[i].id)!.x += x;
+        delta.get(people[i].id)!.y += y;
+        delta.get(people[j].id)!.x -= x;
+        delta.get(people[j].id)!.y -= y;
+      }
+    }
+
+    for (const relation of data.relations) {
+      const a = positions.get(relation.source);
+      const b = positions.get(relation.target);
+      if (!a || !b) continue;
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      const distance = Math.max(1, Math.hypot(dx, dy));
+      const force = (distance * distance) / k;
+      const x = (dx / distance) * force;
+      const y = (dy / distance) * force;
+      delta.get(relation.source)!.x -= x;
+      delta.get(relation.source)!.y -= y;
+      delta.get(relation.target)!.x += x;
+      delta.get(relation.target)!.y += y;
+    }
+
+    for (const person of people) {
+      const point = positions.get(person.id)!;
+      const move = delta.get(person.id)!;
+      const distance = Math.max(1, Math.hypot(move.x, move.y));
+      point.x += (move.x / distance) * Math.min(distance, temperature);
+      point.y += (move.y / distance) * Math.min(distance, temperature);
+    }
+    temperature *= 0.96;
+  }
+
+  return people.map((person) => {
+    const point = positions.get(person.id)!;
+    return { person, x: point.x, y: point.y, groupIds: [] };
+  });
 }
 
 /**
@@ -415,27 +588,51 @@ function buildEdges(relations: Relation[], byId: Map<string, PersonPlacement>): 
     .filter((edge): edge is EdgePlacement => edge !== null);
 }
 
-export function buildLayout(data: RelationshipData): MapLayout {
-  const groupByName = new Map(data.groups.map((group) => [group.name, group]));
-
-  /* 所属のある人はクラスタとして配置し、所属の無い人は後から相手のそばへ置く */
-  const affiliated = data.people.filter((person) => person.attributes.length > 0);
-  const unaffiliated = data.people.filter((person) => person.attributes.length === 0);
-
-  const rows = packRows(orderClusters(buildClusters(affiliated), data.relations));
-  const people = placePeople(rows);
-
+function assignGroupIds(people: PersonPlacement[], groups: Group[]): void {
+  const groupByName = new Map(groups.map((group) => [group.name, group]));
   for (const placement of people) {
     placement.groupIds = placement.person.attributes
       .map((name) => groupByName.get(name)?.id)
       .filter((id): id is string => id !== undefined);
   }
+}
 
-  /* 領域は所属者だけで決まるので、衛星を置く前に確定できる */
+function clusteredPlacements(data: RelationshipData): PersonPlacement[] {
+  /* 所属のある人はクラスタとして配置し、所属の無い人は後から相手のそばへ置く */
+  const affiliated = data.people.filter((person) => person.attributes.length > 0);
+  const rows = packRows(orderClusters(buildClusters(affiliated), data.relations));
+  return placePeople(rows);
+}
+
+function placementsFor(data: RelationshipData, mode: LayoutMode, centerId: string): PersonPlacement[] {
+  if (mode === 'force') return placeForce(data);
+  if (mode === 'radial') return placeRadial(data, centerId);
+  if (mode === 'layered') return placeLayered(data);
+  if (mode === 'circular') return placeCircular(data);
+  return clusteredPlacements(data);
+}
+
+export function buildLayout(data: RelationshipData, mode: LayoutMode = 'cluster', centerId = ''): MapLayout {
+  const effectiveCenterId = centerId || data.view?.centerPersonId || data.project.defaultCenterPersonId || data.people[0]?.id || '';
+  const people = placementsFor(data, mode, effectiveCenterId);
+  assignGroupIds(people, data.groups);
+
+  if (mode === 'cluster') {
+    const unaffiliated = data.people.filter((person) => person.attributes.length === 0);
+    const affiliatedIds = new Set(people.map((placement) => placement.person.id));
+
+    /* 領域は所属者だけで決まるので、衛星を置く前に確定できる */
+    const initialRegions = enforceStrictRegions(data.groups, people);
+    const leftovers = placeSatellites(
+      unaffiliated.filter((person) => !affiliatedIds.has(person.id)),
+      data.relations,
+      people,
+      initialRegions,
+    );
+    placeLeftovers(leftovers, people);
+  }
+
   const regions = enforceStrictRegions(data.groups, people);
-  const leftovers = placeSatellites(unaffiliated, data.relations, people, regions);
-  placeLeftovers(leftovers, people);
-
   const { width, height } = normalize(people, regions);
   const byId = new Map(people.map((placement) => [placement.person.id, placement]));
 

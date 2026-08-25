@@ -7,7 +7,7 @@ import type { VizTheme } from '../theme/palette';
 import { APP_TEXT, MAP_TEXT, ZUKAN_TEXT } from '../config/messages';
 import { ZUKAN_PATH } from '../routes';
 import { RELATIONSHIP_MAP_DEFAULT_EDGE_MODE } from '../config/dataRegistry';
-import { EDGE_MODES, ISSUE_PREVIEW_COUNT, type EdgeMode } from '../map/config';
+import { EDGE_MODES, ISSUE_PREVIEW_COUNT, LAYOUT_MODES, type EdgeMode, type LayoutMode } from '../map/config';
 import { loadRelationshipData } from '../map/data';
 import { groupTypeLabel, personLabel } from '../map/display';
 import { buildLayout, withPositions } from '../map/layout';
@@ -31,6 +31,7 @@ interface RelationshipWorkspaceExport {
     centerPersonId: string;
     highlightedGroupId: string;
     edgeMode: EdgeMode;
+    layoutMode?: LayoutMode;
   };
 }
 
@@ -62,6 +63,7 @@ export function MapPage({ theme }: MapPageProps) {
   const [centerId, setCenterId] = useState(data?.view?.centerPersonId ?? data?.project.defaultCenterPersonId ?? '');
   const [highlightedGroupId, setHighlightedGroupId] = useState('');
   const [edgeMode, setEdgeMode] = useState<EdgeMode>(RELATIONSHIP_MAP_DEFAULT_EDGE_MODE);
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('cluster');
   const [importMessage, setImportMessage] = useState('');
 
   /*
@@ -70,11 +72,16 @@ export function MapPage({ theme }: MapPageProps) {
    */
   const [positions, setPositions] = useState<Record<string, Point>>({});
 
-  const base = useMemo(() => (data ? buildLayout(data) : null), [data]);
+  const base = useMemo(() => (data ? buildLayout(data, layoutMode, centerId) : null), [centerId, data, layoutMode]);
   const layout = useMemo(() => (base ? withPositions(base, positions) : null), [base, positions]);
 
   const movePerson = useCallback((personId: string, x: number, y: number) => {
     setPositions((previous) => ({ ...previous, [personId]: { x, y } }));
+  }, []);
+
+  const changeLayoutMode = useCallback((mode: LayoutMode) => {
+    setLayoutMode(mode);
+    setPositions({});
   }, []);
 
   const exportWorkspace = useCallback(() => {
@@ -88,6 +95,7 @@ export function MapPage({ theme }: MapPageProps) {
         centerPersonId: centerId,
         highlightedGroupId,
         edgeMode,
+        layoutMode,
       },
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -97,7 +105,7 @@ export function MapPage({ theme }: MapPageProps) {
     link.download = `srusa-relationship-layout-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(url);
-  }, [centerId, data, edgeMode, highlightedGroupId, positions]);
+  }, [centerId, data, edgeMode, highlightedGroupId, layoutMode, positions]);
 
   const importWorkspace = useCallback(async (file: File) => {
     try {
@@ -120,11 +128,17 @@ export function MapPage({ theme }: MapPageProps) {
         ? nextCenter
         : fallbackCenter;
       const nextEdgeMode = wrapped.layout?.edgeMode;
+      const nextLayoutMode = wrapped.layout?.layoutMode;
       const validEdgeMode: EdgeMode =
         wrapped.schemaVersion === 'srusa-relationship-workspace-v1' &&
         EDGE_MODES.some((mode) => mode.value === nextEdgeMode)
           ? nextEdgeMode as EdgeMode
           : 'all';
+      const validLayoutMode: LayoutMode =
+        wrapped.schemaVersion === 'srusa-relationship-workspace-v1' &&
+        LAYOUT_MODES.some((mode) => mode.value === nextLayoutMode)
+          ? nextLayoutMode as LayoutMode
+          : 'cluster';
 
       setPositions(nextPositions);
       setCenterId(validCenter);
@@ -134,6 +148,7 @@ export function MapPage({ theme }: MapPageProps) {
           : '',
       );
       setEdgeMode(validEdgeMode);
+      setLayoutMode(validLayoutMode);
       setImportMessage(
         parsed.issues.length > 0
           ? `インポートしました。不整合 ${parsed.issues.length} 件を読み込み時に補正しています。`
@@ -230,6 +245,13 @@ export function MapPage({ theme }: MapPageProps) {
                 value={highlightedGroupId}
                 options={groupOptions}
                 onChange={setHighlightedGroupId}
+              />
+              <Picker
+                showLabel
+                label={MAP_TEXT.picker.layout}
+                value={layoutMode}
+                options={LAYOUT_MODES.map((mode) => ({ value: mode.value, label: mode.label }))}
+                onChange={changeLayoutMode}
               />
               <Picker
                 showLabel

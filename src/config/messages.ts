@@ -395,6 +395,7 @@ export const MAP_TEXT = {
   picker: {
     center: '中心人物',
     group: '強調するグループ',
+    layout: '配置',
     noHighlight: '強調しない',
     /** グループのプルダウンに出す 1 件分の説明。 */
     groupOption: (name: string, type: string, members: number) =>

@@ -207,6 +207,11 @@ src/
 | タブ名・URL | [src/routes.ts](src/routes.ts) |
 | サイト名・説明・アイコン（タブとホーム画面） | [src/config/pwa.ts](src/config/pwa.ts) |
 
+相関図の配置パターンは [src/map/config.ts](src/map/config.ts) の `LAYOUT_MODES` と
+[src/map/layout.ts](src/map/layout.ts) に集約する。新しい配置を試すときは、人物座標だけを変え、
+グループ領域と関係線は既存の再計算処理に通す。配置を切り替えたときは手動移動済みの座標をリセットし、
+別アルゴリズムの座標を混ぜない。
+
 どの値をどう使い分けるかは [DESIGN.md](DESIGN.md) に書いてある。
 
 #### 書いてよい形 / いけない形
