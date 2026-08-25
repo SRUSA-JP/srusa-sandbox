@@ -59,7 +59,7 @@ const SOURCE_FILES = [
   { target: 'stats', prefix: 'minecraft-stats', ext: 'json', registryKey: 'minecraftStats', redact: true },
   { target: 'daily', prefix: 'player-data-by-date', ext: 'json', registryKey: 'playerDataByDate' },
   { target: 'daily', prefix: 'player-data-by-date', ext: 'md', optional: true },
-  { target: 'logs', prefix: 'mc-log-daily-summary', ext: 'json', optional: true },
+  { target: 'logs', prefix: 'mc-log-daily-summary', ext: 'json', registryKey: 'playLogSource', optional: true },
   { target: 'logs', prefix: 'mc-log-daily-summary', ext: 'csv', optional: true },
   { target: 'logs', prefix: 'mc-log-daily-summary', ext: 'md', optional: true },
 ];
@@ -77,6 +77,12 @@ const DERIVED_FILES = [
 
 /** 派生ファイルを作り直す npm script（この順に実行する）。 */
 const DERIVED_COMMANDS = ['build:player-daily', 'build:item-rankings'];
+
+/** ログを取り込んだときに作り直すもの。日別データとは出どころが違う。 */
+const LOG_DERIVED = {
+  files: [{ registryKey: 'playLog', prefix: 'play-days', ext: 'json' }],
+  commands: ['build:play-days'],
+};
 
 /** このリポジトリでは作れない（../aws_minecraft 側で作る）もの。 */
 const EXTERNAL_FILES = [{ registryKey: 'playerDb', prefix: 'player-db', ext: 'json' }];
@@ -343,7 +349,7 @@ function applyVersion(changed, { dryRun }) {
 
   /* current.ts は import 文に日付を直書きしている（Vite に静的に解決させるため） */
   let source = readFileSync(CURRENT_TS_PATH, 'utf8');
-  for (const key of ['playerFeaturedUsedItems', 'playerDailySummary', 'playerDb']) {
+  for (const key of ['playerFeaturedUsedItems', 'playerDailySummary', 'playerDb', 'playLog']) {
     const path = next.paths[key];
     source = source.replace(
       new RegExp(`\\.\\./\\.\\./data/${path.replace(/^data\//, '').replace(/-\d{8}(\.json)$/, '-\\d{8}$1')}`),
@@ -379,6 +385,7 @@ function main() {
   /* ---- ../aws_minecraft から持ってくる ---- */
   const changed = [];
   let dailyDate = null;
+  let logsDate = null;
 
   for (const target of ['stats', 'daily', 'logs']) {
     if (!options.targets.includes(target)) continue;
@@ -393,6 +400,7 @@ function main() {
       copyFile(join(sourceDir, found.name), join(ROOT, 'data', found.name), options, file.redact === true);
       if (file.registryKey) changed.push({ registryKey: file.registryKey, date: found.date });
       if (file.registryKey === 'playerDataByDate') dailyDate = found.date;
+      if (file.registryKey === 'playLogSource') logsDate = found.date;
     }
     console.log('');
   }
@@ -407,6 +415,9 @@ function main() {
   }
 
   /* ---- 日付を揃えて、派生する JSON を作り直す ---- */
+  if (options.targets.includes('logs') && logsDate) {
+    changed.push(...LOG_DERIVED.files.map((file) => ({ registryKey: file.registryKey, date: logsDate })));
+  }
   if (options.targets.includes('daily') && dailyDate) {
     /* 派生 JSON は日別データから作るので、日付もそれに合わせる */
     changed.push(...DERIVED_FILES.map((file) => ({ registryKey: file.registryKey, date: dailyDate })));
@@ -416,9 +427,13 @@ function main() {
     applyVersion(changed, options);
     console.log('');
   }
-  if (options.targets.includes('daily')) {
+  if (options.targets.includes('daily') || (options.targets.includes('logs') && logsDate)) {
     console.log('[derived] 派生する JSON を作り直す');
-    for (const script of DERIVED_COMMANDS) run(script, [], options);
+    const scripts = [
+      ...(options.targets.includes('daily') ? DERIVED_COMMANDS : []),
+      ...(options.targets.includes('logs') && logsDate ? LOG_DERIVED.commands : []),
+    ];
+    for (const script of scripts) run(script, [], options);
     console.log('');
   }
 
