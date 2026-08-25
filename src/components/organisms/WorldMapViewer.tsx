@@ -22,6 +22,7 @@ import { ViewportFrame } from './ViewportFrame';
 export interface WorldMapViewerProps {
   map: WorldMap;
   theme: VizTheme;
+  showTooltips?: boolean;
 }
 
 interface PointerTooltip {
@@ -47,26 +48,27 @@ interface PointerTooltip {
  * 拡大・移動の状態は usePanZoom が、座標の変換は world/display.ts が持つ。
  * このコンポーネントは「どこを指しているか」だけを覚える。
  */
-export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
+export function WorldMapViewer({ map, theme, showTooltips = true }: WorldMapViewerProps) {
   const panZoom = usePanZoom(map.pixels.width, map.pixels.height, WORLD_MAP_ZOOM);
   const [failedImage, setFailedImage] = useState<string | null>(null);
   const [pointed, setPointed] = useState<BlockPoint | null>(null);
   const [selected, setSelected] = useState<BlockPoint | null>(null);
   const [tooltip, setTooltip] = useState<PointerTooltip | null>(null);
+  const visibleTooltip = showTooltips ? tooltip : null;
 
   const world = map.label ?? WORLD_LABELS[map.id] ?? map.id;
   const area = visibleArea(panZoom.view, panZoom.box);
   const center = blockAt(map, { x: (area.from.x + area.to.x) / 2, y: (area.from.y + area.to.y) / 2 });
   const mark = markStyle(theme, panZoom.view.scale);
-  const paired = tooltip ? pairedCoordinate(map, tooltip.block) : null;
+  const paired = visibleTooltip ? pairedCoordinate(map, visibleTooltip.block) : null;
   /*
    * 貼り付けた吹き出しは、指の位置ではなくブロックの位置を基準に置き直す。
    * こうすると地図を動かしても、示している場所から吹き出しが離れない。
    */
-  const anchor = tooltip
-    ? tooltip.pinned
-      ? toScreen(panZoom.view, pixelOf(map, tooltip.block))
-      : { x: tooltip.x, y: tooltip.y }
+  const anchor = visibleTooltip
+    ? visibleTooltip.pinned
+      ? toScreen(panZoom.view, pixelOf(map, visibleTooltip.block))
+      : { x: visibleTooltip.x, y: visibleTooltip.y }
     : null;
   const placement = anchor ? tooltipPlacement(anchor, panZoom.box) : null;
   const imagePath = `${import.meta.env.BASE_URL}${map.image}`;
@@ -78,13 +80,13 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
       label={WORLD_MAP_TEXT.card.alt(world)}
       status={coordinateStatus(pointed, center, selected)}
       overlay={
-        tooltip && (
+        visibleTooltip && (
           <div
             className="pointer-events-none absolute z-10 grid min-w-[var(--sr-layout-tooltip-min-width)] gap-xxs rounded-md border-hairline border-divider bg-surface px-md py-xs font-mono text-sm text-muted tabular-nums"
             style={{ left: placement?.x ?? 0, top: placement?.y ?? 0 }}
           >
             <strong className="text-xs font-bold text-heading">{WORLD_MAP_TEXT.tooltip.title}</strong>
-            <span>{WORLD_MAP_TEXT.tooltip.current(tooltip.block.x, tooltip.block.z)}</span>
+            <span>{WORLD_MAP_TEXT.tooltip.current(visibleTooltip.block.x, visibleTooltip.block.z)}</span>
             {paired && (
               <span>
                 {paired.kind === 'nether'
@@ -111,7 +113,7 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
           if (event.pointerType === 'mouse') return;
           const block = blockAt(map, panZoom.toContentPoint(event.clientX, event.clientY));
           setPointed(isInside(map, block) ? block : null);
-          setTooltip(isInside(map, block) ? { block, pinned: true, x: 0, y: 0 } : null);
+          if (showTooltips) setTooltip(isInside(map, block) ? { block, pinned: true, x: 0, y: 0 } : null);
         }}
         onPointerMove={(event) => {
           if (event.pointerType !== 'mouse') return;
@@ -119,6 +121,7 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
           const block = blockAt(map, point);
           const inside = isInside(map, block);
           setPointed(inside ? block : null);
+          if (!showTooltips) return;
           if (!inside) {
             setTooltip(null);
             return;
@@ -141,7 +144,7 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
            * 貼り付けた吹き出しはここで消さない。指はタップのたびに離れるため、
            * 消してしまうと一瞬しか読めなくなる。次に別の場所へ触れるまで残す。
            */
-          if (tooltip?.pinned) return;
+          if (visibleTooltip?.pinned) return;
           setPointed(null);
           setTooltip(null);
         }}

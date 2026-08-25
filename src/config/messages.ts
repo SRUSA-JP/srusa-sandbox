@@ -333,6 +333,7 @@ export const WORLD_MAP_TEXT = {
   picker: {
     view: '表示',
     map: '日付',
+    tooltips: 'ツールチップ',
     log: 'ログ',
   },
 
@@ -397,6 +398,9 @@ export const MAP_TEXT = {
     center: '中心人物',
     group: '強調するグループ',
     layout: '配置',
+    tooltips: 'ツールチップ',
+    tooltipOn: '表示',
+    tooltipOff: '非表示',
     noHighlight: '強調しない',
     /** グループのプルダウンに出す 1 件分の説明。 */
     groupOption: (name: string, type: string, members: number) =>

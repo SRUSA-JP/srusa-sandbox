@@ -7,10 +7,11 @@ export interface GroupRegionProps {
   region: RegionPlacement;
   theme: VizTheme;
   highlighted: boolean;
+  showTooltip?: boolean;
 }
 
 /** グループを囲う領域 1 つ。見た目の決定は display.ts に任せる。 */
-export function GroupRegion({ region, theme, highlighted }: GroupRegionProps) {
+export function GroupRegion({ region, theme, highlighted, showTooltip = true }: GroupRegionProps) {
   const style = regionStyle(region.group, theme, highlighted);
   const path = roundedPolygonPath(region.polygon, style.cornerRadius);
   const anchor = region.polygon.reduce((best, point) => (point.y < best.y ? point : best), region.polygon[0]);
@@ -33,7 +34,7 @@ export function GroupRegion({ region, theme, highlighted }: GroupRegionProps) {
         fontWeight={style.labelFontWeight}
       >
         {groupLabel(region.group)}
-        <title>{groupTooltip(region.group, region.memberIds.length)}</title>
+        {showTooltip && <title>{groupTooltip(region.group, region.memberIds.length)}</title>}
       </text>
     </g>
   );

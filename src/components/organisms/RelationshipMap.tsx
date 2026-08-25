@@ -26,6 +26,8 @@ export interface RelationshipMapProps {
   onMovePerson?: (personId: string, x: number, y: number) => void;
   /** 図の右上に足す操作（配置を戻す、など）。 */
   actions?: ReactNode;
+  /** 人・領域・関係線の SVG 標準ツールチップを出すか。 */
+  showTooltips?: boolean;
 }
 
 /** 掴んでいる最中の人物。動いたかどうかで「押した」と「動かした」を分ける。 */
@@ -59,6 +61,7 @@ export function RelationshipMap({
   onSelectPerson,
   onMovePerson,
   actions,
+  showTooltips = true,
 }: RelationshipMapProps) {
   const panZoom = usePanZoom(layout.width, layout.height, RELATIONSHIP_ZOOM);
   const drag = useRef<DragState | null>(null);
@@ -163,6 +166,7 @@ export function RelationshipMap({
                 region={region}
                 theme={theme}
                 highlighted={region.group.id === highlightedGroupId}
+                showTooltip={showTooltips}
               />
             ))}
           </g>
@@ -174,6 +178,7 @@ export function RelationshipMap({
                 theme={theme}
                 highlighted={edge.relation.source === centerId || edge.relation.target === centerId}
                 nameOf={nameOf}
+                showTooltip={showTooltips}
               />
             ))}
           </g>
@@ -192,6 +197,7 @@ export function RelationshipMap({
                 onSelect={onSelectPerson}
                 pointer={pointerFor(placement)}
                 grabbed={grabbedId === placement.person.id}
+                showTooltip={showTooltips}
               />
             ))}
           </g>

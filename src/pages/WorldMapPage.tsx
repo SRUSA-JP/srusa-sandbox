@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { AppLayout, ChartCard, Note, NoticePanel, Picker, ProsePanel, WorldMapViewer } from '../components';
-import { APP_TEXT, WORLD_MAP_TEXT } from '../config/messages';
+import { APP_TEXT, MAP_TEXT, WORLD_MAP_TEXT } from '../config/messages';
 import { WORLD_LABELS } from '../config/labels';
 import { WORLD_MAP_CONTENT } from '../content';
 import type { VizTheme } from '../theme/palette';
@@ -13,6 +13,13 @@ export interface WorldMapPageProps {
 }
 
 const EMPTY_MAPS: WorldMap[] = [];
+
+type TooltipMode = 'on' | 'off';
+
+const TOOLTIP_OPTIONS: Array<{ value: TooltipMode; label: string }> = [
+  { value: 'on', label: MAP_TEXT.picker.tooltipOn },
+  { value: 'off', label: MAP_TEXT.picker.tooltipOff },
+];
 
 function mapDimension(map: WorldMap): string {
   return map.dimension ?? map.id;
@@ -132,6 +139,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
   );
   const latestDate = mapDates[0] ?? '';
   const [selectedDate, setSelectedDate] = useState(mapDates[0] ?? '');
+  const [tooltipMode, setTooltipMode] = useState<TooltipMode>('on');
   const effectiveDate = mapDates.includes(selectedDate) ? selectedDate : mapDates[0] ?? '';
   const dateMaps = useMemo(
     () =>
@@ -158,14 +166,22 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
         title={WORLD_MAP_TEXT.card.title}
         note={WORLD_MAP_TEXT.card.note}
         actions={
-          mapDates.length > 0 ? (
+          <>
+            {mapDates.length > 0 && (
+              <Picker
+                label={WORLD_MAP_TEXT.picker.map}
+                value={effectiveDate}
+                options={mapDates.map((date) => ({ value: date, label: datePickerLabel(date, latestDate) }))}
+                onChange={setSelectedDate}
+              />
+            )}
             <Picker
-              label={WORLD_MAP_TEXT.picker.map}
-              value={effectiveDate}
-              options={mapDates.map((date) => ({ value: date, label: datePickerLabel(date, latestDate) }))}
-              onChange={setSelectedDate}
+              label={WORLD_MAP_TEXT.picker.tooltips}
+              value={tooltipMode}
+              options={TOOLTIP_OPTIONS}
+              onChange={setTooltipMode}
             />
-          ) : undefined
+          </>
         }
       >
         {document?.issues && document.issues.length > 0 && (
@@ -189,7 +205,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
                       coordinateBounds(map),
                     )}
                   </p>
-                  <WorldMapViewer map={map} theme={theme} />
+                  <WorldMapViewer map={map} theme={theme} showTooltips={tooltipMode === 'on'} />
                 </section>
               );
             })}

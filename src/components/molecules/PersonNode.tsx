@@ -21,6 +21,8 @@ export interface PersonNodeProps {
   };
   /** いま掴まれているか。カーソルの見た目だけに使う。 */
   grabbed?: boolean;
+  /** SVG の標準ツールチップを出すか。 */
+  showTooltip?: boolean;
 }
 
 /** アイコンの中身。画像・イニシャル・人型のどれをどの寸法で描くかは display.ts が決める。 */
@@ -89,6 +91,7 @@ export function PersonNode({
   onSelect,
   pointer,
   grabbed = false,
+  showTooltip = true,
 }: PersonNodeProps) {
   const style = nodeStyle(theme, state);
   const label = personLabel(placement.person, nameMode);
@@ -116,7 +119,7 @@ export function PersonNode({
           : undefined
       }
     >
-      <title>{personTooltip(placement.person, nameMode)}</title>
+      {showTooltip && <title>{personTooltip(placement.person, nameMode)}</title>}
       <defs>
         <clipPath id={clipId}>
           <circle r={style.radius} />
