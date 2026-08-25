@@ -33,6 +33,7 @@ npm install
 npm run dev             # 開発サーバー（--host 付き。スマホ実機からも開ける）
 npm run build           # 型検査 → ESLint → コントラスト検査 → dist/ に出力
 npm run preview         # ビルド成果物のプレビュー
+npm run deploy:preview  # Netlify のプレビューデプロイ（本番公開しない）
 npm run typecheck       # tsc --noEmit
 npm run lint            # ESLint
 npm run check:contrast  # 配色の WCAG コントラスト検査
@@ -40,6 +41,9 @@ npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合�
 npm run update:data     # AWS SSO 確認 → ../aws_minecraft の抽出 → sync:data
 npm run sync:data       # ../aws_minecraft と BlueMap の出力からデータを取り込む
 ```
+
+`npm run deploy:preview` は `npm run build` の後に Netlify CLI の draft deploy を実行する。
+初回やセッション切れのときは Netlify CLI のログイン確認が入る。本番公開は `main` への push に任せる。
 
 ### データの取り込み
 
