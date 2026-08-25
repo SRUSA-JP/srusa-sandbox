@@ -11,7 +11,9 @@ import {
   ECONOMY_ASSETS,
   ECONOMY_DEFAULT_SOURCE,
   ECONOMY_INDEX_BASE,
+  ECONOMY_ITEM_CATEGORIES,
   type EconomyAsset,
+  type EconomyItemCategoryId,
   type EconomyStatsSourceMetric,
   type EconomySourceMetric,
 } from '../config/economy';
@@ -277,11 +279,25 @@ export interface EconomyAssetValue {
   value: number;
 }
 
+/** 資産 1 種類の中で、1 item がどれだけの資産量になっているか。 */
+export interface EconomyItemAmount {
+  /** item ID（名前空間なし）。 */
+  id: string;
+  /** 内訳の分類。装備・ツール・原石など。 */
+  category: EconomyItemCategoryId;
+  /** 所持数（換算前）。 */
+  count: number;
+  /** 換算後の資産量。 */
+  value: number;
+}
+
 export interface PlayerEconomyRow {
   name: string;
   diamond: number;
   emerald: number;
   total: number;
+  /** 資産 1 種類ごとの item 内訳。分類別の積み上げに使う。 */
+  items: Record<EconomyAsset['id'], EconomyItemAmount[]>;
 }
 
 export interface EconomySummary {
@@ -295,15 +311,31 @@ function isStatsEconomySource(source: EconomySourceMetric): source is EconomySta
   return source === 'picked_up' || source === 'mined';
 }
 
-function economyAssetValue(player: NamedPlayer, asset: EconomyAsset, source: EconomyStatsSourceMetric): number {
+/** stats の累計指標から、その資産の item 内訳を作る。0 の item は落とす。 */
+function economyAssetItems(
+  player: NamedPlayer,
+  asset: EconomyAsset,
+  source: EconomyStatsSourceMetric,
+): EconomyItemAmount[] {
   const counts = player.production[source];
-  return asset.statsEntries.reduce((total, entry) => {
-    const value = Object.entries(counts).reduce(
-      (acc, [key, count]) => (stripNamespace(key) === entry.id ? acc + count : acc),
-      0,
-    );
-    return total + value * entry.multiplier;
-  }, 0);
+  return asset.statsEntries
+    .map((entry) => {
+      const count = Object.entries(counts).reduce(
+        (acc, [key, value]) => (stripNamespace(key) === entry.id ? acc + value : acc),
+        0,
+      );
+      return {
+        id: entry.id,
+        category: entry.category,
+        count,
+        value: count * entry.multiplier,
+      };
+    })
+    .filter((item) => item.value > 0);
+}
+
+function sumItemValues(items: EconomyItemAmount[]): number {
+  return items.reduce((total, item) => total + item.value, 0);
 }
 
 /** プレイヤー別の鉱物資産量。ダイヤ・エメラルドの合計を同じ 1 単位として足す。 */
@@ -321,16 +353,70 @@ export function playerEconomyRows(
   const statsSource = isStatsEconomySource(source) ? source : 'picked_up';
   return includedPlayers(doc, options.players)
     .map((player) => {
-      const diamond = economyAssetValue(player, ECONOMY_ASSETS[0], statsSource);
-      const emerald = economyAssetValue(player, ECONOMY_ASSETS[1], statsSource);
+      const items = {
+        diamond: economyAssetItems(player, ECONOMY_ASSETS[0], statsSource),
+        emerald: economyAssetItems(player, ECONOMY_ASSETS[1], statsSource),
+      };
+      const diamond = sumItemValues(items.diamond);
+      const emerald = sumItemValues(items.emerald);
       return {
         name: player.name,
         diamond,
         emerald,
         total: diamond + emerald,
+        items,
       };
     })
     .sort((a, b) => b.total - a.total);
+}
+
+/** 資産の種類（ダイヤ・エメラルド）別の積み上げランキング。 */
+export function economyAssetRanking(rows: PlayerEconomyRow[]): StackedSeries {
+  return {
+    series: ECONOMY_ASSETS.map((asset) => ({ key: asset.id, label: asset.label })),
+    rows: [...rows]
+      .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name, 'ja'))
+      .map((row) => ({
+        name: row.name,
+        ...Object.fromEntries(ECONOMY_ASSETS.map((asset) => [asset.id, row[asset.id]])),
+      })),
+  };
+}
+
+/**
+ * 資産 1 種類の、分類別の積み上げランキング。
+ *
+ * 「ダイヤ 300 のうち、装備が 80・ツールが 40・原石が 180」のように、
+ * 同じ資産量でも中身が違うことを見せるための形。
+ * 系列は分類の定義順で固定するので、対象を絞っても色が入れ替わらない。
+ */
+export function economyCategoryRanking(
+  rows: PlayerEconomyRow[],
+  assetId: EconomyAsset['id'],
+): StackedSeries {
+  const totals = new Map<EconomyItemCategoryId, number>();
+  for (const row of rows) {
+    for (const item of row.items[assetId]) {
+      totals.set(item.category, (totals.get(item.category) ?? 0) + item.value);
+    }
+  }
+  const series = ECONOMY_ITEM_CATEGORIES.filter((category) => (totals.get(category.id) ?? 0) > 0).map(
+    (category) => ({ key: category.id, label: category.label }),
+  );
+  return {
+    series,
+    rows: [...rows]
+      .sort((a, b) => b[assetId] - a[assetId] || a.name.localeCompare(b.name, 'ja'))
+      .map((row) => {
+        const byCategory: Record<string, number> = Object.fromEntries(
+          series.map((entry) => [entry.key, 0]),
+        );
+        for (const item of row.items[assetId]) {
+          byCategory[item.category] = (byCategory[item.category] ?? 0) + item.value;
+        }
+        return { name: row.name, ...byCategory };
+      }),
+  };
 }
 
 /** 対象者全体の鉱物資産サマリ。rate は「1 DI が何 EM 相当か」を供給量から見る簡易レート。 */
@@ -364,7 +450,10 @@ export function economySummary(
     label: asset.label,
     shortLabel: asset.shortLabel,
     unit: asset.unit,
-    value: players.reduce((total, player) => total + economyAssetValue(player, asset, statsSource), 0),
+    value: players.reduce(
+      (total, player) => total + sumItemValues(economyAssetItems(player, asset, statsSource)),
+      0,
+    ),
   }));
   const diamond = assets.find((asset) => asset.id === 'diamond')?.value ?? 0;
   const emerald = assets.find((asset) => asset.id === 'emerald')?.value ?? 0;

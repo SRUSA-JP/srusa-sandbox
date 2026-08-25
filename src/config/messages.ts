@@ -275,10 +275,23 @@ export const STATS_TEXT = {
       rankingMode: '表示',
       rankingModes: {
         total: '合計と内訳',
-        diamond: 'ダイヤ数',
-        emerald: 'エメラルド数',
+        diamond: 'ダイヤの内訳',
+        emerald: 'エメラルドの内訳',
       },
+      /** 合計と内訳のとき。ダイヤとエメラルドの積み上げ。 */
+      rankingNote: 'ダイヤとエメラルドを同じ 1 単位として積み上げた、プレイヤー別の資産量です。',
+      /** 1 資産だけを見るとき。装備・ツールなどの分類に分けた積み上げ。 */
+      categoryNote: (asset: string, categories: string) =>
+        `${asset}の資産量を${categories}に分けた内訳です。`,
+      /** 装備やツールを含むときだけ足す注記。 */
+      craftedNote: '装備とツールは、素材何個分かに換算した値で数えます。',
+      /** 表と CSV の列。 */
+      totalColumn: '合計',
+      /** 換算後の資産量の単位。ダイヤとエメラルドを同じ 1 単位として数える。 */
+      unit: '個',
       trend: '指数推移',
+      trendNote: '算出元を切り替えると、指数の元になる資産量の数え方も変わります。',
+      trendColumn: 'スナップショット',
       source: '算出元',
       noRate: '算出なし',
       base: (base: number) => `最初のスナップショットを ${formatInt(base)} として指数化`,
@@ -311,6 +324,8 @@ export const STATS_TEXT = {
     breakdown: (breakdown: string, basis: string) => `breakdown-${breakdown}-${basis}.csv`,
     series: (series: string, basis: string) => `series-${series}-${basis}.csv`,
     trend: (metric: string, basis: string) => `trend-${metric}-${basis}.csv`,
+    economyRanking: (mode: string) => `economy-ranking-${mode}.csv`,
+    economyIndex: (source: string) => `economy-index-${source}.csv`,
     scatter: (x: string, y: string, basis: string) => `scatter-${x}-${y}-${basis}.csv`,
   },
 } as const;

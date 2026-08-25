@@ -14,6 +14,16 @@ export interface EconomyAssetEntry {
   id: string;
   multiplier: number;
   label?: string;
+  /** 内訳の分類（装備・ツール・原石など）。itemCategories の id。 */
+  category: EconomyItemCategoryId;
+}
+
+export type EconomyItemCategoryId = 'raw' | 'block' | 'ore' | 'armor' | 'tool';
+
+/** 内訳の分類。並び順がそのまま積み上げの順になる。 */
+export interface EconomyItemCategory {
+  id: EconomyItemCategoryId;
+  label: string;
 }
 
 export interface EconomyAsset {
@@ -31,6 +41,7 @@ interface EconomyAssetsConfig {
   indexName: string;
   indexBase: number;
   defaultSource: EconomySourceMetric;
+  itemCategories: EconomyItemCategory[];
   sourceOptions: Array<{ value: EconomySourceMetric; label: string; note: string }>;
   assets: EconomyAsset[];
 }
@@ -46,3 +57,22 @@ export const ECONOMY_DEFAULT_SOURCE = config.defaultSource;
 export const ECONOMY_SOURCE_OPTIONS = config.sourceOptions;
 
 export const ECONOMY_ASSETS = config.assets;
+
+export const ECONOMY_ITEM_CATEGORIES = config.itemCategories;
+
+/** item ID → 内訳の分類。名前空間の有無は呼び出し側で落としてから渡す。 */
+const CATEGORY_BY_ITEM_ID = new Map<string, EconomyItemCategoryId>(
+  ECONOMY_ASSETS.flatMap((asset) =>
+    [...asset.statsEntries, ...asset.inventoryEntries].map(
+      (entry) => [entry.id, entry.category] as const,
+    ),
+  ),
+);
+
+/**
+ * その item がどの分類に入るか。
+ * 未登録の item は素材（原石）として数え、内訳から取りこぼさないようにする。
+ */
+export function economyItemCategory(itemId: string): EconomyItemCategoryId {
+  return CATEGORY_BY_ITEM_ID.get(itemId) ?? 'raw';
+}

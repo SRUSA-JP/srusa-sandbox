@@ -2,6 +2,13 @@
   "indexName": "SRUSA鉱物指数",
   "indexBase": 100,
   "defaultSource": "inventory",
+  "itemCategories": [
+    { "id": "raw", "label": "原石" },
+    { "id": "block", "label": "ブロック" },
+    { "id": "ore", "label": "鉱石" },
+    { "id": "armor", "label": "装備" },
+    { "id": "tool", "label": "ツール" }
+  ],
   "sourceOptions": [
     {
       "value": "inventory",
@@ -26,34 +33,34 @@
       "shortLabel": "DI",
       "unit": "DI",
       "statsEntries": [
-        { "id": "diamond", "multiplier": 1 },
-        { "id": "diamond_block", "multiplier": 9 },
-        { "id": "diamond_ore", "multiplier": 1 },
-        { "id": "deepslate_diamond_ore", "multiplier": 1 }
+        { "id": "diamond", "multiplier": 1, "category": "raw" },
+        { "id": "diamond_block", "multiplier": 9, "category": "block" },
+        { "id": "diamond_ore", "multiplier": 1, "category": "ore" },
+        { "id": "deepslate_diamond_ore", "multiplier": 1, "category": "ore" }
       ],
       "inventoryEntries": [
-        { "id": "diamond", "multiplier": 1, "label": "ダイヤ" },
-        { "id": "diamond_block", "multiplier": 9, "label": "ダイヤブロック" },
-        { "id": "diamond_helmet", "multiplier": 5, "label": "ダイヤのヘルメット" },
-        { "id": "diamond_chestplate", "multiplier": 8, "label": "ダイヤのチェストプレート" },
-        { "id": "diamond_leggings", "multiplier": 7, "label": "ダイヤのレギンス" },
-        { "id": "diamond_boots", "multiplier": 4, "label": "ダイヤのブーツ" },
-        { "id": "diamond_sword", "multiplier": 2, "label": "ダイヤの剣" },
-        { "id": "diamond_pickaxe", "multiplier": 3, "label": "ダイヤのツルハシ" },
-        { "id": "diamond_axe", "multiplier": 3, "label": "ダイヤの斧" },
-        { "id": "diamond_shovel", "multiplier": 1, "label": "ダイヤのシャベル" },
-        { "id": "diamond_hoe", "multiplier": 2, "label": "ダイヤのクワ" },
-        { "id": "netherite_helmet", "multiplier": 5, "label": "ネザライトのヘルメット" },
-        { "id": "netherite_chestplate", "multiplier": 8, "label": "ネザライトのチェストプレート" },
-        { "id": "netherite_leggings", "multiplier": 7, "label": "ネザライトのレギンス" },
-        { "id": "netherite_boots", "multiplier": 4, "label": "ネザライトのブーツ" },
-        { "id": "netherite_sword", "multiplier": 2, "label": "ネザライトの剣" },
-        { "id": "netherite_pickaxe", "multiplier": 3, "label": "ネザライトのツルハシ" },
-        { "id": "netherite_axe", "multiplier": 3, "label": "ネザライトの斧" },
-        { "id": "netherite_shovel", "multiplier": 1, "label": "ネザライトのシャベル" },
-        { "id": "netherite_hoe", "multiplier": 2, "label": "ネザライトのクワ" },
-        { "id": "diamond_knife", "multiplier": 1, "label": "ダイヤのナイフ" },
-        { "id": "diamond_minotaur_axe", "multiplier": 3, "label": "ミノタウロスの斧" }
+        { "id": "diamond", "multiplier": 1, "label": "ダイヤ", "category": "raw" },
+        { "id": "diamond_block", "multiplier": 9, "label": "ダイヤブロック", "category": "block" },
+        { "id": "diamond_helmet", "multiplier": 5, "label": "ダイヤのヘルメット", "category": "armor" },
+        { "id": "diamond_chestplate", "multiplier": 8, "label": "ダイヤのチェストプレート", "category": "armor" },
+        { "id": "diamond_leggings", "multiplier": 7, "label": "ダイヤのレギンス", "category": "armor" },
+        { "id": "diamond_boots", "multiplier": 4, "label": "ダイヤのブーツ", "category": "armor" },
+        { "id": "diamond_sword", "multiplier": 2, "label": "ダイヤの剣", "category": "tool" },
+        { "id": "diamond_pickaxe", "multiplier": 3, "label": "ダイヤのツルハシ", "category": "tool" },
+        { "id": "diamond_axe", "multiplier": 3, "label": "ダイヤの斧", "category": "tool" },
+        { "id": "diamond_shovel", "multiplier": 1, "label": "ダイヤのシャベル", "category": "tool" },
+        { "id": "diamond_hoe", "multiplier": 2, "label": "ダイヤのクワ", "category": "tool" },
+        { "id": "netherite_helmet", "multiplier": 5, "label": "ネザライトのヘルメット", "category": "armor" },
+        { "id": "netherite_chestplate", "multiplier": 8, "label": "ネザライトのチェストプレート", "category": "armor" },
+        { "id": "netherite_leggings", "multiplier": 7, "label": "ネザライトのレギンス", "category": "armor" },
+        { "id": "netherite_boots", "multiplier": 4, "label": "ネザライトのブーツ", "category": "armor" },
+        { "id": "netherite_sword", "multiplier": 2, "label": "ネザライトの剣", "category": "tool" },
+        { "id": "netherite_pickaxe", "multiplier": 3, "label": "ネザライトのツルハシ", "category": "tool" },
+        { "id": "netherite_axe", "multiplier": 3, "label": "ネザライトの斧", "category": "tool" },
+        { "id": "netherite_shovel", "multiplier": 1, "label": "ネザライトのシャベル", "category": "tool" },
+        { "id": "netherite_hoe", "multiplier": 2, "label": "ネザライトのクワ", "category": "tool" },
+        { "id": "diamond_knife", "multiplier": 1, "label": "ダイヤのナイフ", "category": "tool" },
+        { "id": "diamond_minotaur_axe", "multiplier": 3, "label": "ミノタウロスの斧", "category": "tool" }
       ]
     },
     {
@@ -62,14 +69,14 @@
       "shortLabel": "EM",
       "unit": "EM",
       "statsEntries": [
-        { "id": "emerald", "multiplier": 1 },
-        { "id": "emerald_block", "multiplier": 9 },
-        { "id": "emerald_ore", "multiplier": 1 },
-        { "id": "deepslate_emerald_ore", "multiplier": 1 }
+        { "id": "emerald", "multiplier": 1, "category": "raw" },
+        { "id": "emerald_block", "multiplier": 9, "category": "block" },
+        { "id": "emerald_ore", "multiplier": 1, "category": "ore" },
+        { "id": "deepslate_emerald_ore", "multiplier": 1, "category": "ore" }
       ],
       "inventoryEntries": [
-        { "id": "emerald", "multiplier": 1, "label": "エメラルド" },
-        { "id": "emerald_block", "multiplier": 9, "label": "エメラルドブロック" }
+        { "id": "emerald", "multiplier": 1, "label": "エメラルド", "category": "raw" },
+        { "id": "emerald_block", "multiplier": 9, "label": "エメラルドブロック", "category": "block" }
       ]
     }
   ]

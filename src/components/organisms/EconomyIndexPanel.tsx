@@ -7,7 +7,6 @@ import {
   STATS_TEXT,
   type EconomySourceMetric,
 } from '../../config';
-import { figureColors } from '../../config/colors';
 import {
   economyIndexTimeline,
   economySummary,
@@ -15,15 +14,19 @@ import {
   TIMELINE_CATEGORY_KEY,
   type Snapshot,
 } from '../../lib/selectors';
+import { joinNotes } from '../../lib/display';
 import { formatDecimal, formatInt } from '../../lib/format';
+import { useChartMetrics } from '../../hooks/useChartMetrics';
+import type { Row } from '../../lib/export';
 import type { StatsDocument } from '../../data/schema';
 import { playerInventoryAssetRows, playerInventoryAssetsGeneratedOn } from '../../data/playerInventoryAssets';
 import type { VizTheme } from '../../theme/palette';
 import { Picker } from '../atoms';
 import { KpiTile, SectionHeader } from '../molecules';
 import { SECTION } from '../classes';
-import { RankBarChart } from './RankBarChart';
-import { SeriesBarChart } from './SeriesBarChart';
+import { ChartCard } from './ChartCard';
+import { EconomyRankingCard, type EconomyRankingMode } from './EconomyRankingCard';
+import { KpiGrid } from './KpiGrid';
 import { TrendLineChart } from './TrendLineChart';
 
 export interface EconomyIndexPanelProps {
@@ -33,29 +36,17 @@ export interface EconomyIndexPanelProps {
   theme: VizTheme;
 }
 
-const RANKING_LIMIT = 8;
-const RANKING_ROW_HEIGHT = 26;
-const RANKING_MIN_HEIGHT = 178;
-const TREND_HEIGHT = 190;
-type RankingMode = 'total' | 'diamond' | 'emerald';
-
 function sourceNote(source: EconomySourceMetric): string {
   return ECONOMY_SOURCE_OPTIONS.find((option) => option.value === source)?.note ?? '';
 }
 
 /** ダイヤ・エメラルドから作る、サーバー内の簡易経済指標。 */
 export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyIndexPanelProps) {
+  const chart = useChartMetrics();
   const [source, setSource] = useState<EconomySourceMetric>(ECONOMY_DEFAULT_SOURCE);
-  const [rankingMode, setRankingMode] = useState<RankingMode>('total');
+  const [rankingMode, setRankingMode] = useState<EconomyRankingMode>('total');
   const inventoryGeneratedOn = playerInventoryAssetsGeneratedOn();
   const inventoryRows = useMemo(() => playerInventoryAssetRows(players), [players]);
-  const assetColors = useMemo(() => {
-    const colors = figureColors(theme);
-    return {
-      diamond: colors.economyAsset('diamond'),
-      emerald: colors.economyAsset('emerald'),
-    };
-  }, [theme]);
   const summary = useMemo(
     () => economySummary(doc, { players, source, inventoryRows }),
     [doc, players, source, inventoryRows],
@@ -63,31 +54,6 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
   const economyRows = useMemo(
     () => playerEconomyRows(doc, { players, source, inventoryRows }),
     [doc, players, source, inventoryRows],
-  );
-  const ranking = useMemo(
-    () => {
-      const rows = [...economyRows].sort((a, b) => b.total - a.total).slice(0, RANKING_LIMIT);
-      return {
-        series: [
-          { key: 'diamond', label: STATS_TEXT.card.economy.diamond },
-          { key: 'emerald', label: STATS_TEXT.card.economy.emerald },
-        ],
-        rows: rows.map((row) => ({
-          name: row.name,
-          diamond: row.diamond,
-          emerald: row.emerald,
-        })),
-      };
-    },
-    [economyRows],
-  );
-  const singleRanking = useMemo(
-    () =>
-      [...economyRows]
-        .sort((a, b) => b[rankingMode] - a[rankingMode])
-        .slice(0, RANKING_LIMIT)
-        .map((row) => ({ key: row.name, label: row.name, value: row[rankingMode] })),
-    [economyRows, rankingMode],
   );
   const trend = useMemo(
     () =>
@@ -102,14 +68,14 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
   const latestIndex = Number(trend.rows[trend.rows.length - 1]?.index ?? 0);
   const diamond = summary.assets.find((asset) => asset.id === 'diamond')?.value ?? 0;
   const emerald = summary.assets.find((asset) => asset.id === 'emerald')?.value ?? 0;
+  const dataDate = source === 'inventory' ? inventoryGeneratedOn.slice(0, 10) : doc.generated_on;
+  const updatedNote = ` 更新 ${dataDate}`;
 
   return (
     <section className={SECTION}>
       <SectionHeader
         title={ECONOMY_INDEX_NAME}
-        note={`${STATS_TEXT.card.economy.note} ${sourceNote(source)} 更新 ${
-          source === 'inventory' ? inventoryGeneratedOn.slice(0, 10) : doc.generated_on
-        }`}
+        note={joinNotes(STATS_TEXT.card.economy.note, sourceNote(source), updatedNote)}
         actions={
           <Picker
             label={STATS_TEXT.card.economy.source}
@@ -120,75 +86,54 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
         }
       />
 
-      <div className="mb-md grid gap-sm grid-cols-[repeat(auto-fit,minmax(160px,1fr))]">
+      <KpiGrid>
         <KpiTile
           label={STATS_TEXT.card.economy.total}
           value={`${formatInt(summary.total)} pt`}
           sub={`${STATS_TEXT.card.economy.diamond} ${formatInt(diamond)} / ${STATS_TEXT.card.economy.emerald} ${formatInt(emerald)}`}
-          compact
         />
         <KpiTile
           label={STATS_TEXT.card.economy.rate}
           value={summary.rate === null ? STATS_TEXT.card.economy.noRate : STATS_TEXT.card.economy.rateValue(formatDecimal(summary.rate))}
           sub={STATS_TEXT.card.economy.rateNote}
-          compact
         />
         <KpiTile
           label={STATS_TEXT.card.economy.index}
           value={formatDecimal(latestIndex)}
           sub={STATS_TEXT.card.economy.base(ECONOMY_INDEX_BASE)}
-          compact
         />
-      </div>
+      </KpiGrid>
 
-      <div className="grid gap-md lg:grid-cols-2">
-        <div className="min-w-0">
-          <div className="mb-xs flex min-w-0 flex-wrap items-center justify-between gap-sm">
-            <h3 className="text-sm font-bold text-heading">{STATS_TEXT.card.economy.ranking}</h3>
-            <Picker
-              label={STATS_TEXT.card.economy.rankingMode}
-              value={rankingMode}
-              options={[
-                { value: 'total', label: STATS_TEXT.card.economy.rankingModes.total },
-                { value: 'diamond', label: STATS_TEXT.card.economy.rankingModes.diamond },
-                { value: 'emerald', label: STATS_TEXT.card.economy.rankingModes.emerald },
-              ]}
-              onChange={setRankingMode}
-            />
-          </div>
-          {rankingMode === 'total' ? (
-            <SeriesBarChart
-              data={ranking}
-              theme={theme}
-              unit="個"
-              stacked
-              horizontal
-              seriesColors={assetColors}
-              height={Math.max(RANKING_MIN_HEIGHT, ranking.rows.length * RANKING_ROW_HEIGHT)}
-            />
-          ) : (
-            <RankBarChart
-              data={singleRanking}
-              theme={theme}
-              color={assetColors[rankingMode]}
-              unit="個"
-              showUnitOnAllLabels
-              height={Math.max(RANKING_MIN_HEIGHT, singleRanking.length * RANKING_ROW_HEIGHT)}
-            />
-          )}
-        </div>
-        <div className="min-w-0">
-          <h3 className="mb-xs text-sm font-bold text-heading">{STATS_TEXT.card.economy.trend}</h3>
-          <TrendLineChart
-            data={trend}
-            theme={theme}
-            categoryKey={TIMELINE_CATEGORY_KEY}
-            unit=""
-            height={TREND_HEIGHT}
-            showValueLabels={snapshots.length <= 4}
-          />
-        </div>
-      </div>
+      <EconomyRankingCard
+        rows={economyRows}
+        mode={rankingMode}
+        onModeChange={setRankingMode}
+        theme={theme}
+        note={updatedNote}
+      />
+
+      <ChartCard
+        title={STATS_TEXT.card.economy.trend}
+        note={joinNotes(STATS_TEXT.card.economy.trendNote, updatedNote)}
+        tableRows={trend.rows.map<Row>((row) => ({
+          date: String(row[TIMELINE_CATEGORY_KEY] ?? ''),
+          index: Number(row.index ?? 0),
+        }))}
+        tableColumns={[
+          { key: 'date', label: STATS_TEXT.card.economy.trendColumn, align: 'left' },
+          { key: 'index', label: STATS_TEXT.card.economy.index },
+        ]}
+        csvName={STATS_TEXT.file.economyIndex(source)}
+      >
+        <TrendLineChart
+          data={trend}
+          theme={theme}
+          categoryKey={TIMELINE_CATEGORY_KEY}
+          unit=""
+          height={chart.height.base}
+          showValueLabels={snapshots.length <= 4}
+        />
+      </ChartCard>
     </section>
   );
 }

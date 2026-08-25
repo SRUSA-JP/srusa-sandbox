@@ -4,6 +4,7 @@ export * from './ClipGallery';
 export * from './DataTable';
 export * from './DiscoveryBoard';
 export * from './EconomyIndexPanel';
+export * from './EconomyRankingCard';
 export * from './FilterPanel';
 export * from './FeaturedItemUseColumns';
 export * from './KpiGrid';
