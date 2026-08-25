@@ -18,8 +18,15 @@ function mapDimension(map: WorldMap): string {
   return map.dimension ?? map.id;
 }
 
-function mapLabel(map: WorldMap): string {
-  return map.label ?? WORLD_LABELS[mapDimension(map)] ?? WORLD_LABELS[map.id] ?? map.id;
+function dateLabel(date: string, latestDate = ''): string {
+  return latestDate && date === latestDate ? `最新 ${date}` : date;
+}
+
+function mapLabel(map: WorldMap, fallbackDate = '', latestDate = ''): string {
+  const dimension = mapDimension(map);
+  const base = WORLD_LABELS[dimension] ?? WORLD_LABELS[map.id] ?? map.label ?? map.id;
+  const date = mapDate(map, fallbackDate);
+  return date ? `${base}（${dateLabel(date, latestDate)}）` : base;
 }
 
 function mapArea(map: WorldMap): number {
@@ -27,38 +34,38 @@ function mapArea(map: WorldMap): number {
   return size.width * size.height;
 }
 
-function mapFreshness(map: WorldMap): string {
-  return map.updated_on ?? '';
+function mapFreshness(map: WorldMap, fallbackDate = ''): string {
+  return mapDate(map, fallbackDate);
 }
 
 function mapDate(map: WorldMap, fallbackDate = ''): string {
   return map.updated_on ?? fallbackDate;
 }
 
-function sortMapsForDisplay(maps: WorldMap[]): WorldMap[] {
+function sortMapsForDisplay(maps: WorldMap[], fallbackDate = '', latestDate = ''): WorldMap[] {
   return [...maps].sort(
     (a, b) =>
-      mapFreshness(b).localeCompare(mapFreshness(a)) ||
+      mapFreshness(b, fallbackDate).localeCompare(mapFreshness(a, fallbackDate)) ||
       mapArea(b) - mapArea(a) ||
-      mapLabel(a).localeCompare(mapLabel(b), 'ja'),
+      mapLabel(a, fallbackDate, latestDate).localeCompare(mapLabel(b, fallbackDate, latestDate), 'ja'),
   );
 }
 
-function sortMapsForDate(maps: WorldMap[]): WorldMap[] {
+function sortMapsForDate(maps: WorldMap[], fallbackDate = '', latestDate = ''): WorldMap[] {
   return [...maps].sort(
     (a, b) =>
       mapDimension(a).localeCompare(mapDimension(b), 'ja') ||
       mapArea(b) - mapArea(a) ||
-      mapLabel(a).localeCompare(mapLabel(b), 'ja'),
+      mapLabel(a, fallbackDate, latestDate).localeCompare(mapLabel(b, fallbackDate, latestDate), 'ja'),
   );
 }
 
-function logRows(maps: WorldMap[]) {
-  return sortMapsForDisplay(maps).map((map) => {
+function logRows(maps: WorldMap[], fallbackDate = '', latestDate = '') {
+  return sortMapsForDisplay(maps, fallbackDate, latestDate).map((map) => {
     const size = coverage(map);
     return {
       map,
-      label: mapLabel(map),
+      label: mapLabel(map, fallbackDate, latestDate),
       dimension: WORLD_LABELS[mapDimension(map)] ?? mapDimension(map),
       area: `${size.width} x ${size.height}`,
       bounds: coordinateBounds(map),
@@ -69,10 +76,10 @@ function logRows(maps: WorldMap[]) {
   });
 }
 
-function WorldMapLog({ maps }: { maps: WorldMap[] }) {
+function WorldMapLog({ maps, fallbackDate, latestDate }: { maps: WorldMap[]; fallbackDate?: string; latestDate?: string }) {
   return (
     <div className="grid gap-xs">
-      {logRows(maps).map((row) => (
+      {logRows(maps, fallbackDate, latestDate).map((row) => (
         <div
           key={row.map.id}
           className="grid gap-xs border-hairline border-divider bg-sunken p-sm text-sm sm:grid-cols-[minmax(0,1fr)_auto_auto_auto_auto]"
@@ -119,11 +126,17 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
       ),
     [document?.generated_on, maps],
   );
+  const latestDate = mapDates[0] ?? '';
   const [selectedDate, setSelectedDate] = useState(mapDates[0] ?? '');
   const effectiveDate = mapDates.includes(selectedDate) ? selectedDate : mapDates[0] ?? '';
   const dateMaps = useMemo(
-    () => sortMapsForDate(maps.filter((entry) => mapDate(entry, document?.generated_on) === effectiveDate)),
-    [document?.generated_on, effectiveDate, maps],
+    () =>
+      sortMapsForDate(
+        maps.filter((entry) => mapDate(entry, document?.generated_on) === effectiveDate),
+        document?.generated_on,
+        latestDate,
+      ),
+    [document?.generated_on, effectiveDate, latestDate, maps],
   );
 
   return (
@@ -162,9 +175,15 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
               const size = coverage(map);
               return (
                 <section key={map.id} className="min-w-0">
-                  <h3 className="mb-xs text-sm font-bold text-heading">{mapLabel(map)}</h3>
+                  <h3 className="mb-xs text-sm font-bold text-heading">{mapLabel(map, document?.generated_on, latestDate)}</h3>
                   <p className="mb-sm text-xs text-muted">
-                    {WORLD_MAP_TEXT.summary(mapLabel(map), size.width, size.height, map.bytes, coordinateBounds(map))}
+                    {WORLD_MAP_TEXT.summary(
+                      mapLabel(map, document?.generated_on, latestDate),
+                      size.width,
+                      size.height,
+                      map.bytes,
+                      coordinateBounds(map),
+                    )}
                   </p>
                   <WorldMapViewer map={map} theme={theme} />
                 </section>
@@ -178,7 +197,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
 
       {maps.length > 0 && (
         <ChartCard title={WORLD_MAP_TEXT.log.title}>
-          <WorldMapLog maps={maps} />
+          <WorldMapLog maps={maps} fallbackDate={document?.generated_on} latestDate={latestDate} />
         </ChartCard>
       )}
 

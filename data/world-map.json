@@ -63,6 +63,7 @@
       "id": "overworld-20260822-0715",
       "dimension": "overworld",
       "label": "オーバーワールド（2026-08-22 07:15）",
+      "updated_on": "2026-08-22",
       "image": "world-map/overworld-20260822-0715.png",
       "bounds": {
         "minX": -1024,
@@ -80,7 +81,8 @@
     {
       "id": "overworld-current",
       "dimension": "overworld",
-      "label": "既存ワールド",
+      "label": "オーバーワールド（最新 2026-08-25）",
+      "updated_on": "2026-08-25",
       "image": "world-map/overworld-current.png",
       "bounds": {
         "minX": -702,

@@ -17,7 +17,7 @@ interface Args {
   source: string;
   id: string;
   dimension: string;
-  label: string;
+  label?: string;
 }
 
 interface ChunkEntry {
@@ -59,8 +59,20 @@ function parseArgs(argv: string[]): Args {
   const source = argValue(argv, '--source') ?? 'data/end-2d-map-20260825.json';
   const id = argValue(argv, '--id') ?? 'end-wide-20260825';
   const dimension = argValue(argv, '--dimension') ?? 'end';
-  const label = argValue(argv, '--label') ?? 'End（2026-08-25 広域）';
+  const label = argValue(argv, '--label');
   return { source, id, dimension, label };
+}
+
+function dimensionLabel(dimension: string): string {
+  if (dimension === 'overworld') return 'オーバーワールド';
+  if (dimension === 'nether') return 'ネザー';
+  if (dimension === 'end') return 'ジ・エンド';
+  if (dimension === 'twilightforest') return '黄昏の森';
+  return dimension;
+}
+
+function mapLabel(dimension: string, date: string): string {
+  return `${dimensionLabel(dimension)}（${date}）`;
 }
 
 function put(data: Buffer, width: number, x: number, y: number, rgba: [number, number, number, number]) {
@@ -141,7 +153,6 @@ function main() {
   const entry: WorldMapEntry = {
     id: args.id,
     dimension: args.dimension,
-    label: args.label,
     updated_on: (doc.generated_on ?? new Date().toISOString()).slice(0, 10),
     image,
     bounds: {
@@ -154,6 +165,7 @@ function main() {
     blocksPerPixel: CHUNK_SIZE,
     bytes: readFileSync(outPath).length,
   };
+  entry.label = args.label ?? mapLabel(args.dimension, entry.updated_on);
 
   const merged = [
     ...previous.filter((map) => map.id !== entry.id),
