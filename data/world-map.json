@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-25",
-  "source": "BlueMap lowres LOD1",
+  "source": "BlueMap lowres LOD1 / End MCA overview",
   "maps": [
     {
       "id": "end",
@@ -9,17 +9,17 @@
       "updated_on": "2026-08-25",
       "image": "world-map/end.png",
       "bounds": {
-        "minX": -4500,
-        "minZ": -990,
-        "maxX": 1410,
-        "maxZ": 4386
+        "minX": -17408,
+        "minZ": -1536,
+        "maxX": 2048,
+        "maxZ": 4608
       },
       "pixels": {
-        "width": 5910,
-        "height": 5376
+        "width": 4864,
+        "height": 1536
       },
-      "blocksPerPixel": 1,
-      "bytes": 498860
+      "blocksPerPixel": 4,
+      "bytes": 204224
     },
     {
       "id": "nether",
@@ -30,15 +30,15 @@
       "bounds": {
         "minX": -512,
         "minZ": -478,
-        "maxX": 513,
+        "maxX": 802,
         "maxZ": 482
       },
       "pixels": {
-        "width": 1025,
+        "width": 1314,
         "height": 960
       },
       "blocksPerPixel": 1,
-      "bytes": 438503
+      "bytes": 518791
     },
     {
       "id": "overworld",
@@ -49,15 +49,15 @@
       "bounds": {
         "minX": -1024,
         "minZ": -1024,
-        "maxX": 1025,
-        "maxZ": 1025
+        "maxX": 3074,
+        "maxZ": 2914
       },
       "pixels": {
-        "width": 2049,
-        "height": 2049
+        "width": 4098,
+        "height": 3938
       },
       "blocksPerPixel": 1,
-      "bytes": 1422002
+      "bytes": 3938294
     },
     {
       "id": "overworld-20260822-0715",
