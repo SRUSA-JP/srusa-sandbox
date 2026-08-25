@@ -7,6 +7,7 @@
 import { WORLD_MAP } from '../config/worldMap';
 import { WORLD_MAP_TEXT } from '../config/messages';
 import { figureColors } from '../config/colors';
+import { WORLD_DIMENSION_ORDER, WORLD_LABELS } from '../config/labels';
 import type { Point } from '../lib/viewport';
 import type { VizTheme } from '../theme/palette';
 import type { WorldMap } from './schema';
@@ -24,8 +25,112 @@ export interface CoordinatePair {
   point: BlockPoint;
 }
 
-function mapDimension(map: WorldMap): string {
+export interface WorldMapOption {
+  value: string;
+  label: string;
+}
+
+export interface WorldMapLogRow {
+  map: WorldMap;
+  label: string;
+  dimension: string;
+  area: string;
+  bounds: ReturnType<typeof coordinateBounds>;
+  pixels: string;
+  bytes: string;
+  updatedOn: string;
+}
+
+export function mapDimension(map: WorldMap): string {
   return map.dimension ?? map.id;
+}
+
+export function mapDate(map: WorldMap, fallbackDate = ''): string {
+  return map.updated_on ?? fallbackDate;
+}
+
+function dimensionOrder(dimension: string): number {
+  const index = WORLD_DIMENSION_ORDER.findIndex((entry) => entry === dimension);
+  return index === -1 ? WORLD_DIMENSION_ORDER.length : index;
+}
+
+export function sortDimensions(dimensions: string[]): string[] {
+  return [...dimensions].sort(
+    (a, b) =>
+      dimensionOrder(a) - dimensionOrder(b) ||
+      (WORLD_LABELS[a] ?? a).localeCompare(WORLD_LABELS[b] ?? b, 'ja'),
+  );
+}
+
+function dateLabel(date: string, latestDate = ''): string {
+  return latestDate && date === latestDate ? `最新 ${date}` : date;
+}
+
+export function mapLabel(map: WorldMap, fallbackDate = '', latestDate = ''): string {
+  const dimension = mapDimension(map);
+  const base = WORLD_LABELS[dimension] ?? WORLD_LABELS[map.id] ?? map.label ?? map.id;
+  const date = mapDate(map, fallbackDate);
+  return date ? `${base}（${dateLabel(date, latestDate)}）` : base;
+}
+
+function mapArea(map: WorldMap): number {
+  const size = coverage(map);
+  return size.width * size.height;
+}
+
+function mapFreshness(map: WorldMap, fallbackDate = ''): string {
+  return mapDate(map, fallbackDate);
+}
+
+export function sortMapsForDisplay(maps: WorldMap[], fallbackDate = '', latestDate = ''): WorldMap[] {
+  return [...maps].sort(
+    (a, b) =>
+      mapFreshness(b, fallbackDate).localeCompare(mapFreshness(a, fallbackDate)) ||
+      mapArea(b) - mapArea(a) ||
+      mapLabel(a, fallbackDate, latestDate).localeCompare(mapLabel(b, fallbackDate, latestDate), 'ja'),
+  );
+}
+
+export function mapOptionsForDimension(
+  maps: WorldMap[],
+  dimension: string,
+  fallbackDate = '',
+  latestDate = '',
+): WorldMapOption[] {
+  return sortMapsForDisplay(
+    maps.filter((entry) => mapDimension(entry) === dimension),
+    fallbackDate,
+    latestDate,
+  ).map((map) => ({
+    value: map.id,
+    label: mapLabel(map, fallbackDate, latestDate),
+  }));
+}
+
+export function mapById(maps: WorldMap[], id: string): WorldMap | undefined {
+  return maps.find((map) => map.id === id);
+}
+
+export function latestWorldMapDate(maps: WorldMap[], fallbackDate = ''): string {
+  return [...new Set(maps.map((entry) => mapDate(entry, fallbackDate)).filter(Boolean))].sort((a, b) =>
+    b.localeCompare(a),
+  )[0] ?? '';
+}
+
+export function worldMapLogRows(maps: WorldMap[], fallbackDate = '', latestDate = ''): WorldMapLogRow[] {
+  return sortMapsForDisplay(maps, fallbackDate, latestDate).map((map) => {
+    const size = coverage(map);
+    return {
+      map,
+      label: mapLabel(map, fallbackDate, latestDate),
+      dimension: WORLD_LABELS[mapDimension(map)] ?? mapDimension(map),
+      area: `${size.width} x ${size.height}`,
+      bounds: coordinateBounds(map),
+      pixels: `${map.pixels.width} x ${map.pixels.height}`,
+      bytes: `${(map.bytes / 1024 / 1024).toFixed(2)} MB`,
+      updatedOn: map.updated_on ?? '-',
+    };
+  });
 }
 
 function isNetherMap(map: WorldMap): boolean {
@@ -129,12 +234,34 @@ export function tooltipPlacement(anchor: Point, box: { width: number; height: nu
   };
 }
 
-/** 画面下に出す座標の表示。選択、ポインタ、中心の順に優先する。 */
+/**
+ * 画面左下に出す座標の行。選択、ポインタ、中心の順に優先する。
+ *
+ * 対になるワールドがあるとき（オーバーワールド ⇔ ネザー）は、換算した座標を
+ * 2 行目に足す。吹き出しを出していなくても行き先の座標が読めるようにするため。
+ * ジ・エンドと黄昏の森には対になる相手がいないので 1 行のまま。
+ *
+ * JSX を返さず行の配列にしておく。ここは「何を出すか」だけを決める層で、
+ * どう積むかは組み立てる側の仕事にする。
+ */
 export function coordinateStatus(
+  map: WorldMap,
   pointed: BlockPoint | null,
   center: BlockPoint,
   selected: BlockPoint | null = null,
-): string {
-  if (selected) return WORLD_MAP_TEXT.selected(selected.x, selected.z);
-  return pointed ? WORLD_MAP_TEXT.pointer(pointed.x, pointed.z) : WORLD_MAP_TEXT.center(center.x, center.z);
+): string[] {
+  const [block, here] = selected
+    ? ([selected, WORLD_MAP_TEXT.selected(selected.x, selected.z)] as const)
+    : pointed
+      ? ([pointed, WORLD_MAP_TEXT.pointer(pointed.x, pointed.z)] as const)
+      : ([center, WORLD_MAP_TEXT.center(center.x, center.z)] as const);
+
+  const paired = pairedCoordinate(map, block);
+  if (!paired) return [here];
+  return [
+    here,
+    paired.kind === 'nether'
+      ? WORLD_MAP_TEXT.paired.nether(paired.point.x, paired.point.z)
+      : WORLD_MAP_TEXT.paired.overworld(paired.point.x, paired.point.z),
+  ];
 }

@@ -7,13 +7,20 @@ import {
   Picker,
   ProsePanel,
   TechnicalDetails,
-  WorldMapViewer,
+  WorldMapGallery,
+  WorldMapLog,
 } from '../components';
 import { APP_TEXT, MAP_TEXT, TECHNICAL_TEXT, WORLD_MAP_TEXT } from '../config/messages';
 import { WORLD_LABELS } from '../config/labels';
 import { WORLD_MAP_CONTENT, builderSections, readerSections } from '../content';
 import type { VizTheme } from '../theme/palette';
-import { coordinateBounds, coverage } from '../world/display';
+import {
+  latestWorldMapDate,
+  mapById,
+  mapDimension,
+  mapOptionsForDimension,
+  sortDimensions,
+} from '../world/display';
 import { loadWorldMaps } from '../world/data';
 import type { WorldMap } from '../world/schema';
 
@@ -23,134 +30,14 @@ export interface WorldMapPageProps {
 
 const EMPTY_MAPS: WorldMap[] = [];
 const ALL_DIMENSIONS = '*';
-const LATEST_SELECTION = 'latest';
 
 type TooltipMode = 'on' | 'off';
 type DimensionSelection = typeof ALL_DIMENSIONS | string;
-type DateSelection = typeof LATEST_SELECTION | string;
 
 const TOOLTIP_OPTIONS: Array<{ value: TooltipMode; label: string }> = [
   { value: 'on', label: MAP_TEXT.picker.tooltipOn },
   { value: 'off', label: MAP_TEXT.picker.tooltipOff },
 ];
-
-function mapDimension(map: WorldMap): string {
-  return map.dimension ?? map.id;
-}
-
-function dateLabel(date: string, latestDate = ''): string {
-  return latestDate && date === latestDate ? `最新 ${date}` : date;
-}
-
-function datePickerLabel(date: string, latestDate = ''): string {
-  return latestDate && date === latestDate ? `最新（${date}）` : date;
-}
-
-function mapLabel(map: WorldMap, fallbackDate = '', latestDate = ''): string {
-  const dimension = mapDimension(map);
-  const base = WORLD_LABELS[dimension] ?? WORLD_LABELS[map.id] ?? map.label ?? map.id;
-  const date = mapDate(map, fallbackDate);
-  return date ? `${base}（${dateLabel(date, latestDate)}）` : base;
-}
-
-function mapArea(map: WorldMap): number {
-  const size = coverage(map);
-  return size.width * size.height;
-}
-
-function mapFreshness(map: WorldMap, fallbackDate = ''): string {
-  return mapDate(map, fallbackDate);
-}
-
-function mapDate(map: WorldMap, fallbackDate = ''): string {
-  return map.updated_on ?? fallbackDate;
-}
-
-function sortMapsForDisplay(maps: WorldMap[], fallbackDate = '', latestDate = ''): WorldMap[] {
-  return [...maps].sort(
-    (a, b) =>
-      mapFreshness(b, fallbackDate).localeCompare(mapFreshness(a, fallbackDate)) ||
-      mapArea(b) - mapArea(a) ||
-      mapLabel(a, fallbackDate, latestDate).localeCompare(mapLabel(b, fallbackDate, latestDate), 'ja'),
-  );
-}
-
-function sortMapsForDate(maps: WorldMap[], fallbackDate = '', latestDate = ''): WorldMap[] {
-  return [...maps].sort(
-    (a, b) =>
-      mapDimension(a).localeCompare(mapDimension(b), 'ja') ||
-      mapArea(b) - mapArea(a) ||
-      mapLabel(a, fallbackDate, latestDate).localeCompare(mapLabel(b, fallbackDate, latestDate), 'ja'),
-  );
-}
-
-function latestMapsByDimension(maps: WorldMap[], fallbackDate = '', latestDate = ''): WorldMap[] {
-  const byDimension = new Map<string, WorldMap[]>();
-  for (const map of maps) {
-    const dimension = mapDimension(map);
-    const list = byDimension.get(dimension) ?? [];
-    list.push(map);
-    byDimension.set(dimension, list);
-  }
-
-  return [...byDimension.values()]
-    .map((entries) => sortMapsForDisplay(entries, fallbackDate, latestDate)[0])
-    .filter((map): map is WorldMap => map !== undefined)
-    .sort(
-      (a, b) =>
-        mapDimension(a).localeCompare(mapDimension(b), 'ja') ||
-        mapLabel(a, fallbackDate, latestDate).localeCompare(mapLabel(b, fallbackDate, latestDate), 'ja'),
-    );
-}
-
-function logRows(maps: WorldMap[], fallbackDate = '', latestDate = '') {
-  return sortMapsForDisplay(maps, fallbackDate, latestDate).map((map) => {
-    const size = coverage(map);
-    return {
-      map,
-      label: mapLabel(map, fallbackDate, latestDate),
-      dimension: WORLD_LABELS[mapDimension(map)] ?? mapDimension(map),
-      area: `${size.width} x ${size.height}`,
-      bounds: coordinateBounds(map),
-      pixels: `${map.pixels.width} x ${map.pixels.height}`,
-      bytes: `${(map.bytes / 1024 / 1024).toFixed(2)} MB`,
-      updatedOn: map.updated_on ?? '-',
-    };
-  });
-}
-
-function WorldMapLog({ maps, fallbackDate, latestDate }: { maps: WorldMap[]; fallbackDate?: string; latestDate?: string }) {
-  return (
-    <div className="grid gap-xs">
-      {logRows(maps, fallbackDate, latestDate).map((row) => (
-        <div
-          key={row.map.id}
-          className="grid gap-xs border-hairline border-divider bg-surface p-sm text-sm sm:grid-cols-[minmax(0,1fr)_auto_auto_auto_auto]"
-        >
-          <p className="truncate font-bold text-heading">{row.label}</p>
-          <p className="font-mono text-muted">
-            {WORLD_MAP_TEXT.log.dimension} {row.dimension}
-          </p>
-          <p className="font-mono text-muted">
-            {WORLD_MAP_TEXT.log.area} {row.area}
-          </p>
-          <p className="font-mono text-muted">
-            {WORLD_MAP_TEXT.log.bounds} X {row.bounds.minX}..{row.bounds.maxX} / Z {row.bounds.minZ}..{row.bounds.maxZ}
-          </p>
-          <p className="font-mono text-muted">
-            {WORLD_MAP_TEXT.log.pixels} {row.pixels}
-          </p>
-          <p className="font-mono text-muted">
-            {WORLD_MAP_TEXT.log.size} {row.bytes}
-          </p>
-          <p className="font-mono text-muted">
-            {WORLD_MAP_TEXT.log.updated} {row.updatedOn}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 /**
  * ワールドマップの画面。
@@ -165,15 +52,16 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
   const document = useMemo(() => loadWorldMaps(), []);
   const maps = document?.maps ?? EMPTY_MAPS;
   const latestDate = useMemo(
-    () =>
-      [...new Set(maps.map((entry) => mapDate(entry, document?.generated_on)).filter(Boolean))].sort((a, b) =>
-        b.localeCompare(a),
-      )[0] ?? '',
+    () => latestWorldMapDate(maps, document?.generated_on),
     [document?.generated_on, maps],
   );
   const [selectedDimension, setSelectedDimension] = useState<DimensionSelection>(ALL_DIMENSIONS);
-  const [selectedDate, setSelectedDate] = useState<DateSelection>(LATEST_SELECTION);
-  const [tooltipMode, setTooltipMode] = useState<TooltipMode>('on');
+  const [selectedMapIds, setSelectedMapIds] = useState<Record<string, string>>({});
+  /*
+   * 吹き出しは既定で出さない。座標は左下に常に出ているので、
+   * 地図の上に重ねる分は「もっと大きく読みたい人」向けの追加にする。
+   */
+  const [tooltipMode, setTooltipMode] = useState<TooltipMode>('off');
   const dimensionMaps = useMemo(
     () =>
       selectedDimension === ALL_DIMENSIONS
@@ -181,49 +69,34 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
         : maps.filter((entry) => mapDimension(entry) === selectedDimension),
     [maps, selectedDimension],
   );
-  const mapDates = useMemo(
-    () =>
-      [...new Set(dimensionMaps.map((entry) => mapDate(entry, document?.generated_on)).filter(Boolean))].sort((a, b) =>
-        b.localeCompare(a),
-      ),
-    [dimensionMaps, document?.generated_on],
+  const dimensions = useMemo(
+    () => sortDimensions([...new Set(dimensionMaps.map(mapDimension))]),
+    [dimensionMaps],
   );
-  const effectiveDate = selectedDate === LATEST_SELECTION || mapDates.includes(selectedDate)
-    ? selectedDate
-    : LATEST_SELECTION;
-  const dateMaps = useMemo(
-    () => {
-      if (effectiveDate === LATEST_SELECTION) {
-        return latestMapsByDimension(dimensionMaps, document?.generated_on, latestDate);
-      }
-      return sortMapsForDate(
-        dimensionMaps.filter((entry) => mapDate(entry, document?.generated_on) === effectiveDate),
-        document?.generated_on,
-        latestDate,
-      );
-    },
-    [dimensionMaps, document?.generated_on, effectiveDate, latestDate],
+  const selectedMaps = useMemo(
+    () =>
+      dimensions
+        .map((dimension) => {
+          const options = mapOptionsForDimension(dimensionMaps, dimension, document?.generated_on, latestDate);
+          const selected = mapById(dimensionMaps, selectedMapIds[dimension]);
+          return selected && mapDimension(selected) === dimension
+            ? selected
+            : mapById(dimensionMaps, options[0]?.value ?? '');
+        })
+        .filter((map): map is WorldMap => Boolean(map)),
+    [dimensionMaps, dimensions, document?.generated_on, latestDate, selectedMapIds],
   );
   const dimensionOptions = useMemo(
     () => [
       { value: ALL_DIMENSIONS, label: WORLD_MAP_TEXT.picker.allDimensions },
-      ...[...new Set(maps.map(mapDimension))]
-        .sort((a, b) => (WORLD_LABELS[a] ?? a).localeCompare(WORLD_LABELS[b] ?? b, 'ja'))
-        .map((dimension) => ({ value: dimension, label: WORLD_LABELS[dimension] ?? dimension })),
+      ...sortDimensions([...new Set(maps.map(mapDimension))]).map((dimension) => ({
+        value: dimension,
+        label: WORLD_LABELS[dimension] ?? dimension,
+      })),
     ],
     [maps],
   );
-  const dateOptions = useMemo(
-    () => [
-      { value: LATEST_SELECTION, label: WORLD_MAP_TEXT.picker.latestMaps },
-      ...mapDates.map((date) => ({ value: date, label: datePickerLabel(date, latestDate) })),
-    ],
-    [latestDate, mapDates],
-  );
-  const note =
-    effectiveDate === LATEST_SELECTION
-      ? WORLD_MAP_TEXT.latestSummary(dateMaps.length)
-      : WORLD_MAP_TEXT.dateSummary(effectiveDate, dateMaps.length);
+  const note = WORLD_MAP_TEXT.mapSelectionSummary(selectedMaps.length, dimensionMaps.length);
 
   return (
     <AppLayout
@@ -260,14 +133,6 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
                 onChange={setSelectedDimension}
               />
             )}
-            {dateOptions.length > 0 && (
-              <Picker
-                label={WORLD_MAP_TEXT.picker.map}
-                value={effectiveDate}
-                options={dateOptions}
-                onChange={setSelectedDate}
-              />
-            )}
             <Picker
               label={WORLD_MAP_TEXT.picker.tooltips}
               value={tooltipMode}
@@ -282,28 +147,19 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
             <NoticePanel title={APP_TEXT.disclaimer}>{WORLD_MAP_TEXT.partialData(document.issues.length)}</NoticePanel>
           </div>
         )}
-        {dateMaps.length > 0 ? (
-          <div className="grid gap-md">
-            {dateMaps.map((map) => {
-              const size = coverage(map);
-              return (
-                <section key={map.id} className="min-w-0">
-                  <h3 className="mb-xs text-sm font-bold text-heading">{mapLabel(map, document?.generated_on, latestDate)}</h3>
-                  {/* 地図そのものを先に見せ、寸法や座標の範囲は見終わったあとに読めればよい */}
-                  <WorldMapViewer map={map} theme={theme} showTooltips={tooltipMode === 'on'} />
-                  <p className="mt-sm text-xs text-muted">
-                    {WORLD_MAP_TEXT.summary(
-                      mapLabel(map, document?.generated_on, latestDate),
-                      size.width,
-                      size.height,
-                      map.bytes,
-                      coordinateBounds(map),
-                    )}
-                  </p>
-                </section>
-              );
-            })}
-          </div>
+        {selectedMaps.length > 0 ? (
+          <WorldMapGallery
+            maps={dimensionMaps}
+            selectedMaps={selectedMaps}
+            selectedMapIds={selectedMapIds}
+            fallbackDate={document?.generated_on}
+            latestDate={latestDate}
+            showTooltips={tooltipMode === 'on'}
+            theme={theme}
+            onSelectMap={(dimension, mapId) => {
+              setSelectedMapIds((previous) => ({ ...previous, [dimension]: mapId }));
+            }}
+          />
         ) : (
           <Note tone="error">{WORLD_MAP_TEXT.noData}</Note>
         )}

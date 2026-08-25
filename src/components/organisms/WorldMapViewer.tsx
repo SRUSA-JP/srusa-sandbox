@@ -78,7 +78,14 @@ export function WorldMapViewer({ map, theme, showTooltips = true }: WorldMapView
     <ViewportFrame
       panZoom={panZoom}
       label={WORLD_MAP_TEXT.card.alt(world)}
-      status={coordinateStatus(pointed, center, selected)}
+      status={
+        /* 対になるワールドの座標が付くと 2 行になるので、行として積む */
+        <span className="grid gap-xxs">
+          {coordinateStatus(map, pointed, center, selected).map((line) => (
+            <span key={line}>{line}</span>
+          ))}
+        </span>
+      }
       overlay={
         visibleTooltip && (
           <div
@@ -90,8 +97,8 @@ export function WorldMapViewer({ map, theme, showTooltips = true }: WorldMapView
             {paired && (
               <span>
                 {paired.kind === 'nether'
-                  ? WORLD_MAP_TEXT.tooltip.nether(paired.point.x, paired.point.z)
-                  : WORLD_MAP_TEXT.tooltip.overworld(paired.point.x, paired.point.z)}
+                  ? WORLD_MAP_TEXT.paired.nether(paired.point.x, paired.point.z)
+                  : WORLD_MAP_TEXT.paired.overworld(paired.point.x, paired.point.z)}
               </span>
             )}
           </div>

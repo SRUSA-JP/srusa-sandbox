@@ -28,5 +28,7 @@ export * from './RelationshipMap';
 export * from './SeriesBarChart';
 export * from './TrendLineChart';
 export * from './ViewportFrame';
+export * from './WorldMapGallery';
+export * from './WorldMapLog';
 export * from './WorldMapViewer';
 export * from './PlayerStreakPanel';

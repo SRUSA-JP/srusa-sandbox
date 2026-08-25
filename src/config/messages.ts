@@ -441,6 +441,8 @@ export const WORLD_MAP_TEXT = {
   /** 地図の規模。見出しの下に出す。 */
   dateSummary: (date: string, count: number) => `${date} の地図 ${formatInt(count)} 件を表示`,
   latestSummary: (count: number) => `各ディメンションの最新地図 ${formatInt(count)} 件を表示`,
+  mapSelectionSummary: (shown: number, total: number) =>
+    `${formatInt(shown)} ワールドを表示（保存済み地図 ${formatInt(total)} 件）`,
   summary: (
     world: string,
     width: number,
@@ -459,6 +461,15 @@ export const WORLD_MAP_TEXT = {
   tooltip: {
     title: '座標',
     current: (x: number, z: number) => `X ${formatInt(x)} / Z ${formatInt(z)}`,
+  },
+
+  /**
+   * 対になるワールドの座標（Minecraft の 1:8 換算）。
+   *
+   * 換算が成り立つのはオーバーワールドとネザーのあいだだけなので、
+   * ジ・エンドと黄昏の森では出さない。
+   */
+  paired: {
     nether: (x: number, z: number) => `ネザー X ${formatInt(x)} / Z ${formatInt(z)}`,
     overworld: (x: number, z: number) => `通常世界 X ${formatInt(x)} / Z ${formatInt(z)}`,
   },
