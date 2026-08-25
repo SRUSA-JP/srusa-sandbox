@@ -271,6 +271,12 @@ export const STATS_TEXT = {
       diamond: 'ダイヤ',
       emerald: 'エメラルド',
       ranking: '資産ランキング',
+      rankingMode: '表示',
+      rankingModes: {
+        total: '合計と内訳',
+        diamond: 'ダイヤ数',
+        emerald: 'エメラルド数',
+      },
       trend: '指数推移',
       source: '算出元',
       noRate: '算出なし',

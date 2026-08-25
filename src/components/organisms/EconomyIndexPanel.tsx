@@ -20,6 +20,7 @@ import type { VizTheme } from '../../theme/palette';
 import { Picker } from '../atoms';
 import { KpiTile, SectionHeader } from '../molecules';
 import { SECTION } from '../classes';
+import { RankBarChart } from './RankBarChart';
 import { SeriesBarChart } from './SeriesBarChart';
 import { TrendLineChart } from './TrendLineChart';
 
@@ -34,6 +35,7 @@ const RANKING_LIMIT = 8;
 const RANKING_ROW_HEIGHT = 26;
 const RANKING_MIN_HEIGHT = 178;
 const TREND_HEIGHT = 190;
+type RankingMode = 'total' | 'diamond' | 'emerald';
 
 function sourceNote(source: EconomySourceMetric): string {
   return ECONOMY_SOURCE_OPTIONS.find((option) => option.value === source)?.note ?? '';
@@ -42,10 +44,15 @@ function sourceNote(source: EconomySourceMetric): string {
 /** ダイヤ・エメラルドから作る、サーバー内の簡易経済指標。 */
 export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyIndexPanelProps) {
   const [source, setSource] = useState<EconomySourceMetric>(ECONOMY_DEFAULT_SOURCE);
+  const [rankingMode, setRankingMode] = useState<RankingMode>('total');
   const summary = useMemo(() => economySummary(doc, { players, source }), [doc, players, source]);
+  const economyRows = useMemo(
+    () => playerEconomyRows(doc, { players, source }),
+    [doc, players, source],
+  );
   const ranking = useMemo(
     () => {
-      const rows = playerEconomyRows(doc, { players, source }).slice(0, RANKING_LIMIT);
+      const rows = [...economyRows].sort((a, b) => b.total - a.total).slice(0, RANKING_LIMIT);
       return {
         series: [
           { key: 'diamond', label: STATS_TEXT.card.economy.diamond },
@@ -58,7 +65,15 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
         })),
       };
     },
-    [doc, players, source],
+    [economyRows],
+  );
+  const singleRanking = useMemo(
+    () =>
+      [...economyRows]
+        .sort((a, b) => b[rankingMode] - a[rankingMode])
+        .slice(0, RANKING_LIMIT)
+        .map((row) => ({ key: row.name, label: row.name, value: row[rankingMode] })),
+    [economyRows, rankingMode],
   );
   const trend = useMemo(
     () => economyIndexTimeline(snapshots, { players, source }),
@@ -106,15 +121,36 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
 
       <div className="grid gap-md lg:grid-cols-2">
         <div className="min-w-0">
-          <h3 className="mb-xs text-sm font-bold text-heading">{STATS_TEXT.card.economy.ranking}</h3>
-          <SeriesBarChart
-            data={ranking}
-            theme={theme}
-            unit="個"
-            stacked
-            horizontal
-            height={Math.max(RANKING_MIN_HEIGHT, ranking.rows.length * RANKING_ROW_HEIGHT)}
-          />
+          <div className="mb-xs flex min-w-0 flex-wrap items-center justify-between gap-sm">
+            <h3 className="text-sm font-bold text-heading">{STATS_TEXT.card.economy.ranking}</h3>
+            <Picker
+              label={STATS_TEXT.card.economy.rankingMode}
+              value={rankingMode}
+              options={[
+                { value: 'total', label: STATS_TEXT.card.economy.rankingModes.total },
+                { value: 'diamond', label: STATS_TEXT.card.economy.rankingModes.diamond },
+                { value: 'emerald', label: STATS_TEXT.card.economy.rankingModes.emerald },
+              ]}
+              onChange={setRankingMode}
+            />
+          </div>
+          {rankingMode === 'total' ? (
+            <SeriesBarChart
+              data={ranking}
+              theme={theme}
+              unit="個"
+              stacked
+              horizontal
+              height={Math.max(RANKING_MIN_HEIGHT, ranking.rows.length * RANKING_ROW_HEIGHT)}
+            />
+          ) : (
+            <RankBarChart
+              data={singleRanking}
+              theme={theme}
+              unit="個"
+              height={Math.max(RANKING_MIN_HEIGHT, singleRanking.length * RANKING_ROW_HEIGHT)}
+            />
+          )}
         </div>
         <div className="min-w-0">
           <h3 className="mb-xs text-sm font-bold text-heading">{STATS_TEXT.card.economy.trend}</h3>
