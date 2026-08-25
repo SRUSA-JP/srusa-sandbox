@@ -107,6 +107,7 @@ npm run sync:data -- --dry-run    # 何をするかだけ出す
 | `/check` | 型・ESLint・配色・実値の直書き・層の向きをまとめて検査する |
 | `/commit` | `/check` を通してから、変更を論理単位に分けてコミットする |
 | `/preview` | ビルドしてプレビューを起動する（スマホ実機の確認込み） |
+| `/deploy-preview` | Netlify のプレビューデプロイを作成する（本番公開しない） |
 
 `.claude/settings.json` は共有する権限設定（読み取り系と `git add` / `git commit` は許可、
 `push` / `checkout` / `reset --hard` / `rm -rf` は拒否）。
