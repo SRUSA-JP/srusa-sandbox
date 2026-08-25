@@ -4,7 +4,8 @@ import { RELATIONSHIPS_CONTENT } from '../content';
 import { joinNotes } from '../lib/display';
 import { playerPath } from '../data/playerProfiles';
 import type { VizTheme } from '../theme/palette';
-import { APP_TEXT, MAP_TEXT } from '../config/messages';
+import { APP_TEXT, MAP_TEXT, ZUKAN_TEXT } from '../config/messages';
+import { ZUKAN_PATH } from '../routes';
 import { RELATIONSHIP_MAP_DEFAULT_EDGE_MODE } from '../config/dataRegistry';
 import { EDGE_MODES, ISSUE_PREVIEW_COUNT, type EdgeMode } from '../map/config';
 import { loadRelationshipData } from '../map/data';
@@ -245,6 +246,10 @@ export function MapPage({ theme }: MapPageProps) {
                   {MAP_TEXT.picker.profile}
                 </a>
               )}
+              {/* 図の中の人を探すより、名簿から選ぶほうが早いこともある */}
+              <a href={ZUKAN_PATH} className={`${CONTROL} ${CONTROL_ROW} ${CONTROL_HOVER}`}>
+                {ZUKAN_TEXT.link}
+              </a>
               <Button label="エクスポート" icon="download" onClick={exportWorkspace} />
               <Button label="インポート" icon="upload" onClick={() => fileInputRef.current?.click()} />
               <input

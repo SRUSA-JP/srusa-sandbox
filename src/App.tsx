@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { AppShell } from './components';
 import { useHashRoute } from './hooks/useHashRoute';
-import { EventRankingsPage, MapPage, PlayerPage, StatsPage, WorldMapPage } from './pages';
+import { EventRankingsPage, MapPage, PlayerPage, StatsPage, WorldMapPage, ZukanPage } from './pages';
 import { skinForRoute, type Route, type RouteId } from './routes';
 import { setActiveSkin } from './config/skins';
 import { useAppTheme } from './theme/useThemeMode';
@@ -12,6 +12,7 @@ const PAGES: Record<RouteId, (props: { theme: VizTheme; route: Route }) => React
   stats: StatsPage,
   'world-map': WorldMapPage,
   relationships: MapPage,
+  zukan: ZukanPage,
   events: EventRankingsPage,
   player: PlayerPage,
 };
