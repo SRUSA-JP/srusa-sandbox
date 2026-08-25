@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 
-SRUSA の **Minecraft サーバー統計** と **メンバー相関図** を 1 つにまとめた単体の Web アプリ。
+SRUSA の **Minecraft サーバー統計**、**ワールドマップ**、**相関図**、**SRUSA 図鑑** を 1 つにまとめた単体の Web アプリ。
 
 コンテンツとビューアの実装は [srusa-portal](../srusa-portal)（MkDocs サイト）から移植した。
 srusa-portal 側は MkDocs のページに iframe で埋め込む前提だったが、こちらは**単体で動く SPA** として作り直している。
