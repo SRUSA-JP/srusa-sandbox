@@ -20,6 +20,7 @@
  */
 import { cssVar } from '../theme/tokens';
 import {
+  CONTRAST_MIN_LARGE,
   CONTRAST_MIN_TEXT,
   chartText,
   ensureContrast,
@@ -218,6 +219,30 @@ export const PLAYER_DATA_HIGHLIGHT = {
   scatterTopShare: 0.82,
   topFillAlpha: 0.18,
   notableFillAlpha: 0.12,
+} as const;
+
+/**
+ * 連続プレイ日数の帯の 1 マスの色。
+ *
+ * 3 段階だけにする。いま続いている連なりを強調色、それ以外のログインした日を
+ * 薄く、ログインしていない日は沈んだ背景。図形なので下限は 3:1。
+ */
+export function playStreakMarkColors(
+  theme: VizTheme,
+  accent: string,
+): { current: string; played: string; missed: string; border: string } {
+  return {
+    current: ensureContrast(accent, theme.surface, CONTRAST_MIN_LARGE),
+    played: withAlpha(accent, PLAY_STREAK_MARK.playedAlpha),
+    missed: theme.surfaceHover,
+    border: theme.border,
+  };
+}
+
+/** 帯の 1 マスの見た目。 */
+export const PLAY_STREAK_MARK = {
+  /** ログインはしたが、いまの連なりには入っていない日の濃さ。 */
+  playedAlpha: 0.42,
 } as const;
 
 export function playerDataHighlightLevel({

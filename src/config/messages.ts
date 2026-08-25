@@ -436,6 +436,79 @@ export const DATA_TEXT = {
   },
 } as const;
 
+/**
+ * 連続プレイ日数。プレイヤー紹介ページに出す。
+ *
+ * 数え方の元はサーバーログの日別記録で、「その日サーバーに入ったか」だけを見る。
+ * 何時間遊んだかは見ないので、少し覗いた日も 1 日として数える。
+ */
+export const STREAK_TEXT = {
+  title: '連続プレイ日数',
+  note: 'サーバーのログから、その日ログインしたかどうかで数えています。',
+  current: '現在の連続',
+  /** 途切れている人には「現在」と出さない（最後に続いた長さなので）。 */
+  lastRun: '最後の連続',
+  longest: '最長の連続',
+  totalDays: '遊んだ日数',
+  lastPlayed: '最後にログイン',
+  days: (count: number) => `${count} 日`,
+  /** 帯の見出し。何日ぶんを並べているか。 */
+  recent: (count: number) => `直近 ${count} 日`,
+  /** 連なりが途切れているとき。 */
+  broken: '途切れています',
+  /** 続いているとき。 */
+  active: '継続中',
+  /** 一度もログインの記録が無い人。 */
+  empty: 'ログインの記録がまだありません。',
+  /** 帯の 1 マスの読み上げ。 */
+  markAlt: (date: string, played: boolean) => `${date} ${played ? 'ログインあり' : 'ログインなし'}`,
+} as const;
+
+/**
+ * SRUSA 図鑑。人をまとめて並べ、ひとりずつの紹介ページへ渡す入口。
+ *
+ * 名前は相関図のデータにある表記のまま出す。頭文字だけの人はそのまま頭文字で出し、
+ * ここで本名に近づける言い換えをしないこと（相関図の匿名化を弱めないため）。
+ */
+export const ZUKAN_TEXT = {
+  title: 'SRUSA 図鑑',
+  note: '相関図と Minecraft のデータにいる人をまとめた名簿です。',
+  lead: '名前を選ぶと、その人の紹介ページへ移ります。所属や、Minecraft に参加しているかで絞り込めます。',
+  /** 絞り込みのプルダウン。 */
+  filter: {
+    attribute: '所属',
+    kind: '種類',
+    /** 絞り込まないときの選択肢。 */
+    any: 'すべて',
+  },
+  /** 種類での絞り込み。 */
+  kind: {
+    all: 'すべての人',
+    minecraft: 'Minecraft に参加',
+    relationship: '相関図のみ',
+  },
+  /** 見出しの下に出す人数。 */
+  count: (shown: number, total: number) => `${total} 人中 ${shown} 人`,
+  /** 絞り込んだ結果が空のとき。 */
+  empty: '条件に合う人がいません。絞り込みを緩めてください。',
+  /** カードに付ける札。 */
+  badge: {
+    stats: '統計あり',
+    daily: '日別ログ',
+    streak: (days: number) => `継続 ${days} 日`,
+  },
+  /** 所属が多すぎて省いたとき。 */
+  moreAttributes: (count: number) => `ほか ${count}`,
+  /** カード全体の読み上げ。 */
+  open: (name: string) => `${name} の紹介ページを開く`,
+  /** 他のページから図鑑へ飛ぶボタン。 */
+  link: '図鑑を見る',
+  /** 紹介ページから図鑑へ戻るボタン。 */
+  back: '図鑑へ戻る',
+  /** 知らない名前で紹介ページを開いたとき。 */
+  notFound: 'その名前の人は見つかりませんでした。下の図鑑から選び直せます。',
+} as const;
+
 /** 表（DataTable）。統計ビューアと相関図で共用する。 */
 export const TABLE_TEXT = {
   exportCsv: 'CSV を書き出す',
