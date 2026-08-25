@@ -93,6 +93,26 @@ function checkArbitraryClasses(file: string, source: string) {
   }
 }
 
+/**
+ * SVG の文字の大きさを数値で直接書いていないか。
+ *
+ * SVG は CSS のクラスを通せないので、つい `fontSize="5.4"` のように書いてしまう。
+ * するとスキンの倍率が効かず、拡大縮小する図の中では読めない大きさになる
+ * （実際にレーダーの軸名がそうなっていた）。トークンか、寸法を計算した値を渡す。
+ */
+function checkLiteralFontSize(file: string, source: string) {
+  const literal = /\bfontSize=(?:"[\d.]+"|\{\s*[\d.]+\s*\})/g;
+  for (const match of source.matchAll(literal)) {
+    addFinding(
+      file,
+      source,
+      match.index,
+      '文字の大きさの直書き',
+      `${match[0]} は FONT_SIZE と skinnedFontSize（または配置計算の結果）から渡してください`,
+    );
+  }
+}
+
 function checkNestedCards(file: string, source: string) {
   let chartCardDepth = 0;
   let offset = 0;
@@ -121,6 +141,7 @@ for (const filePath of TARGETS.flatMap(walk)) {
   const source = withoutComments(readFileSync(filePath, 'utf8'));
   checkColorLiterals(file, source);
   checkArbitraryClasses(file, source);
+  checkLiteralFontSize(file, source);
   checkNestedCards(file, source);
 }
 

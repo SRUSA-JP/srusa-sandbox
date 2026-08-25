@@ -7,7 +7,7 @@
   "scripts": {
     "prepare": "git config core.hooksPath .githooks",
     "dev": "vite --host",
-    "build": "npm run typecheck && npm run lint && npm run test:ui && npm run check:contrast && npm run check:design && npm run check:world-map && vite build",
+    "build": "npm run typecheck && npm run lint && npm run test:ui && npm run check:contrast && npm run check:design && npm run check:layout && npm run check:world-map && vite build",
     "preview": "vite preview",
     "deploy:preview": "npm run build && npx netlify-cli deploy --dir=dist --alias preview",
     "deplpy:preview": "npm run deploy:preview",
@@ -17,6 +17,7 @@
     "test:ui": "vite build --ssr scripts/check-ui-render.tsx --outDir node_modules/.cache/ui-render --emptyOutDir false && node node_modules/.cache/ui-render/check-ui-render.js",
     "check:contrast": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-contrast.ts --outfile=node_modules/.cache/check-contrast.mjs && node node_modules/.cache/check-contrast.mjs",
     "check:design": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-design.ts --outfile=node_modules/.cache/check-design.mjs && node node_modules/.cache/check-design.mjs",
+    "check:layout": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-layout.ts --outfile=node_modules/.cache/check-layout.mjs && node node_modules/.cache/check-layout.mjs",
     "check:world-map": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-world-map.ts --outfile=node_modules/.cache/check-world-map.mjs && node node_modules/.cache/check-world-map.mjs",
     "audit:bluemap": "node scripts/audit-bluemap-source.mjs",
     "lint": "eslint .",

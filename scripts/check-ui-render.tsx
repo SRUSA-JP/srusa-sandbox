@@ -4,6 +4,10 @@
  * ブラウザ操作までは見ない軽量なスモークテスト。
  * ルート追加、データ import、相関図/地図の初期計算、ページ単位の JSX 破損を
  * `npm run build` の前段で検知するために使う。
+ *
+ * 描き上がった SVG の中の文字が枠からはみ出していないかも、ここで一緒に見る
+ * （切り取られた文字は console.error を出さないので、レンダリングが通るだけでは気づけない）。
+ * 図の寸法そのものの検査は scripts/check-layout.ts。
  */
 import { renderToString } from 'react-dom/server';
 import type { ReactElement } from 'react';
@@ -11,6 +15,7 @@ import { ClipsPage, EventRankingsPage, MapPage, PlayerPage, StatsPage, WorldMapP
 import { ROUTES, routeFromHash, skinForRoute, type Route, type RouteId } from '../src/routes';
 import { setActiveSkin } from '../src/config/skins';
 import { buildTheme } from '../src/theme/useThemeMode';
+import { svgTextOverflow } from './svg-text-fit';
 
 type PageRenderer = (props: { route: Route }) => ReactElement;
 
@@ -60,6 +65,16 @@ for (const route of ROUTES_TO_CHECK) {
   try {
     const html = withConsoleTrap(label, () => renderToString(PAGES[route.id]({ route })));
     if (html.length < 100) throw new Error(`レンダリング結果が短すぎます (${html.length} chars)`);
+
+    const overflow = svgTextOverflow(html);
+    if (overflow.length > 0) {
+      throw new Error(
+        `図の文字が枠からはみ出しています:\n${overflow
+          .map((finding) => `  「${finding.text}」（${finding.frame}）${finding.detail}`)
+          .join('\n')}`,
+      );
+    }
+
     console.log(`OK  ${label} (${html.length} chars)`);
   } catch (error) {
     failed = true;
