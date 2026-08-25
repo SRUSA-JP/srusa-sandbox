@@ -20,7 +20,6 @@ import type { VizTheme } from '../../theme/palette';
 import { Picker } from '../atoms';
 import { KpiTile, SectionHeader } from '../molecules';
 import { SECTION } from '../classes';
-import { KpiGrid } from './KpiGrid';
 import { RankBarChart } from './RankBarChart';
 import { TrendLineChart } from './TrendLineChart';
 
@@ -32,8 +31,9 @@ export interface EconomyIndexPanelProps {
 }
 
 const RANKING_LIMIT = 8;
-const RANKING_ROW_HEIGHT = 32;
-const RANKING_MIN_HEIGHT = 220;
+const RANKING_ROW_HEIGHT = 26;
+const RANKING_MIN_HEIGHT = 178;
+const TREND_HEIGHT = 190;
 
 function sourceNote(source: EconomySourceMetric): string {
   return ECONOMY_SOURCE_OPTIONS.find((option) => option.value === source)?.note ?? '';
@@ -73,27 +73,30 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
         }
       />
 
-      <KpiGrid>
+      <div className="mb-md grid gap-sm grid-cols-[repeat(auto-fit,minmax(160px,1fr))]">
         <KpiTile
           label={STATS_TEXT.card.economy.total}
           value={`${formatInt(summary.total)} pt`}
           sub={`${STATS_TEXT.card.economy.diamond} ${formatInt(diamond)} / ${STATS_TEXT.card.economy.emerald} ${formatInt(emerald)}`}
+          compact
         />
         <KpiTile
           label={STATS_TEXT.card.economy.rate}
           value={summary.rate === null ? STATS_TEXT.card.economy.noRate : STATS_TEXT.card.economy.rateValue(formatDecimal(summary.rate))}
           sub={STATS_TEXT.card.economy.rateNote}
+          compact
         />
         <KpiTile
           label={STATS_TEXT.card.economy.index}
           value={formatDecimal(latestIndex)}
           sub={STATS_TEXT.card.economy.base(ECONOMY_INDEX_BASE)}
+          compact
         />
-      </KpiGrid>
+      </div>
 
-      <div className="grid gap-xl lg:grid-cols-2">
+      <div className="grid gap-md lg:grid-cols-2">
         <div className="min-w-0">
-          <h3 className="mb-sm text-md font-bold text-heading">{STATS_TEXT.card.economy.ranking}</h3>
+          <h3 className="mb-xs text-sm font-bold text-heading">{STATS_TEXT.card.economy.ranking}</h3>
           <RankBarChart
             data={ranking}
             theme={theme}
@@ -102,12 +105,13 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
           />
         </div>
         <div className="min-w-0">
-          <h3 className="mb-sm text-md font-bold text-heading">{STATS_TEXT.card.economy.trend}</h3>
+          <h3 className="mb-xs text-sm font-bold text-heading">{STATS_TEXT.card.economy.trend}</h3>
           <TrendLineChart
             data={trend}
             theme={theme}
             categoryKey={TIMELINE_CATEGORY_KEY}
             unit=""
+            height={TREND_HEIGHT}
             showValueLabels={snapshots.length <= 4}
           />
         </div>
