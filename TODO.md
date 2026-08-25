@@ -8,6 +8,11 @@
 
 #### 2026-08-25
 
+- 原文: `適宜skills育てる方針をCLAUDEｍｄにも`
+  - [CLAUDE.md](CLAUDE.md) の作業ルールに、繰り返し作業・更新手順・判断基準・注意点を `.codex/skills/` の skill として育てる方針を追記した
+  - [CODEX.md](CODEX.md) にも同じ入口を短く追記した
+  - 確認: Markdown の文面確認のみ
+
 - 原文: `指数推移とかマップとか，ランキングとかデータを更新するたびに反映するところを洗い出しして，それをどう更新していくかっていうログ？を作ってほしい，あとはそれを自動で更新？最新にするコマンドとかも．`
   - データ更新時に何がどこへ反映されるかを [docs/data-update-runbook.md](docs/data-update-runbook.md) に整理した
   - `npm run refresh:data`（AWS再取得込み）と `npm run refresh:data:local`（抽出済みデータ同期のみ）を追加した
