@@ -1,5 +1,5 @@
 import featuredUsedItemsJson from '../../data/player-featured-used-items-20260824.json';
-import playerInventoryAssetsJson from '../../data/player-inventory-assets-20260823.json';
+import playerInventoryAssetsJson from '../../data/player-inventory-assets-20260825.json';
 import playerDailySummaryJson from '../../data/player-daily-summary-20260824.json';
 import playerDbJson from '../../data/player-db-20260823.json';
 import playLogJson from '../../data/play-days-20260824.json';

@@ -1,0 +1,2582 @@
+{
+  "generated_on": "2026-08-25T07:21:50.125Z",
+  "source": {
+    "player_inventory": "../aws_minecraft/data/item-inventory-stats-20260825-latest-player.json",
+    "backpack_inventory": "../aws_minecraft/data/item-inventory-stats-20260825-latest-player-backpacks.json",
+    "note": "公開用に UUID と生NBTを除き、通常インベントリ・装備・エンダーチェスト・所有者別バックパック集計を資産換算した軽量データ。"
+  },
+  "assets": [
+    {
+      "id": "diamond",
+      "label": "ダイヤ",
+      "shortLabel": "DI",
+      "unit": "DI",
+      "entries": [
+        {
+          "id": "diamond",
+          "multiplier": 1,
+          "label": "ダイヤ",
+          "category": "raw"
+        },
+        {
+          "id": "diamond_block",
+          "multiplier": 9,
+          "label": "ダイヤブロック",
+          "category": "block"
+        },
+        {
+          "id": "diamond_helmet",
+          "multiplier": 5,
+          "label": "ダイヤのヘルメット",
+          "category": "armor"
+        },
+        {
+          "id": "diamond_chestplate",
+          "multiplier": 8,
+          "label": "ダイヤのチェストプレート",
+          "category": "armor"
+        },
+        {
+          "id": "diamond_leggings",
+          "multiplier": 7,
+          "label": "ダイヤのレギンス",
+          "category": "armor"
+        },
+        {
+          "id": "diamond_boots",
+          "multiplier": 4,
+          "label": "ダイヤのブーツ",
+          "category": "armor"
+        },
+        {
+          "id": "diamond_sword",
+          "multiplier": 2,
+          "label": "ダイヤの剣",
+          "category": "tool"
+        },
+        {
+          "id": "diamond_pickaxe",
+          "multiplier": 3,
+          "label": "ダイヤのツルハシ",
+          "category": "tool"
+        },
+        {
+          "id": "diamond_axe",
+          "multiplier": 3,
+          "label": "ダイヤの斧",
+          "category": "tool"
+        },
+        {
+          "id": "diamond_shovel",
+          "multiplier": 1,
+          "label": "ダイヤのシャベル",
+          "category": "tool"
+        },
+        {
+          "id": "diamond_hoe",
+          "multiplier": 2,
+          "label": "ダイヤのクワ",
+          "category": "tool"
+        },
+        {
+          "id": "netherite_helmet",
+          "multiplier": 5,
+          "label": "ネザライトのヘルメット",
+          "category": "armor"
+        },
+        {
+          "id": "netherite_chestplate",
+          "multiplier": 8,
+          "label": "ネザライトのチェストプレート",
+          "category": "armor"
+        },
+        {
+          "id": "netherite_leggings",
+          "multiplier": 7,
+          "label": "ネザライトのレギンス",
+          "category": "armor"
+        },
+        {
+          "id": "netherite_boots",
+          "multiplier": 4,
+          "label": "ネザライトのブーツ",
+          "category": "armor"
+        },
+        {
+          "id": "netherite_sword",
+          "multiplier": 2,
+          "label": "ネザライトの剣",
+          "category": "tool"
+        },
+        {
+          "id": "netherite_pickaxe",
+          "multiplier": 3,
+          "label": "ネザライトのツルハシ",
+          "category": "tool"
+        },
+        {
+          "id": "netherite_axe",
+          "multiplier": 3,
+          "label": "ネザライトの斧",
+          "category": "tool"
+        },
+        {
+          "id": "netherite_shovel",
+          "multiplier": 1,
+          "label": "ネザライトのシャベル",
+          "category": "tool"
+        },
+        {
+          "id": "netherite_hoe",
+          "multiplier": 2,
+          "label": "ネザライトのクワ",
+          "category": "tool"
+        },
+        {
+          "id": "diamond_knife",
+          "multiplier": 1,
+          "label": "ダイヤのナイフ",
+          "category": "tool"
+        },
+        {
+          "id": "diamond_minotaur_axe",
+          "multiplier": 3,
+          "label": "ミノタウロスの斧",
+          "category": "tool"
+        }
+      ]
+    },
+    {
+      "id": "emerald",
+      "label": "エメラルド",
+      "shortLabel": "EM",
+      "unit": "EM",
+      "entries": [
+        {
+          "id": "emerald",
+          "multiplier": 1,
+          "label": "エメラルド",
+          "category": "raw"
+        },
+        {
+          "id": "emerald_block",
+          "multiplier": 9,
+          "label": "エメラルドブロック",
+          "category": "block"
+        }
+      ]
+    }
+  ],
+  "players": {
+    "kagyki": {
+      "total": 295,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 282,
+          "items": {
+            "diamond": {
+              "label": "ダイヤ",
+              "count": 177,
+              "multiplier": 1,
+              "value": 177
+            },
+            "diamond_helmet": {
+              "label": "ダイヤのヘルメット",
+              "count": 2,
+              "multiplier": 5,
+              "value": 10
+            },
+            "diamond_chestplate": {
+              "label": "ダイヤのチェストプレート",
+              "count": 2,
+              "multiplier": 8,
+              "value": 16
+            },
+            "diamond_leggings": {
+              "label": "ダイヤのレギンス",
+              "count": 2,
+              "multiplier": 7,
+              "value": 14
+            },
+            "diamond_boots": {
+              "label": "ダイヤのブーツ",
+              "count": 2,
+              "multiplier": 4,
+              "value": 8
+            },
+            "diamond_sword": {
+              "label": "ダイヤの剣",
+              "count": 4,
+              "multiplier": 2,
+              "value": 8
+            },
+            "diamond_pickaxe": {
+              "label": "ダイヤのツルハシ",
+              "count": 2,
+              "multiplier": 3,
+              "value": 6
+            },
+            "diamond_axe": {
+              "label": "ダイヤの斧",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            },
+            "diamond_shovel": {
+              "label": "ダイヤのシャベル",
+              "count": 5,
+              "multiplier": 1,
+              "value": 5
+            },
+            "netherite_helmet": {
+              "label": "ネザライトのヘルメット",
+              "count": 1,
+              "multiplier": 5,
+              "value": 5
+            },
+            "netherite_chestplate": {
+              "label": "ネザライトのチェストプレート",
+              "count": 1,
+              "multiplier": 8,
+              "value": 8
+            },
+            "netherite_leggings": {
+              "label": "ネザライトのレギンス",
+              "count": 1,
+              "multiplier": 7,
+              "value": 7
+            },
+            "netherite_boots": {
+              "label": "ネザライトのブーツ",
+              "count": 1,
+              "multiplier": 4,
+              "value": 4
+            },
+            "netherite_sword": {
+              "label": "ネザライトの剣",
+              "count": 1,
+              "multiplier": 2,
+              "value": 2
+            },
+            "netherite_pickaxe": {
+              "label": "ネザライトのツルハシ",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            },
+            "diamond_knife": {
+              "label": "ダイヤのナイフ",
+              "count": 6,
+              "multiplier": 1,
+              "value": 6
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 13,
+          "items": {
+            "emerald": {
+              "label": "エメラルド",
+              "count": 13,
+              "multiplier": 1,
+              "value": 13
+            }
+          }
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 22,
+            "items": {
+              "diamond_shovel": {
+                "label": "ダイヤのシャベル",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              },
+              "netherite_helmet": {
+                "label": "ネザライトのヘルメット",
+                "count": 1,
+                "multiplier": 5,
+                "value": 5
+              },
+              "netherite_leggings": {
+                "label": "ネザライトのレギンス",
+                "count": 1,
+                "multiplier": 7,
+                "value": 7
+              },
+              "netherite_boots": {
+                "label": "ネザライトのブーツ",
+                "count": 1,
+                "multiplier": 4,
+                "value": 4
+              },
+              "netherite_sword": {
+                "label": "ネザライトの剣",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              },
+              "netherite_pickaxe": {
+                "label": "ネザライトのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 260,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 177,
+                "multiplier": 1,
+                "value": 177
+              },
+              "diamond_helmet": {
+                "label": "ダイヤのヘルメット",
+                "count": 2,
+                "multiplier": 5,
+                "value": 10
+              },
+              "diamond_chestplate": {
+                "label": "ダイヤのチェストプレート",
+                "count": 2,
+                "multiplier": 8,
+                "value": 16
+              },
+              "diamond_leggings": {
+                "label": "ダイヤのレギンス",
+                "count": 2,
+                "multiplier": 7,
+                "value": 14
+              },
+              "diamond_boots": {
+                "label": "ダイヤのブーツ",
+                "count": 2,
+                "multiplier": 4,
+                "value": 8
+              },
+              "diamond_sword": {
+                "label": "ダイヤの剣",
+                "count": 4,
+                "multiplier": 2,
+                "value": 8
+              },
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 2,
+                "multiplier": 3,
+                "value": 6
+              },
+              "diamond_axe": {
+                "label": "ダイヤの斧",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "diamond_shovel": {
+                "label": "ダイヤのシャベル",
+                "count": 4,
+                "multiplier": 1,
+                "value": 4
+              },
+              "netherite_chestplate": {
+                "label": "ネザライトのチェストプレート",
+                "count": 1,
+                "multiplier": 8,
+                "value": 8
+              },
+              "diamond_knife": {
+                "label": "ダイヤのナイフ",
+                "count": 6,
+                "multiplier": 1,
+                "value": 6
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 13,
+            "items": {
+              "emerald": {
+                "label": "エメラルド",
+                "count": 13,
+                "multiplier": 1,
+                "value": 13
+              }
+            }
+          }
+        }
+      }
+    },
+    "Mitigli4": {
+      "total": 277,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 209,
+          "items": {
+            "diamond": {
+              "label": "ダイヤ",
+              "count": 114,
+              "multiplier": 1,
+              "value": 114
+            },
+            "diamond_helmet": {
+              "label": "ダイヤのヘルメット",
+              "count": 3,
+              "multiplier": 5,
+              "value": 15
+            },
+            "diamond_chestplate": {
+              "label": "ダイヤのチェストプレート",
+              "count": 1,
+              "multiplier": 8,
+              "value": 8
+            },
+            "diamond_leggings": {
+              "label": "ダイヤのレギンス",
+              "count": 3,
+              "multiplier": 7,
+              "value": 21
+            },
+            "diamond_boots": {
+              "label": "ダイヤのブーツ",
+              "count": 7,
+              "multiplier": 4,
+              "value": 28
+            },
+            "diamond_sword": {
+              "label": "ダイヤの剣",
+              "count": 4,
+              "multiplier": 2,
+              "value": 8
+            },
+            "diamond_pickaxe": {
+              "label": "ダイヤのツルハシ",
+              "count": 3,
+              "multiplier": 3,
+              "value": 9
+            },
+            "diamond_shovel": {
+              "label": "ダイヤのシャベル",
+              "count": 6,
+              "multiplier": 1,
+              "value": 6
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 68,
+          "items": {
+            "emerald": {
+              "label": "エメラルド",
+              "count": 14,
+              "multiplier": 1,
+              "value": 14
+            },
+            "emerald_block": {
+              "label": "エメラルドブロック",
+              "count": 6,
+              "multiplier": 9,
+              "value": 54
+            }
+          }
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 3,
+            "items": {
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 206,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 114,
+                "multiplier": 1,
+                "value": 114
+              },
+              "diamond_helmet": {
+                "label": "ダイヤのヘルメット",
+                "count": 3,
+                "multiplier": 5,
+                "value": 15
+              },
+              "diamond_chestplate": {
+                "label": "ダイヤのチェストプレート",
+                "count": 1,
+                "multiplier": 8,
+                "value": 8
+              },
+              "diamond_leggings": {
+                "label": "ダイヤのレギンス",
+                "count": 3,
+                "multiplier": 7,
+                "value": 21
+              },
+              "diamond_boots": {
+                "label": "ダイヤのブーツ",
+                "count": 7,
+                "multiplier": 4,
+                "value": 28
+              },
+              "diamond_sword": {
+                "label": "ダイヤの剣",
+                "count": 4,
+                "multiplier": 2,
+                "value": 8
+              },
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 2,
+                "multiplier": 3,
+                "value": 6
+              },
+              "diamond_shovel": {
+                "label": "ダイヤのシャベル",
+                "count": 6,
+                "multiplier": 1,
+                "value": 6
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 68,
+            "items": {
+              "emerald": {
+                "label": "エメラルド",
+                "count": 14,
+                "multiplier": 1,
+                "value": 14
+              },
+              "emerald_block": {
+                "label": "エメラルドブロック",
+                "count": 6,
+                "multiplier": 9,
+                "value": 54
+              }
+            }
+          }
+        }
+      }
+    },
+    "nodoamenn": {
+      "total": 251,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 250,
+          "items": {
+            "diamond": {
+              "label": "ダイヤ",
+              "count": 38,
+              "multiplier": 1,
+              "value": 38
+            },
+            "diamond_block": {
+              "label": "ダイヤブロック",
+              "count": 7,
+              "multiplier": 9,
+              "value": 63
+            },
+            "diamond_helmet": {
+              "label": "ダイヤのヘルメット",
+              "count": 4,
+              "multiplier": 5,
+              "value": 20
+            },
+            "diamond_chestplate": {
+              "label": "ダイヤのチェストプレート",
+              "count": 3,
+              "multiplier": 8,
+              "value": 24
+            },
+            "diamond_leggings": {
+              "label": "ダイヤのレギンス",
+              "count": 5,
+              "multiplier": 7,
+              "value": 35
+            },
+            "diamond_boots": {
+              "label": "ダイヤのブーツ",
+              "count": 7,
+              "multiplier": 4,
+              "value": 28
+            },
+            "diamond_sword": {
+              "label": "ダイヤの剣",
+              "count": 4,
+              "multiplier": 2,
+              "value": 8
+            },
+            "diamond_pickaxe": {
+              "label": "ダイヤのツルハシ",
+              "count": 4,
+              "multiplier": 3,
+              "value": 12
+            },
+            "diamond_axe": {
+              "label": "ダイヤの斧",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            },
+            "diamond_shovel": {
+              "label": "ダイヤのシャベル",
+              "count": 5,
+              "multiplier": 1,
+              "value": 5
+            },
+            "diamond_hoe": {
+              "label": "ダイヤのクワ",
+              "count": 3,
+              "multiplier": 2,
+              "value": 6
+            },
+            "diamond_knife": {
+              "label": "ダイヤのナイフ",
+              "count": 5,
+              "multiplier": 1,
+              "value": 5
+            },
+            "diamond_minotaur_axe": {
+              "label": "ミノタウロスの斧",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 1,
+          "items": {
+            "emerald": {
+              "label": "エメラルド",
+              "count": 1,
+              "multiplier": 1,
+              "value": 1
+            }
+          }
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 35,
+            "items": {
+              "diamond_helmet": {
+                "label": "ダイヤのヘルメット",
+                "count": 1,
+                "multiplier": 5,
+                "value": 5
+              },
+              "diamond_chestplate": {
+                "label": "ダイヤのチェストプレート",
+                "count": 1,
+                "multiplier": 8,
+                "value": 8
+              },
+              "diamond_leggings": {
+                "label": "ダイヤのレギンス",
+                "count": 1,
+                "multiplier": 7,
+                "value": 7
+              },
+              "diamond_boots": {
+                "label": "ダイヤのブーツ",
+                "count": 1,
+                "multiplier": 4,
+                "value": 4
+              },
+              "diamond_sword": {
+                "label": "ダイヤの剣",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              },
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "diamond_shovel": {
+                "label": "ダイヤのシャベル",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              },
+              "diamond_hoe": {
+                "label": "ダイヤのクワ",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              },
+              "diamond_minotaur_axe": {
+                "label": "ミノタウロスの斧",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 110,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 38,
+                "multiplier": 1,
+                "value": 38
+              },
+              "diamond_block": {
+                "label": "ダイヤブロック",
+                "count": 7,
+                "multiplier": 9,
+                "value": 63
+              },
+              "diamond_sword": {
+                "label": "ダイヤの剣",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              },
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 2,
+                "multiplier": 3,
+                "value": 6
+              },
+              "diamond_shovel": {
+                "label": "ダイヤのシャベル",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 1,
+            "items": {
+              "emerald": {
+                "label": "エメラルド",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              }
+            }
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 105,
+            "items": {
+              "diamond_helmet": {
+                "label": "ダイヤのヘルメット",
+                "count": 3,
+                "multiplier": 5,
+                "value": 15
+              },
+              "diamond_chestplate": {
+                "label": "ダイヤのチェストプレート",
+                "count": 2,
+                "multiplier": 8,
+                "value": 16
+              },
+              "diamond_leggings": {
+                "label": "ダイヤのレギンス",
+                "count": 4,
+                "multiplier": 7,
+                "value": 28
+              },
+              "diamond_boots": {
+                "label": "ダイヤのブーツ",
+                "count": 6,
+                "multiplier": 4,
+                "value": 24
+              },
+              "diamond_sword": {
+                "label": "ダイヤの剣",
+                "count": 2,
+                "multiplier": 2,
+                "value": 4
+              },
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "diamond_axe": {
+                "label": "ダイヤの斧",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "diamond_shovel": {
+                "label": "ダイヤのシャベル",
+                "count": 3,
+                "multiplier": 1,
+                "value": 3
+              },
+              "diamond_hoe": {
+                "label": "ダイヤのクワ",
+                "count": 2,
+                "multiplier": 2,
+                "value": 4
+              },
+              "diamond_knife": {
+                "label": "ダイヤのナイフ",
+                "count": 5,
+                "multiplier": 1,
+                "value": 5
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        }
+      }
+    },
+    "natch_1105": {
+      "total": 160,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 112,
+          "items": {
+            "diamond": {
+              "label": "ダイヤ",
+              "count": 63,
+              "multiplier": 1,
+              "value": 63
+            },
+            "diamond_helmet": {
+              "label": "ダイヤのヘルメット",
+              "count": 1,
+              "multiplier": 5,
+              "value": 5
+            },
+            "diamond_chestplate": {
+              "label": "ダイヤのチェストプレート",
+              "count": 1,
+              "multiplier": 8,
+              "value": 8
+            },
+            "diamond_leggings": {
+              "label": "ダイヤのレギンス",
+              "count": 1,
+              "multiplier": 7,
+              "value": 7
+            },
+            "diamond_boots": {
+              "label": "ダイヤのブーツ",
+              "count": 2,
+              "multiplier": 4,
+              "value": 8
+            },
+            "diamond_sword": {
+              "label": "ダイヤの剣",
+              "count": 1,
+              "multiplier": 2,
+              "value": 2
+            },
+            "diamond_pickaxe": {
+              "label": "ダイヤのツルハシ",
+              "count": 2,
+              "multiplier": 3,
+              "value": 6
+            },
+            "diamond_axe": {
+              "label": "ダイヤの斧",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            },
+            "diamond_shovel": {
+              "label": "ダイヤのシャベル",
+              "count": 1,
+              "multiplier": 1,
+              "value": 1
+            },
+            "netherite_leggings": {
+              "label": "ネザライトのレギンス",
+              "count": 1,
+              "multiplier": 7,
+              "value": 7
+            },
+            "diamond_knife": {
+              "label": "ダイヤのナイフ",
+              "count": 2,
+              "multiplier": 1,
+              "value": 2
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 48,
+          "items": {
+            "emerald": {
+              "label": "エメラルド",
+              "count": 48,
+              "multiplier": 1,
+              "value": 48
+            }
+          }
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 16,
+            "items": {
+              "diamond_boots": {
+                "label": "ダイヤのブーツ",
+                "count": 1,
+                "multiplier": 4,
+                "value": 4
+              },
+              "diamond_sword": {
+                "label": "ダイヤの剣",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              },
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "netherite_leggings": {
+                "label": "ネザライトのレギンス",
+                "count": 1,
+                "multiplier": 7,
+                "value": 7
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 40,
+            "items": {
+              "emerald": {
+                "label": "エメラルド",
+                "count": 40,
+                "multiplier": 1,
+                "value": 40
+              }
+            }
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 96,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 63,
+                "multiplier": 1,
+                "value": 63
+              },
+              "diamond_helmet": {
+                "label": "ダイヤのヘルメット",
+                "count": 1,
+                "multiplier": 5,
+                "value": 5
+              },
+              "diamond_chestplate": {
+                "label": "ダイヤのチェストプレート",
+                "count": 1,
+                "multiplier": 8,
+                "value": 8
+              },
+              "diamond_leggings": {
+                "label": "ダイヤのレギンス",
+                "count": 1,
+                "multiplier": 7,
+                "value": 7
+              },
+              "diamond_boots": {
+                "label": "ダイヤのブーツ",
+                "count": 1,
+                "multiplier": 4,
+                "value": 4
+              },
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "diamond_axe": {
+                "label": "ダイヤの斧",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "diamond_shovel": {
+                "label": "ダイヤのシャベル",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              },
+              "diamond_knife": {
+                "label": "ダイヤのナイフ",
+                "count": 2,
+                "multiplier": 1,
+                "value": 2
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 8,
+            "items": {
+              "emerald": {
+                "label": "エメラルド",
+                "count": 8,
+                "multiplier": 1,
+                "value": 8
+              }
+            }
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        }
+      }
+    },
+    "detkent": {
+      "total": 156,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 147,
+          "items": {
+            "diamond": {
+              "label": "ダイヤ",
+              "count": 63,
+              "multiplier": 1,
+              "value": 63
+            },
+            "diamond_helmet": {
+              "label": "ダイヤのヘルメット",
+              "count": 3,
+              "multiplier": 5,
+              "value": 15
+            },
+            "diamond_chestplate": {
+              "label": "ダイヤのチェストプレート",
+              "count": 3,
+              "multiplier": 8,
+              "value": 24
+            },
+            "diamond_leggings": {
+              "label": "ダイヤのレギンス",
+              "count": 3,
+              "multiplier": 7,
+              "value": 21
+            },
+            "diamond_boots": {
+              "label": "ダイヤのブーツ",
+              "count": 2,
+              "multiplier": 4,
+              "value": 8
+            },
+            "diamond_sword": {
+              "label": "ダイヤの剣",
+              "count": 1,
+              "multiplier": 2,
+              "value": 2
+            },
+            "diamond_pickaxe": {
+              "label": "ダイヤのツルハシ",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            },
+            "diamond_shovel": {
+              "label": "ダイヤのシャベル",
+              "count": 3,
+              "multiplier": 1,
+              "value": 3
+            },
+            "diamond_knife": {
+              "label": "ダイヤのナイフ",
+              "count": 5,
+              "multiplier": 1,
+              "value": 5
+            },
+            "diamond_minotaur_axe": {
+              "label": "ミノタウロスの斧",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 9,
+          "items": {
+            "emerald": {
+              "label": "エメラルド",
+              "count": 9,
+              "multiplier": 1,
+              "value": 9
+            }
+          }
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 88,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 63,
+                "multiplier": 1,
+                "value": 63
+              },
+              "diamond_helmet": {
+                "label": "ダイヤのヘルメット",
+                "count": 1,
+                "multiplier": 5,
+                "value": 5
+              },
+              "diamond_chestplate": {
+                "label": "ダイヤのチェストプレート",
+                "count": 1,
+                "multiplier": 8,
+                "value": 8
+              },
+              "diamond_leggings": {
+                "label": "ダイヤのレギンス",
+                "count": 1,
+                "multiplier": 7,
+                "value": 7
+              },
+              "diamond_boots": {
+                "label": "ダイヤのブーツ",
+                "count": 1,
+                "multiplier": 4,
+                "value": 4
+              },
+              "diamond_shovel": {
+                "label": "ダイヤのシャベル",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 59,
+            "items": {
+              "diamond_helmet": {
+                "label": "ダイヤのヘルメット",
+                "count": 2,
+                "multiplier": 5,
+                "value": 10
+              },
+              "diamond_chestplate": {
+                "label": "ダイヤのチェストプレート",
+                "count": 2,
+                "multiplier": 8,
+                "value": 16
+              },
+              "diamond_leggings": {
+                "label": "ダイヤのレギンス",
+                "count": 2,
+                "multiplier": 7,
+                "value": 14
+              },
+              "diamond_boots": {
+                "label": "ダイヤのブーツ",
+                "count": 1,
+                "multiplier": 4,
+                "value": 4
+              },
+              "diamond_sword": {
+                "label": "ダイヤの剣",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              },
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "diamond_shovel": {
+                "label": "ダイヤのシャベル",
+                "count": 2,
+                "multiplier": 1,
+                "value": 2
+              },
+              "diamond_knife": {
+                "label": "ダイヤのナイフ",
+                "count": 5,
+                "multiplier": 1,
+                "value": 5
+              },
+              "diamond_minotaur_axe": {
+                "label": "ミノタウロスの斧",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 9,
+            "items": {
+              "emerald": {
+                "label": "エメラルド",
+                "count": 9,
+                "multiplier": 1,
+                "value": 9
+              }
+            }
+          }
+        }
+      }
+    },
+    "tibepianegt46": {
+      "total": 99,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 95,
+          "items": {
+            "diamond": {
+              "label": "ダイヤ",
+              "count": 6,
+              "multiplier": 1,
+              "value": 6
+            },
+            "diamond_block": {
+              "label": "ダイヤブロック",
+              "count": 8,
+              "multiplier": 9,
+              "value": 72
+            },
+            "diamond_leggings": {
+              "label": "ダイヤのレギンス",
+              "count": 1,
+              "multiplier": 7,
+              "value": 7
+            },
+            "diamond_boots": {
+              "label": "ダイヤのブーツ",
+              "count": 1,
+              "multiplier": 4,
+              "value": 4
+            },
+            "diamond_sword": {
+              "label": "ダイヤの剣",
+              "count": 1,
+              "multiplier": 2,
+              "value": 2
+            },
+            "diamond_pickaxe": {
+              "label": "ダイヤのツルハシ",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            },
+            "diamond_shovel": {
+              "label": "ダイヤのシャベル",
+              "count": 1,
+              "multiplier": 1,
+              "value": 1
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 4,
+          "items": {
+            "emerald": {
+              "label": "エメラルド",
+              "count": 4,
+              "multiplier": 1,
+              "value": 4
+            }
+          }
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 11,
+            "items": {
+              "diamond_leggings": {
+                "label": "ダイヤのレギンス",
+                "count": 1,
+                "multiplier": 7,
+                "value": 7
+              },
+              "diamond_boots": {
+                "label": "ダイヤのブーツ",
+                "count": 1,
+                "multiplier": 4,
+                "value": 4
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 2,
+            "items": {
+              "diamond_sword": {
+                "label": "ダイヤの剣",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 82,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 6,
+                "multiplier": 1,
+                "value": 6
+              },
+              "diamond_block": {
+                "label": "ダイヤブロック",
+                "count": 8,
+                "multiplier": 9,
+                "value": 72
+              },
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "diamond_shovel": {
+                "label": "ダイヤのシャベル",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 4,
+            "items": {
+              "emerald": {
+                "label": "エメラルド",
+                "count": 4,
+                "multiplier": 1,
+                "value": 4
+              }
+            }
+          }
+        }
+      }
+    },
+    "dekkaishi": {
+      "total": 32,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 32,
+          "items": {
+            "diamond": {
+              "label": "ダイヤ",
+              "count": 1,
+              "multiplier": 1,
+              "value": 1
+            },
+            "diamond_helmet": {
+              "label": "ダイヤのヘルメット",
+              "count": 1,
+              "multiplier": 5,
+              "value": 5
+            },
+            "diamond_chestplate": {
+              "label": "ダイヤのチェストプレート",
+              "count": 1,
+              "multiplier": 8,
+              "value": 8
+            },
+            "diamond_leggings": {
+              "label": "ダイヤのレギンス",
+              "count": 1,
+              "multiplier": 7,
+              "value": 7
+            },
+            "diamond_boots": {
+              "label": "ダイヤのブーツ",
+              "count": 1,
+              "multiplier": 4,
+              "value": 4
+            },
+            "diamond_sword": {
+              "label": "ダイヤの剣",
+              "count": 2,
+              "multiplier": 2,
+              "value": 4
+            },
+            "diamond_minotaur_axe": {
+              "label": "ミノタウロスの斧",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 0,
+          "items": {}
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 24,
+            "items": {
+              "diamond_chestplate": {
+                "label": "ダイヤのチェストプレート",
+                "count": 1,
+                "multiplier": 8,
+                "value": 8
+              },
+              "diamond_leggings": {
+                "label": "ダイヤのレギンス",
+                "count": 1,
+                "multiplier": 7,
+                "value": 7
+              },
+              "diamond_boots": {
+                "label": "ダイヤのブーツ",
+                "count": 1,
+                "multiplier": 4,
+                "value": 4
+              },
+              "diamond_sword": {
+                "label": "ダイヤの剣",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              },
+              "diamond_minotaur_axe": {
+                "label": "ミノタウロスの斧",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 2,
+            "items": {
+              "diamond_sword": {
+                "label": "ダイヤの剣",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 6,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              },
+              "diamond_helmet": {
+                "label": "ダイヤのヘルメット",
+                "count": 1,
+                "multiplier": 5,
+                "value": 5
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        }
+      }
+    },
+    "Boi0331": {
+      "total": 27,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 17,
+          "items": {
+            "diamond": {
+              "label": "ダイヤ",
+              "count": 2,
+              "multiplier": 1,
+              "value": 2
+            },
+            "diamond_leggings": {
+              "label": "ダイヤのレギンス",
+              "count": 1,
+              "multiplier": 7,
+              "value": 7
+            },
+            "diamond_boots": {
+              "label": "ダイヤのブーツ",
+              "count": 1,
+              "multiplier": 4,
+              "value": 4
+            },
+            "diamond_hoe": {
+              "label": "ダイヤのクワ",
+              "count": 2,
+              "multiplier": 2,
+              "value": 4
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 10,
+          "items": {
+            "emerald": {
+              "label": "エメラルド",
+              "count": 10,
+              "multiplier": 1,
+              "value": 10
+            }
+          }
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 14,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              },
+              "diamond_leggings": {
+                "label": "ダイヤのレギンス",
+                "count": 1,
+                "multiplier": 7,
+                "value": 7
+              },
+              "diamond_boots": {
+                "label": "ダイヤのブーツ",
+                "count": 1,
+                "multiplier": 4,
+                "value": 4
+              },
+              "diamond_hoe": {
+                "label": "ダイヤのクワ",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 1,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 2,
+            "items": {
+              "diamond_hoe": {
+                "label": "ダイヤのクワ",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 10,
+            "items": {
+              "emerald": {
+                "label": "エメラルド",
+                "count": 10,
+                "multiplier": 1,
+                "value": 10
+              }
+            }
+          }
+        }
+      }
+    },
+    "OCTBEE": {
+      "total": 23,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 23,
+          "items": {
+            "diamond": {
+              "label": "ダイヤ",
+              "count": 1,
+              "multiplier": 1,
+              "value": 1
+            },
+            "diamond_chestplate": {
+              "label": "ダイヤのチェストプレート",
+              "count": 1,
+              "multiplier": 8,
+              "value": 8
+            },
+            "diamond_leggings": {
+              "label": "ダイヤのレギンス",
+              "count": 1,
+              "multiplier": 7,
+              "value": 7
+            },
+            "diamond_pickaxe": {
+              "label": "ダイヤのツルハシ",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            },
+            "diamond_axe": {
+              "label": "ダイヤの斧",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            },
+            "diamond_shovel": {
+              "label": "ダイヤのシャベル",
+              "count": 1,
+              "multiplier": 1,
+              "value": 1
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 0,
+          "items": {}
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 22,
+            "items": {
+              "diamond_chestplate": {
+                "label": "ダイヤのチェストプレート",
+                "count": 1,
+                "multiplier": 8,
+                "value": 8
+              },
+              "diamond_leggings": {
+                "label": "ダイヤのレギンス",
+                "count": 1,
+                "multiplier": 7,
+                "value": 7
+              },
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "diamond_axe": {
+                "label": "ダイヤの斧",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "diamond_shovel": {
+                "label": "ダイヤのシャベル",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 1,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 1,
+                "multiplier": 1,
+                "value": 1
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        }
+      }
+    },
+    "gurando0302": {
+      "total": 10,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 10,
+          "items": {
+            "diamond": {
+              "label": "ダイヤ",
+              "count": 5,
+              "multiplier": 1,
+              "value": 5
+            },
+            "diamond_sword": {
+              "label": "ダイヤの剣",
+              "count": 1,
+              "multiplier": 2,
+              "value": 2
+            },
+            "diamond_pickaxe": {
+              "label": "ダイヤのツルハシ",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 0,
+          "items": {}
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 10,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 5,
+                "multiplier": 1,
+                "value": 5
+              },
+              "diamond_sword": {
+                "label": "ダイヤの剣",
+                "count": 1,
+                "multiplier": 2,
+                "value": 2
+              },
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        }
+      }
+    },
+    "panndasanngou": {
+      "total": 6,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 6,
+          "items": {
+            "diamond_pickaxe": {
+              "label": "ダイヤのツルハシ",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            },
+            "diamond_axe": {
+              "label": "ダイヤの斧",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 0,
+          "items": {}
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 6,
+            "items": {
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              },
+              "diamond_axe": {
+                "label": "ダイヤの斧",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        }
+      }
+    },
+    "gaburichan": {
+      "total": 5,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 5,
+          "items": {
+            "diamond": {
+              "label": "ダイヤ",
+              "count": 2,
+              "multiplier": 1,
+              "value": 2
+            },
+            "diamond_axe": {
+              "label": "ダイヤの斧",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 0,
+          "items": {}
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 3,
+            "items": {
+              "diamond_axe": {
+                "label": "ダイヤの斧",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 2,
+            "items": {
+              "diamond": {
+                "label": "ダイヤ",
+                "count": 2,
+                "multiplier": 1,
+                "value": 2
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        }
+      }
+    },
+    "Kenshi_www": {
+      "total": 3,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 3,
+          "items": {
+            "diamond_pickaxe": {
+              "label": "ダイヤのツルハシ",
+              "count": 1,
+              "multiplier": 3,
+              "value": 3
+            }
+          }
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 0,
+          "items": {}
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 3,
+            "items": {
+              "diamond_pickaxe": {
+                "label": "ダイヤのツルハシ",
+                "count": 1,
+                "multiplier": 3,
+                "value": 3
+              }
+            }
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        }
+      }
+    },
+    "gottigoti": {
+      "total": 0,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 0,
+          "items": {}
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 0,
+          "items": {}
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        }
+      }
+    },
+    "sukmkms": {
+      "total": 0,
+      "assets": {
+        "diamond": {
+          "label": "ダイヤ",
+          "shortLabel": "DI",
+          "unit": "DI",
+          "value": 0,
+          "items": {}
+        },
+        "emerald": {
+          "label": "エメラルド",
+          "shortLabel": "EM",
+          "unit": "EM",
+          "value": 0,
+          "items": {}
+        }
+      },
+      "sources": {
+        "inventory": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "ender_chest": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        },
+        "backpacks": {
+          "diamond": {
+            "label": "ダイヤ",
+            "shortLabel": "DI",
+            "unit": "DI",
+            "value": 0,
+            "items": {}
+          },
+          "emerald": {
+            "label": "エメラルド",
+            "shortLabel": "EM",
+            "unit": "EM",
+            "value": 0,
+            "items": {}
+          }
+        }
+      }
+    }
+  }
+}
