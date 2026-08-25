@@ -3,24 +3,24 @@ import {
   AppLayout,
   Note,
   PlayerDailyPanel,
+  PlayerDirectory,
   PlayerFeaturedUsePanel,
   PlayerProfileHero,
   PlayerRankingPanel,
   PlayerRelationshipPanel,
   PlayerStatTiles,
+  PlayerStreakPanel,
 } from '../components';
 import { CONTROL, CONTROL_HOVER, CONTROL_ROW } from '../components/classes';
-import { APP_TEXT } from '../config/messages';
-import {
-  allPlayerProfiles,
-  playerPath,
-  playerProfile,
-} from '../data/playerProfiles';
+import { APP_TEXT, ZUKAN_TEXT } from '../config/messages';
+import { allPlayerProfiles, playerProfile } from '../data/playerProfiles';
 import { listDatasets, loadDataset } from '../data/datasets';
+import { playLog } from '../data/playLog';
+import { playStreakOf, playStreakRanking } from '../lib/playStreak';
+import { PLAY_STREAK_WINDOW_DAYS } from '../config/dataRegistry';
 import type { StatsDocument } from '../data/schema';
 import type { VizTheme } from '../theme/palette';
-import type { Route } from '../routes';
-import { PlayerIconPlaceholder } from '../components/molecules';
+import { ZUKAN_PATH, type Route } from '../routes';
 
 export interface PlayerPageProps {
   theme: VizTheme;
@@ -50,19 +50,31 @@ export function PlayerPage({ theme, route }: PlayerPageProps) {
   const slug = route.params?.player ?? '';
   const profile = useMemo(() => playerProfile(slug, doc), [slug, doc]);
   const profiles = useMemo(() => allPlayerProfiles(doc), [doc]);
+  /* 連続プレイ日数はログ由来なので、統計データの読み込みを待たずに出せる */
+  const streak = useMemo(
+    () => (profile ? playStreakOf(playLog(), profile.name, PLAY_STREAK_WINDOW_DAYS) : null),
+    [profile],
+  );
+  /* 見つからなかったときは図鑑をそのまま出すので、そちら用の一覧も用意しておく */
+  const streaks = useMemo(
+    () => new Map(playStreakRanking(playLog(), PLAY_STREAK_WINDOW_DAYS).map((entry) => [entry.name, entry.streak])),
+    [],
+  );
 
   if (error) return <Note tone="error">{error}</Note>;
   if (!profile) {
     return (
-      <AppLayout title="プレイヤー紹介" note="プレイヤーを選んでください">
-        <div className="grid gap-xs sm:grid-cols-2 lg:grid-cols-3">
-          {profiles.map((entry) => (
-            <a key={entry.slug} href={playerPath(entry.name)} className={`${CONTROL} ${CONTROL_ROW} ${CONTROL_HOVER} min-w-0`}>
-              <PlayerIconPlaceholder name={entry.name} accent={theme.accent} alt={`${entry.name} のアイコン`} />
-              <span className="truncate">{entry.name}</span>
-            </a>
-          ))}
-        </div>
+      <AppLayout
+        title={ZUKAN_TEXT.title}
+        note={ZUKAN_TEXT.count(profiles.length, profiles.length)}
+        messages={<Note tone="error">{ZUKAN_TEXT.notFound}</Note>}
+      >
+        <PlayerDirectory
+          profiles={profiles}
+          colorKeys={profiles.map((entry) => entry.name)}
+          streaks={streaks}
+          theme={theme}
+        />
       </AppLayout>
     );
   }
@@ -75,8 +87,14 @@ export function PlayerPage({ theme, route }: PlayerPageProps) {
       title={`${profile.name} の紹介`}
       note={dataset ? `統計 ${dataset.label} / ${APP_TEXT.siteName}` : undefined}
       lead="Minecraft の統計、日別ログ、相関図上の所属をまとめたプレイヤー別ページです。"
+      actions={
+        <a href={ZUKAN_PATH} className={`${CONTROL} ${CONTROL_ROW} ${CONTROL_HOVER}`}>
+          {ZUKAN_TEXT.back}
+        </a>
+      }
     >
       <PlayerProfileHero profile={profile} theme={theme} />
+      {streak && <PlayerStreakPanel streak={streak} theme={theme} />}
       {player ? (
         <>
           <PlayerStatTiles player={player} theme={theme} generatedOn={statsGeneratedOn} />
