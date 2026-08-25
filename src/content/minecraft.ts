@@ -56,7 +56,7 @@ export const MINECRAFT_CONTENT: PageContent = {
         },
         {
           kind: 'paragraph',
-          text: '画面上部の「絞り込み」で、任意の指標に下限・上限を設けて対象プレイヤーを限定できます（例: プレイ時間 10 時間以上）。絞り込みはすべてのグラフと上部の集計値に反映されます。',
+          text: 'グラフの手前にある「絞り込み」で、任意の指標に下限・上限を設けて対象プレイヤーを限定できます（例: プレイ時間 10 時間以上）。絞り込みはすべてのグラフと上部の集計値に反映されます。',
         },
         {
           kind: 'paragraph',
@@ -64,7 +64,7 @@ export const MINECRAFT_CONTENT: PageContent = {
         },
         {
           kind: 'paragraph',
-          text: '別の日の集計を見る場合は、画面右上の「JSON を読み込む」から手元の minecraft-stats-YYYYMMDD.json を選びます。読み込んだファイルはブラウザ内でのみ処理され、サーバーへは送信されません。',
+          text: '同梱している別の日の集計は、画面右上の「データセット」で切り替えます。手元のファイルを見る場合は、ページ末尾の「データの詳細」を開いて「JSON を読み込む」から minecraft-stats-YYYYMMDD.json を選びます。読み込んだファイルはブラウザ内でのみ処理され、サーバーへは送信されません。',
         },
       ],
     },
@@ -84,6 +84,7 @@ export const MINECRAFT_CONTENT: PageContent = {
     },
     {
       heading: '構成',
+      audience: 'builder',
       blocks: [
         {
           kind: 'table',

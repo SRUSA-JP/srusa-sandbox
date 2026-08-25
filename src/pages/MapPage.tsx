@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { AppLayout, Button, ChartCard, NoticePanel, Note, Picker, ProsePanel } from '../components';
-import { RELATIONSHIPS_CONTENT } from '../content';
+import { AppLayout, Button, ChartCard, NoticePanel, Note, Picker, ProsePanel, TechnicalDetails } from '../components';
+import { RELATIONSHIPS_CONTENT, builderSections, readerSections } from '../content';
 import { joinNotes } from '../lib/display';
 import type { VizTheme } from '../theme/palette';
-import { APP_TEXT, MAP_TEXT, ZUKAN_TEXT } from '../config/messages';
+import { APP_TEXT, MAP_TEXT, TECHNICAL_TEXT, ZUKAN_TEXT } from '../config/messages';
 import { ZUKAN_PATH } from '../routes';
 import { RELATIONSHIP_MAP_DEFAULT_EDGE_MODE } from '../config/dataRegistry';
 import { EDGE_MODES, ISSUE_PREVIEW_COUNT, LAYOUT_MODES, type EdgeMode, type LayoutMode } from '../map/config';
@@ -15,7 +15,7 @@ import type { Point } from '../map/geometry';
 import type { RelationshipData } from '../map/schema';
 import { MapLegend } from '../components/organisms/MapLegend';
 import { RelationshipMap } from '../components/organisms/RelationshipMap';
-import { CONTROL, CONTROL_HOVER, CONTROL_ROW } from '../components/classes';
+import { ACTIONS, CONTROL, CONTROL_HOVER, CONTROL_ROW } from '../components/classes';
 
 export interface MapPageProps {
   theme: VizTheme;
@@ -214,20 +214,50 @@ export function MapPage({ theme }: MapPageProps) {
         source?.version ?? '',
       )}
       lead={RELATIONSHIPS_CONTENT.lead}
-      messages={
-        source && source.issues.length > 0 ? (
-          <Note tone="error">
-            {MAP_TEXT.issues(
-              source.issues.slice(0, ISSUE_PREVIEW_COUNT),
-              Math.max(0, source.issues.length - ISSUE_PREVIEW_COUNT),
-            )}
-          </Note>
-        ) : undefined
-      }
       footnotes={
         RELATIONSHIPS_CONTENT.disclaimer ? (
           <NoticePanel title={APP_TEXT.disclaimer}>{RELATIONSHIPS_CONTENT.disclaimer}</NoticePanel>
         ) : undefined
+      }
+      technical={
+        <TechnicalDetails title={TECHNICAL_TEXT.relationships.title} note={TECHNICAL_TEXT.relationships.note}>
+          <section className="grid gap-xxs text-sm text-subtle">
+            <h3 className="text-md font-medium text-heading">{TECHNICAL_TEXT.relationships.issues}</h3>
+            {source && source.issues.length > 0 ? (
+              <Note tone="error">
+                {MAP_TEXT.issues(
+                  source.issues.slice(0, ISSUE_PREVIEW_COUNT),
+                  Math.max(0, source.issues.length - ISSUE_PREVIEW_COUNT),
+                )}
+              </Note>
+            ) : (
+              <span>{TECHNICAL_TEXT.relationships.noIssues}</span>
+            )}
+          </section>
+
+          <section className="grid gap-sm text-sm text-subtle">
+            <h3 className="text-md font-medium text-heading">{TECHNICAL_TEXT.relationships.io}</h3>
+            <span>{TECHNICAL_TEXT.relationships.ioNote}</span>
+            {importMessage && <Note>{importMessage}</Note>}
+            <div className={ACTIONS}>
+              <Button label={MAP_TEXT.action.exportLayout} icon="download" onClick={exportWorkspace} />
+              <Button label={MAP_TEXT.action.importLayout} icon="upload" onClick={() => fileInputRef.current?.click()} />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0];
+                  if (file) void importWorkspace(file);
+                  event.currentTarget.value = '';
+                }}
+              />
+            </div>
+          </section>
+
+          <ProsePanel sections={builderSections(RELATIONSHIPS_CONTENT.sections)} />
+        </TechnicalDetails>
       }
       footer={
         data.view?.notes && data.view.notes.length > 0 ? (
@@ -282,23 +312,9 @@ export function MapPage({ theme }: MapPageProps) {
               <a href={ZUKAN_PATH} className={`${CONTROL} ${CONTROL_ROW} ${CONTROL_HOVER}`}>
                 {ZUKAN_TEXT.link}
               </a>
-              <Button label="エクスポート" icon="download" onClick={exportWorkspace} />
-              <Button label="インポート" icon="upload" onClick={() => fileInputRef.current?.click()} />
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="application/json,.json"
-                className="hidden"
-                onChange={(event) => {
-                  const file = event.currentTarget.files?.[0];
-                  if (file) void importWorkspace(file);
-                  event.currentTarget.value = '';
-                }}
-              />
             </>
           }
         >
-          {importMessage && <Note>{importMessage}</Note>}
           <RelationshipMap
             layout={layout}
             theme={theme}
@@ -330,7 +346,7 @@ export function MapPage({ theme }: MapPageProps) {
           />
         </ChartCard>
 
-        <ProsePanel sections={RELATIONSHIPS_CONTENT.sections} />
+        <ProsePanel sections={readerSections(RELATIONSHIPS_CONTENT.sections)} />
     </AppLayout>
   );
 }

@@ -22,10 +22,12 @@ import {
   ProsePanel,
   RankBarChart,
   SeriesBarChart,
+  TechnicalDetails,
   TrendLineChart,
 } from '../components';
-import { MINECRAFT_CONTENT } from '../content';
-import { APP_TEXT } from '../config/messages';
+import { ACTIONS } from '../components/classes';
+import { MINECRAFT_CONTENT, builderSections, readerSections } from '../content';
+import { APP_TEXT, TECHNICAL_TEXT } from '../config/messages';
 import {
   BASIS_OPTIONS,
   BREAKDOWNS,
@@ -292,75 +294,88 @@ export function StatsPage({ theme }: StatsPageProps) {
           : undefined
       }
       actions={
-        <>
-          {datasets.length > 1 && (
-            <Picker
-              label={STATS_TEXT.action.dataset}
-              value={datasetId}
-              options={datasets.map((dataset) => ({ value: dataset.id, label: dataset.label }))}
-              onChange={setDatasetId}
-            />
-          )}
-          <input
-            ref={fileInput}
-            type="file"
-            accept="application/json,.json"
-            hidden
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (file) void importFile(file);
-              event.target.value = '';
-            }}
+        /* 見る日付の切り替えだけを上に残す。JSON の読み書きは下の「データの詳細」へ回す */
+        datasets.length > 1 ? (
+          <Picker
+            label={STATS_TEXT.action.dataset}
+            value={datasetId}
+            options={datasets.map((dataset) => ({ value: dataset.id, label: dataset.label }))}
+            onChange={setDatasetId}
           />
-          <Button
-            label={STATS_TEXT.action.importJson}
-            icon="upload"
-            onClick={() => fileInput.current?.click()}
-          />
-          <Button
-            label={STATS_TEXT.action.exportSummary}
-            icon="download"
-            disabled={!doc}
-            onClick={() =>
-              doc && downloadJson(STATS_TEXT.file.summary(doc.generated_on), playerRows(doc))
-            }
-          />
-        </>
+        ) : undefined
       }
-      messages={
-        <>
-          {error && <Note tone="error">{STATS_TEXT.error.load(error)}</Note>}
-          {mismatches.length > 0 && (
-            <Note tone="error">{STATS_TEXT.error.totalsMismatch(mismatches.map((m) => m.field))}</Note>
-          )}
-        </>
-      }
+      messages={error ? <Note tone="error">{STATS_TEXT.error.load(error)}</Note> : undefined}
       footnotes={
         MINECRAFT_CONTENT.disclaimer ? (
           <NoticePanel title={APP_TEXT.disclaimer}>{MINECRAFT_CONTENT.disclaimer}</NoticePanel>
         ) : undefined
       }
-      footer={
-        doc && (
-          <>
-            <span>
-              {STATS_TEXT.footer.dataset({
-                version: doc.source.minecraft_version,
-                loader: doc.source.loader,
-                difficulty: doc.source.difficulty,
-                file: sourceLabel,
-              })}
-            </span>
-            <span>
-              {STATS_TEXT.footer.source(
-                doc.source.path,
-                doc.source.retrieved_via,
-                doc.source.instance_id,
-              )}
-            </span>
-            <span>{doc.units.playtime}</span>
-          </>
-        )
+      technical={
+        <TechnicalDetails title={TECHNICAL_TEXT.stats.title} note={TECHNICAL_TEXT.stats.note}>
+          {doc && (
+            <section className="grid gap-xxs text-sm text-subtle">
+              <h3 className="text-md font-medium text-heading">{TECHNICAL_TEXT.stats.source}</h3>
+              <span>
+                {STATS_TEXT.footer.dataset({
+                  version: doc.source.minecraft_version,
+                  loader: doc.source.loader,
+                  difficulty: doc.source.difficulty,
+                  file: sourceLabel,
+                })}
+              </span>
+              <span>
+                {STATS_TEXT.footer.source(
+                  doc.source.path,
+                  doc.source.retrieved_via,
+                  doc.source.instance_id,
+                )}
+              </span>
+              <span>{doc.units.playtime}</span>
+            </section>
+          )}
+
+          <section className="grid gap-xxs text-sm text-subtle">
+            <h3 className="text-md font-medium text-heading">{TECHNICAL_TEXT.stats.validation}</h3>
+            {mismatches.length > 0 ? (
+              <Note tone="error">{STATS_TEXT.error.totalsMismatch(mismatches.map((m) => m.field))}</Note>
+            ) : (
+              <span>{TECHNICAL_TEXT.stats.validationOk}</span>
+            )}
+          </section>
+
+          <section className="grid gap-sm text-sm text-subtle">
+            <h3 className="text-md font-medium text-heading">{TECHNICAL_TEXT.stats.io}</h3>
+            <span>{TECHNICAL_TEXT.stats.ioNote}</span>
+            <div className={ACTIONS}>
+              <input
+                ref={fileInput}
+                type="file"
+                accept="application/json,.json"
+                hidden
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) void importFile(file);
+                  event.target.value = '';
+                }}
+              />
+              <Button
+                label={STATS_TEXT.action.importJson}
+                icon="upload"
+                onClick={() => fileInput.current?.click()}
+              />
+              <Button
+                label={STATS_TEXT.action.exportSummary}
+                icon="download"
+                disabled={!doc}
+                onClick={() =>
+                  doc && downloadJson(STATS_TEXT.file.summary(doc.generated_on), playerRows(doc))
+                }
+              />
+            </div>
+          </section>
+
+          <ProsePanel sections={builderSections(MINECRAFT_CONTENT.sections)} />
+        </TechnicalDetails>
       }
     >
         {!doc && !error && datasets.length === 0 && (
@@ -722,7 +737,7 @@ export function StatsPage({ theme }: StatsPageProps) {
           </>
         )}
 
-        <ProsePanel sections={MINECRAFT_CONTENT.sections} />
+        <ProsePanel sections={readerSections(MINECRAFT_CONTENT.sections)} />
     </AppLayout>
   );
 }

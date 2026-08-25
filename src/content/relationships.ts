@@ -48,6 +48,10 @@ export const RELATIONSHIPS_CONTENT: PageContent = {
           },
         },
         { kind: 'paragraph', text: '下部の「グループ」一覧からも領域を強調できます。' },
+        {
+          kind: 'paragraph',
+          text: '掴んで動かした配置は、ページ末尾の「データの詳細」から書き出して、あとで読み込み直せます。',
+        },
       ],
     },
     {
@@ -88,6 +92,7 @@ export const RELATIONSHIPS_CONTENT: PageContent = {
     },
     {
       heading: '構成',
+      audience: 'builder',
       blocks: [
         {
           kind: 'table',

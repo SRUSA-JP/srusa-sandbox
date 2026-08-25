@@ -1,8 +1,17 @@
 import { useMemo, useState } from 'react';
-import { AppLayout, ChartCard, Note, NoticePanel, Picker, ProsePanel, WorldMapViewer } from '../components';
-import { APP_TEXT, MAP_TEXT, WORLD_MAP_TEXT } from '../config/messages';
+import {
+  AppLayout,
+  ChartCard,
+  Note,
+  NoticePanel,
+  Picker,
+  ProsePanel,
+  TechnicalDetails,
+  WorldMapViewer,
+} from '../components';
+import { APP_TEXT, MAP_TEXT, TECHNICAL_TEXT, WORLD_MAP_TEXT } from '../config/messages';
 import { WORLD_LABELS } from '../config/labels';
-import { WORLD_MAP_CONTENT } from '../content';
+import { WORLD_MAP_CONTENT, builderSections, readerSections } from '../content';
 import type { VizTheme } from '../theme/palette';
 import { coordinateBounds, coverage } from '../world/display';
 import { loadWorldMaps } from '../world/data';
@@ -116,7 +125,7 @@ function WorldMapLog({ maps, fallbackDate, latestDate }: { maps: WorldMap[]; fal
       {logRows(maps, fallbackDate, latestDate).map((row) => (
         <div
           key={row.map.id}
-          className="grid gap-xs border-hairline border-divider bg-sunken p-sm text-sm sm:grid-cols-[minmax(0,1fr)_auto_auto_auto_auto]"
+          className="grid gap-xs border-hairline border-divider bg-surface p-sm text-sm sm:grid-cols-[minmax(0,1fr)_auto_auto_auto_auto]"
         >
           <p className="truncate font-bold text-heading">{row.label}</p>
           <p className="font-mono text-muted">
@@ -148,6 +157,8 @@ function WorldMapLog({ maps, fallbackDate, latestDate }: { maps: WorldMap[]; fal
  *
  * 主役は操作できる 2D の地図なので先頭に置き、3D のスクリーンショットと
  * 経緯の説明はその下に回す（DESIGN.md の「主役を先に見せる」）。
+ * 生成ログ（PNG の画素数やファイルの大きさ）は作り手向けなので、
+ * ページのいちばん下でたたんでおく。
  * 3D の出力そのもの（数百 MB）はこのリポジトリに持たない。
  */
 export function WorldMapPage({ theme }: WorldMapPageProps) {
@@ -224,6 +235,17 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
           <NoticePanel title={APP_TEXT.disclaimer}>{WORLD_MAP_CONTENT.disclaimer}</NoticePanel>
         ) : undefined
       }
+      technical={
+        maps.length > 0 ? (
+          <TechnicalDetails
+            title={TECHNICAL_TEXT.worldMap.title}
+            note={TECHNICAL_TEXT.worldMap.note(maps.length)}
+          >
+            <WorldMapLog maps={maps} fallbackDate={document?.generated_on} latestDate={latestDate} />
+            <ProsePanel sections={builderSections(WORLD_MAP_CONTENT.sections)} />
+          </TechnicalDetails>
+        ) : undefined
+      }
     >
       <ChartCard
         title={WORLD_MAP_TEXT.card.title}
@@ -267,7 +289,9 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
               return (
                 <section key={map.id} className="min-w-0">
                   <h3 className="mb-xs text-sm font-bold text-heading">{mapLabel(map, document?.generated_on, latestDate)}</h3>
-                  <p className="mb-sm text-xs text-muted">
+                  {/* 地図そのものを先に見せ、寸法や座標の範囲は見終わったあとに読めればよい */}
+                  <WorldMapViewer map={map} theme={theme} showTooltips={tooltipMode === 'on'} />
+                  <p className="mt-sm text-xs text-muted">
                     {WORLD_MAP_TEXT.summary(
                       mapLabel(map, document?.generated_on, latestDate),
                       size.width,
@@ -276,7 +300,6 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
                       coordinateBounds(map),
                     )}
                   </p>
-                  <WorldMapViewer map={map} theme={theme} showTooltips={tooltipMode === 'on'} />
                 </section>
               );
             })}
@@ -286,13 +309,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
         )}
       </ChartCard>
 
-      {maps.length > 0 && (
-        <ChartCard title={WORLD_MAP_TEXT.log.title}>
-          <WorldMapLog maps={maps} fallbackDate={document?.generated_on} latestDate={latestDate} />
-        </ChartCard>
-      )}
-
-      <ProsePanel sections={WORLD_MAP_CONTENT.sections} />
+      <ProsePanel sections={readerSections(WORLD_MAP_CONTENT.sections)} />
     </AppLayout>
   );
 }
