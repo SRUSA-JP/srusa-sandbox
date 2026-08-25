@@ -6,7 +6,14 @@ import { allPlayerProfiles } from '../data/playerProfiles';
 import { listDatasets, loadDataset } from '../data/datasets';
 import { playLog } from '../data/playLog';
 import { playStreakRanking } from '../lib/playStreak';
-import { ANY_ATTRIBUTE, attributeCounts, filterProfiles, type DirectoryKind } from '../lib/playerDirectory';
+import {
+  ANY_ATTRIBUTE,
+  attributeCounts,
+  filterProfiles,
+  sortProfiles,
+  type DirectoryKind,
+  type DirectorySort,
+} from '../lib/playerDirectory';
 import type { StatsDocument } from '../data/schema';
 import type { VizTheme } from '../theme/palette';
 
@@ -19,13 +26,14 @@ export interface ZukanPageProps {
  *
  * 相関図と Minecraft の両方に散らばっている人を 1 か所に集めて、
  * ひとりずつの紹介ページ（#/players/…）への入口にする。
- * 誰を出すかの判定は lib/playerDirectory.ts、並べ方は PlayerDirectory が持つ。
+ * 誰を出すか・どう並べるかの判定は lib/playerDirectory.ts が持つ。
  */
 export function ZukanPage({ theme }: ZukanPageProps) {
   const [doc, setDoc] = useState<StatsDocument | null>(null);
   const [error, setError] = useState('');
   const [attribute, setAttribute] = useState(ANY_ATTRIBUTE);
   const [kind, setKind] = useState<DirectoryKind>('all');
+  const [sort, setSort] = useState<DirectorySort>('name');
   const dataset = useMemo(() => listDatasets()[0], []);
 
   /* 統計は「統計あり」の札にしか使わないので、読み込みを待たずに一覧を出す */
@@ -45,10 +53,13 @@ export function ZukanPage({ theme }: ZukanPageProps) {
   }, [dataset]);
 
   const profiles = useMemo(() => allPlayerProfiles(doc), [doc]);
-  const shown = useMemo(() => filterProfiles(profiles, { attribute, kind }), [profiles, attribute, kind]);
   const streaks = useMemo(
     () => new Map(playStreakRanking(playLog(), PLAY_STREAK_WINDOW_DAYS).map((entry) => [entry.name, entry.streak])),
     [],
+  );
+  const shown = useMemo(
+    () => sortProfiles(filterProfiles(profiles, { attribute, kind }), sort, streaks),
+    [profiles, attribute, kind, sort, streaks],
   );
 
   const attributeOptions = useMemo(
@@ -66,6 +77,14 @@ export function ZukanPage({ theme }: ZukanPageProps) {
     { value: 'all', label: ZUKAN_TEXT.kind.all },
     { value: 'minecraft', label: ZUKAN_TEXT.kind.minecraft },
     { value: 'relationship', label: ZUKAN_TEXT.kind.relationship },
+  ];
+
+  const sortOptions: Array<{ value: DirectorySort; label: string }> = [
+    { value: 'name', label: ZUKAN_TEXT.sort.name },
+    { value: 'minecraft', label: ZUKAN_TEXT.sort.minecraft },
+    { value: 'relationship', label: ZUKAN_TEXT.sort.relationship },
+    { value: 'playtime', label: ZUKAN_TEXT.sort.playtime },
+    { value: 'streak', label: ZUKAN_TEXT.sort.streak },
   ];
 
   return (
@@ -89,6 +108,13 @@ export function ZukanPage({ theme }: ZukanPageProps) {
             value={kind}
             options={kindOptions}
             onChange={setKind}
+          />
+          <Picker
+            showLabel
+            label={ZUKAN_TEXT.filter.sort}
+            value={sort}
+            options={sortOptions}
+            onChange={setSort}
           />
         </>
       }

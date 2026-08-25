@@ -495,6 +495,7 @@ export const ZUKAN_TEXT = {
   filter: {
     attribute: '所属',
     kind: '種類',
+    sort: '並び替え',
     /** 絞り込まないときの選択肢。 */
     any: 'すべて',
   },
@@ -503,6 +504,14 @@ export const ZUKAN_TEXT = {
     all: 'すべての人',
     minecraft: 'Minecraft に参加',
     relationship: '相関図のみ',
+  },
+  /** 並び替え。 */
+  sort: {
+    name: '名前順',
+    minecraft: 'Minecraft 参加を先',
+    relationship: '相関図のみを先',
+    playtime: 'プレイ時間が長い順',
+    streak: '連続ログインが長い順',
   },
   /** 見出しの下に出す人数。 */
   count: (shown: number, total: number) => `${total} 人中 ${shown} 人`,

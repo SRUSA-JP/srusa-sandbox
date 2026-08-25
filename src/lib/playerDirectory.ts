@@ -6,9 +6,13 @@
  * 見せ方（札の文言・所属を何個まで出すか）は lib/display.ts と config が決める。
  */
 import type { PlayerProfile } from '../data/playerProfiles';
+import type { PlayStreak } from './playStreak';
 
 /** 種類での絞り込み。 */
 export type DirectoryKind = 'all' | 'minecraft' | 'relationship';
+
+/** 図鑑の並び替え。 */
+export type DirectorySort = 'name' | 'minecraft' | 'relationship' | 'playtime' | 'streak';
 
 /**
  * 所属で絞らないときの値。
@@ -58,5 +62,39 @@ export function filterProfiles(
     if (kind === 'minecraft') return playsMinecraft(profile);
     if (kind === 'relationship') return !playsMinecraft(profile);
     return true;
+  });
+}
+
+function byName(a: PlayerProfile, b: PlayerProfile): number {
+  return a.name.localeCompare(b.name, 'ja');
+}
+
+/** 図鑑の並び替え。入力の配列は変更しない。 */
+export function sortProfiles(
+  profiles: PlayerProfile[],
+  sort: DirectorySort,
+  streaks: Map<string, PlayStreak> = new Map(),
+): PlayerProfile[] {
+  return [...profiles].sort((a, b) => {
+    if (sort === 'minecraft') {
+      return Number(playsMinecraft(b)) - Number(playsMinecraft(a)) || byName(a, b);
+    }
+    if (sort === 'relationship') {
+      return Number(!playsMinecraft(b)) - Number(!playsMinecraft(a)) || byName(a, b);
+    }
+    if (sort === 'playtime') {
+      return (b.stats?.playtime.hours ?? 0) - (a.stats?.playtime.hours ?? 0) || byName(a, b);
+    }
+    if (sort === 'streak') {
+      const aStreak = streaks.get(a.name);
+      const bStreak = streaks.get(b.name);
+      return (
+        (bStreak?.current ?? 0) - (aStreak?.current ?? 0) ||
+        (bStreak?.longest ?? 0) - (aStreak?.longest ?? 0) ||
+        (bStreak?.totalDays ?? 0) - (aStreak?.totalDays ?? 0) ||
+        byName(a, b)
+      );
+    }
+    return byName(a, b);
   });
 }
