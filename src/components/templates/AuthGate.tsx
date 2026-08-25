@@ -5,6 +5,9 @@ import { PasswordField } from '../molecules';
 
 const AUTH_PASSWORD = 'Srusa1234！';
 const AUTH_STORAGE_KEY = 'srusa-authenticated';
+const AUTH_LOG_STORAGE_KEY = 'srusa-auth-login-at';
+const AUTH_COOKIE_NAME = 'srusa_auth';
+const AUTH_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 export interface AuthGateProps {
   children: ReactNode;
@@ -16,14 +19,41 @@ function isStoredAuthenticated() {
   }
 
   try {
-    return window.localStorage.getItem(AUTH_STORAGE_KEY) === 'true';
+    if (window.localStorage.getItem(AUTH_STORAGE_KEY) === 'true') {
+      return true;
+    }
   } catch {
+    // localStorage が使えない環境では cookie を見る。
+  }
+
+  if (typeof document === 'undefined') {
     return false;
   }
+
+  return document.cookie
+    .split(';')
+    .map((entry) => entry.trim())
+    .some((entry) => entry === `${AUTH_COOKIE_NAME}=true`);
 }
 
 function normalizePassword(password: FormDataEntryValue | null) {
   return typeof password === 'string' ? password.trim().normalize('NFKC') : '';
+}
+
+function rememberAuthentication() {
+  if (typeof window !== 'undefined') {
+    try {
+      window.localStorage.setItem(AUTH_STORAGE_KEY, 'true');
+      window.localStorage.setItem(AUTH_LOG_STORAGE_KEY, new Date().toISOString());
+    } catch {
+      // localStorage が使えないブラウザでも cookie 側でできるだけ保持する。
+    }
+  }
+
+  if (typeof document !== 'undefined') {
+    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${AUTH_COOKIE_NAME}=true; Max-Age=${AUTH_COOKIE_MAX_AGE_SECONDS}; Path=/; SameSite=Lax${secure}`;
+  }
 }
 
 export function AuthGate({ children }: AuthGateProps) {
@@ -37,13 +67,7 @@ export function AuthGate({ children }: AuthGateProps) {
     const password = normalizePassword(data.get('password'));
 
     if (password === normalizePassword(AUTH_PASSWORD)) {
-      if (typeof window !== 'undefined') {
-        try {
-          window.localStorage.setItem(AUTH_STORAGE_KEY, 'true');
-        } catch {
-          // localStorage が使えないブラウザでも、その場の表示は通す。
-        }
-      }
+      rememberAuthentication();
       setAuthenticated(true);
       setError('');
       return;
