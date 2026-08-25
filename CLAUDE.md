@@ -35,6 +35,7 @@ npm run build           # 型検査 → ESLint → コントラスト検査 → 
 npm run preview         # ビルド成果物のプレビュー
 npm run deploy:preview  # Netlify の固定プレビューへデプロイ（本番公開しない）
 npm run typecheck       # tsc --noEmit
+npm run test:ui         # 公開ルートの初期レンダリングが壊れていないか確認
 npm run lint            # ESLint
 npm run check:contrast  # 配色の WCAG コントラスト検査
 npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（BlueMap の出力が要る）
@@ -358,7 +359,7 @@ git rev-parse --abbrev-ref HEAD
 
 ## 変更時の確認
 
-- `npm run build`（型検査・ESLint・コントラスト検査を含む）が通ること。`/check` で一括実行できる
+- `npm run build`（型検査・ESLint・UI初期レンダリング・コントラスト検査を含む）が通ること。`/check` で一括実行できる
 - 追加した部品が正しい層（atoms / molecules / organisms / templates）に置かれ、
   下の層から上の層を import していないこと
 - **ウィンドウからはみ出していないこと**（DESIGN.md「ウィンドウからはみ出さない」）。
