@@ -7,6 +7,7 @@ import {
   STATS_TEXT,
   type EconomySourceMetric,
 } from '../../config';
+import { figureColors } from '../../config/colors';
 import {
   economyIndexTimeline,
   economySummary,
@@ -45,6 +46,13 @@ function sourceNote(source: EconomySourceMetric): string {
 export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyIndexPanelProps) {
   const [source, setSource] = useState<EconomySourceMetric>(ECONOMY_DEFAULT_SOURCE);
   const [rankingMode, setRankingMode] = useState<RankingMode>('total');
+  const assetColors = useMemo(() => {
+    const colors = figureColors(theme);
+    return {
+      diamond: colors.economyAsset('diamond'),
+      emerald: colors.economyAsset('emerald'),
+    };
+  }, [theme]);
   const summary = useMemo(() => economySummary(doc, { players, source }), [doc, players, source]);
   const economyRows = useMemo(
     () => playerEconomyRows(doc, { players, source }),
@@ -141,12 +149,14 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
               unit="個"
               stacked
               horizontal
+              seriesColors={assetColors}
               height={Math.max(RANKING_MIN_HEIGHT, ranking.rows.length * RANKING_ROW_HEIGHT)}
             />
           ) : (
             <RankBarChart
               data={singleRanking}
               theme={theme}
+              color={assetColors[rankingMode]}
               unit="個"
               height={Math.max(RANKING_MIN_HEIGHT, singleRanking.length * RANKING_ROW_HEIGHT)}
             />

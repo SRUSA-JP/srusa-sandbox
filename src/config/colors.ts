@@ -318,6 +318,8 @@ export interface FigureColors {
   separator: string;
   /** 系列キー → 色。登録順で固定するので、絞り込んでも色が変わらない。 */
   series: (keys: string[]) => (key: string) => string;
+  /** Minecraft 資産キー → 意味色。 */
+  economyAsset: (key: keyof VizTheme['economyAssets']) => string;
   /** 分類ごとのスロット色（相関図のグループなど）。 */
   slot: (index: number) => string;
   /** 色の面の上に載せる文字・図形。読める色まで寄せて返す。 */
@@ -344,6 +346,7 @@ export function figureColors(theme: VizTheme): FigureColors {
     background: roles.surface,
     separator: roles.surface,
     series: (keys) => colorScale(keys, theme),
+    economyAsset: (key) => theme.economyAssets[key],
     slot: (index) => theme.categorical[index % theme.categorical.length],
     labelOn: (background, minRatio = CONTRAST_MIN_TEXT) => readableTextOn(background, theme, minRatio),
     tooltip: tooltipSurface(theme),

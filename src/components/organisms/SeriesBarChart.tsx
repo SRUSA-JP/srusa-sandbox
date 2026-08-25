@@ -31,6 +31,8 @@ export interface SeriesBarChartProps {
   height?: number;
   /** 横棒にする場合は true。 */
   horizontal?: boolean;
+  /** 系列キーに意味色がある場合だけ渡す。未指定の系列は登録順の配色を使う。 */
+  seriesColors?: Partial<Record<string, string>>;
 }
 
 /**
@@ -51,6 +53,7 @@ export function SeriesBarChart({
   unit = '',
   height,
   horizontal = false,
+  seriesColors,
 }: SeriesBarChartProps) {
   const metrics = useChartMetrics();
   const colors = figureColors(theme);
@@ -137,7 +140,7 @@ export function SeriesBarChart({
             dataKey={series.key}
             name={series.label}
             stackId={stacked ? 'total' : undefined}
-            fill={color(series.key)}
+            fill={seriesColors?.[series.key] ?? color(series.key)}
             /* 隣接セグメントの間に背景色の隙間を作る（枠線ではなく余白として） */
             stroke={stacked ? colors.separator : undefined}
             strokeWidth={stacked ? BAR.stackGap : 0}
