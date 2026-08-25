@@ -57,6 +57,11 @@ export function playerPath(name: string): string {
   return `#/players/${playerSlug(name)}`;
 }
 
+export function playerPathForRelationshipPerson(personId: string, fallbackName: string): string {
+  const record = allPlayerRecords().find((entry) => entry.sources.relationship_id === personId);
+  return playerPath(record?.username ?? fallbackName);
+}
+
 export function comparablePlayerName(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '');
 }

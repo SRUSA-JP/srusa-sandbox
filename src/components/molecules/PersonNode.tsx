@@ -114,7 +114,10 @@ export function PersonNode({
       onKeyDown={
         onSelect
           ? (event) => {
-              if (event.key === 'Enter' || event.key === ' ') onSelect(placement.person.id);
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onSelect(placement.person.id);
+              }
             }
           : undefined
       }

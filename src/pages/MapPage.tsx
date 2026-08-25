@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { AppLayout, Button, ChartCard, NoticePanel, Note, Picker, ProsePanel, TechnicalDetails } from '../components';
 import { RELATIONSHIPS_CONTENT, builderSections, readerSections } from '../content';
+import { playerPathForRelationshipPerson } from '../data/playerDb';
 import { joinNotes } from '../lib/display';
 import type { VizTheme } from '../theme/palette';
-import { APP_TEXT, MAP_TEXT, TECHNICAL_TEXT, ZUKAN_TEXT } from '../config/messages';
-import { ZUKAN_PATH } from '../routes';
+import { APP_TEXT, MAP_TEXT, TECHNICAL_TEXT } from '../config/messages';
 import { RELATIONSHIP_MAP_DEFAULT_EDGE_MODE } from '../config/dataRegistry';
 import { EDGE_MODES, ISSUE_PREVIEW_COUNT, LAYOUT_MODES, type EdgeMode, type LayoutMode } from '../map/config';
 import { loadRelationshipData } from '../map/data';
@@ -15,7 +15,7 @@ import type { Point } from '../map/geometry';
 import type { RelationshipData } from '../map/schema';
 import { MapLegend } from '../components/organisms/MapLegend';
 import { RelationshipMap } from '../components/organisms/RelationshipMap';
-import { ACTIONS, CONTROL, CONTROL_HOVER, CONTROL_ROW } from '../components/classes';
+import { ACTIONS } from '../components/classes';
 
 export interface MapPageProps {
   theme: VizTheme;
@@ -308,10 +308,6 @@ export function MapPage({ theme }: MapPageProps) {
                 options={TOOLTIP_OPTIONS}
                 onChange={setTooltipMode}
               />
-              {/* 図の中の人を探すより、名簿から選ぶほうが早いこともある */}
-              <a href={ZUKAN_PATH} className={`${CONTROL} ${CONTROL_ROW} ${CONTROL_HOVER}`}>
-                {ZUKAN_TEXT.link}
-              </a>
             </>
           }
         >
@@ -322,7 +318,9 @@ export function MapPage({ theme }: MapPageProps) {
             highlightedGroupId={highlightedGroupId}
             edges={edges}
             nameMode={nameMode}
-            onSelectPerson={setCenterId}
+            profileHref={(placement) =>
+              playerPathForRelationshipPerson(placement.person.id, placement.person.onlineName)
+            }
             onMovePerson={movePerson}
             showTooltips={tooltipMode === 'on'}
             actions={

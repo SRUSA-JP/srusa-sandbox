@@ -515,7 +515,7 @@ export const MAP_TEXT = {
       note: [
         '所属の組み合わせが同じ人をまとめて配置し、各グループをその所属者を囲う領域として描いています。',
         '複数の所属は領域の重なりで表れます。',
-        '人を掴んで動かすと配置を変えられます（領域と関係線も追従します）。押すとその人が中心になります。',
+        '人を掴んで動かすと配置を変えられます（領域と関係線も追従します）。押すと紹介へのリンクを出します。',
       ].join(''),
       center: (name: string) => `中心人物: ${name}`,
       ariaLabel: 'SRUSA の相関図',
@@ -531,6 +531,8 @@ export const MAP_TEXT = {
     group: (name: string, members: number) => `${name}: ${formatInt(members)} 人`,
     person: (name: string, attributes: string[]) =>
       attributes.length > 0 ? `${name}（${attributes.join('・')}）` : name,
+    profileLink: '紹介を見る',
+    close: '閉じる',
     relation: (from: string, to: string, context?: string, uncertain?: boolean) =>
       `${from} ↔ ${to}${context ? `（${context}）` : ''}${uncertain ? ' ※確度が低い関係' : ''}`,
   },
