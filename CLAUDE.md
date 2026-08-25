@@ -43,6 +43,9 @@ npm run sync:data       # ../aws_minecraft と BlueMap の出力からデータ�
 ### データの取り込み
 
 `npm run sync:data` が、元データの取り込みから派生 JSON の作り直しまでをまとめて行う。
+データ更新・再取得・差し替えを頼まれたら、まず `../aws_minecraft` を確認する。
+Minecraft 統計、日別データ、ログ集計、スキン、BlueMap 用に作った中間データは
+`../aws_minecraft/data/` やその配下に追加されていることがある。
 
 ```bash
 npm run sync:data                 # 全部
