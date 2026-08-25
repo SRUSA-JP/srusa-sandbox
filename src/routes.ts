@@ -47,7 +47,7 @@ export const ROUTES: Route[] = [
   { id: 'relationships', path: '#/relationships', label: '相関図', skinId: MINECRAFT_SKIN.id },
   { id: 'zukan', path: ZUKAN_PATH, label: 'SRUSA 図鑑', skinId: MINECRAFT_SKIN.id },
   { id: 'events', path: '#/events', label: 'イベント', skinId: MINECRAFT_SKIN.id },
-  { id: 'clips', path: '#/clips', label: 'Clips', skinId: MINECRAFT_SKIN.id },
+  { id: 'clips', path: '#/gallery', label: 'ギャラリー', skinId: MINECRAFT_SKIN.id },
 ];
 
 /** ハッシュが無い・知らないときに出す画面。 */
@@ -56,6 +56,9 @@ export const DEFAULT_ROUTE = ROUTES[0];
 /** URL のハッシュから画面を決める唯一の入口。 */
 export function routeFromHash(hash: string): Route {
   const normalized = hash.replace(/\/$/, '');
+  if (normalized === '#/clips') {
+    return ROUTES.find((route) => route.id === 'clips') ?? DEFAULT_ROUTE;
+  }
   const known = ROUTES.find((route) => route.path === normalized);
   if (known) return known;
   const player = normalized.match(/^#\/players\/(.+)$/);

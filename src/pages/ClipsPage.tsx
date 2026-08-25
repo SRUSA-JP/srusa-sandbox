@@ -5,7 +5,7 @@ import { CLIP_ENTRIES, CLIP_TEXT, embedUrlFromClipUrl, type ClipEntry } from '..
 
 const CUSTOM_CLIP_ID = 'custom';
 
-/** 動画クリップを iframe で確認するページ。 */
+/** ゲームの名シーンを iframe で確認するページ。 */
 export function ClipsPage() {
   const defaultClip = useMemo(() => CLIP_ENTRIES[0], []);
   const [selectedClip, setSelectedClip] = useState<ClipEntry | undefined>(defaultClip);

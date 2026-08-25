@@ -37,34 +37,34 @@ export type ClipSortKey = 'score' | 'title' | 'views';
 const SCORE_DEFAULTS: ClipScore = { smooth: 2, clutch: 0, tap: 3, '6kills': 0, onemag: 0 };
 
 const TAG_LABELS: Record<string, string> = {
+  clutch: 'クラッチ',
+  miracle: 'ミラクル',
+  comeback: '逆転',
   build: '建築',
-  explore: '探索',
-  battle: '戦闘',
-  event: 'イベント',
-  daily: '日常',
-  funny: 'おもしろ',
+  chaos: 'わちゃわちゃ',
   highlight: 'ハイライト',
   accident: '事故',
   teamwork: '連携',
   tutorial: '解説',
+  memorial: '記念',
 };
 
-const SCENE_TAGS = ['build', 'explore', 'battle', 'event', 'daily'] as const;
-const TOPIC_TAGS = ['funny', 'highlight', 'accident', 'teamwork', 'tutorial'] as const;
+const SCENE_TAGS = ['clutch', 'miracle', 'comeback', 'build', 'chaos'] as const;
+const TOPIC_TAGS = ['highlight', 'accident', 'teamwork', 'tutorial', 'memorial'] as const;
 
 /**
- * Clips ページに最初から並べる動画。
+ * ギャラリーページに最初から並べる動画。
  *
  * URL を追加・差し替えたいときはここだけを編集する。YouTube / Twitch は
  * 通常の共有 URL でも iframe 用 URL に変換される。
  */
 export const CLIP_ENTRIES: ClipEntry[] = [
   {
-    id: 'sample-build',
-    title: 'ダミー: 建築クリップ',
+    id: 'sample-minecraft',
+    title: 'ダミー: Minecraft 建築名シーン',
     sourceUrl: '',
     category: 'sample',
-    map: 'overworld',
+    map: 'minecraft',
     agent: 'nodoamen',
     views: 0,
     tags: ['build', 'tutorial'],
@@ -72,70 +72,70 @@ export const CLIP_ENTRIES: ClipEntry[] = [
     note: '本番動画を入れる前の表示確認用データです。',
   },
   {
-    id: 'sample-explore',
-    title: 'ダミー: 探索クリップ',
+    id: 'sample-mahjong',
+    title: 'ダミー: 麻雀 逆転名シーン',
     sourceUrl: '',
     category: 'sample',
-    map: 'nether',
+    map: 'mahjong',
     agent: 'natch',
     views: 0,
-    tags: ['explore', 'highlight'],
+    tags: ['comeback', 'highlight'],
     score: { smooth: 4, clutch: 0, tap: 3, '6kills': 0, onemag: 0 },
     note: '本番動画を入れる前の表示確認用データです。',
   },
   {
-    id: 'sample-battle',
-    title: 'ダミー: 戦闘クリップ',
+    id: 'sample-apex',
+    title: 'ダミー: Apex 連携名シーン',
     sourceUrl: '',
     category: 'sample',
-    map: 'end',
+    map: 'apex',
     agent: 'mitiglia',
     views: 0,
-    tags: ['battle', 'teamwork'],
+    tags: ['clutch', 'teamwork'],
     score: { smooth: 2, clutch: 2, tap: 4, '6kills': 0, onemag: 0 },
     note: '本番動画を入れる前の表示確認用データです。',
   },
   {
-    id: 'sample-event',
-    title: 'ダミー: イベントクリップ',
+    id: 'sample-splatoon',
+    title: 'ダミー: Splatoon ミラクル名シーン',
     sourceUrl: '',
     category: 'sample',
-    map: 'event-stage',
+    map: 'splatoon',
     agent: 'octbee',
     views: 0,
-    tags: ['event', 'funny'],
+    tags: ['miracle', 'accident'],
     score: { smooth: 3, clutch: 1, tap: 3, '6kills': 0, onemag: 0 },
     note: '本番動画を入れる前の表示確認用データです。',
   },
   {
-    id: 'sample-daily',
-    title: 'ダミー: 日常クリップ',
+    id: 'sample-party',
+    title: 'ダミー: パーティゲーム わちゃわちゃ名シーン',
     sourceUrl: '',
     category: 'sample',
-    map: 'base',
+    map: 'party',
     agent: 'sohei',
     views: 0,
-    tags: ['daily', 'accident'],
+    tags: ['chaos', 'memorial'],
     score: { smooth: 2, clutch: 0, tap: 2, '6kills': 0, onemag: 1 },
     note: '本番動画を入れる前の表示確認用データです。',
   },
 ];
 
 export const CLIP_TEXT = {
-  title: 'Clips',
-  note: '動画クリップをタグで探して iframe で確認するページ',
-  lead: 'これから動画を入れる前の仮ギャラリーです。カード、タグ、絞り込み、iframe の表示だけ先に確認できます。',
-  picker: 'クリップ',
+  title: 'ギャラリー',
+  note: 'SRUSA のいろんなゲームの名シーンをタグで探して iframe で確認するページ',
+  lead: 'これから動画を入れる前の仮ギャラリーです。ゲーム、プレイヤー、シーン、タグで名シーンを探せる形だけ先に確認できます。',
+  picker: '動画',
   customUrl: 'URL',
   customTitle: '入力したURL',
   show: '表示',
-  featured: '選択中のクリップ',
-  gallery: 'Clip Gallery',
+  featured: '選択中の名シーン',
+  gallery: '名シーンギャラリー',
   result: (count: number, total: number) => `${count} / ${total} 件`,
   sort: '並び替え',
   filters: {
     all: 'ALL',
-    map: 'AREA',
+    map: 'GAME',
     agent: 'PLAYER',
     play: 'SCENE',
     weapon: 'TAG',
@@ -145,8 +145,8 @@ export const CLIP_TEXT = {
     title: 'タイトル順',
     views: '再生数順',
   },
-  empty: 'このクリップにはまだ動画URLがありません。URL を入力すると、この画面で表示できます。',
-  noMatch: '条件に合うクリップがありません。',
+  empty: 'この名シーンにはまだ動画URLがありません。URL を入力すると、この画面で表示できます。',
+  noMatch: '条件に合う名シーンがありません。',
   invalidUrl: 'https:// または http:// で始まる URL を入力してください。',
   iframeTitle: (title: string) => `${title} の埋め込みプレイヤー`,
 } as const;

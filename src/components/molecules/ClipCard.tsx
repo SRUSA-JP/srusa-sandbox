@@ -14,7 +14,7 @@ export interface ClipCardProps {
   onFilter: (type: 'map' | 'agent' | 'keyword', value: string) => void;
 }
 
-/** Clips 一覧のカード。情報密度は高く、再生操作はカード全体にまとめる。 */
+/** 名シーン一覧のカード。情報密度は高く、再生操作はカード全体にまとめる。 */
 export function ClipCard({ clip, active, onSelect, onFilter }: ClipCardProps) {
   const tagClass = `${TAG} cursor-pointer transition-colors hover:bg-hover`;
   const playable = Boolean(clip.sourceUrl.trim());

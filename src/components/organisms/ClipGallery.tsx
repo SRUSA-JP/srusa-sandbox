@@ -31,7 +31,7 @@ const SORT_OPTIONS: Array<{ value: ClipSortKey; label: string }> = [
   { value: 'views', label: CLIP_TEXT.sorts.views },
 ];
 
-/** Pinterest 風のクリップ一覧。フィルタとカード配置をまとめる。 */
+/** Pinterest 風の名シーン一覧。フィルタとカード配置をまとめる。 */
 export function ClipGallery({ clips, selectedClip, onSelect }: ClipGalleryProps) {
   const [filters, setFilters] = useState<ClipFilters>({ map: ALL, agent: ALL, keyword: ALL });
   const [sortKey, setSortKey] = useState<ClipSortKey>('score');
