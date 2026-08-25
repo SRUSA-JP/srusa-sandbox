@@ -15,6 +15,10 @@
 | ページごとの見た目（スキン） | [src/config/skins.ts](src/config/skins.ts) |
 | グラフの寸法 | [src/config/charts.ts](src/config/charts.ts) |
 
+UI は Claude / Codex のどちらで編集する場合も、[CLAUDE.md](CLAUDE.md) のアトミックデザイン方針に従う。
+見た目の判断はこの文書、部品の層分けは `atoms` → `molecules` → `organisms` → `templates` の一方向で揃える。
+page は画面の組み立てだけを持ち、再利用できる表示や操作は適切な component 層へ逃がす。
+
 ---
 
 ## 1. 何を大事にするか
