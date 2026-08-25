@@ -5,6 +5,7 @@
  * 依存しない純関数で、同じ入力なら同じ出力を返す。
  * 見せ方（色・文言・何日ぶんの帯を出すか）は lib/display.ts と config が決める。
  */
+import { dayNumber, dayString } from './date';
 import type { PlayLog, PlayLogDay } from '../data/playLog';
 
 /** 帯に出す 1 日分。 */
@@ -38,19 +39,6 @@ export interface PlayStreak {
   active: boolean;
   /** 記録のうち新しいほうから並べた日ごとの印。 */
   marks: PlayDayMark[];
-}
-
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-/** `YYYY-MM-DD` を日数に直す。時差の影響を受けないよう UTC で扱う。 */
-function dayNumber(date: string): number {
-  const [year, month, day] = date.split('-').map(Number);
-  return Date.UTC(year, month - 1, day) / DAY_MS;
-}
-
-/** 日数を `YYYY-MM-DD` に戻す。 */
-function dayString(value: number): string {
-  return new Date(value * DAY_MS).toISOString().slice(0, 10);
 }
 
 const EMPTY: PlayStreak = {
