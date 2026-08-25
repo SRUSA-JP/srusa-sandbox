@@ -19,13 +19,6 @@ jobs:
 
       - run: npm ci
 
-      # build が型検査・ESLint・配色のコントラスト検査を順に実行する
-      - name: 型検査・lint・配色の検査とビルド
+      # build が型検査・ESLint・UI初期レンダリング・配色/デザイン検査を順に実行する
+      - name: 型検査・lint・UI/デザイン検査とビルド
         run: npm run build
-
-      - name: 実値の直書きが無いことを確認
-        run: |
-          if grep -rnoE '\b[a-z-]+-\[[^]]*\]' --include='*.tsx' src/ | grep -v 'var(--sr-'; then
-            echo "::error::トークンを経由しない値が直書きされています（DESIGN.md を参照）"
-            exit 1
-          fi

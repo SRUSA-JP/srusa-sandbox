@@ -2,12 +2,13 @@ import { useRef, useState, type ReactNode } from 'react';
 import { MAP_TEXT, VIEWPORT_TEXT } from '../../config/messages';
 import { RELATIONSHIP_ZOOM, VIEWPORT } from '../../config/viewport';
 import { usePanZoom } from '../../hooks/usePanZoom';
-import { transformStyle } from '../../lib/viewport';
-import { clampToCanvas, regionPaintOrder } from '../../map/display';
+import { toScreen, transformStyle } from '../../lib/viewport';
+import { clampToCanvas, personLabel, regionPaintOrder } from '../../map/display';
 import type { MapLayout, PersonPlacement } from '../../map/layout';
 import type { VizTheme } from '../../theme/palette';
 import { GroupRegion } from '../molecules/GroupRegion';
 import { PersonNode } from '../molecules/PersonNode';
+import { PersonProfileTooltip } from '../molecules/PersonProfileTooltip';
 import { RelationEdge } from '../molecules/RelationEdge';
 import { ViewportFrame } from './ViewportFrame';
 
@@ -21,11 +22,13 @@ export interface RelationshipMapProps {
   /** 描画する関係線。呼び出し側が絞り込んだものを渡す。 */
   edges: MapLayout['edges'];
   nameMode: string;
-  onSelectPerson?: (personId: string) => void;
+  profileHref: (placement: PersonPlacement) => string;
   /** 人を掴んで動かせるようにする。動かした先の座標を受け取る。 */
   onMovePerson?: (personId: string, x: number, y: number) => void;
   /** 図の右上に足す操作（配置を戻す、など）。 */
   actions?: ReactNode;
+  /** 人・領域・関係線の SVG 標準ツールチップを出すか。 */
+  showTooltips?: boolean;
 }
 
 /** 掴んでいる最中の人物。動いたかどうかで「押した」と「動かした」を分ける。 */
@@ -56,13 +59,15 @@ export function RelationshipMap({
   highlightedGroupId,
   edges,
   nameMode,
-  onSelectPerson,
+  profileHref,
   onMovePerson,
   actions,
+  showTooltips = true,
 }: RelationshipMapProps) {
   const panZoom = usePanZoom(layout.width, layout.height, RELATIONSHIP_ZOOM);
   const drag = useRef<DragState | null>(null);
   const [grabbedId, setGrabbedId] = useState<string | null>(null);
+  const [activePersonId, setActivePersonId] = useState<string | null>(null);
 
   const relatedIds = new Set<string>();
   for (const edge of layout.edges) {
@@ -76,6 +81,10 @@ export function RelationshipMap({
 
   const nameOf = (personId: string) => layout.byId.get(personId)?.person.onlineName ?? personId;
   const regions = [...layout.regions].sort(regionPaintOrder);
+  const activePlacement = activePersonId ? layout.byId.get(activePersonId) : undefined;
+  const activePoint = activePlacement
+    ? toScreen(panZoom.view, { x: activePlacement.x, y: activePlacement.y })
+    : null;
 
   /* ---------------------------------------------------------------- *
    * 人を掴んで動かす
@@ -100,6 +109,7 @@ export function RelationshipMap({
           moved: false,
         };
         setGrabbedId(personId);
+        setActivePersonId(null);
       },
 
       onPointerMove: (event: React.PointerEvent<SVGGElement>) => {
@@ -125,8 +135,8 @@ export function RelationshipMap({
       onPointerUp: (event: React.PointerEvent<SVGGElement>) => {
         const state = drag.current;
         event.stopPropagation();
-        /* 動かしていなければ「押した」とみなして中心人物にする */
-        if (state && !state.moved) onSelectPerson?.(personId);
+        /* 動かしていなければ「押した」とみなして人物の吹き出しを出す */
+        if (state && !state.moved) setActivePersonId(personId);
         drag.current = null;
         setGrabbedId(null);
       },
@@ -139,6 +149,21 @@ export function RelationshipMap({
       label={MAP_TEXT.card.map.ariaLabel}
       status={VIEWPORT_TEXT.zoom(Math.round(panZoom.view.scale * 100))}
       actions={actions}
+      overlay={
+        activePlacement && activePoint ? (
+          <div
+            className="absolute z-10 -translate-x-1/2 -translate-y-full"
+            style={{ left: activePoint.x, top: activePoint.y }}
+          >
+            <PersonProfileTooltip
+              person={activePlacement.person}
+              label={personLabel(activePlacement.person, nameMode)}
+              href={profileHref(activePlacement)}
+              onClose={() => setActivePersonId(null)}
+            />
+          </div>
+        ) : undefined
+      }
     >
       <div
         className="origin-top-left"
@@ -163,6 +188,7 @@ export function RelationshipMap({
                 region={region}
                 theme={theme}
                 highlighted={region.group.id === highlightedGroupId}
+                showTooltip={showTooltips}
               />
             ))}
           </g>
@@ -174,6 +200,7 @@ export function RelationshipMap({
                 theme={theme}
                 highlighted={edge.relation.source === centerId || edge.relation.target === centerId}
                 nameOf={nameOf}
+                showTooltip={showTooltips}
               />
             ))}
           </g>
@@ -189,9 +216,10 @@ export function RelationshipMap({
                   isRelated: relatedIds.has(placement.person.id),
                   isDimmed: highlightedGroupId !== '' && !highlightedMembers.has(placement.person.id),
                 }}
-                onSelect={onSelectPerson}
+                onSelect={setActivePersonId}
                 pointer={pointerFor(placement)}
                 grabbed={grabbedId === placement.person.id}
+                showTooltip={showTooltips}
               />
             ))}
           </g>

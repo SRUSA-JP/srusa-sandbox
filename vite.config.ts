@@ -45,6 +45,26 @@ function siteMetadata(): Plugin {
           injectTo: 'head' as const,
         },
         {
+          tag: 'meta',
+          attrs: { name: 'mobile-web-app-capable', content: 'yes' },
+          injectTo: 'head' as const,
+        },
+        {
+          tag: 'meta',
+          attrs: { name: 'apple-mobile-web-app-capable', content: 'yes' },
+          injectTo: 'head' as const,
+        },
+        {
+          tag: 'meta',
+          attrs: { name: 'apple-mobile-web-app-title', content: APP_TEXT.shortName },
+          injectTo: 'head' as const,
+        },
+        {
+          tag: 'meta',
+          attrs: { name: 'apple-mobile-web-app-status-bar-style', content: 'default' },
+          injectTo: 'head' as const,
+        },
+        {
           tag: 'link',
           attrs: { rel: 'icon', type: APP_ICON.type, href: `./${APP_ICON.path}` },
           injectTo: 'head' as const,

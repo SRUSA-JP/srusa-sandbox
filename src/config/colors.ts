@@ -20,6 +20,7 @@
  */
 import { cssVar } from '../theme/tokens';
 import {
+  CONTRAST_MIN_LARGE,
   CONTRAST_MIN_TEXT,
   chartText,
   ensureContrast,
@@ -28,6 +29,7 @@ import {
   mutedFill,
   readableTextOn,
   tooltipSurface,
+  withAlpha,
   type TooltipSurfaceStyle,
   type VizTheme,
 } from '../theme/palette';
@@ -202,7 +204,94 @@ export function uiCssVariables(theme: VizTheme): Record<string, string> {
 export const COLOR_SLOTS = {
   /** 単一系列のグラフ・強調表示。 */
   primary: 0,
+  /** プレイヤーデータでトップ級の値を示す色。 */
+  playerTop: 3,
+  /** プレイヤーデータで目立つ値を示す色。 */
+  playerNotable: 1,
 } as const;
+
+export type PlayerDataHighlightLevel = 'normal' | 'notable' | 'top';
+
+export const PLAYER_DATA_HIGHLIGHT = {
+  topRank: 1,
+  notableRank: 3,
+  notableAverageRatio: 1.5,
+  scatterTopShare: 0.82,
+  topFillAlpha: 0.18,
+  notableFillAlpha: 0.12,
+} as const;
+
+/**
+ * 連続プレイ日数の帯の 1 マスの色。
+ *
+ * 3 段階だけにする。いま続いている連なりを強調色、それ以外のログインした日を
+ * 薄く、ログインしていない日は沈んだ背景。図形なので下限は 3:1。
+ */
+export function playStreakMarkColors(
+  theme: VizTheme,
+  accent: string,
+): { current: string; played: string; missed: string; border: string } {
+  return {
+    current: ensureContrast(accent, theme.surface, CONTRAST_MIN_LARGE),
+    played: withAlpha(accent, PLAY_STREAK_MARK.playedAlpha),
+    missed: theme.surfaceHover,
+    border: theme.border,
+  };
+}
+
+/** 帯の 1 マスの見た目。 */
+export const PLAY_STREAK_MARK = {
+  /** ログインはしたが、いまの連なりには入っていない日の濃さ。 */
+  playedAlpha: 0.42,
+} as const;
+
+export function playerDataHighlightLevel({
+  rank,
+  averageRatio,
+  maxShare,
+}: {
+  rank?: number;
+  averageRatio?: number;
+  maxShare?: number;
+}): PlayerDataHighlightLevel {
+  if (rank !== undefined && rank <= PLAYER_DATA_HIGHLIGHT.topRank) return 'top';
+  if (rank !== undefined && rank <= PLAYER_DATA_HIGHLIGHT.notableRank) return 'notable';
+  if (averageRatio !== undefined && averageRatio >= PLAYER_DATA_HIGHLIGHT.notableAverageRatio) return 'notable';
+  if (maxShare !== undefined && maxShare >= PLAYER_DATA_HIGHLIGHT.scatterTopShare) return 'notable';
+  return 'normal';
+}
+
+export function playerDataHighlightColors(
+  theme: VizTheme,
+  level: PlayerDataHighlightLevel,
+  fallback: string = theme.accent,
+): { border: string; fill: string; bar: string; text: string } {
+  const roles = roleColors(theme);
+  if (level === 'top') {
+    const color = theme.categorical[COLOR_SLOTS.playerTop % theme.categorical.length];
+    return {
+      border: color,
+      fill: withAlpha(color, PLAYER_DATA_HIGHLIGHT.topFillAlpha),
+      bar: color,
+      text: ensureContrast(color, theme.surfaceHover, CONTRAST_MIN_TEXT),
+    };
+  }
+  if (level === 'notable') {
+    const color = theme.categorical[COLOR_SLOTS.playerNotable % theme.categorical.length];
+    return {
+      border: color,
+      fill: withAlpha(color, PLAYER_DATA_HIGHLIGHT.notableFillAlpha),
+      bar: color,
+      text: ensureContrast(color, theme.surfaceHover, CONTRAST_MIN_TEXT),
+    };
+  }
+  return {
+    border: roles.border,
+    fill: roles.sunken,
+    bar: fallback,
+    text: roles.text,
+  };
+}
 
 export interface FigureColors {
   /** 軸・目盛り・凡例・データラベルの文字。 */
@@ -229,6 +318,8 @@ export interface FigureColors {
   separator: string;
   /** 系列キー → 色。登録順で固定するので、絞り込んでも色が変わらない。 */
   series: (keys: string[]) => (key: string) => string;
+  /** Minecraft 資産キー → 意味色。 */
+  economyAsset: (key: keyof VizTheme['economyAssets']) => string;
   /** 分類ごとのスロット色（相関図のグループなど）。 */
   slot: (index: number) => string;
   /** 色の面の上に載せる文字・図形。読める色まで寄せて返す。 */
@@ -255,6 +346,7 @@ export function figureColors(theme: VizTheme): FigureColors {
     background: roles.surface,
     separator: roles.surface,
     series: (keys) => colorScale(keys, theme),
+    economyAsset: (key) => theme.economyAssets[key],
     slot: (index) => theme.categorical[index % theme.categorical.length],
     labelOn: (background, minRatio = CONTRAST_MIN_TEXT) => readableTextOn(background, theme, minRatio),
     tooltip: tooltipSurface(theme),

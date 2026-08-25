@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+# main ブランチへの直接コミットを止める。
+#
+# 作業は必ず作業用ブランチ（edit など）で行い、main へは Pull Request か
+# マージで入れる。うっかり main で作業してしまう事故を git 側で防ぐ。
+#
+#   有効化: git config core.hooksPath .githooks
+#   どうしても main に直接コミットするとき: git commit --no-verify
+set -eu
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+case "$branch" in
+  main|master)
+    echo "エラー: $branch ブランチには直接コミットできません。" >&2
+    echo "作業用ブランチに移ってからコミットしてください。" >&2
+    echo "  git switch -c 作業ブランチ名" >&2
+    echo "（意図してコミットする場合のみ: git commit --no-verify）" >&2
+    exit 1
+    ;;
+esac

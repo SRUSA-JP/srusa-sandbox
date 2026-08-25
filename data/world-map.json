@@ -1,9 +1,89 @@
 {
-  "source": "BlueMap lowres LOD1",
+  "generated_on": "2026-08-25",
+  "source": "BlueMap lowres LOD1 / End MCA overview",
   "maps": [
     {
+      "id": "end",
+      "dimension": "end",
+      "label": "End",
+      "updated_on": "2026-08-25",
+      "image": "world-map/end.png",
+      "bounds": {
+        "minX": -17408,
+        "minZ": -1536,
+        "maxX": 2048,
+        "maxZ": 4608
+      },
+      "pixels": {
+        "width": 4864,
+        "height": 1536
+      },
+      "blocksPerPixel": 4,
+      "bytes": 204224
+    },
+    {
+      "id": "nether",
+      "dimension": "nether",
+      "label": "Nether",
+      "updated_on": "2026-08-25",
+      "image": "world-map/nether.png",
+      "bounds": {
+        "minX": -512,
+        "minZ": -478,
+        "maxX": 802,
+        "maxZ": 482
+      },
+      "pixels": {
+        "width": 1314,
+        "height": 960
+      },
+      "blocksPerPixel": 1,
+      "bytes": 518791
+    },
+    {
       "id": "overworld",
+      "dimension": "overworld",
+      "label": "Overworld",
+      "updated_on": "2026-08-25",
       "image": "world-map/overworld.png",
+      "bounds": {
+        "minX": -1024,
+        "minZ": -1024,
+        "maxX": 3074,
+        "maxZ": 2914
+      },
+      "pixels": {
+        "width": 4098,
+        "height": 3938
+      },
+      "blocksPerPixel": 1,
+      "bytes": 3938294
+    },
+    {
+      "id": "overworld-20260822-0715",
+      "dimension": "overworld",
+      "label": "オーバーワールド（2026-08-22 07:15）",
+      "updated_on": "2026-08-22",
+      "image": "world-map/overworld-20260822-0715.png",
+      "bounds": {
+        "minX": -1024,
+        "minZ": -1024,
+        "maxX": 1025,
+        "maxZ": 1025
+      },
+      "pixels": {
+        "width": 2049,
+        "height": 2049
+      },
+      "blocksPerPixel": 1,
+      "bytes": 1369646
+    },
+    {
+      "id": "overworld-current",
+      "dimension": "overworld",
+      "label": "オーバーワールド",
+      "updated_on": "2026-08-25",
+      "image": "world-map/overworld-current.png",
       "bounds": {
         "minX": -702,
         "minZ": -1024,
@@ -16,6 +96,25 @@
       },
       "blocksPerPixel": 1,
       "bytes": 1240285
+    },
+    {
+      "id": "twilightforest",
+      "dimension": "twilightforest",
+      "label": "Twilight Forest",
+      "updated_on": "2026-08-25",
+      "image": "world-map/twilightforest.png",
+      "bounds": {
+        "minX": -2206,
+        "minZ": -510,
+        "maxX": 418,
+        "maxZ": 2242
+      },
+      "pixels": {
+        "width": 2624,
+        "height": 2752
+      },
+      "blocksPerPixel": 1,
+      "bytes": 3137263
     }
   ]
 }

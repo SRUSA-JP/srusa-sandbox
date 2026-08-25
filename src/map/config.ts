@@ -117,6 +117,14 @@ export const REGION = {
   fillAlpha: 0.1,
   /** 強調時の塗りの不透明度。 */
   highlightFillAlpha: 0.22,
+  /** 非所属者が領域内に入ったとき、外側へ押し出す最大パス数。 */
+  strictPasses: 5,
+  /** 1 回あたりの押し出し距離。 */
+  strictPushStep: 42,
+  /** 1 人あたりの押し出し最大試行回数。 */
+  strictMaxSteps: 16,
+  /** 真上に重なったときの退避方向数。 */
+  strictDirections: 12,
   labelFontSize: FONT_SIZE.sm,
   labelOffsetY: -8,
   labelFontWeight: FONT_WEIGHT.medium,
@@ -208,3 +216,19 @@ export const EDGE_MODES = [
 ] as const;
 
 export type EdgeMode = (typeof EDGE_MODES)[number]['value'];
+
+/** 相関図の配置アルゴリズム。 */
+export const LAYOUT_MODES = [
+  { value: 'cluster', label: '所属クラスタ' },
+  { value: 'clusterHybrid', label: '所属ハイブリッド' },
+  { value: 'community', label: '関係コミュニティ' },
+  { value: 'stress', label: '距離ストレス' },
+  { value: 'attributeRadial', label: '所属リング' },
+  { value: 'corePeriphery', label: 'コア周辺' },
+  { value: 'force', label: '力学' },
+  { value: 'radial', label: '放射状' },
+  { value: 'layered', label: '階層' },
+  { value: 'circular', label: '円形' },
+] as const;
+
+export type LayoutMode = (typeof LAYOUT_MODES)[number]['value'];

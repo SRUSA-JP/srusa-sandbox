@@ -1,0 +1,1135 @@
+{
+  "generated_on": "2026-08-25T06:46:29.867Z",
+  "source": "data/mc-log-daily-summary-20260824.json",
+  "days": [
+    {
+      "date": "2026-08-02",
+      "joins": 10,
+      "leaves": 10,
+      "deaths": 7,
+      "players": {
+        "dekkaishi": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 4,
+          "first_seen_jst": "20:22:30",
+          "last_seen_jst": "22:29:05"
+        },
+        "Kenshi_www": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 1,
+          "first_seen_jst": "19:16:08",
+          "last_seen_jst": "22:29:21"
+        },
+        "natch_1105": {
+          "joins": 3,
+          "leaves": 3,
+          "deaths": 2,
+          "first_seen_jst": "21:29:05",
+          "last_seen_jst": "22:28:59"
+        },
+        "OCTBEE": {
+          "joins": 4,
+          "leaves": 4,
+          "deaths": 0,
+          "first_seen_jst": "21:41:14",
+          "last_seen_jst": "22:32:23"
+        }
+      }
+    },
+    {
+      "date": "2026-08-03",
+      "joins": 8,
+      "leaves": 8,
+      "deaths": 7,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 5,
+          "first_seen_jst": "20:55:37",
+          "last_seen_jst": "22:23:30"
+        },
+        "Kenshi_www": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "20:59:10",
+          "last_seen_jst": "22:24:13"
+        },
+        "Mitigli4": {
+          "joins": 3,
+          "leaves": 3,
+          "deaths": 0,
+          "first_seen_jst": "20:26:39",
+          "last_seen_jst": "22:24:06"
+        },
+        "nodoamenn": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 2,
+          "first_seen_jst": "20:48:49",
+          "last_seen_jst": "21:11:47"
+        },
+        "OCTBEE": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "12:49:32",
+          "last_seen_jst": "13:10:32"
+        }
+      }
+    },
+    {
+      "date": "2026-08-04",
+      "joins": 2,
+      "leaves": 2,
+      "deaths": 1,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 1,
+          "first_seen_jst": "20:58:01",
+          "last_seen_jst": "21:26:46"
+        },
+        "Kenshi_www": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "23:17:12",
+          "last_seen_jst": "23:45:23"
+        }
+      }
+    },
+    {
+      "date": "2026-08-05",
+      "joins": 4,
+      "leaves": 4,
+      "deaths": 3,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 3,
+          "first_seen_jst": "20:20:57",
+          "last_seen_jst": "22:29:36"
+        },
+        "Kenshi_www": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "22:25:55",
+          "last_seen_jst": "23:22:16"
+        },
+        "Mitigli4": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "21:41:29",
+          "last_seen_jst": "23:22:18"
+        }
+      }
+    },
+    {
+      "date": "2026-08-06",
+      "joins": 16,
+      "leaves": 15,
+      "deaths": 6,
+      "players": {
+        "Boi0331": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "20:21:46",
+          "last_seen_jst": "22:30:41"
+        },
+        "kagyki": {
+          "joins": 12,
+          "leaves": 12,
+          "deaths": 6,
+          "first_seen_jst": "20:37:35",
+          "last_seen_jst": "22:46:29"
+        },
+        "Mitigli4": {
+          "joins": 1,
+          "leaves": 0,
+          "deaths": 0,
+          "first_seen_jst": "21:43:34",
+          "last_seen_jst": "21:43:34"
+        },
+        "tibepianegt46": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "22:29:29",
+          "last_seen_jst": "23:36:15"
+        }
+      }
+    },
+    {
+      "date": "2026-08-07",
+      "joins": 26,
+      "leaves": 22,
+      "deaths": 19,
+      "players": {
+        "Boi0331": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "20:37:32",
+          "last_seen_jst": "22:57:37"
+        },
+        "dekkaishi": {
+          "joins": 1,
+          "leaves": 0,
+          "deaths": 9,
+          "first_seen_jst": "22:23:49",
+          "last_seen_jst": "23:45:13"
+        },
+        "kagyki": {
+          "joins": 5,
+          "leaves": 4,
+          "deaths": 8,
+          "first_seen_jst": "19:41:28",
+          "last_seen_jst": "23:56:41"
+        },
+        "Mitigli4": {
+          "joins": 6,
+          "leaves": 6,
+          "deaths": 0,
+          "first_seen_jst": "00:03:24",
+          "last_seen_jst": "23:26:14"
+        },
+        "nodoamenn": {
+          "joins": 4,
+          "leaves": 3,
+          "deaths": 0,
+          "first_seen_jst": "23:09:48",
+          "last_seen_jst": "23:54:23"
+        },
+        "tibepianegt46": {
+          "joins": 8,
+          "leaves": 7,
+          "deaths": 2,
+          "first_seen_jst": "21:41:00",
+          "last_seen_jst": "23:25:19"
+        }
+      }
+    },
+    {
+      "date": "2026-08-08",
+      "joins": 81,
+      "leaves": 82,
+      "deaths": 87,
+      "players": {
+        "Boi0331": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "12:51:02",
+          "last_seen_jst": "18:57:09"
+        },
+        "dekkaishi": {
+          "joins": 17,
+          "leaves": 17,
+          "deaths": 44,
+          "first_seen_jst": "00:14:52",
+          "last_seen_jst": "23:52:39"
+        },
+        "detkent": {
+          "joins": 14,
+          "leaves": 13,
+          "deaths": 0,
+          "first_seen_jst": "01:57:00",
+          "last_seen_jst": "23:59:07"
+        },
+        "kagyki": {
+          "joins": 2,
+          "leaves": 3,
+          "deaths": 1,
+          "first_seen_jst": "00:02:17",
+          "last_seen_jst": "01:53:09"
+        },
+        "Kenshi_www": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 2,
+          "first_seen_jst": "00:56:57",
+          "last_seen_jst": "01:32:13"
+        },
+        "Mitigli4": {
+          "joins": 8,
+          "leaves": 9,
+          "deaths": 7,
+          "first_seen_jst": "00:14:44",
+          "last_seen_jst": "21:56:21"
+        },
+        "nodoamenn": {
+          "joins": 12,
+          "leaves": 12,
+          "deaths": 6,
+          "first_seen_jst": "00:26:24",
+          "last_seen_jst": "23:52:40"
+        },
+        "OCTBEE": {
+          "joins": 3,
+          "leaves": 3,
+          "deaths": 1,
+          "first_seen_jst": "00:25:03",
+          "last_seen_jst": "15:18:41"
+        },
+        "tibepianegt46": {
+          "joins": 22,
+          "leaves": 22,
+          "deaths": 26,
+          "first_seen_jst": "00:26:10",
+          "last_seen_jst": "23:48:49"
+        }
+      }
+    },
+    {
+      "date": "2026-08-09",
+      "joins": 53,
+      "leaves": 52,
+      "deaths": 150,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 2,
+          "first_seen_jst": "21:07:35",
+          "last_seen_jst": "22:51:30"
+        },
+        "dekkaishi": {
+          "joins": 1,
+          "leaves": 2,
+          "deaths": 9,
+          "first_seen_jst": "00:03:48",
+          "last_seen_jst": "01:44:44"
+        },
+        "detkent": {
+          "joins": 5,
+          "leaves": 5,
+          "deaths": 16,
+          "first_seen_jst": "00:10:00",
+          "last_seen_jst": "23:56:15"
+        },
+        "gurando0302": {
+          "joins": 9,
+          "leaves": 9,
+          "deaths": 1,
+          "first_seen_jst": "18:41:43",
+          "last_seen_jst": "23:33:09"
+        },
+        "kagyki": {
+          "joins": 4,
+          "leaves": 3,
+          "deaths": 0,
+          "first_seen_jst": "18:44:58",
+          "last_seen_jst": "21:11:04"
+        },
+        "Kenshi_www": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 9,
+          "first_seen_jst": "00:13:00",
+          "last_seen_jst": "01:44:36"
+        },
+        "Mitigli4": {
+          "joins": 8,
+          "leaves": 7,
+          "deaths": 3,
+          "first_seen_jst": "16:25:48",
+          "last_seen_jst": "23:25:48"
+        },
+        "natch_1105": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 5,
+          "first_seen_jst": "16:58:06",
+          "last_seen_jst": "22:51:29"
+        },
+        "nodoamenn": {
+          "joins": 11,
+          "leaves": 11,
+          "deaths": 58,
+          "first_seen_jst": "00:04:48",
+          "last_seen_jst": "23:59:21"
+        },
+        "tibepianegt46": {
+          "joins": 11,
+          "leaves": 11,
+          "deaths": 47,
+          "first_seen_jst": "00:18:30",
+          "last_seen_jst": "23:54:09"
+        }
+      }
+    },
+    {
+      "date": "2026-08-10",
+      "joins": 29,
+      "leaves": 32,
+      "deaths": 46,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 2,
+          "first_seen_jst": "20:06:49",
+          "last_seen_jst": "22:26:20"
+        },
+        "detkent": {
+          "joins": 3,
+          "leaves": 4,
+          "deaths": 3,
+          "first_seen_jst": "00:07:54",
+          "last_seen_jst": "23:28:17"
+        },
+        "gurando0302": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "22:23:03",
+          "last_seen_jst": "22:36:12"
+        },
+        "kagyki": {
+          "joins": 4,
+          "leaves": 4,
+          "deaths": 3,
+          "first_seen_jst": "00:03:36",
+          "last_seen_jst": "23:33:44"
+        },
+        "Kenshi_www": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "22:16:35",
+          "last_seen_jst": "22:46:31"
+        },
+        "Mitigli4": {
+          "joins": 6,
+          "leaves": 7,
+          "deaths": 4,
+          "first_seen_jst": "00:28:25",
+          "last_seen_jst": "23:26:48"
+        },
+        "nodoamenn": {
+          "joins": 7,
+          "leaves": 8,
+          "deaths": 23,
+          "first_seen_jst": "00:27:51",
+          "last_seen_jst": "23:55:46"
+        },
+        "tibepianegt46": {
+          "joins": 5,
+          "leaves": 5,
+          "deaths": 11,
+          "first_seen_jst": "00:15:52",
+          "last_seen_jst": "23:53:47"
+        }
+      }
+    },
+    {
+      "date": "2026-08-11",
+      "joins": 94,
+      "leaves": 95,
+      "deaths": 88,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 3,
+          "first_seen_jst": "20:07:42",
+          "last_seen_jst": "22:12:06"
+        },
+        "dekkaishi": {
+          "joins": 3,
+          "leaves": 3,
+          "deaths": 10,
+          "first_seen_jst": "19:27:57",
+          "last_seen_jst": "22:35:11"
+        },
+        "detkent": {
+          "joins": 9,
+          "leaves": 8,
+          "deaths": 0,
+          "first_seen_jst": "10:58:04",
+          "last_seen_jst": "23:20:21"
+        },
+        "gaburichan": {
+          "joins": 17,
+          "leaves": 17,
+          "deaths": 7,
+          "first_seen_jst": "12:47:08",
+          "last_seen_jst": "18:36:19"
+        },
+        "gottigoti": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 1,
+          "first_seen_jst": "17:17:44",
+          "last_seen_jst": "20:56:35"
+        },
+        "gurando0302": {
+          "joins": 5,
+          "leaves": 5,
+          "deaths": 2,
+          "first_seen_jst": "13:20:48",
+          "last_seen_jst": "22:52:27"
+        },
+        "kagyki": {
+          "joins": 14,
+          "leaves": 15,
+          "deaths": 4,
+          "first_seen_jst": "01:03:30",
+          "last_seen_jst": "23:06:25"
+        },
+        "natch_1105": {
+          "joins": 4,
+          "leaves": 4,
+          "deaths": 2,
+          "first_seen_jst": "16:47:13",
+          "last_seen_jst": "23:39:23"
+        },
+        "nodoamenn": {
+          "joins": 19,
+          "leaves": 19,
+          "deaths": 15,
+          "first_seen_jst": "10:10:42",
+          "last_seen_jst": "23:39:06"
+        },
+        "panndasanngou": {
+          "joins": 4,
+          "leaves": 4,
+          "deaths": 2,
+          "first_seen_jst": "16:33:20",
+          "last_seen_jst": "22:52:18"
+        },
+        "tibepianegt46": {
+          "joins": 16,
+          "leaves": 17,
+          "deaths": 42,
+          "first_seen_jst": "00:32:56",
+          "last_seen_jst": "22:37:51"
+        }
+      }
+    },
+    {
+      "date": "2026-08-12",
+      "joins": 21,
+      "leaves": 22,
+      "deaths": 28,
+      "players": {
+        "detkent": {
+          "joins": 2,
+          "leaves": 3,
+          "deaths": 0,
+          "first_seen_jst": "00:09:36",
+          "last_seen_jst": "14:11:07"
+        },
+        "gaburichan": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "19:16:51",
+          "last_seen_jst": "20:06:24"
+        },
+        "kagyki": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "19:55:13",
+          "last_seen_jst": "21:01:15"
+        },
+        "nodoamenn": {
+          "joins": 14,
+          "leaves": 14,
+          "deaths": 0,
+          "first_seen_jst": "11:17:23",
+          "last_seen_jst": "20:02:18"
+        },
+        "panndasanngou": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "13:24:23",
+          "last_seen_jst": "13:25:27"
+        },
+        "sukmkms": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 28,
+          "first_seen_jst": "12:57:16",
+          "last_seen_jst": "20:08:29"
+        }
+      }
+    },
+    {
+      "date": "2026-08-13",
+      "joins": 2,
+      "leaves": 0,
+      "deaths": 0,
+      "players": {
+        "nodoamenn": {
+          "joins": 1,
+          "leaves": 0,
+          "deaths": 0,
+          "first_seen_jst": "23:10:15",
+          "last_seen_jst": "23:10:15"
+        },
+        "tibepianegt46": {
+          "joins": 1,
+          "leaves": 0,
+          "deaths": 0,
+          "first_seen_jst": "23:13:31",
+          "last_seen_jst": "23:13:31"
+        }
+      }
+    },
+    {
+      "date": "2026-08-14",
+      "joins": 7,
+      "leaves": 7,
+      "deaths": 62,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 4,
+          "first_seen_jst": "20:27:15",
+          "last_seen_jst": "22:53:41"
+        },
+        "kagyki": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 33,
+          "first_seen_jst": "19:32:03",
+          "last_seen_jst": "23:58:08"
+        },
+        "natch_1105": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 23,
+          "first_seen_jst": "20:33:53",
+          "last_seen_jst": "23:50:08"
+        },
+        "nodoamenn": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "00:39:16",
+          "last_seen_jst": "23:18:13"
+        },
+        "tibepianegt46": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 2,
+          "first_seen_jst": "00:00:06",
+          "last_seen_jst": "23:58:02"
+        }
+      }
+    },
+    {
+      "date": "2026-08-15",
+      "joins": 15,
+      "leaves": 15,
+      "deaths": 4,
+      "players": {
+        "Boi0331": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "20:18:01",
+          "last_seen_jst": "21:22:39"
+        },
+        "kagyki": {
+          "joins": 7,
+          "leaves": 7,
+          "deaths": 1,
+          "first_seen_jst": "19:32:48",
+          "last_seen_jst": "21:20:56"
+        },
+        "nodoamenn": {
+          "joins": 3,
+          "leaves": 3,
+          "deaths": 0,
+          "first_seen_jst": "00:01:58",
+          "last_seen_jst": "22:37:21"
+        },
+        "tibepianegt46": {
+          "joins": 3,
+          "leaves": 3,
+          "deaths": 3,
+          "first_seen_jst": "00:02:05",
+          "last_seen_jst": "23:32:33"
+        }
+      }
+    },
+    {
+      "date": "2026-08-16",
+      "joins": 43,
+      "leaves": 45,
+      "deaths": 125,
+      "players": {
+        "Boi0331": {
+          "joins": 3,
+          "leaves": 3,
+          "deaths": 3,
+          "first_seen_jst": "21:03:49",
+          "last_seen_jst": "22:49:04"
+        },
+        "dekkaishi": {
+          "joins": 5,
+          "leaves": 5,
+          "deaths": 25,
+          "first_seen_jst": "00:20:52",
+          "last_seen_jst": "22:49:03"
+        },
+        "detkent": {
+          "joins": 4,
+          "leaves": 4,
+          "deaths": 1,
+          "first_seen_jst": "16:04:53",
+          "last_seen_jst": "22:37:59"
+        },
+        "gaburichan": {
+          "joins": 4,
+          "leaves": 4,
+          "deaths": 2,
+          "first_seen_jst": "11:45:44",
+          "last_seen_jst": "18:17:08"
+        },
+        "kagyki": {
+          "joins": 3,
+          "leaves": 3,
+          "deaths": 44,
+          "first_seen_jst": "15:14:26",
+          "last_seen_jst": "22:46:09"
+        },
+        "Mitigli4": {
+          "joins": 6,
+          "leaves": 6,
+          "deaths": 8,
+          "first_seen_jst": "00:09:33",
+          "last_seen_jst": "23:26:37"
+        },
+        "natch_1105": {
+          "joins": 6,
+          "leaves": 6,
+          "deaths": 33,
+          "first_seen_jst": "00:36:44",
+          "last_seen_jst": "23:00:12"
+        },
+        "nodoamenn": {
+          "joins": 7,
+          "leaves": 8,
+          "deaths": 4,
+          "first_seen_jst": "00:32:11",
+          "last_seen_jst": "23:08:34"
+        },
+        "panndasanngou": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "21:12:20",
+          "last_seen_jst": "21:34:48"
+        },
+        "tibepianegt46": {
+          "joins": 4,
+          "leaves": 5,
+          "deaths": 5,
+          "first_seen_jst": "00:13:09",
+          "last_seen_jst": "22:38:43"
+        }
+      }
+    },
+    {
+      "date": "2026-08-17",
+      "joins": 10,
+      "leaves": 8,
+      "deaths": 4,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 1,
+          "first_seen_jst": "20:20:21",
+          "last_seen_jst": "22:39:45"
+        },
+        "kagyki": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 1,
+          "first_seen_jst": "20:49:41",
+          "last_seen_jst": "22:39:55"
+        },
+        "Mitigli4": {
+          "joins": 4,
+          "leaves": 3,
+          "deaths": 2,
+          "first_seen_jst": "19:40:29",
+          "last_seen_jst": "23:25:06"
+        },
+        "natch_1105": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "21:35:54",
+          "last_seen_jst": "23:09:58"
+        },
+        "nodoamenn": {
+          "joins": 3,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "19:46:23",
+          "last_seen_jst": "23:42:04"
+        }
+      }
+    },
+    {
+      "date": "2026-08-18",
+      "joins": 12,
+      "leaves": 13,
+      "deaths": 1,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "20:27:11",
+          "last_seen_jst": "22:36:17"
+        },
+        "kagyki": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "20:05:18",
+          "last_seen_jst": "22:55:23"
+        },
+        "Mitigli4": {
+          "joins": 0,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "00:03:23",
+          "last_seen_jst": "00:03:23"
+        },
+        "natch_1105": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "21:14:33",
+          "last_seen_jst": "22:52:36"
+        },
+        "nodoamenn": {
+          "joins": 8,
+          "leaves": 8,
+          "deaths": 0,
+          "first_seen_jst": "00:11:54",
+          "last_seen_jst": "23:46:35"
+        },
+        "tibepianegt46": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 1,
+          "first_seen_jst": "21:40:32",
+          "last_seen_jst": "22:36:23"
+        }
+      }
+    },
+    {
+      "date": "2026-08-19",
+      "joins": 10,
+      "leaves": 9,
+      "deaths": 14,
+      "players": {
+        "Boi0331": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "21:13:08",
+          "last_seen_jst": "22:15:15"
+        },
+        "kagyki": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 3,
+          "first_seen_jst": "20:10:02",
+          "last_seen_jst": "22:33:40"
+        },
+        "Mitigli4": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "22:42:29",
+          "last_seen_jst": "22:55:56"
+        },
+        "nodoamenn": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "00:23:52",
+          "last_seen_jst": "23:00:30"
+        },
+        "tibepianegt46": {
+          "joins": 4,
+          "leaves": 3,
+          "deaths": 11,
+          "first_seen_jst": "20:43:32",
+          "last_seen_jst": "23:58:15"
+        }
+      }
+    },
+    {
+      "date": "2026-08-20",
+      "joins": 10,
+      "leaves": 8,
+      "deaths": 26,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 0,
+          "deaths": 6,
+          "first_seen_jst": "20:41:45",
+          "last_seen_jst": "23:03:15"
+        },
+        "kagyki": {
+          "joins": 1,
+          "leaves": 0,
+          "deaths": 0,
+          "first_seen_jst": "22:20:26",
+          "last_seen_jst": "22:20:26"
+        },
+        "natch_1105": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "21:54:39",
+          "last_seen_jst": "23:18:50"
+        },
+        "nodoamenn": {
+          "joins": 4,
+          "leaves": 4,
+          "deaths": 0,
+          "first_seen_jst": "00:21:02",
+          "last_seen_jst": "23:05:31"
+        },
+        "tibepianegt46": {
+          "joins": 3,
+          "leaves": 3,
+          "deaths": 20,
+          "first_seen_jst": "00:05:30",
+          "last_seen_jst": "23:54:29"
+        }
+      }
+    },
+    {
+      "date": "2026-08-21",
+      "joins": 12,
+      "leaves": 12,
+      "deaths": 8,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "00:08:44",
+          "last_seen_jst": "15:29:03"
+        },
+        "kagyki": {
+          "joins": 5,
+          "leaves": 5,
+          "deaths": 0,
+          "first_seen_jst": "00:07:17",
+          "last_seen_jst": "20:44:29"
+        },
+        "Mitigli4": {
+          "joins": 1,
+          "leaves": 0,
+          "deaths": 0,
+          "first_seen_jst": "23:14:38",
+          "last_seen_jst": "23:14:38"
+        },
+        "natch_1105": {
+          "joins": 2,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "21:47:56",
+          "last_seen_jst": "23:41:12"
+        },
+        "nodoamenn": {
+          "joins": 0,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "00:35:31",
+          "last_seen_jst": "00:35:31"
+        },
+        "tibepianegt46": {
+          "joins": 3,
+          "leaves": 3,
+          "deaths": 8,
+          "first_seen_jst": "00:09:00",
+          "last_seen_jst": "23:52:10"
+        }
+      }
+    },
+    {
+      "date": "2026-08-22",
+      "joins": 37,
+      "leaves": 35,
+      "deaths": 33,
+      "players": {
+        "Boi0331": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 1,
+          "first_seen_jst": "21:37:45",
+          "last_seen_jst": "22:46:02"
+        },
+        "detkent": {
+          "joins": 8,
+          "leaves": 7,
+          "deaths": 3,
+          "first_seen_jst": "00:09:40",
+          "last_seen_jst": "23:27:30"
+        },
+        "gaburichan": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 0,
+          "first_seen_jst": "13:43:16",
+          "last_seen_jst": "17:32:39"
+        },
+        "kagyki": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 2,
+          "first_seen_jst": "01:19:31",
+          "last_seen_jst": "23:21:26"
+        },
+        "Mitigli4": {
+          "joins": 4,
+          "leaves": 4,
+          "deaths": 0,
+          "first_seen_jst": "01:53:25",
+          "last_seen_jst": "23:33:55"
+        },
+        "natch_1105": {
+          "joins": 4,
+          "leaves": 4,
+          "deaths": 0,
+          "first_seen_jst": "02:01:35",
+          "last_seen_jst": "21:02:22"
+        },
+        "nodoamenn": {
+          "joins": 10,
+          "leaves": 9,
+          "deaths": 0,
+          "first_seen_jst": "01:21:16",
+          "last_seen_jst": "22:13:58"
+        },
+        "OCTBEE": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "14:37:08",
+          "last_seen_jst": "14:45:16"
+        },
+        "tibepianegt46": {
+          "joins": 6,
+          "leaves": 6,
+          "deaths": 27,
+          "first_seen_jst": "00:03:58",
+          "last_seen_jst": "23:21:35"
+        }
+      }
+    },
+    {
+      "date": "2026-08-23",
+      "joins": 25,
+      "leaves": 31,
+      "deaths": 12,
+      "players": {
+        "dekkaishi": {
+          "joins": 2,
+          "leaves": 2,
+          "deaths": 3,
+          "first_seen_jst": "15:31:03",
+          "last_seen_jst": "22:41:43"
+        },
+        "detkent": {
+          "joins": 5,
+          "leaves": 6,
+          "deaths": 1,
+          "first_seen_jst": "01:12:25",
+          "last_seen_jst": "23:29:37"
+        },
+        "kagyki": {
+          "joins": 4,
+          "leaves": 5,
+          "deaths": 5,
+          "first_seen_jst": "00:06:09",
+          "last_seen_jst": "23:10:03"
+        },
+        "Mitigli4": {
+          "joins": 0,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "01:14:48",
+          "last_seen_jst": "01:14:48"
+        },
+        "natch_1105": {
+          "joins": 5,
+          "leaves": 6,
+          "deaths": 2,
+          "first_seen_jst": "01:38:27",
+          "last_seen_jst": "23:04:05"
+        },
+        "nodoamenn": {
+          "joins": 8,
+          "leaves": 9,
+          "deaths": 0,
+          "first_seen_jst": "01:45:47",
+          "last_seen_jst": "21:59:04"
+        },
+        "tibepianegt46": {
+          "joins": 1,
+          "leaves": 2,
+          "deaths": 1,
+          "first_seen_jst": "00:23:25",
+          "last_seen_jst": "00:46:38"
+        }
+      }
+    },
+    {
+      "date": "2026-08-24",
+      "joins": 6,
+      "leaves": 5,
+      "deaths": 0,
+      "players": {
+        "kagyki": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "20:00:23",
+          "last_seen_jst": "20:37:13"
+        },
+        "natch_1105": {
+          "joins": 1,
+          "leaves": 1,
+          "deaths": 0,
+          "first_seen_jst": "21:38:14",
+          "last_seen_jst": "22:54:56"
+        },
+        "nodoamenn": {
+          "joins": 4,
+          "leaves": 3,
+          "deaths": 0,
+          "first_seen_jst": "19:53:24",
+          "last_seen_jst": "21:27:35"
+        }
+      }
+    }
+  ]
+}

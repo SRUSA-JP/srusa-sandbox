@@ -44,8 +44,9 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
         className="mt-lg mb-xxl flex flex-wrap gap-xs border-b-hairline border-divider sm:mt-xl sm:mb-section"
         aria-label={APP_TEXT.navLabel}
       >
+        {/* タブに並ばない画面（プレイヤー紹介）は、親のタブを選択中に見せる */}
         {ROUTES.map((entry) => {
-          const active = entry.id === route.id;
+          const active = entry.id === (route.tabId ?? route.id);
           return (
             <button
               key={entry.id}

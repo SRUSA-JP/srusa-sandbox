@@ -8,13 +8,24 @@ import type { CountMap, ItemMetric, NamedPlayer, StatsDocument } from '../data/s
 import { toNamedPlayers } from '../data/parse';
 import { LIMITS } from '../config/metrics';
 import {
+  ECONOMY_ASSETS,
+  ECONOMY_DEFAULT_SOURCE,
+  ECONOMY_INDEX_BASE,
+  ECONOMY_ITEM_CATEGORIES,
+  type EconomyAsset,
+  type EconomyItemCategoryId,
+  type EconomyStatsSourceMetric,
+  type EconomySourceMetric,
+} from '../config/economy';
+import {
   DAMAGE_LABELS,
   ENVIRONMENT_ENTRY,
   MOVEMENT_LABELS,
   OTHER_ENTRY,
   TOTAL_SERIES,
 } from '../config/labels';
-import { labelFor, prettifyId } from './format';
+import { addDays, daysBetween, isDayString } from './date';
+import { labelFor, prettifyId, stripNamespace } from './format';
 
 /** チャート・表で使う汎用の 1 行。 */
 export interface Entry {
@@ -106,9 +117,12 @@ export function basisDivisor(hours: number, basis: RateBasis): number {
   }
 }
 
+/** 換算した値の小数点以下の桁数。率も概算も同じ細かさで揃える。 */
+const RATE_DIGITS = 3;
+
 /** 0 除算を避けて割る。分母が 0 以下なら 0 とする。 */
 export function perUnit(value: number, divisor: number): number {
-  return divisor > 0 ? round(value / divisor, 3) : 0;
+  return divisor > 0 ? round(value / divisor, RATE_DIGITS) : 0;
 }
 
 /** 基準に応じて 1 件の値を換算する。換算はすべてこの関数を通す。 */
@@ -257,6 +271,244 @@ export function deathCauseRanking(doc: StatsDocument, options: { players?: strin
   return other > 0 ? [...entries, { ...ENVIRONMENT_ENTRY, value: other }] : entries;
 }
 
+/* ------------------------------------------------------------------ *
+ * SRUSA 鉱物指数
+ * ------------------------------------------------------------------ */
+
+export interface EconomyAssetValue {
+  id: EconomyAsset['id'];
+  label: string;
+  shortLabel: string;
+  unit: string;
+  value: number;
+}
+
+/** 資産 1 種類の中で、1 item がどれだけの資産量になっているか。 */
+export interface EconomyItemAmount {
+  /** item ID（名前空間なし）。 */
+  id: string;
+  /** 内訳の分類。装備・ツール・原石など。 */
+  category: EconomyItemCategoryId;
+  /** 所持数（換算前）。 */
+  count: number;
+  /** 換算後の資産量。 */
+  value: number;
+}
+
+export interface PlayerEconomyRow {
+  name: string;
+  diamond: number;
+  emerald: number;
+  total: number;
+  /** 資産 1 種類ごとの item 内訳。分類別の積み上げに使う。 */
+  items: Record<EconomyAsset['id'], EconomyItemAmount[]>;
+}
+
+export interface EconomySummary {
+  assets: EconomyAssetValue[];
+  total: number;
+  rate: number | null;
+  source: EconomySourceMetric;
+}
+
+function isStatsEconomySource(source: EconomySourceMetric): source is EconomyStatsSourceMetric {
+  return source === 'picked_up' || source === 'mined';
+}
+
+/** stats の累計指標から、その資産の item 内訳を作る。0 の item は落とす。 */
+function economyAssetItems(
+  player: NamedPlayer,
+  asset: EconomyAsset,
+  source: EconomyStatsSourceMetric,
+): EconomyItemAmount[] {
+  const counts = player.production[source];
+  return asset.statsEntries
+    .map((entry) => {
+      const count = Object.entries(counts).reduce(
+        (acc, [key, value]) => (stripNamespace(key) === entry.id ? acc + value : acc),
+        0,
+      );
+      return {
+        id: entry.id,
+        category: entry.category,
+        count,
+        value: count * entry.multiplier,
+      };
+    })
+    .filter((item) => item.value > 0);
+}
+
+function sumItemValues(items: EconomyItemAmount[]): number {
+  return items.reduce((total, item) => total + item.value, 0);
+}
+
+/** プレイヤー別の鉱物資産量。ダイヤ・エメラルドの合計を同じ 1 単位として足す。 */
+export function playerEconomyRows(
+  doc: StatsDocument,
+  options: { players?: string[]; source?: EconomySourceMetric; inventoryRows?: PlayerEconomyRow[] } = {},
+): PlayerEconomyRow[] {
+  const source = options.source ?? ECONOMY_DEFAULT_SOURCE;
+  if (source === 'inventory') {
+    const playerSet = options.players && options.players.length > 0 ? new Set(options.players) : null;
+    return (options.inventoryRows ?? [])
+      .filter((row) => !playerSet || playerSet.has(row.name))
+      .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name, 'ja'));
+  }
+  const statsSource = isStatsEconomySource(source) ? source : 'picked_up';
+  return includedPlayers(doc, options.players)
+    .map((player) => {
+      const items = {
+        diamond: economyAssetItems(player, ECONOMY_ASSETS[0], statsSource),
+        emerald: economyAssetItems(player, ECONOMY_ASSETS[1], statsSource),
+      };
+      const diamond = sumItemValues(items.diamond);
+      const emerald = sumItemValues(items.emerald);
+      return {
+        name: player.name,
+        diamond,
+        emerald,
+        total: diamond + emerald,
+        items,
+      };
+    })
+    .sort((a, b) => b.total - a.total);
+}
+
+/** 資産の種類（ダイヤ・エメラルド）別の積み上げランキング。 */
+export function economyAssetRanking(rows: PlayerEconomyRow[]): StackedSeries {
+  return {
+    series: ECONOMY_ASSETS.map((asset) => ({ key: asset.id, label: asset.label })),
+    rows: [...rows]
+      .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name, 'ja'))
+      .map((row) => ({
+        name: row.name,
+        ...Object.fromEntries(ECONOMY_ASSETS.map((asset) => [asset.id, row[asset.id]])),
+      })),
+  };
+}
+
+/**
+ * 資産 1 種類の、分類別の積み上げランキング。
+ *
+ * 「ダイヤ 300 のうち、装備が 80・ツールが 40・原石が 180」のように、
+ * 同じ資産量でも中身が違うことを見せるための形。
+ * 系列は分類の定義順で固定するので、対象を絞っても色が入れ替わらない。
+ */
+export function economyCategoryRanking(
+  rows: PlayerEconomyRow[],
+  assetId: EconomyAsset['id'],
+): StackedSeries {
+  const totals = new Map<EconomyItemCategoryId, number>();
+  for (const row of rows) {
+    for (const item of row.items[assetId]) {
+      totals.set(item.category, (totals.get(item.category) ?? 0) + item.value);
+    }
+  }
+  const series = ECONOMY_ITEM_CATEGORIES.filter((category) => (totals.get(category.id) ?? 0) > 0).map(
+    (category) => ({ key: category.id, label: category.label }),
+  );
+  return {
+    series,
+    rows: [...rows]
+      .sort((a, b) => b[assetId] - a[assetId] || a.name.localeCompare(b.name, 'ja'))
+      .map((row) => {
+        const byCategory: Record<string, number> = Object.fromEntries(
+          series.map((entry) => [entry.key, 0]),
+        );
+        for (const item of row.items[assetId]) {
+          byCategory[item.category] = (byCategory[item.category] ?? 0) + item.value;
+        }
+        return { name: row.name, ...byCategory };
+      }),
+  };
+}
+
+/** 対象者全体の鉱物資産サマリ。rate は「1 DI が何 EM 相当か」を供給量から見る簡易レート。 */
+export function economySummary(
+  doc: StatsDocument,
+  options: { players?: string[]; source?: EconomySourceMetric; inventoryRows?: PlayerEconomyRow[] } = {},
+): EconomySummary {
+  const source = options.source ?? ECONOMY_DEFAULT_SOURCE;
+  if (source === 'inventory') {
+    const rows = playerEconomyRows(doc, options);
+    const assets = ECONOMY_ASSETS.map((asset) => ({
+      id: asset.id,
+      label: asset.label,
+      shortLabel: asset.shortLabel,
+      unit: asset.unit,
+      value: rows.reduce((total, row) => total + row[asset.id], 0),
+    }));
+    const diamond = assets.find((asset) => asset.id === 'diamond')?.value ?? 0;
+    const emerald = assets.find((asset) => asset.id === 'emerald')?.value ?? 0;
+    return {
+      assets,
+      total: assets.reduce((total, asset) => total + asset.value, 0),
+      rate: diamond > 0 ? round(emerald / diamond, 3) : null,
+      source,
+    };
+  }
+  const statsSource = isStatsEconomySource(source) ? source : 'picked_up';
+  const players = includedPlayers(doc, options.players);
+  const assets = ECONOMY_ASSETS.map((asset) => ({
+    id: asset.id,
+    label: asset.label,
+    shortLabel: asset.shortLabel,
+    unit: asset.unit,
+    value: players.reduce(
+      (total, player) => total + sumItemValues(economyAssetItems(player, asset, statsSource)),
+      0,
+    ),
+  }));
+  const diamond = assets.find((asset) => asset.id === 'diamond')?.value ?? 0;
+  const emerald = assets.find((asset) => asset.id === 'emerald')?.value ?? 0;
+  return {
+    assets,
+    total: assets.reduce((total, asset) => total + asset.value, 0),
+    rate: diamond > 0 ? round(emerald / diamond, 3) : null,
+    source,
+  };
+}
+
+/** 最初のスナップショットを 100 とした、日経平均のような指数推移。 */
+export function economyIndexTimeline(
+  snapshots: Snapshot[],
+  options: {
+    players?: string[];
+    source?: EconomySourceMetric;
+    inventoryRows?: PlayerEconomyRow[];
+    inventoryLabel?: string;
+  } = {},
+): StackedSeries {
+  const source = options.source ?? ECONOMY_DEFAULT_SOURCE;
+  if (source === 'inventory') {
+    const playerSet = options.players && options.players.length > 0 ? new Set(options.players) : null;
+    const total = (options.inventoryRows ?? [])
+      .filter((row) => !playerSet || playerSet.has(row.name))
+      .reduce((sum, row) => sum + row.total, 0);
+    return {
+      series: [{ key: 'index', label: '指数' }],
+      rows: [
+        {
+          [TIMELINE_CATEGORY_KEY]: options.inventoryLabel ?? '現在所有',
+          index: total > 0 ? ECONOMY_INDEX_BASE : 0,
+        },
+      ],
+    };
+  }
+  const summaries = snapshots.map((snapshot) => ({
+    label: snapshot.label,
+    summary: economySummary(snapshot.doc, { players: options.players, source }),
+  }));
+  const base = summaries.find((entry) => entry.summary.total > 0)?.summary.total ?? 0;
+  return {
+    series: [{ key: 'index', label: '指数' }],
+    rows: summaries.map(({ label, summary }) => ({
+      [TIMELINE_CATEGORY_KEY]: label,
+      index: base > 0 ? round((summary.total / base) * ECONOMY_INDEX_BASE, 2) : 0,
+    })),
+  };
+}
+
 /** 積み上げ棒グラフ用: プレイヤー × 移動手段（km）。 */
 export interface StackedSeries {
   /** 系列（積み上げの各セグメント）。順序 = 色スロット順。 */
@@ -350,19 +602,82 @@ export interface Snapshot {
 export const TIMELINE_CATEGORY_KEY = 'date';
 
 /**
+ * 推移の出し方。
+ *
+ * - `cumulative`: スナップショット時点の累計をそのまま点にする
+ * - `daily_average`: 前のスナップショットからの増分を、その間の日数で割って
+ *   1 日ずつに広げる
+ */
+export type TrendMode = 'cumulative' | 'daily_average';
+
+/** その日 1 日ぶんの概算値。 */
+interface DailyPoint {
+  /** `YYYY-MM-DD`。 */
+  date: string;
+  /** キー（合計なら total、プレイヤー別なら名前）ごとの 1 日あたりの概算。 */
+  values: Record<string, number>;
+}
+
+/**
+ * スナップショットの増分を、間に挟まる日へ均等に配る。
+ *
+ * スナップショットは毎日は取っていない。累計をそのまま点にすると、5 日ぶんの
+ * 増加が 1 点に乗って「その日にそれだけ動いた」ように見えてしまう。そこで
+ * 増分を日数で割り、その期間の各日に同じ値を置く（**概算**であって実測ではない）。
+ *
+ * 増分が負になる（データが取り直された）区間は 0 として扱う。マイナスの活動量は
+ * 意味を持たないので、線を跳ねさせるより落としたほうが読み違えにくい。
+ */
+function dailyAverages(
+  snapshots: Array<{ label: string; values: Record<string, number> }>,
+): DailyPoint[] {
+  const points: DailyPoint[] = [];
+
+  for (let index = 1; index < snapshots.length; index += 1) {
+    const previous = snapshots[index - 1];
+    const current = snapshots[index];
+    if (!isDayString(previous.label) || !isDayString(current.label)) continue;
+
+    const days = daysBetween(previous.label, current.label);
+    if (days <= 0) continue;
+
+    const perDay: Record<string, number> = {};
+    for (const key of Object.keys(current.values)) {
+      const delta = current.values[key] - (previous.values[key] ?? 0);
+      perDay[key] = Math.max(0, delta) / days;
+    }
+
+    for (let day = 1; day <= days; day += 1) {
+      points.push({ date: addDays(previous.label, day), values: perDay });
+    }
+  }
+
+  return points;
+}
+
+/**
  * 日付を横軸にした系列を作る。
  *
  * - `perPlayer` が false: 対象者の合計を 1 本の線にする
  * - `perPlayer` が true: プレイヤーごとに 1 本ずつ。色は 8 枠までなので上位のみ残す
  *
  * 1時間あたりへの換算は、合計値を合計プレイ時間で割る（各人の率の平均ではない）。
+ * `mode` が `daily_average` のときは、換算せずに増分を日数で割った概算を返す
+ * （プレイ時間で割る換算と、カレンダーの日数で割る概算を重ねない）。
  */
 export function metricTimeline(
   snapshots: Snapshot[],
   metric: NumericPlayerRowKey,
-  options: { players?: string[]; basis?: RateBasis; perPlayer?: boolean; limit?: number } = {},
+  options: {
+    players?: string[];
+    basis?: RateBasis;
+    perPlayer?: boolean;
+    limit?: number;
+    mode?: TrendMode;
+  } = {},
 ): StackedSeries {
-  const basis = options.basis ?? 'total';
+  const mode = options.mode ?? 'cumulative';
+  const basis = mode === 'daily_average' ? 'total' : (options.basis ?? 'total');
   const limit = options.limit ?? LIMITS.trendPlayers;
   const perSnapshot = snapshots.map((snapshot) => ({
     label: snapshot.label,
@@ -370,6 +685,20 @@ export function metricTimeline(
   }));
 
   if (!options.perPlayer) {
+    if (mode === 'daily_average') {
+      const totals = perSnapshot.map(({ label, rows: snapshotRows }) => ({
+        label,
+        values: { [TOTAL_SERIES.key]: snapshotRows.reduce((acc, row) => acc + row[metric], 0) },
+      }));
+      return {
+        series: [{ ...TOTAL_SERIES }],
+        rows: dailyAverages(totals).map((point) => ({
+          [TIMELINE_CATEGORY_KEY]: point.date,
+          [TOTAL_SERIES.key]: round(point.values[TOTAL_SERIES.key] ?? 0, RATE_DIGITS),
+        })),
+      };
+    }
+
     const rows = perSnapshot.map(({ label, rows: snapshotRows }) => {
       const value = snapshotRows.reduce((acc, row) => acc + row[metric], 0);
       const hours = snapshotRows.reduce((acc, row) => acc + row.playtime_hours, 0);
@@ -388,6 +717,24 @@ export function metricTimeline(
     .slice(0, limit)
     .map((row) => row.name);
 
+  const series = names.map((name) => ({ key: name, label: name }));
+
+  if (mode === 'daily_average') {
+    const byName = perSnapshot.map(({ label, rows: snapshotRows }) => ({
+      label,
+      values: Object.fromEntries(
+        names.map((name) => [name, snapshotRows.find((r) => r.name === name)?.[metric] ?? 0]),
+      ),
+    }));
+    return {
+      series,
+      rows: dailyAverages(byName).map((point) => ({
+        [TIMELINE_CATEGORY_KEY]: point.date,
+        ...Object.fromEntries(names.map((name) => [name, round(point.values[name] ?? 0, RATE_DIGITS)])),
+      })),
+    };
+  }
+
   const rows = perSnapshot.map(({ label, rows: snapshotRows }) => {
     const row: Record<string, string | number> = { [TIMELINE_CATEGORY_KEY]: label };
     for (const name of names) {
@@ -397,7 +744,7 @@ export function metricTimeline(
     return row;
   });
 
-  return { series: names.map((name) => ({ key: name, label: name })), rows };
+  return { series, rows };
 }
 
 /** 散布図用（任意の指標 × 任意の指標）。 */

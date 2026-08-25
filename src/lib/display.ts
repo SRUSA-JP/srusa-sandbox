@@ -28,6 +28,10 @@ import {
 } from '../config/metrics';
 import type { NumericPlayerRowKey, RateBasis } from './selectors';
 import { formatDecimal, formatInt } from './format';
+import { PLAYSTYLE_IDS, type PlaystyleScore } from './statsExperience';
+import { STREAK_TEXT, ZUKAN_TEXT } from '../config/messages';
+import { ZUKAN_ATTRIBUTE_LIMIT, ZUKAN_PRIORITY_ATTRIBUTES } from '../config/dataRegistry';
+import type { PlayStreak } from './playStreak';
 
 /* ------------------------------------------------------------------ *
  * 値の表示
@@ -130,4 +134,89 @@ export function metricColumnLabel(metric: NumericPlayerRowKey, basis: RateBasis)
  */
 export function barChartHeight(count: number, setting: BarRowSetting): number {
   return Math.max(setting.minHeight, count * setting.rowHeight);
+}
+
+/* ------------------------------------------------------------------ *
+ * 遊び方のレーダーチャート
+ * ------------------------------------------------------------------ */
+
+/**
+ * レーダーチャートの軸に並べる順番。
+ *
+ * PlayerStatus.scores は「強い順」で持っている（一覧と代表値のため）。
+ * そのまま角に割り当てるとプレイヤーごとに軸が入れ替わり、
+ * 「右上が戦闘」といった読み方ができない。ここで必ず固定順に並べ直す。
+ */
+export function playstyleAxisOrder(scores: PlaystyleScore[]): PlaystyleScore[] {
+  return PLAYSTYLE_IDS.map((id) => scores.find((score) => score.id === id)).filter(
+    (score): score is PlaystyleScore => Boolean(score),
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * 連続プレイ日数
+ * ------------------------------------------------------------------ */
+
+/**
+ * 連続プレイ日数の見せ方。
+ *
+ * 数え方は lib/playStreak.ts、色は config/colors.ts が持つ。ここは
+ * 「どの数字にどの見出しを付け、続いているかをどう言うか」だけを決める。
+ */
+export function playStreakSummary(streak: PlayStreak): {
+  tiles: Array<{ label: string; value: string }>;
+  state: string;
+  hasRecord: boolean;
+} {
+  return {
+    tiles: [
+      /* 途切れている人の連なりを「現在」と呼ぶと、いまも続いていると読めてしまう */
+      {
+        label: streak.active ? STREAK_TEXT.current : STREAK_TEXT.lastRun,
+        value: STREAK_TEXT.days(streak.current),
+      },
+      { label: STREAK_TEXT.longest, value: STREAK_TEXT.days(streak.longest) },
+      { label: STREAK_TEXT.totalDays, value: STREAK_TEXT.days(streak.totalDays) },
+      { label: STREAK_TEXT.lastPlayed, value: streak.lastPlayed },
+    ],
+    state: streak.active ? STREAK_TEXT.active : STREAK_TEXT.broken,
+    hasRecord: streak.totalDays > 0,
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * 図鑑
+ * ------------------------------------------------------------------ */
+
+/**
+ * 図鑑のカード 1 枚に出すもの。
+ *
+ * 誰を出すかは lib/playerDirectory.ts、色は config/colors.ts が持つ。
+ * ここは「所属を何個まで並べ、どんな札を付けるか」だけを決める。
+ */
+export function playerCardContent(input: {
+  /** その人の所属。多いときは先頭から順に採る。 */
+  attributes: string[];
+  hasStats: boolean;
+  hasDaily: boolean;
+  /** 連続プレイ日数。ログに記録が無ければ null。 */
+  streak: PlayStreak | null;
+}): { attributes: string[]; overflow: string; badges: string[] } {
+  const priority = input.attributes.filter((attribute) => ZUKAN_PRIORITY_ATTRIBUTES.includes(attribute));
+  const rest = input.attributes.filter((attribute) => !ZUKAN_PRIORITY_ATTRIBUTES.includes(attribute));
+  const shown = [...priority, ...rest].slice(0, ZUKAN_ATTRIBUTE_LIMIT);
+  const hidden = input.attributes.length - shown.length;
+  const badges: string[] = [];
+  /* 続いている人だけ日数を出す。途切れた日数を並べても比べる意味がない */
+  if (input.streak?.active && input.streak.current > 0) {
+    badges.push(ZUKAN_TEXT.badge.streak(input.streak.current));
+  }
+  if (input.hasStats) badges.push(ZUKAN_TEXT.badge.stats);
+  if (input.hasDaily) badges.push(ZUKAN_TEXT.badge.daily);
+
+  return {
+    attributes: shown,
+    overflow: hidden > 0 ? ZUKAN_TEXT.moreAttributes(hidden) : '',
+    badges,
+  };
 }
