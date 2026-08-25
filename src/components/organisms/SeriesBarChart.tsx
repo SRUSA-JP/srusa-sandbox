@@ -29,6 +29,8 @@ export interface SeriesBarChartProps {
   categoryKey?: string;
   unit?: string;
   height?: number;
+  /** 横棒にする場合は true。 */
+  horizontal?: boolean;
 }
 
 /**
@@ -48,6 +50,7 @@ export function SeriesBarChart({
   categoryKey = 'name',
   unit = '',
   height,
+  horizontal = false,
 }: SeriesBarChartProps) {
   const metrics = useChartMetrics();
   const colors = figureColors(theme);
@@ -55,22 +58,55 @@ export function SeriesBarChart({
 
   return (
     <ResponsiveContainer width="100%" height={height ?? metrics.height.tall}>
-      <BarChart data={data.rows} margin={metrics.margin.series} barCategoryGap={BAR.categoryGap.series}>
-        <CartesianGrid stroke={colors.grid} strokeDasharray={GRID_DASH} vertical={false} />
-        <XAxis
-          dataKey={categoryKey}
+      <BarChart
+        data={data.rows}
+        layout={horizontal ? 'vertical' : 'horizontal'}
+        margin={metrics.margin.series}
+        barCategoryGap={horizontal ? BAR.categoryGap.horizontal : BAR.categoryGap.series}
+      >
+        <CartesianGrid
           stroke={colors.grid}
-          tick={{ fill: colors.axis, fontSize: skinnedFontSize(AXIS.fontSize) }}
-          interval={0}
-          angle={AXIS.tickAngle}
-          textAnchor="end"
-          height={metrics.axisTickHeight}
+          strokeDasharray={GRID_DASH}
+          horizontal={!horizontal}
+          vertical={horizontal}
         />
-        <YAxis
-          tickFormatter={formatCompact}
-          stroke={colors.grid}
-          tick={{ fill: colors.axis, fontSize: skinnedFontSize(AXIS.fontSize) }}
-        />
+        {horizontal ? (
+          <>
+            <XAxis
+              type="number"
+              tickFormatter={formatCompact}
+              stroke={colors.grid}
+              tick={{ fill: colors.axis, fontSize: skinnedFontSize(AXIS.fontSize) }}
+            />
+            <YAxis
+              type="category"
+              dataKey={categoryKey}
+              width={metrics.axisCategoryWidth}
+              interval={0}
+              stroke={colors.grid}
+              tick={{ fill: colors.axis, fontSize: skinnedFontSize(AXIS.fontSize) }}
+            />
+          </>
+        ) : (
+          <>
+            <XAxis
+              type="category"
+              dataKey={categoryKey}
+              stroke={colors.grid}
+              tick={{ fill: colors.axis, fontSize: skinnedFontSize(AXIS.fontSize) }}
+              interval={0}
+              angle={AXIS.tickAngle}
+              textAnchor="end"
+              height={metrics.axisTickHeight}
+            />
+            <YAxis
+              type="number"
+              tickFormatter={formatCompact}
+              stroke={colors.grid}
+              tick={{ fill: colors.axis, fontSize: skinnedFontSize(AXIS.fontSize) }}
+            />
+          </>
+        )}
         <Tooltip
           cursor={{ fill: colors.cursor }}
           content={({ active, payload, label }) => {
@@ -107,7 +143,9 @@ export function SeriesBarChart({
             strokeWidth={stacked ? BAR.stackGap : 0}
             radius={
               stacked && index === data.series.length - 1
-                ? [skinnedRadius(BAR.radius), skinnedRadius(BAR.radius), 0, 0]
+                ? horizontal
+                  ? [0, skinnedRadius(BAR.radius), skinnedRadius(BAR.radius), 0]
+                  : [skinnedRadius(BAR.radius), skinnedRadius(BAR.radius), 0, 0]
                 : undefined
             }
             isAnimationActive={false}
@@ -116,7 +154,7 @@ export function SeriesBarChart({
             {!stacked && (
               <LabelList
                 dataKey={series.key}
-                position="top"
+                position={horizontal ? 'right' : 'top'}
                 fill={colors.axis}
                 fontSize={skinnedFontSize(VALUE_LABEL.fontSize)}
                 formatter={(value) => (Number(value) ? formatValue(Number(value)) : '')}

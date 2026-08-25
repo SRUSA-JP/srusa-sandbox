@@ -20,7 +20,7 @@ import type { VizTheme } from '../../theme/palette';
 import { Picker } from '../atoms';
 import { KpiTile, SectionHeader } from '../molecules';
 import { SECTION } from '../classes';
-import { RankBarChart } from './RankBarChart';
+import { SeriesBarChart } from './SeriesBarChart';
 import { TrendLineChart } from './TrendLineChart';
 
 export interface EconomyIndexPanelProps {
@@ -44,10 +44,20 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
   const [source, setSource] = useState<EconomySourceMetric>(ECONOMY_DEFAULT_SOURCE);
   const summary = useMemo(() => economySummary(doc, { players, source }), [doc, players, source]);
   const ranking = useMemo(
-    () =>
-      playerEconomyRows(doc, { players, source })
-        .slice(0, RANKING_LIMIT)
-        .map((row) => ({ key: row.name, label: row.name, value: row.total })),
+    () => {
+      const rows = playerEconomyRows(doc, { players, source }).slice(0, RANKING_LIMIT);
+      return {
+        series: [
+          { key: 'diamond', label: STATS_TEXT.card.economy.diamond },
+          { key: 'emerald', label: STATS_TEXT.card.economy.emerald },
+        ],
+        rows: rows.map((row) => ({
+          name: row.name,
+          diamond: row.diamond,
+          emerald: row.emerald,
+        })),
+      };
+    },
     [doc, players, source],
   );
   const trend = useMemo(
@@ -97,11 +107,13 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
       <div className="grid gap-md lg:grid-cols-2">
         <div className="min-w-0">
           <h3 className="mb-xs text-sm font-bold text-heading">{STATS_TEXT.card.economy.ranking}</h3>
-          <RankBarChart
+          <SeriesBarChart
             data={ranking}
             theme={theme}
-            unit="pt"
-            height={Math.max(RANKING_MIN_HEIGHT, ranking.length * RANKING_ROW_HEIGHT)}
+            unit="個"
+            stacked
+            horizontal
+            height={Math.max(RANKING_MIN_HEIGHT, ranking.rows.length * RANKING_ROW_HEIGHT)}
           />
         </div>
         <div className="min-w-0">
