@@ -24,7 +24,7 @@
     {
       "id": "end-wide-20260825",
       "dimension": "end",
-      "label": "End（2026-08-25 広域）",
+      "label": "End（2026-08-25）",
       "updated_on": "2026-08-25",
       "image": "world-map/end-wide-20260825.png",
       "bounds": {
@@ -98,7 +98,7 @@
     {
       "id": "overworld-wide-20260825",
       "dimension": "overworld",
-      "label": "Overworld（2026-08-25 広域）",
+      "label": "Overworld（2026-08-25）",
       "updated_on": "2026-08-25",
       "image": "world-map/overworld-wide-20260825.png",
       "bounds": {

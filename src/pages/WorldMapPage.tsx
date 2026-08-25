@@ -24,8 +24,26 @@ function mapLabel(map: WorldMap): string {
   return map.label ?? WORLD_LABELS[mapDimension(map)] ?? WORLD_LABELS[map.id] ?? map.id;
 }
 
+function mapArea(map: WorldMap): number {
+  const size = coverage(map);
+  return size.width * size.height;
+}
+
+function mapFreshness(map: WorldMap): string {
+  return map.updated_on ?? '';
+}
+
+function sortMapsForDisplay(maps: WorldMap[]): WorldMap[] {
+  return [...maps].sort(
+    (a, b) =>
+      mapFreshness(b).localeCompare(mapFreshness(a)) ||
+      mapArea(b) - mapArea(a) ||
+      mapLabel(a).localeCompare(mapLabel(b), 'ja'),
+  );
+}
+
 function logRows(maps: WorldMap[]) {
-  return maps.map((map) => {
+  return sortMapsForDisplay(maps).map((map) => {
     const size = coverage(map);
     return {
       map,
@@ -88,7 +106,10 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
     dimensions[0] ? `dimension:${dimensions[0]}` : 'log',
   );
   const selectedDimension = selectedView.startsWith('dimension:') ? selectedView.slice('dimension:'.length) : null;
-  const dimensionMaps = selectedDimension ? maps.filter((entry) => mapDimension(entry) === selectedDimension) : [];
+  const dimensionMaps = useMemo(
+    () => (selectedDimension ? sortMapsForDisplay(maps.filter((entry) => mapDimension(entry) === selectedDimension)) : []),
+    [maps, selectedDimension],
+  );
   const [selectedMapIds, setSelectedMapIds] = useState<Record<string, string>>({});
   const selectedMapId = selectedDimension ? selectedMapIds[selectedDimension] : undefined;
   const map = dimensionMaps.find((entry) => entry.id === selectedMapId) ?? dimensionMaps[0] ?? null;

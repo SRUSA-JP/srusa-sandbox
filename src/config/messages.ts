@@ -323,7 +323,7 @@ export const WORLD_MAP_TEXT = {
 
   picker: {
     view: '表示',
-    map: '版',
+    map: '日付',
     log: 'ログ',
   },
 
