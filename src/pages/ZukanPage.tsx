@@ -85,6 +85,7 @@ export function ZukanPage({ theme }: ZukanPageProps) {
     { value: 'relationship', label: ZUKAN_TEXT.sort.relationship },
     { value: 'playtime', label: ZUKAN_TEXT.sort.playtime },
     { value: 'streak', label: ZUKAN_TEXT.sort.streak },
+    { value: 'related', label: ZUKAN_TEXT.sort.related },
   ];
 
   return (

@@ -523,6 +523,7 @@ export const ZUKAN_TEXT = {
     relationship: '相関図のみを先',
     playtime: 'プレイ時間が長い順',
     streak: '連続ログインが長い順',
+    related: '連携してる人が多い順',
   },
   /** 見出しの下に出す人数。 */
   count: (shown: number, total: number) => `${total} 人中 ${shown} 人`,

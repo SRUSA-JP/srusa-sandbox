@@ -12,7 +12,7 @@ import type { PlayStreak } from './playStreak';
 export type DirectoryKind = 'all' | 'minecraft' | 'relationship';
 
 /** 図鑑の並び替え。 */
-export type DirectorySort = 'name' | 'minecraft' | 'relationship' | 'playtime' | 'streak';
+export type DirectorySort = 'name' | 'minecraft' | 'relationship' | 'playtime' | 'streak' | 'related';
 
 /**
  * 所属で絞らないときの値。
@@ -69,6 +69,11 @@ function byName(a: PlayerProfile, b: PlayerProfile): number {
   return a.name.localeCompare(b.name, 'ja');
 }
 
+/** 相関図で直接つながっている人数。 */
+export function relatedPeopleCount(profile: PlayerProfile): number {
+  return new Set(profile.relatedPeople.map((person) => person.id)).size;
+}
+
 /** 図鑑の並び替え。入力の配列は変更しない。 */
 export function sortProfiles(
   profiles: PlayerProfile[],
@@ -94,6 +99,9 @@ export function sortProfiles(
         (bStreak?.totalDays ?? 0) - (aStreak?.totalDays ?? 0) ||
         byName(a, b)
       );
+    }
+    if (sort === 'related') {
+      return relatedPeopleCount(b) - relatedPeopleCount(a) || byName(a, b);
     }
     return byName(a, b);
   });
