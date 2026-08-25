@@ -7,6 +7,8 @@
     "playerDailySummaryCsv": "data/player-daily-summary-20260824.csv",
     "playerDb": "data/player-db-20260823.json",
     "playerFeaturedUsedItems": "data/player-featured-used-items-20260824.json",
+    "playLogSource": "data/mc-log-daily-summary-20260824.json",
+    "playLog": "data/play-days-20260824.json",
     "playerSkinsManifest": "data/player-skins/manifest.json",
     "worldMapMetadata": "data/world-map.json",
     "worldMapImageDir": "world-map",
