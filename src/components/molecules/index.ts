@@ -1,3 +1,4 @@
+export * from './ClipCard';
 export * from './ChartTooltip';
 export * from './GroupRegion';
 export * from './KpiTile';

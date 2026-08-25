@@ -1,5 +1,6 @@
 export * from './ChartCard';
 export * from './ClipFrame';
+export * from './ClipGallery';
 export * from './DataTable';
 export * from './DiscoveryBoard';
 export * from './EconomyIndexPanel';
