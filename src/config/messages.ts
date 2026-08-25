@@ -265,7 +265,7 @@ export const STATS_TEXT = {
     economy: {
       title: 'SRUSA鉱物指数',
       note:
-        'ダイヤとエメラルドを資産バスケットとして見ます。Minecraft の stats は現在在庫を持たないため、拾得・採掘の累計から作る近似指標です。',
+        'ダイヤとエメラルドを資産バスケットとして見ます。所有ベースでは装備・ツール・エンダーチェスト・所有者別バックパック内の在庫も換算します。',
       total: '総資産',
       rate: 'DI/EM レート',
       index: '指数',
@@ -283,7 +283,7 @@ export const STATS_TEXT = {
       noRate: '算出なし',
       base: (base: number) => `最初のスナップショットを ${formatInt(base)} として指数化`,
       rateValue: (rate: string) => `1 DI = ${rate} EM`,
-      rateNote: '供給量から見た簡易レート',
+      rateNote: '選択中の算出元から見た簡易レート',
     },
   },
 

@@ -17,6 +17,7 @@ import {
 } from '../../lib/selectors';
 import { formatDecimal, formatInt } from '../../lib/format';
 import type { StatsDocument } from '../../data/schema';
+import { playerInventoryAssetRows, playerInventoryAssetsGeneratedOn } from '../../data/playerInventoryAssets';
 import type { VizTheme } from '../../theme/palette';
 import { Picker } from '../atoms';
 import { KpiTile, SectionHeader } from '../molecules';
@@ -46,6 +47,8 @@ function sourceNote(source: EconomySourceMetric): string {
 export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyIndexPanelProps) {
   const [source, setSource] = useState<EconomySourceMetric>(ECONOMY_DEFAULT_SOURCE);
   const [rankingMode, setRankingMode] = useState<RankingMode>('total');
+  const inventoryGeneratedOn = playerInventoryAssetsGeneratedOn();
+  const inventoryRows = useMemo(() => playerInventoryAssetRows(players), [players]);
   const assetColors = useMemo(() => {
     const colors = figureColors(theme);
     return {
@@ -53,10 +56,13 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
       emerald: colors.economyAsset('emerald'),
     };
   }, [theme]);
-  const summary = useMemo(() => economySummary(doc, { players, source }), [doc, players, source]);
+  const summary = useMemo(
+    () => economySummary(doc, { players, source, inventoryRows }),
+    [doc, players, source, inventoryRows],
+  );
   const economyRows = useMemo(
-    () => playerEconomyRows(doc, { players, source }),
-    [doc, players, source],
+    () => playerEconomyRows(doc, { players, source, inventoryRows }),
+    [doc, players, source, inventoryRows],
   );
   const ranking = useMemo(
     () => {
@@ -84,8 +90,14 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
     [economyRows, rankingMode],
   );
   const trend = useMemo(
-    () => economyIndexTimeline(snapshots, { players, source }),
-    [snapshots, players, source],
+    () =>
+      economyIndexTimeline(snapshots, {
+        players,
+        source,
+        inventoryRows,
+        inventoryLabel: inventoryGeneratedOn.slice(0, 10),
+      }),
+    [snapshots, players, source, inventoryRows, inventoryGeneratedOn],
   );
   const latestIndex = Number(trend.rows[trend.rows.length - 1]?.index ?? 0);
   const diamond = summary.assets.find((asset) => asset.id === 'diamond')?.value ?? 0;
@@ -95,7 +107,9 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
     <section className={SECTION}>
       <SectionHeader
         title={ECONOMY_INDEX_NAME}
-        note={`${STATS_TEXT.card.economy.note} ${sourceNote(source)}`}
+        note={`${STATS_TEXT.card.economy.note} ${sourceNote(source)} 更新 ${
+          source === 'inventory' ? inventoryGeneratedOn.slice(0, 10) : doc.generated_on
+        }`}
         actions={
           <Picker
             label={STATS_TEXT.card.economy.source}

@@ -1,0 +1,76 @@
+{
+  "indexName": "SRUSA鉱物指数",
+  "indexBase": 100,
+  "defaultSource": "inventory",
+  "sourceOptions": [
+    {
+      "value": "inventory",
+      "label": "所有ベース",
+      "note": "通常インベントリ、装備、エンダーチェスト、所有者が分かるバックパック内の在庫を現在資産として数えます。"
+    },
+    {
+      "value": "picked_up",
+      "label": "拾得ベース",
+      "note": "拾ったアイテム数から見る流通量寄りの指標です。チェスト内の実在庫ではありません。"
+    },
+    {
+      "value": "mined",
+      "label": "採掘ベース",
+      "note": "鉱石ブロックの採掘数から見る産出量寄りの指標です。村人取引などで得たエメラルドは入りにくくなります。"
+    }
+  ],
+  "assets": [
+    {
+      "id": "diamond",
+      "label": "ダイヤ",
+      "shortLabel": "DI",
+      "unit": "DI",
+      "statsEntries": [
+        { "id": "diamond", "multiplier": 1 },
+        { "id": "diamond_block", "multiplier": 9 },
+        { "id": "diamond_ore", "multiplier": 1 },
+        { "id": "deepslate_diamond_ore", "multiplier": 1 }
+      ],
+      "inventoryEntries": [
+        { "id": "diamond", "multiplier": 1, "label": "ダイヤ" },
+        { "id": "diamond_block", "multiplier": 9, "label": "ダイヤブロック" },
+        { "id": "diamond_helmet", "multiplier": 5, "label": "ダイヤのヘルメット" },
+        { "id": "diamond_chestplate", "multiplier": 8, "label": "ダイヤのチェストプレート" },
+        { "id": "diamond_leggings", "multiplier": 7, "label": "ダイヤのレギンス" },
+        { "id": "diamond_boots", "multiplier": 4, "label": "ダイヤのブーツ" },
+        { "id": "diamond_sword", "multiplier": 2, "label": "ダイヤの剣" },
+        { "id": "diamond_pickaxe", "multiplier": 3, "label": "ダイヤのツルハシ" },
+        { "id": "diamond_axe", "multiplier": 3, "label": "ダイヤの斧" },
+        { "id": "diamond_shovel", "multiplier": 1, "label": "ダイヤのシャベル" },
+        { "id": "diamond_hoe", "multiplier": 2, "label": "ダイヤのクワ" },
+        { "id": "netherite_helmet", "multiplier": 5, "label": "ネザライトのヘルメット" },
+        { "id": "netherite_chestplate", "multiplier": 8, "label": "ネザライトのチェストプレート" },
+        { "id": "netherite_leggings", "multiplier": 7, "label": "ネザライトのレギンス" },
+        { "id": "netherite_boots", "multiplier": 4, "label": "ネザライトのブーツ" },
+        { "id": "netherite_sword", "multiplier": 2, "label": "ネザライトの剣" },
+        { "id": "netherite_pickaxe", "multiplier": 3, "label": "ネザライトのツルハシ" },
+        { "id": "netherite_axe", "multiplier": 3, "label": "ネザライトの斧" },
+        { "id": "netherite_shovel", "multiplier": 1, "label": "ネザライトのシャベル" },
+        { "id": "netherite_hoe", "multiplier": 2, "label": "ネザライトのクワ" },
+        { "id": "diamond_knife", "multiplier": 1, "label": "ダイヤのナイフ" },
+        { "id": "diamond_minotaur_axe", "multiplier": 3, "label": "ミノタウロスの斧" }
+      ]
+    },
+    {
+      "id": "emerald",
+      "label": "エメラルド",
+      "shortLabel": "EM",
+      "unit": "EM",
+      "statsEntries": [
+        { "id": "emerald", "multiplier": 1 },
+        { "id": "emerald_block", "multiplier": 9 },
+        { "id": "emerald_ore", "multiplier": 1 },
+        { "id": "deepslate_emerald_ore", "multiplier": 1 }
+      ],
+      "inventoryEntries": [
+        { "id": "emerald", "multiplier": 1, "label": "エメラルド" },
+        { "id": "emerald_block", "multiplier": 9, "label": "エメラルドブロック" }
+      ]
+    }
+  ]
+}

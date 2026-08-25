@@ -12,6 +12,7 @@ import {
   ECONOMY_DEFAULT_SOURCE,
   ECONOMY_INDEX_BASE,
   type EconomyAsset,
+  type EconomyStatsSourceMetric,
   type EconomySourceMetric,
 } from '../config/economy';
 import {
@@ -290,9 +291,13 @@ export interface EconomySummary {
   source: EconomySourceMetric;
 }
 
-function economyAssetValue(player: NamedPlayer, asset: EconomyAsset, source: EconomySourceMetric): number {
+function isStatsEconomySource(source: EconomySourceMetric): source is EconomyStatsSourceMetric {
+  return source === 'picked_up' || source === 'mined';
+}
+
+function economyAssetValue(player: NamedPlayer, asset: EconomyAsset, source: EconomyStatsSourceMetric): number {
   const counts = player.production[source];
-  return asset.entries.reduce((total, entry) => {
+  return asset.statsEntries.reduce((total, entry) => {
     const value = Object.entries(counts).reduce(
       (acc, [key, count]) => (stripNamespace(key) === entry.id ? acc + count : acc),
       0,
@@ -304,13 +309,20 @@ function economyAssetValue(player: NamedPlayer, asset: EconomyAsset, source: Eco
 /** プレイヤー別の鉱物資産量。ダイヤ・エメラルドの合計を同じ 1 単位として足す。 */
 export function playerEconomyRows(
   doc: StatsDocument,
-  options: { players?: string[]; source?: EconomySourceMetric } = {},
+  options: { players?: string[]; source?: EconomySourceMetric; inventoryRows?: PlayerEconomyRow[] } = {},
 ): PlayerEconomyRow[] {
   const source = options.source ?? ECONOMY_DEFAULT_SOURCE;
+  if (source === 'inventory') {
+    const playerSet = options.players && options.players.length > 0 ? new Set(options.players) : null;
+    return (options.inventoryRows ?? [])
+      .filter((row) => !playerSet || playerSet.has(row.name))
+      .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name, 'ja'));
+  }
+  const statsSource = isStatsEconomySource(source) ? source : 'picked_up';
   return includedPlayers(doc, options.players)
     .map((player) => {
-      const diamond = economyAssetValue(player, ECONOMY_ASSETS[0], source);
-      const emerald = economyAssetValue(player, ECONOMY_ASSETS[1], source);
+      const diamond = economyAssetValue(player, ECONOMY_ASSETS[0], statsSource);
+      const emerald = economyAssetValue(player, ECONOMY_ASSETS[1], statsSource);
       return {
         name: player.name,
         diamond,
@@ -324,16 +336,35 @@ export function playerEconomyRows(
 /** 対象者全体の鉱物資産サマリ。rate は「1 DI が何 EM 相当か」を供給量から見る簡易レート。 */
 export function economySummary(
   doc: StatsDocument,
-  options: { players?: string[]; source?: EconomySourceMetric } = {},
+  options: { players?: string[]; source?: EconomySourceMetric; inventoryRows?: PlayerEconomyRow[] } = {},
 ): EconomySummary {
   const source = options.source ?? ECONOMY_DEFAULT_SOURCE;
+  if (source === 'inventory') {
+    const rows = playerEconomyRows(doc, options);
+    const assets = ECONOMY_ASSETS.map((asset) => ({
+      id: asset.id,
+      label: asset.label,
+      shortLabel: asset.shortLabel,
+      unit: asset.unit,
+      value: rows.reduce((total, row) => total + row[asset.id], 0),
+    }));
+    const diamond = assets.find((asset) => asset.id === 'diamond')?.value ?? 0;
+    const emerald = assets.find((asset) => asset.id === 'emerald')?.value ?? 0;
+    return {
+      assets,
+      total: assets.reduce((total, asset) => total + asset.value, 0),
+      rate: diamond > 0 ? round(emerald / diamond, 3) : null,
+      source,
+    };
+  }
+  const statsSource = isStatsEconomySource(source) ? source : 'picked_up';
   const players = includedPlayers(doc, options.players);
   const assets = ECONOMY_ASSETS.map((asset) => ({
     id: asset.id,
     label: asset.label,
     shortLabel: asset.shortLabel,
     unit: asset.unit,
-    value: players.reduce((total, player) => total + economyAssetValue(player, asset, source), 0),
+    value: players.reduce((total, player) => total + economyAssetValue(player, asset, statsSource), 0),
   }));
   const diamond = assets.find((asset) => asset.id === 'diamond')?.value ?? 0;
   const emerald = assets.find((asset) => asset.id === 'emerald')?.value ?? 0;
@@ -348,9 +379,29 @@ export function economySummary(
 /** 最初のスナップショットを 100 とした、日経平均のような指数推移。 */
 export function economyIndexTimeline(
   snapshots: Snapshot[],
-  options: { players?: string[]; source?: EconomySourceMetric } = {},
+  options: {
+    players?: string[];
+    source?: EconomySourceMetric;
+    inventoryRows?: PlayerEconomyRow[];
+    inventoryLabel?: string;
+  } = {},
 ): StackedSeries {
   const source = options.source ?? ECONOMY_DEFAULT_SOURCE;
+  if (source === 'inventory') {
+    const playerSet = options.players && options.players.length > 0 ? new Set(options.players) : null;
+    const total = (options.inventoryRows ?? [])
+      .filter((row) => !playerSet || playerSet.has(row.name))
+      .reduce((sum, row) => sum + row.total, 0);
+    return {
+      series: [{ key: 'index', label: '指数' }],
+      rows: [
+        {
+          [TIMELINE_CATEGORY_KEY]: options.inventoryLabel ?? '現在所有',
+          index: total > 0 ? ECONOMY_INDEX_BASE : 0,
+        },
+      ],
+    };
+  }
   const summaries = snapshots.map((snapshot) => ({
     label: snapshot.label,
     summary: economySummary(snapshot.doc, { players: options.players, source }),
