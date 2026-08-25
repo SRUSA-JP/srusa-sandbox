@@ -111,7 +111,7 @@ src/
   App.tsx                 # 画面の切り替えとスキン・配色の結びつけ
   routes.ts               # 画面の一覧・URL・タブ名・使うスキン
   hooks/                  # ハッシュによる画面切り替え、画面幅の問い合わせ、掴んで動かす・拡大縮小
-  pages/                  # 画面そのもの（StatsPage / WorldMapPage / MapPage）
+  pages/                  # 画面そのもの（StatsPage / WorldMapPage / MapPage / ZukanPage / PlayerPage / EventRankingsPage）
   components/             # アトミックデザイン（atoms → molecules → organisms → templates）
     classes.ts            # 部品をまたいで共有する Tailwind クラスの組み合わせ
   config/                 # 指標・文言・グラフ設定・色の割り当て・スキン

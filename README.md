@@ -18,6 +18,9 @@ srusa-portal では MkDocs のページに iframe で埋め込んでいました
 | Minecraft 統計 | `#/minecraft` | プレイヤー比較・内訳・系列比較・日付ごとの推移・2指標の関係の 5 グラフ。絞り込み、表への切り替え、CSV / JSON 書き出し |
 | ワールドマップ | `#/minecraft/world-map` | BlueMap の 2D 出力を掴んで動かせる地図。3D はスクリーンショットで掲載 |
 | 相関図 | `#/relationships` | メンバーのつながりと所属を 1 枚にまとめた SVG の図。掴んで動かす・拡大縮小・人物の移動、中心人物・グループの強調・関係線の切り替え |
+| SRUSA 図鑑 | `#/zukan` | 相関図と Minecraft に出てくる人の名簿。所属・種類で絞り込み、ひとりずつの紹介ページへ渡す |
+| プレイヤー紹介 | `#/players/<名前>` | ひとりぶんのまとめ。統計・連続プレイ日数・日別ログ・使用アイテム・ランキング・相関図の所属。タブには並ばず、図鑑の下に入る |
+| イベント | `#/events` | Minecraft の外でやったイベントの成績 |
 
 配色は最初は端末の設定に従い、画面右上のボタンで明るい ⇄ 暗いを切り替えられます（選択はブラウザに保存されます）。
 Minecraft のページはドット絵風のスキン（書体・直角・太い線・緑のテーマ色）で表示されます。
@@ -163,7 +166,7 @@ npm run sync:data -- --dry-run    # 何をするかだけ出す
 | --- | --- | --- |
 | `stats` | Minecraft 統計 JSON | `../aws_minecraft/data/` |
 | `daily` | 日別データ。取り込み後に派生 JSON を作り直す | `../aws_minecraft/data/` |
-| `logs` | サーバーログの日別集計 | `../aws_minecraft/data/` |
+| `logs` | サーバーログの日別集計。取り込み後に「日ごとの在席」だけを抜き出した JSON を作り直す | `../aws_minecraft/data/` |
 | `skins` | スキンとアイコン（`public/player-skins/`） | `../aws_minecraft/data/` |
 | `map` / `2d` | ワールドマップ（2D）の PNG と範囲 JSON | `../srusa-portal/bluemap/web/` |
 | 地図の名前 | その 1 枚だけ（`overworld` / `nether` / `end` / `twilightforest`） | `../srusa-portal/bluemap/web/` |
