@@ -1,5 +1,3 @@
-import valorantClipsRaw from '../data/valorantClips.json';
-
 export interface ClipEntry {
   id: string;
   title: string;
@@ -36,37 +34,23 @@ export interface ClipFilterGroup {
 
 export type ClipSortKey = 'score' | 'title' | 'views';
 
-type ValorantClipRaw = {
-  id: string;
-  url: string;
-  title: string;
-  map: string;
-  agent: string;
-  views: number;
-  tags?: string[];
-  score?: Partial<ClipScore>;
-};
-
 const SCORE_DEFAULTS: ClipScore = { smooth: 2, clutch: 0, tap: 3, '6kills': 0, onemag: 0 };
 
 const TAG_LABELS: Record<string, string> = {
-  op: 'OP',
-  guardian: 'Guardian',
-  ghost: 'Ghost',
-  bundit: 'Bundit',
-  vandal: 'Vandal',
-  bucky: 'Bucky',
-  spectre: 'Spectre',
-  classic: 'Classic',
-  clutch: 'Clutch',
-  smooth: 'Smooth',
-  onemagazine: '1Mag',
-  '6kills': '6kills',
-  ult: 'Ult',
+  build: '建築',
+  explore: '探索',
+  battle: '戦闘',
+  event: 'イベント',
+  daily: '日常',
+  funny: 'おもしろ',
+  highlight: 'ハイライト',
+  accident: '事故',
+  teamwork: '連携',
+  tutorial: '解説',
 };
 
-const PLAY_TAGS = ['clutch', 'ult', 'onemagazine', 'smooth', '6kills'] as const;
-const WEAPON_TAGS = ['vandal', 'ghost', 'guardian', 'bundit', 'op', 'bucky', 'spectre', 'classic'] as const;
+const SCENE_TAGS = ['build', 'explore', 'battle', 'event', 'daily'] as const;
+const TOPIC_TAGS = ['funny', 'highlight', 'accident', 'teamwork', 'tutorial'] as const;
 
 /**
  * Clips ページに最初から並べる動画。
@@ -74,23 +58,73 @@ const WEAPON_TAGS = ['vandal', 'ghost', 'guardian', 'bundit', 'op', 'bucky', 'sp
  * URL を追加・差し替えたいときはここだけを編集する。YouTube / Twitch は
  * 通常の共有 URL でも iframe 用 URL に変換される。
  */
-export const CLIP_ENTRIES: ClipEntry[] = (valorantClipsRaw as ValorantClipRaw[]).map((clip) => ({
-  id: clip.id,
-  title: clip.title,
-  sourceUrl: clip.url,
-  category: 'valorant',
-  map: clip.map,
-  agent: clip.agent,
-  views: clip.views,
-  tags: clip.tags ?? [],
-  score: clip.score,
-  thumbnailUrl: `https://img.youtube.com/vi/${clip.id}/hqdefault.jpg`,
-}));
+export const CLIP_ENTRIES: ClipEntry[] = [
+  {
+    id: 'sample-build',
+    title: 'ダミー: 建築クリップ',
+    sourceUrl: '',
+    category: 'sample',
+    map: 'overworld',
+    agent: 'nodoamen',
+    views: 0,
+    tags: ['build', 'tutorial'],
+    score: { smooth: 3, clutch: 0, tap: 2, '6kills': 0, onemag: 0 },
+    note: '本番動画を入れる前の表示確認用データです。',
+  },
+  {
+    id: 'sample-explore',
+    title: 'ダミー: 探索クリップ',
+    sourceUrl: '',
+    category: 'sample',
+    map: 'nether',
+    agent: 'natch',
+    views: 0,
+    tags: ['explore', 'highlight'],
+    score: { smooth: 4, clutch: 0, tap: 3, '6kills': 0, onemag: 0 },
+    note: '本番動画を入れる前の表示確認用データです。',
+  },
+  {
+    id: 'sample-battle',
+    title: 'ダミー: 戦闘クリップ',
+    sourceUrl: '',
+    category: 'sample',
+    map: 'end',
+    agent: 'mitiglia',
+    views: 0,
+    tags: ['battle', 'teamwork'],
+    score: { smooth: 2, clutch: 2, tap: 4, '6kills': 0, onemag: 0 },
+    note: '本番動画を入れる前の表示確認用データです。',
+  },
+  {
+    id: 'sample-event',
+    title: 'ダミー: イベントクリップ',
+    sourceUrl: '',
+    category: 'sample',
+    map: 'event-stage',
+    agent: 'octbee',
+    views: 0,
+    tags: ['event', 'funny'],
+    score: { smooth: 3, clutch: 1, tap: 3, '6kills': 0, onemag: 0 },
+    note: '本番動画を入れる前の表示確認用データです。',
+  },
+  {
+    id: 'sample-daily',
+    title: 'ダミー: 日常クリップ',
+    sourceUrl: '',
+    category: 'sample',
+    map: 'base',
+    agent: 'sohei',
+    views: 0,
+    tags: ['daily', 'accident'],
+    score: { smooth: 2, clutch: 0, tap: 2, '6kills': 0, onemag: 1 },
+    note: '本番動画を入れる前の表示確認用データです。',
+  },
+];
 
 export const CLIP_TEXT = {
   title: 'Clips',
   note: '動画クリップをタグで探して iframe で確認するページ',
-  lead: 'Valorant のクリップをカード状に並べ、MAP・AGENT・タグで絞り込めるギャラリーです。',
+  lead: 'これから動画を入れる前の仮ギャラリーです。カード、タグ、絞り込み、iframe の表示だけ先に確認できます。',
   picker: 'クリップ',
   customUrl: 'URL',
   customTitle: '入力したURL',
@@ -101,17 +135,17 @@ export const CLIP_TEXT = {
   sort: '並び替え',
   filters: {
     all: 'ALL',
-    map: 'MAP',
-    agent: 'AGENT',
-    play: 'PLAY',
-    weapon: 'WEAPON',
+    map: 'AREA',
+    agent: 'PLAYER',
+    play: 'SCENE',
+    weapon: 'TAG',
   },
   sorts: {
     score: 'スコア順',
     title: 'タイトル順',
     views: '再生数順',
   },
-  empty: 'まだ登録済みのクリップはありません。URL を入力すると、この画面で表示できます。',
+  empty: 'このクリップにはまだ動画URLがありません。URL を入力すると、この画面で表示できます。',
   noMatch: '条件に合うクリップがありません。',
   invalidUrl: 'https:// または http:// で始まる URL を入力してください。',
   iframeTitle: (title: string) => `${title} の埋め込みプレイヤー`,
@@ -183,8 +217,8 @@ export function clipFilterGroups(entries = CLIP_ENTRIES): ClipFilterGroup[] {
       label: CLIP_TEXT.filters.agent,
       options: optionsFromCounts(countBy(entries.map((clip) => clip.agent).filter(Boolean) as string[])),
     },
-    { id: 'play', label: CLIP_TEXT.filters.play, options: keywordOptions(entries, PLAY_TAGS) },
-    { id: 'weapon', label: CLIP_TEXT.filters.weapon, options: keywordOptions(entries, WEAPON_TAGS) },
+    { id: 'play', label: CLIP_TEXT.filters.play, options: keywordOptions(entries, SCENE_TAGS) },
+    { id: 'weapon', label: CLIP_TEXT.filters.weapon, options: keywordOptions(entries, TOPIC_TAGS) },
   ];
 }
 

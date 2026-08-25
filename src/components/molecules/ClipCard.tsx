@@ -17,6 +17,7 @@ export interface ClipCardProps {
 /** Clips 一覧のカード。情報密度は高く、再生操作はカード全体にまとめる。 */
 export function ClipCard({ clip, active, onSelect, onFilter }: ClipCardProps) {
   const tagClass = `${TAG} cursor-pointer transition-colors hover:bg-hover`;
+  const playable = Boolean(clip.sourceUrl.trim());
 
   return (
     <article
@@ -34,10 +35,12 @@ export function ClipCard({ clip, active, onSelect, onFilter }: ClipCardProps) {
               className="aspect-video w-full object-cover"
             />
           ) : (
-            <div className="aspect-video w-full bg-sunken" />
+            <div className="grid aspect-video w-full place-items-center bg-sunken px-md text-center text-sm text-muted">
+              {clip.title}
+            </div>
           )}
           <span className="absolute inset-0 grid place-items-center bg-[rgb(0_0_0/0.20)] text-lg text-white">
-            Play
+            {playable ? 'Play' : '準備中'}
           </span>
         </div>
       </button>
