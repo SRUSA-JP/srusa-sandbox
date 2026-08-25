@@ -1,5 +1,6 @@
 export * from './ClipCard';
 export * from './ChartTooltip';
+export * from './DateStepper';
 export * from './GroupRegion';
 export * from './KpiTile';
 export * from './PersonNode';
