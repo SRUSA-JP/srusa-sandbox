@@ -158,6 +158,7 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
               theme={theme}
               color={assetColors[rankingMode]}
               unit="個"
+              showUnitOnAllLabels
               height={Math.max(RANKING_MIN_HEIGHT, singleRanking.length * RANKING_ROW_HEIGHT)}
             />
           )}
