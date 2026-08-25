@@ -55,7 +55,7 @@ npm run dev
 | `npm run dev` | 開発サーバーを起動する（`--host` 付き。同じ Wi-Fi のスマホからも開ける） |
 | `npm run build` | 型検査 → ESLint → コントラスト検査を通してから `dist/` に出力する |
 | `npm run preview` | ビルド成果物をローカルで確認する |
-| `npm run deploy:preview` | `dist/` を Netlify のプレビューデプロイに送る（本番公開しない） |
+| `npm run deploy:preview` | `dist/` を Netlify の固定プレビューに送る（本番公開しない） |
 | `npm run typecheck` | 型検査だけを実行する |
 | `npm run lint` | ESLint を実行する |
 | `npm run check:contrast` | 配色が WCAG のコントラスト比を満たすか検査する |
@@ -211,6 +211,7 @@ AWS アカウント、リージョン、サーバー上のパスを生で持っ�
 （設定は [netlify.toml](netlify.toml)）。ビルドには型検査・ESLint・配色のコントラスト検査が
 含まれるので、これらが落ちると公開もされません。
 本番に出す前に Netlify 上で確認したいときは `npm run deploy:preview` を使います。
+確認先は固定で <https://preview--srusa-sandbox.netlify.app/> です。
 初回やセッション切れのときは Netlify CLI のログイン確認が入ります。
 
 ページのタイトル・説明・アイコン・マニフェストは `index.html` に直接書かず、

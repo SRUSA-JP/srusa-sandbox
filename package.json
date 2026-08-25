@@ -9,7 +9,7 @@
     "dev": "vite --host",
     "build": "npm run typecheck && npm run lint && npm run check:contrast && npm run check:world-map && vite build",
     "preview": "vite preview",
-    "deploy:preview": "npm run build && npx netlify-cli deploy --dir=dist",
+    "deploy:preview": "npm run build && npx netlify-cli deploy --dir=dist --alias preview",
     "deplpy:preview": "npm run deploy:preview",
     "typecheck": "tsc --noEmit",
     "check:contrast": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-contrast.ts --outfile=node_modules/.cache/check-contrast.mjs && node node_modules/.cache/check-contrast.mjs",
