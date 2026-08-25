@@ -45,6 +45,9 @@ export const FIELD = 'inline-flex items-center gap-xs text-md text-muted';
 /** 入力欄そのもの。ボタンやプルダウンと同じ高さに揃える。 */
 export const FIELD_INPUT = `${CONTROL_BOX} w-[var(--sr-layout-number-input-width)] px-md`;
 
+/** 横幅いっぱいで使う入力欄。ログイン画面など、単独フォームで使う。 */
+export const FIELD_INPUT_FULL = `${CONTROL_BOX} w-full px-md`;
+
 /** 節（グラフ 1 枚 = 記事の 1 節）。枠で囲わず、余白だけで区切る。 */
 export const SECTION = 'mb-section';
 

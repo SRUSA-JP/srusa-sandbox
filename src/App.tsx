@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { AppShell } from './components';
+import { AppShell, AuthGate } from './components';
 import { useHashRoute } from './hooks/useHashRoute';
 import { ClipsPage, EventRankingsPage, MapPage, PlayerPage, StatsPage, WorldMapPage, ZukanPage } from './pages';
 import { skinForRoute, type Route, type RouteId } from './routes';
@@ -38,8 +38,10 @@ export function App() {
   const Page = PAGES[route.id];
 
   return (
-    <AppShell route={route} onNavigate={navigate} mode={mode} onToggleTheme={toggle}>
-      <Page theme={theme} route={route} />
-    </AppShell>
+    <AuthGate>
+      <AppShell route={route} onNavigate={navigate} mode={mode} onToggleTheme={toggle}>
+        <Page theme={theme} route={route} />
+      </AppShell>
+    </AuthGate>
   );
 }

@@ -37,6 +37,15 @@ export const APP_TEXT = {
     toDark: '暗い配色に切り替える',
     toLight: '明るい配色に切り替える',
   },
+  /** フロントエンドだけでかける簡易ロック。 */
+  auth: {
+    title: 'ログイン',
+    passwordLabel: 'パスワード',
+    showPassword: '表示',
+    hidePassword: '隠す',
+    submit: 'ログイン',
+    error: 'パスワードが違います。',
+  },
 } as const;
 
 /**

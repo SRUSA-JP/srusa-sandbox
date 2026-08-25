@@ -135,7 +135,27 @@
   border-top-width: var(--sr-border-hairline);
 }
 
+@utility min-h-app {
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+@utility p-app-safe {
+  box-sizing: border-box;
+  padding: var(--sr-space-lg);
+  padding-block-start: max(var(--sr-space-lg), env(safe-area-inset-top));
+  padding-block-end: max(var(--sr-space-lg), env(safe-area-inset-bottom));
+  padding-inline-start: max(var(--sr-space-lg), env(safe-area-inset-left));
+  padding-inline-end: max(var(--sr-space-lg), env(safe-area-inset-right));
+}
+
 @layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
   body {
     background: var(--sr-page-background);
     color: var(--sr-page-text);

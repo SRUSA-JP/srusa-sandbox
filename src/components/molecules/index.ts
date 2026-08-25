@@ -4,6 +4,7 @@ export * from './DateStepper';
 export * from './GroupRegion';
 export * from './KpiTile';
 export * from './PersonNode';
+export * from './PasswordField';
 export * from './PlayerIconPlaceholder';
 export * from './RankingPreviewCard';
 export * from './RelationEdge';
