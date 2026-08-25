@@ -7,10 +7,11 @@
   "scripts": {
     "prepare": "git config core.hooksPath .githooks",
     "dev": "vite --host",
-    "build": "npm run typecheck && npm run lint && npm run check:contrast && vite build",
+    "build": "npm run typecheck && npm run lint && npm run check:contrast && npm run check:world-map && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "check:contrast": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-contrast.ts --outfile=node_modules/.cache/check-contrast.mjs && node node_modules/.cache/check-contrast.mjs",
+    "check:world-map": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-world-map.ts --outfile=node_modules/.cache/check-world-map.mjs && node node_modules/.cache/check-world-map.mjs",
     "lint": "eslint .",
     "update:data": "node scripts/update-data.mjs",
     "sync:data": "node scripts/sync-data.mjs",
