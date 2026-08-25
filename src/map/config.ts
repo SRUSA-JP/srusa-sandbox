@@ -220,6 +220,9 @@ export type EdgeMode = (typeof EDGE_MODES)[number]['value'];
 /** 相関図の配置アルゴリズム。 */
 export const LAYOUT_MODES = [
   { value: 'cluster', label: '所属クラスタ' },
+  { value: 'clusterHybrid', label: '所属ハイブリッド' },
+  { value: 'community', label: '関係コミュニティ' },
+  { value: 'stress', label: '距離ストレス' },
   { value: 'force', label: '力学' },
   { value: 'radial', label: '放射状' },
   { value: 'layered', label: '階層' },

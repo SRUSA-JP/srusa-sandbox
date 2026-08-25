@@ -209,6 +209,10 @@ function relationNeighbors(relations: Relation[]): Map<string, string[]> {
   return new Map([...neighbors.entries()].map(([id, values]) => [id, [...values].sort()]));
 }
 
+function relationKey(a: string, b: string): string {
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
 function primaryAttribute(person: Person): string {
   return person.attributes[0] ?? '';
 }
@@ -358,6 +362,159 @@ function placeForce(data: RelationshipData): PersonPlacement[] {
     const point = positions.get(person.id)!;
     return { person, x: point.x, y: point.y, groupIds: [] };
   });
+}
+
+function clusterFromMembers(key: string, members: Person[]): Cluster {
+  const columns = Math.min(CLUSTER.maxColumns, Math.max(1, Math.ceil(Math.sqrt(members.length))));
+  const rows = Math.ceil(members.length / columns);
+  return {
+    key,
+    groupNames: [],
+    members,
+    columns,
+    width: columns * NODE.gapX,
+    height: rows * NODE.gapY,
+  };
+}
+
+function placeClusterBlocks(clusters: Cluster[], relations: Relation[]): PersonPlacement[] {
+  return placePeople(packRows(orderClusters(clusters, relations)));
+}
+
+/**
+ * 関係線だけからコミュニティを作る。
+ *
+ * ラベル伝播に近い決定的なヒューリスティックで、つながりの多いラベルへ寄せる。
+ * 毎回同じ結果になるよう、処理順と同点の決め方は ID / ラベル順で固定する。
+ */
+function relationCommunities(data: RelationshipData): Cluster[] {
+  const people = sortedPeople(data);
+  const neighbors = relationNeighbors(data.relations);
+  const degree = relationDegree(data.relations);
+  const labels = new Map(people.map((person) => [person.id, person.id]));
+
+  for (let iteration = 0; iteration < 14; iteration += 1) {
+    let changed = false;
+    const queue = [...people].sort(
+      (a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) || a.id.localeCompare(b.id),
+    );
+
+    for (const person of queue) {
+      const counts = new Map<string, number>();
+      for (const neighbor of neighbors.get(person.id) ?? []) {
+        const label = labels.get(neighbor) ?? neighbor;
+        counts.set(label, (counts.get(label) ?? 0) + 1);
+      }
+      if (counts.size === 0) continue;
+
+      const current = labels.get(person.id) ?? person.id;
+      counts.set(current, (counts.get(current) ?? 0) + 0.35);
+      const next = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ?? current;
+      if (next !== current) {
+        labels.set(person.id, next);
+        changed = true;
+      }
+    }
+    if (!changed) break;
+  }
+
+  const byLabel = new Map<string, Person[]>();
+  for (const person of people) {
+    const label = labels.get(person.id) ?? person.id;
+    const list = byLabel.get(label) ?? [];
+    list.push(person);
+    byLabel.set(label, list);
+  }
+
+  return [...byLabel.entries()]
+    .map(([label, members]) => clusterFromMembers(label, members))
+    .sort((a, b) => b.members.length - a.members.length || a.key.localeCompare(b.key));
+}
+
+function placeCommunity(data: RelationshipData): PersonPlacement[] {
+  return placeClusterBlocks(relationCommunities(data), data.relations);
+}
+
+function shortestPathDistances(people: Person[], relations: Relation[]): Map<string, Map<string, number>> {
+  const neighbors = relationNeighbors(relations);
+  const all = new Map<string, Map<string, number>>();
+
+  for (const source of people) {
+    const distance = new Map<string, number>([[source.id, 0]]);
+    const queue = [source.id];
+    for (let index = 0; index < queue.length; index += 1) {
+      const id = queue[index];
+      for (const next of neighbors.get(id) ?? []) {
+        if (distance.has(next)) continue;
+        distance.set(next, (distance.get(id) ?? 0) + 1);
+        queue.push(next);
+      }
+    }
+    all.set(source.id, distance);
+  }
+
+  return all;
+}
+
+function placementMap(placements: PersonPlacement[]): Map<string, Point> {
+  return new Map(placements.map((placement) => [placement.person.id, { x: placement.x, y: placement.y }]));
+}
+
+function placementsFromPositionMap(people: Person[], positions: Map<string, Point>): PersonPlacement[] {
+  return people.map((person) => {
+    const point = positions.get(person.id) ?? { x: 0, y: 0 };
+    return { person, x: point.x, y: point.y, groupIds: [] };
+  });
+}
+
+/**
+ * グラフ距離を平面距離に近づけるストレス系の配置。
+ *
+ * MDS / stress majorization の考え方に寄せ、近い関係は近く、遠い関係は遠く置く。
+ * 厳密な固有値分解は入れず、ブラウザで軽く動く反復法にしている。
+ */
+function placeStress(data: RelationshipData): PersonPlacement[] {
+  const people = sortedPeople(data);
+  const positions = placementMap(placeCircular(data));
+  const distances = shortestPathDistances(people, data.relations);
+  const relationPairs = new Set(data.relations.map((relation) => relationKey(relation.source, relation.target)));
+  const disconnectedDistance = Math.min(5, Math.max(3, Math.ceil(Math.sqrt(people.length))));
+
+  for (let iteration = 0; iteration < 150; iteration += 1) {
+    const cooling = 1 - iteration / 150;
+    const delta = new Map(people.map((person) => [person.id, { x: 0, y: 0 }]));
+
+    for (let i = 0; i < people.length; i += 1) {
+      for (let j = i + 1; j < people.length; j += 1) {
+        const a = people[i];
+        const b = people[j];
+        const pointA = positions.get(a.id)!;
+        const pointB = positions.get(b.id)!;
+        const dx = pointA.x - pointB.x;
+        const dy = pointA.y - pointB.y;
+        const current = Math.max(1, Math.hypot(dx, dy));
+        const graphDistance = distances.get(a.id)?.get(b.id) ?? disconnectedDistance;
+        const desired = graphDistance * NODE.gapX * 0.95;
+        const weight = relationPairs.has(relationKey(a.id, b.id)) ? 0.022 : 0.006 / Math.max(graphDistance, 1);
+        const force = (current - desired) * weight * cooling;
+        const x = (dx / current) * force;
+        const y = (dy / current) * force;
+        delta.get(a.id)!.x -= x;
+        delta.get(a.id)!.y -= y;
+        delta.get(b.id)!.x += x;
+        delta.get(b.id)!.y += y;
+      }
+    }
+
+    for (const person of people) {
+      const point = positions.get(person.id)!;
+      const move = delta.get(person.id)!;
+      point.x += Math.max(-26, Math.min(26, move.x));
+      point.y += Math.max(-26, Math.min(26, move.y));
+    }
+  }
+
+  return placementsFromPositionMap(people, positions);
 }
 
 /**
@@ -604,7 +761,83 @@ function clusteredPlacements(data: RelationshipData): PersonPlacement[] {
   return placePeople(rows);
 }
 
+function relaxClusterHybrid(placements: PersonPlacement[], relations: Relation[]): void {
+  const anchors = placementMap(placements);
+  const linked = new Set(relations.map((relation) => relationKey(relation.source, relation.target)));
+
+  for (let iteration = 0; iteration < 72; iteration += 1) {
+    const cooling = 1 - iteration / 72;
+    const delta = new Map(placements.map((placement) => [placement.person.id, { x: 0, y: 0 }]));
+    const byId = new Map(placements.map((placement) => [placement.person.id, placement]));
+
+    for (const relation of relations) {
+      const a = byId.get(relation.source);
+      const b = byId.get(relation.target);
+      if (!a || !b) continue;
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      const distance = Math.max(1, Math.hypot(dx, dy));
+      const desired = NODE.gapX * 1.15;
+      const force = (distance - desired) * 0.026 * cooling;
+      const x = (dx / distance) * force;
+      const y = (dy / distance) * force;
+      delta.get(a.person.id)!.x -= x;
+      delta.get(a.person.id)!.y -= y;
+      delta.get(b.person.id)!.x += x;
+      delta.get(b.person.id)!.y += y;
+    }
+
+    for (let i = 0; i < placements.length; i += 1) {
+      for (let j = i + 1; j < placements.length; j += 1) {
+        const a = placements[i];
+        const b = placements[j];
+        if (linked.has(relationKey(a.person.id, b.person.id))) continue;
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distance = Math.max(1, Math.hypot(dx, dy));
+        if (distance >= SATELLITE.minDistance) continue;
+        const force = (SATELLITE.minDistance - distance) * 0.04 * cooling;
+        const x = (dx / distance) * force;
+        const y = (dy / distance) * force;
+        delta.get(a.person.id)!.x += x;
+        delta.get(a.person.id)!.y += y;
+        delta.get(b.person.id)!.x -= x;
+        delta.get(b.person.id)!.y -= y;
+      }
+    }
+
+    for (const placement of placements) {
+      const anchor = anchors.get(placement.person.id);
+      const move = delta.get(placement.person.id)!;
+      if (anchor && placement.person.attributes.length > 0) {
+        move.x += (anchor.x - placement.x) * 0.018;
+        move.y += (anchor.y - placement.y) * 0.018;
+      }
+      placement.x += Math.max(-18, Math.min(18, move.x));
+      placement.y += Math.max(-18, Math.min(18, move.y));
+    }
+  }
+}
+
+function placeClusterHybrid(data: RelationshipData): PersonPlacement[] {
+  const placements = clusteredPlacements(data);
+  const affiliatedIds = new Set(placements.map((placement) => placement.person.id));
+  const initialRegions = enforceStrictRegions(data.groups, placements);
+  const leftovers = placeSatellites(
+    data.people.filter((person) => person.attributes.length === 0 && !affiliatedIds.has(person.id)),
+    data.relations,
+    placements,
+    initialRegions,
+  );
+  placeLeftovers(leftovers, placements);
+  relaxClusterHybrid(placements, data.relations);
+  return placements;
+}
+
 function placementsFor(data: RelationshipData, mode: LayoutMode, centerId: string): PersonPlacement[] {
+  if (mode === 'clusterHybrid') return placeClusterHybrid(data);
+  if (mode === 'community') return placeCommunity(data);
+  if (mode === 'stress') return placeStress(data);
   if (mode === 'force') return placeForce(data);
   if (mode === 'radial') return placeRadial(data, centerId);
   if (mode === 'layered') return placeLayered(data);
