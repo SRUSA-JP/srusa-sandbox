@@ -117,6 +117,14 @@ export const REGION = {
   fillAlpha: 0.1,
   /** 強調時の塗りの不透明度。 */
   highlightFillAlpha: 0.22,
+  /** 非所属者が領域内に入ったとき、外側へ押し出す最大パス数。 */
+  strictPasses: 5,
+  /** 1 回あたりの押し出し距離。 */
+  strictPushStep: 42,
+  /** 1 人あたりの押し出し最大試行回数。 */
+  strictMaxSteps: 16,
+  /** 真上に重なったときの退避方向数。 */
+  strictDirections: 12,
   labelFontSize: FONT_SIZE.sm,
   labelOffsetY: -8,
   labelFontWeight: FONT_WEIGHT.medium,

@@ -10,7 +10,7 @@
  * レイアウトの副作用として自然に成立する。
  */
 import { CANVAS, CLUSTER, groupTypeSetting, NODE, REGION, SATELLITE, UNASSIGNED } from './config';
-import { enclosingPolygon, pointInPolygon, polygonArea, type Point } from './geometry';
+import { centroid, enclosingPolygon, pointInPolygon, polygonArea, type Point } from './geometry';
 import type { Group, Person, Relation, RelationshipData } from './schema';
 
 export interface PersonPlacement {
@@ -234,6 +234,59 @@ function buildRegions(groups: Group[], placements: PersonPlacement[]): RegionPla
   return regions.filter((region) => region.memberIds.length > 0).sort((a, b) => b.area - a.area);
 }
 
+function isRegionIntruder(placement: PersonPlacement, region: RegionPlacement): boolean {
+  return !region.memberIds.includes(placement.person.id) && pointInPolygon(placement, region.polygon);
+}
+
+function intrudingRegions(placement: PersonPlacement, regions: RegionPlacement[]): RegionPlacement[] {
+  return regions.filter((region) => isRegionIntruder(placement, region));
+}
+
+/**
+ * 領域を厳格に保つ。
+ *
+ * 凸包で作った領域は読みやすい一方、近くに置かれた非所属者を包み込むことがある。
+ * 非所属者が領域内に入ったら外側へ押し出し、所属している領域だけに残るよう再計算する。
+ */
+function enforceStrictRegions(groups: Group[], placements: PersonPlacement[]): RegionPlacement[] {
+  let regions = buildRegions(groups, placements);
+
+  for (let pass = 0; pass < REGION.strictPasses; pass += 1) {
+    let moved = false;
+
+    for (const placement of placements) {
+      const blockers = intrudingRegions(placement, regions);
+      if (blockers.length === 0) continue;
+
+      const center = centroid(blockers.flatMap((region) => region.polygon));
+      let dx = placement.x - center.x;
+      let dy = placement.y - center.y;
+      if (dx === 0 && dy === 0) {
+        const angle = (placement.person.id.charCodeAt(0) % REGION.strictDirections) * ((Math.PI * 2) / REGION.strictDirections);
+        dx = Math.cos(angle);
+        dy = Math.sin(angle);
+      }
+      const length = Math.hypot(dx, dy) || 1;
+
+      for (let step = 0; step < REGION.strictMaxSteps; step += 1) {
+        const next = {
+          x: placement.x + (dx / length) * REGION.strictPushStep,
+          y: placement.y + (dy / length) * REGION.strictPushStep,
+        };
+        placement.x = next.x;
+        placement.y = next.y;
+        moved = true;
+        if (intrudingRegions(placement, regions).length === 0) break;
+      }
+    }
+
+    regions = buildRegions(groups, placements);
+    if (!moved) return regions;
+  }
+
+  return regions;
+}
+
 /** 図全体が正の座標に収まるよう平行移動し、余白込みの寸法を決める。 */
 function normalize(people: PersonPlacement[], regions: RegionPlacement[]) {
   const xs = [
@@ -379,7 +432,7 @@ export function buildLayout(data: RelationshipData): MapLayout {
   }
 
   /* 領域は所属者だけで決まるので、衛星を置く前に確定できる */
-  const regions = buildRegions(data.groups, people);
+  const regions = enforceStrictRegions(data.groups, people);
   const leftovers = placeSatellites(unaffiliated, data.relations, people, regions);
   placeLeftovers(leftovers, people);
 
@@ -407,7 +460,10 @@ export function withPositions(layout: MapLayout, positions: Record<string, Point
   });
   const byId = new Map(people.map((placement) => [placement.person.id, placement]));
 
-  const regions = layout.regions
+  const regions = enforceStrictRegions(
+    layout.regions.map((region) => region.group),
+    people,
+  )
     .map((region) => {
       const points = region.memberIds
         .map((id) => byId.get(id))
