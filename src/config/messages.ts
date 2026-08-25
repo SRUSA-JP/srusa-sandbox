@@ -261,6 +261,23 @@ export const STATS_TEXT = {
       note: '横軸・縦軸の指標をそれぞれ選べます。同じ指標を選ぶと対角線になります。',
       bothAxes: (note: string) => `両軸とも${note}`,
     },
+    economy: {
+      title: 'SRUSA鉱物指数',
+      note:
+        'ダイヤとエメラルドを資産バスケットとして見ます。Minecraft の stats は現在在庫を持たないため、拾得・採掘の累計から作る近似指標です。',
+      total: '総資産',
+      rate: 'DI/EM レート',
+      index: '指数',
+      diamond: 'ダイヤ',
+      emerald: 'エメラルド',
+      ranking: '資産ランキング',
+      trend: '指数推移',
+      source: '算出元',
+      noRate: '算出なし',
+      base: (base: number) => `最初のスナップショットを ${formatInt(base)} として指数化`,
+      rateValue: (rate: string) => `1 DI = ${rate} EM`,
+      rateNote: '供給量から見た簡易レート',
+    },
   },
 
   /** 換算後の分母の説明。グラフの注記に使う。 */

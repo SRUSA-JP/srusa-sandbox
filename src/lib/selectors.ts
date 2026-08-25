@@ -8,13 +8,20 @@ import type { CountMap, ItemMetric, NamedPlayer, StatsDocument } from '../data/s
 import { toNamedPlayers } from '../data/parse';
 import { LIMITS } from '../config/metrics';
 import {
+  ECONOMY_ASSETS,
+  ECONOMY_DEFAULT_SOURCE,
+  ECONOMY_INDEX_BASE,
+  type EconomyAsset,
+  type EconomySourceMetric,
+} from '../config/economy';
+import {
   DAMAGE_LABELS,
   ENVIRONMENT_ENTRY,
   MOVEMENT_LABELS,
   OTHER_ENTRY,
   TOTAL_SERIES,
 } from '../config/labels';
-import { labelFor, prettifyId } from './format';
+import { labelFor, prettifyId, stripNamespace } from './format';
 
 /** チャート・表で使う汎用の 1 行。 */
 export interface Entry {
@@ -255,6 +262,107 @@ export function deathCauseRanking(doc: StatsDocument, options: { players?: strin
   const entries = toEntries(mergeCounts(players.map((p) => p.deaths.by_mob)));
   const other = players.reduce((acc, p) => acc + p.deaths.other_causes, 0);
   return other > 0 ? [...entries, { ...ENVIRONMENT_ENTRY, value: other }] : entries;
+}
+
+/* ------------------------------------------------------------------ *
+ * SRUSA 鉱物指数
+ * ------------------------------------------------------------------ */
+
+export interface EconomyAssetValue {
+  id: EconomyAsset['id'];
+  label: string;
+  shortLabel: string;
+  unit: string;
+  value: number;
+}
+
+export interface PlayerEconomyRow {
+  name: string;
+  diamond: number;
+  emerald: number;
+  total: number;
+}
+
+export interface EconomySummary {
+  assets: EconomyAssetValue[];
+  total: number;
+  rate: number | null;
+  source: EconomySourceMetric;
+}
+
+function economyAssetValue(player: NamedPlayer, asset: EconomyAsset, source: EconomySourceMetric): number {
+  const counts = player.production[source];
+  return asset.entries.reduce((total, entry) => {
+    const value = Object.entries(counts).reduce(
+      (acc, [key, count]) => (stripNamespace(key) === entry.id ? acc + count : acc),
+      0,
+    );
+    return total + value * entry.multiplier;
+  }, 0);
+}
+
+/** プレイヤー別の鉱物資産量。ダイヤ・エメラルドの合計を同じ 1 単位として足す。 */
+export function playerEconomyRows(
+  doc: StatsDocument,
+  options: { players?: string[]; source?: EconomySourceMetric } = {},
+): PlayerEconomyRow[] {
+  const source = options.source ?? ECONOMY_DEFAULT_SOURCE;
+  return includedPlayers(doc, options.players)
+    .map((player) => {
+      const diamond = economyAssetValue(player, ECONOMY_ASSETS[0], source);
+      const emerald = economyAssetValue(player, ECONOMY_ASSETS[1], source);
+      return {
+        name: player.name,
+        diamond,
+        emerald,
+        total: diamond + emerald,
+      };
+    })
+    .sort((a, b) => b.total - a.total);
+}
+
+/** 対象者全体の鉱物資産サマリ。rate は「1 DI が何 EM 相当か」を供給量から見る簡易レート。 */
+export function economySummary(
+  doc: StatsDocument,
+  options: { players?: string[]; source?: EconomySourceMetric } = {},
+): EconomySummary {
+  const source = options.source ?? ECONOMY_DEFAULT_SOURCE;
+  const players = includedPlayers(doc, options.players);
+  const assets = ECONOMY_ASSETS.map((asset) => ({
+    id: asset.id,
+    label: asset.label,
+    shortLabel: asset.shortLabel,
+    unit: asset.unit,
+    value: players.reduce((total, player) => total + economyAssetValue(player, asset, source), 0),
+  }));
+  const diamond = assets.find((asset) => asset.id === 'diamond')?.value ?? 0;
+  const emerald = assets.find((asset) => asset.id === 'emerald')?.value ?? 0;
+  return {
+    assets,
+    total: assets.reduce((total, asset) => total + asset.value, 0),
+    rate: diamond > 0 ? round(emerald / diamond, 3) : null,
+    source,
+  };
+}
+
+/** 最初のスナップショットを 100 とした、日経平均のような指数推移。 */
+export function economyIndexTimeline(
+  snapshots: Snapshot[],
+  options: { players?: string[]; source?: EconomySourceMetric } = {},
+): StackedSeries {
+  const source = options.source ?? ECONOMY_DEFAULT_SOURCE;
+  const summaries = snapshots.map((snapshot) => ({
+    label: snapshot.label,
+    summary: economySummary(snapshot.doc, { players: options.players, source }),
+  }));
+  const base = summaries.find((entry) => entry.summary.total > 0)?.summary.total ?? 0;
+  return {
+    series: [{ key: 'index', label: '指数' }],
+    rows: summaries.map(({ label, summary }) => ({
+      [TIMELINE_CATEGORY_KEY]: label,
+      index: base > 0 ? round((summary.total / base) * ECONOMY_INDEX_BASE, 2) : 0,
+    })),
+  };
 }
 
 /** 積み上げ棒グラフ用: プレイヤー × 移動手段（km）。 */

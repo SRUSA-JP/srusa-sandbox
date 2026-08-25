@@ -7,6 +7,7 @@ import {
   Button,
   ChartCard,
   DiscoveryBoard,
+  EconomyIndexPanel,
   FeaturedItemUseColumns,
   FilterPanel,
   KpiGrid,
@@ -396,6 +397,13 @@ export function StatsPage({ theme }: StatsPageProps) {
                 value={`${formatDecimal(kpi.mobKills)}${metricOption('mob_kills').unit}`}
               />
             </KpiGrid>
+
+            <EconomyIndexPanel
+              doc={doc}
+              snapshots={snapshots}
+              players={playerNames}
+              theme={theme}
+            />
 
             <FeaturedItemUseColumns theme={theme} />
 
