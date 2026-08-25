@@ -1,8 +1,11 @@
 import {
+  CLIP_TEXT,
   capFirst,
   clipKeywordLabel,
   clipKeywords,
+  clipMedia,
   clipScoreTotal,
+  imageUrlFromClipUrl,
   type ClipEntry,
 } from '../../config/clips';
 import { TAG } from '../classes';
@@ -17,7 +20,10 @@ export interface ClipCardProps {
 /** 名シーン一覧のカード。情報密度は高く、再生操作はカード全体にまとめる。 */
 export function ClipCard({ clip, active, onSelect, onFilter }: ClipCardProps) {
   const tagClass = `${TAG} cursor-pointer transition-colors hover:bg-hover`;
-  const playable = Boolean(clip.sourceUrl.trim());
+  const media = clipMedia(clip);
+  /* 画像の名シーンは、その画像そのものが一番分かりやすい見出し絵になる */
+  const thumbnailUrl = clip.thumbnailUrl ?? (media === 'image' ? imageUrlFromClipUrl(clip.sourceUrl) : '');
+  const badge = media === 'image' ? CLIP_TEXT.overlay.image : CLIP_TEXT.overlay.play;
 
   return (
     <article
@@ -27,9 +33,9 @@ export function ClipCard({ clip, active, onSelect, onFilter }: ClipCardProps) {
     >
       <button type="button" className="block w-full text-left" onClick={() => onSelect(clip)}>
         <div className="relative bg-sunken">
-          {clip.thumbnailUrl ? (
+          {thumbnailUrl ? (
             <img
-              src={clip.thumbnailUrl}
+              src={thumbnailUrl}
               alt=""
               loading="lazy"
               className="aspect-video w-full object-cover"
@@ -39,9 +45,16 @@ export function ClipCard({ clip, active, onSelect, onFilter }: ClipCardProps) {
               {clip.title}
             </div>
           )}
-          <span className="absolute inset-0 grid place-items-center bg-overlay/70 text-lg text-heading">
-            {playable ? 'Play' : '準備中'}
-          </span>
+          {/* 見出し絵を隠さないよう、出せるものがある間は隅の小さな札だけにする */}
+          {media === 'none' ? (
+            <span className="absolute inset-0 grid place-items-center bg-overlay/70 text-lg text-heading">
+              {CLIP_TEXT.overlay.pending}
+            </span>
+          ) : (
+            <span className="absolute bottom-xs right-xs rounded-sm bg-overlay/70 px-xs py-xxs text-xs text-heading">
+              {badge}
+            </span>
+          )}
         </div>
       </button>
 

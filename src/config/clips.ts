@@ -1,6 +1,10 @@
+/** 名シーンの中身。動画（埋め込み）か画像（そのまま表示）か、まだ URL が無いか。 */
+export type ClipMedia = 'video' | 'image' | 'none';
+
 export interface ClipEntry {
   id: string;
   title: string;
+  /** 動画の共有 URL、または画像の URL（同梱画像は `images/…` の相対パス）。 */
   sourceUrl: string;
   category: string;
   map?: string;
@@ -53,12 +57,34 @@ const SCENE_TAGS = ['clutch', 'miracle', 'comeback', 'build', 'chaos'] as const;
 const TOPIC_TAGS = ['highlight', 'accident', 'teamwork', 'tutorial', 'memorial'] as const;
 
 /**
- * ギャラリーページに最初から並べる動画。
+ * ギャラリーページに最初から並べる名シーン。
  *
  * URL を追加・差し替えたいときはここだけを編集する。YouTube / Twitch は
  * 通常の共有 URL でも iframe 用 URL に変換される。
+ * 画像（png / jpg / gif / webp など）もそのまま置ける。同梱の画像は
+ * `public/` からの相対パス（`images/…`）で書く。
  */
 export const CLIP_ENTRIES: ClipEntry[] = [
+  {
+    id: 'screenshot-spawn',
+    title: 'スポーン地点の空撮',
+    sourceUrl: 'images/bluemap-overworld-spawn.png',
+    category: 'screenshot',
+    map: 'minecraft',
+    tags: ['build', 'memorial'],
+    score: { smooth: 4, clutch: 0, tap: 3, '6kills': 0, onemag: 0 },
+    note: 'BlueMap の 3D 表示を撮ったスクリーンショットです。',
+  },
+  {
+    id: 'screenshot-flat',
+    title: '拠点まわりの俯瞰',
+    sourceUrl: 'images/bluemap-overworld-flat.png',
+    category: 'screenshot',
+    map: 'minecraft',
+    tags: ['build', 'highlight'],
+    score: { smooth: 4, clutch: 0, tap: 2, '6kills': 0, onemag: 0 },
+    note: 'BlueMap の 3D 表示を撮ったスクリーンショットです。',
+  },
   {
     id: 'sample-minecraft',
     title: 'ダミー: Minecraft 建築名シーン',
@@ -123,14 +149,22 @@ export const CLIP_ENTRIES: ClipEntry[] = [
 
 export const CLIP_TEXT = {
   title: 'ギャラリー',
-  note: 'SRUSA のいろんなゲームの名シーンをタグで探して iframe で確認するページ',
-  lead: 'これから動画を入れる前の仮ギャラリーです。ゲーム、プレイヤー、シーン、タグで名シーンを探せる形だけ先に確認できます。',
-  picker: '動画',
-  customUrl: 'URL',
+  note: 'SRUSA のいろんなゲームの名シーンと写真をタグで探して見るページ',
+  lead: '動画と画像を並べたギャラリーです。ゲーム、プレイヤー、シーン、タグで名シーンを探せます。',
+  picker: '名シーン',
+  customUrl: '動画・画像の URL',
   customTitle: '入力したURL',
   show: '表示',
   featured: '選択中の名シーン',
   gallery: '名シーンギャラリー',
+  /** 一覧のカードに重ねる札。何をするものかが見て分かるようにする。 */
+  overlay: {
+    play: '再生',
+    image: '画像',
+    pending: '準備中',
+  },
+  /** 画像の読み上げと、画像が出ないときの説明。 */
+  imageAlt: (title: string) => `${title} の画像`,
   result: (count: number, total: number) => `${count} / ${total} 件`,
   sort: '並び替え',
   filters: {
@@ -145,9 +179,9 @@ export const CLIP_TEXT = {
     title: 'タイトル順',
     views: '再生数順',
   },
-  empty: 'この名シーンにはまだ動画URLがありません。URL を入力すると、この画面で表示できます。',
+  empty: 'この名シーンにはまだ URL がありません。動画や画像の URL を入力すると、この画面で表示できます。',
   noMatch: '条件に合う名シーンがありません。',
-  invalidUrl: 'https:// または http:// で始まる URL を入力してください。',
+  invalidUrl: 'https:// または http:// で始まる動画・画像の URL を入力してください。',
   iframeTitle: (title: string) => `${title} の埋め込みプレイヤー`,
 } as const;
 
@@ -228,6 +262,51 @@ export function sortClips(entries: ClipEntry[], sortKey: ClipSortKey): ClipEntry
     if (sortKey === 'views') return (b.views ?? 0) - (a.views ?? 0);
     return clipScoreTotal(b) - clipScoreTotal(a);
   });
+}
+
+const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.avif', '.svg'] as const;
+
+/** 拡張子だけで画像かどうかを決める（通信して確かめには行かない）。 */
+function hasImageExtension(path: string): boolean {
+  const lower = path.split(/[?#]/)[0].toLowerCase();
+  return IMAGE_EXTENSIONS.some((extension) => lower.endsWith(extension));
+}
+
+/**
+ * 画像として表示できる URL だけを返す。表示できないときは空文字。
+ *
+ * 同梱の画像は `images/…` のような相対パスで書く（Vite の base が './' のため）。
+ * `javascript:` のような別の scheme は、img の src に渡す前にここで落とす。
+ */
+export function imageUrlFromClipUrl(sourceUrl: string): string {
+  const trimmed = sourceUrl.trim();
+  if (!trimmed) return '';
+
+  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) {
+    let url: URL;
+    try {
+      url = new URL(trimmed);
+    } catch {
+      return '';
+    }
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return '';
+    return hasImageExtension(url.pathname) ? trimmed : '';
+  }
+
+  /* 同梱の画像は公開ディレクトリからの相対パス。読み物の画像（ProsePanel）と同じ解決の仕方に揃える */
+  return hasImageExtension(trimmed) ? `${import.meta.env.BASE_URL}${trimmed}` : '';
+}
+
+/** その名シーンを画面でどう見せるか。画像を先に見るのは、動画側が未知のホストも受けるため。 */
+export function clipMedia(clip: ClipEntry): ClipMedia {
+  return mediaOfUrl(clip.sourceUrl);
+}
+
+/** URL 1 本から見せ方を決める。入力欄に貼られた URL にも同じ判定を使う。 */
+export function mediaOfUrl(sourceUrl: string): ClipMedia {
+  if (imageUrlFromClipUrl(sourceUrl)) return 'image';
+  if (embedUrlFromClipUrl(sourceUrl)) return 'video';
+  return 'none';
 }
 
 export function embedUrlFromClipUrl(sourceUrl: string, parentHost = globalThis.location?.hostname ?? ''): string {
