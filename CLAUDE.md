@@ -37,10 +37,24 @@ npm run typecheck       # tsc --noEmit
 npm run lint            # ESLint
 npm run check:contrast  # 配色の WCAG コントラスト検査
 npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（BlueMap の出力が要る）
+npm run update:data     # AWS SSO 確認 → ../aws_minecraft の抽出 → sync:data
 npm run sync:data       # ../aws_minecraft と BlueMap の出力からデータを取り込む
 ```
 
 ### データの取り込み
+
+AWS からの再取得まで含む更新を頼まれたら、まず `npm run update:data` を使う。
+SSO セッションが切れている場合は `aws sso login --profile minecraft-cdk --use-device-code` を起動し、
+表示された URL とコード入力を利用者に任せてから続行する。
+`--dry-run` と `--list` は AWS 認証と抽出を飛ばし、`sync:data` の確認だけを行う。
+
+```bash
+npm run update:data                  # 全部。AWS認証 → 抽出 → 取り込み
+npm run update:data -- daily logs    # 日別データとログだけ
+npm run update:data -- skins         # スキンと顔アイコンだけ
+npm run update:data -- --dry-run     # 取り込み予定だけ見る
+npm run update:data -- --list        # 取り込める元データを見る
+```
 
 `npm run sync:data` が、元データの取り込みから派生 JSON の作り直しまでをまとめて行う。
 データ更新・再取得・差し替えを頼まれたら、まず `../aws_minecraft` を確認する。

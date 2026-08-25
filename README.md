@@ -59,6 +59,7 @@ npm run dev
 | `npm run lint` | ESLint を実行する |
 | `npm run check:contrast` | 配色が WCAG のコントラスト比を満たすか検査する |
 | `npm run build:world-map` | BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（下の「ワールドマップを作り直すとき」） |
+| `npm run update:data` | AWS SSO の確認、`../aws_minecraft` 側の抽出、こちらへの取り込みをまとめて行う |
 | `npm run sync:data` | `../aws_minecraft` と BlueMap の出力からデータを取り込む（下の「データを差し替えるとき」） |
 
 `main` への push と Pull Request では、GitHub Actions が同じ検査を実行します
@@ -149,6 +150,17 @@ BlueMap の出力が別の場所にあるときは `npm run build:world-map -- -
 操作できる地図と取り違えられないよう、画像には必ず `tag` を付けます。
 
 ## データを差し替えるとき
+
+AWS からの再取得も含めて更新するときは `npm run update:data` を使います。
+SSO セッションが切れている場合は、URL とコードが表示されるので、ブラウザで開いて入力すると続きが自動で進みます。
+
+```shell
+npm run update:data                  # AWS認証 → 抽出 → 取り込み
+npm run update:data -- daily logs    # 日別データとログだけ
+npm run update:data -- skins         # スキンと顔アイコンだけ
+npm run update:data -- --dry-run     # AWS認証・抽出なしで、取り込み予定だけ確認
+npm run update:data -- --list        # 取り込める元データを見るだけ
+```
 
 元データは 2 か所にあります。`npm run sync:data` が、取り込みから派生 JSON の作り直しまでをまとめて行います。
 
