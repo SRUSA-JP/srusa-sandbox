@@ -39,6 +39,7 @@ npm run test:ui         # 公開ルートの初期レンダリングが壊れて
 npm run lint            # ESLint
 npm run check:contrast  # 配色の WCAG コントラスト検査
 npm run check:design    # UI層の色・寸法直書きやカード入れ子などの静的検査
+npm run check:layout    # 図の文字が枠からはみ出さない・小さすぎないかの検査
 npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（BlueMap の出力が要る）
 npm run update:data     # AWS SSO 確認 → ../aws_minecraft の抽出 → sync:data
 npm run sync:data       # ../aws_minecraft と BlueMap の出力からデータを取り込む
@@ -115,6 +116,7 @@ npm run sync:data -- --dry-run    # 何をするかだけ出す
 
 配色・スキン・コントラストのしきい値を変えたら、必ず `npm run check:contrast` を通すこと。
 UI層に色や寸法の実値を足したり、カード構造を変えたりしたら `npm run check:design` も通すこと。
+図（SVG）の寸法・軸の名前・文字の大きさを触ったら `npm run check:layout` も通すこと。
 
 ### スラッシュコマンド
 
@@ -145,6 +147,8 @@ public/icons/             # アプリのアイコン（タブ・ホーム画面�
 netlify.toml              # 公開設定（https://srusa-sandbox.netlify.app/）
 scripts/sync-data.mjs     # ../aws_minecraft と BlueMap の出力からのデータ取り込み
 scripts/check-contrast.ts # 配色の検査
+scripts/check-layout.ts   # 図の文字のはみ出し・大きさの検査
+scripts/svg-text-fit.ts   # 描き上がった SVG から、はみ出した文字を見つける
 scripts/build-world-map.ts # BlueMap の 2D タイルの貼り合わせ
 scripts/png.ts            # PNG の読み書き（画像ライブラリを入れないための最小実装）
 .githooks/pre-commit      # main への直接コミットを止める git フック
@@ -371,7 +375,7 @@ git rev-parse --abbrev-ref HEAD
 
 ## 変更時の確認
 
-- `npm run build`（型検査・ESLint・UI初期レンダリング・コントラスト比・デザイン静的検査を含む）が通ること。`/check` で一括実行できる
+- `npm run build`（型検査・ESLint・UI初期レンダリング・コントラスト比・デザイン静的検査・図のはみ出し検査を含む）が通ること。`/check` で一括実行できる
 - 追加した部品が正しい層（atoms / molecules / organisms / templates）に置かれ、
   下の層から上の層を import していないこと
 - **ウィンドウからはみ出していないこと**（DESIGN.md「ウィンドウからはみ出さない」）。
