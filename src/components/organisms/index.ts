@@ -22,6 +22,7 @@ export * from './PlayerRankingPanel';
 export * from './PlayerRelationshipPanel';
 export * from './PlayerStatTiles';
 export * from './ProsePanel';
+export * from './TechnicalDetails';
 export * from './RankBarChart';
 export * from './RelationshipMap';
 export * from './SeriesBarChart';
