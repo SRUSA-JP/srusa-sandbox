@@ -43,6 +43,8 @@ export function TrendLineChart({
   const colors = figureColors(theme);
   const color = colors.series(data.series.map((s) => s.key));
   const multiSeries = data.series.length > 1;
+  /* 点が多い軸は、日付も値ラベルも全部は出さない（重なって読めなくなる） */
+  const dense = data.rows.length > AXIS.denseCategoryCount;
 
   return (
     <ResponsiveContainer width="100%" height={height ?? metrics.height.base}>
@@ -52,7 +54,7 @@ export function TrendLineChart({
           dataKey={categoryKey}
           stroke={colors.grid}
           tick={{ fill: colors.axis, fontSize: skinnedFontSize(AXIS.fontSize) }}
-          interval={0}
+          interval={dense ? 'preserveStartEnd' : 0}
         />
         <YAxis
           tickFormatter={formatCompact}
@@ -97,7 +99,7 @@ export function TrendLineChart({
             activeDot={{ r: LINE.activeDotRadius }}
             isAnimationActive={false}
           >
-            {showValueLabels && !multiSeries && (
+            {showValueLabels && !multiSeries && !dense && (
               <LabelList
                 dataKey={series.key}
                 position="top"
