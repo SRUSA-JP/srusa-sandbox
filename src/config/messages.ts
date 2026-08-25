@@ -410,7 +410,6 @@ export const MAP_TEXT = {
     groupOption: (name: string, type: string, members: number) =>
       `${name}（${type}・${formatInt(members)}人）`,
     edges: '関係線',
-    profile: '紹介ページ',
   },
 
   /** 掴んで動かした配置を元に戻すボタン。 */

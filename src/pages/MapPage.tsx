@@ -2,7 +2,6 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { AppLayout, Button, ChartCard, NoticePanel, Note, Picker, ProsePanel } from '../components';
 import { RELATIONSHIPS_CONTENT } from '../content';
 import { joinNotes } from '../lib/display';
-import { playerPath } from '../data/playerProfiles';
 import type { VizTheme } from '../theme/palette';
 import { APP_TEXT, MAP_TEXT, ZUKAN_TEXT } from '../config/messages';
 import { ZUKAN_PATH } from '../routes';
@@ -279,14 +278,6 @@ export function MapPage({ theme }: MapPageProps) {
                 options={TOOLTIP_OPTIONS}
                 onChange={setTooltipMode}
               />
-              {centerPerson && (
-                <a
-                  href={playerPath(personLabel(centerPerson, nameMode))}
-                  className={`${CONTROL} ${CONTROL_ROW} ${CONTROL_HOVER}`}
-                >
-                  {MAP_TEXT.picker.profile}
-                </a>
-              )}
               {/* 図の中の人を探すより、名簿から選ぶほうが早いこともある */}
               <a href={ZUKAN_PATH} className={`${CONTROL} ${CONTROL_ROW} ${CONTROL_HOVER}`}>
                 {ZUKAN_TEXT.link}
