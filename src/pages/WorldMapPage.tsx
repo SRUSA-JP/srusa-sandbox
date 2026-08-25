@@ -12,8 +12,6 @@ export interface WorldMapPageProps {
   theme: VizTheme;
 }
 
-type ViewId = `dimension:${string}` | 'log';
-
 const EMPTY_MAPS: WorldMap[] = [];
 
 function mapDimension(map: WorldMap): string {
@@ -33,10 +31,23 @@ function mapFreshness(map: WorldMap): string {
   return map.updated_on ?? '';
 }
 
+function mapDate(map: WorldMap, fallbackDate = ''): string {
+  return map.updated_on ?? fallbackDate;
+}
+
 function sortMapsForDisplay(maps: WorldMap[]): WorldMap[] {
   return [...maps].sort(
     (a, b) =>
       mapFreshness(b).localeCompare(mapFreshness(a)) ||
+      mapArea(b) - mapArea(a) ||
+      mapLabel(a).localeCompare(mapLabel(b), 'ja'),
+  );
+}
+
+function sortMapsForDate(maps: WorldMap[]): WorldMap[] {
+  return [...maps].sort(
+    (a, b) =>
+      mapDimension(a).localeCompare(mapDimension(b), 'ja') ||
       mapArea(b) - mapArea(a) ||
       mapLabel(a).localeCompare(mapLabel(b), 'ja'),
   );
@@ -101,30 +112,24 @@ function WorldMapLog({ maps }: { maps: WorldMap[] }) {
 export function WorldMapPage({ theme }: WorldMapPageProps) {
   const document = useMemo(() => loadWorldMaps(), []);
   const maps = document?.maps ?? EMPTY_MAPS;
-  const dimensions = useMemo(() => [...new Set(maps.map(mapDimension))], [maps]);
-  const [selectedView, setSelectedView] = useState<ViewId>(() =>
-    dimensions[0] ? `dimension:${dimensions[0]}` : 'log',
+  const mapDates = useMemo(
+    () =>
+      [...new Set(maps.map((entry) => mapDate(entry, document?.generated_on)).filter(Boolean))].sort((a, b) =>
+        b.localeCompare(a),
+      ),
+    [document?.generated_on, maps],
   );
-  const selectedDimension = selectedView.startsWith('dimension:') ? selectedView.slice('dimension:'.length) : null;
-  const dimensionMaps = useMemo(
-    () => (selectedDimension ? sortMapsForDisplay(maps.filter((entry) => mapDimension(entry) === selectedDimension)) : []),
-    [maps, selectedDimension],
+  const [selectedDate, setSelectedDate] = useState(mapDates[0] ?? '');
+  const effectiveDate = mapDates.includes(selectedDate) ? selectedDate : mapDates[0] ?? '';
+  const dateMaps = useMemo(
+    () => sortMapsForDate(maps.filter((entry) => mapDate(entry, document?.generated_on) === effectiveDate)),
+    [document?.generated_on, effectiveDate, maps],
   );
-  const [selectedMapIds, setSelectedMapIds] = useState<Record<string, string>>({});
-  const selectedMapId = selectedDimension ? selectedMapIds[selectedDimension] : undefined;
-  const map = dimensionMaps.find((entry) => entry.id === selectedMapId) ?? dimensionMaps[0] ?? null;
-
-  const size = map ? coverage(map) : null;
-  const selectedMapLabel = map ? mapLabel(map) : '';
 
   return (
     <AppLayout
       title={WORLD_MAP_CONTENT.title}
-      note={
-        map && size
-          ? `${WORLD_MAP_TEXT.summary(selectedMapLabel, size.width, size.height, map.bytes, coordinateBounds(map))} / 更新 ${map.updated_on ?? document?.generated_on ?? '-'}`
-          : undefined
-      }
+      note={effectiveDate ? WORLD_MAP_TEXT.dateSummary(effectiveDate, dateMaps.length) : undefined}
       lead={WORLD_MAP_CONTENT.lead}
       footnotes={
         WORLD_MAP_CONTENT.disclaimer ? (
@@ -133,51 +138,44 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
       }
     >
       <ChartCard
-        title={selectedView === 'log' ? WORLD_MAP_TEXT.log.title : WORLD_MAP_TEXT.card.title}
+        title={WORLD_MAP_TEXT.card.title}
         note={WORLD_MAP_TEXT.card.note}
         actions={
-          maps.length > 0 ? (
-            <>
-              <Picker
-                label={WORLD_MAP_TEXT.picker.view}
-                value={selectedView}
-                options={[
-                  ...dimensions.map((dimension) => ({
-                    value: `dimension:${dimension}` as ViewId,
-                    label: WORLD_LABELS[dimension] ?? dimension,
-                  })),
-                  { value: 'log' as ViewId, label: WORLD_MAP_TEXT.picker.log },
-                ]}
-                onChange={setSelectedView}
-              />
-              {selectedView !== 'log' && dimensionMaps.length > 1 && selectedDimension && (
-                <Picker
-                  label={WORLD_MAP_TEXT.picker.map}
-                  value={map?.id ?? ''}
-                  options={dimensionMaps.map((entry) => ({
-                    value: entry.id,
-                    label: mapLabel(entry),
-                  }))}
-                  onChange={(value) =>
-                    setSelectedMapIds((previous) => ({
-                      ...previous,
-                      [selectedDimension]: value,
-                    }))
-                  }
-                />
-              )}
-            </>
+          mapDates.length > 0 ? (
+            <Picker
+              label={WORLD_MAP_TEXT.picker.map}
+              value={effectiveDate}
+              options={mapDates.map((date) => ({ value: date, label: date }))}
+              onChange={setSelectedDate}
+            />
           ) : undefined
         }
       >
-        {selectedView === 'log' ? (
-          <WorldMapLog maps={maps} />
-        ) : map ? (
-          <WorldMapViewer key={map.id} map={map} theme={theme} />
+        {dateMaps.length > 0 ? (
+          <div className="grid gap-md">
+            {dateMaps.map((map) => {
+              const size = coverage(map);
+              return (
+                <section key={map.id} className="min-w-0">
+                  <h3 className="mb-xs text-sm font-bold text-heading">{mapLabel(map)}</h3>
+                  <p className="mb-sm text-xs text-muted">
+                    {WORLD_MAP_TEXT.summary(mapLabel(map), size.width, size.height, map.bytes, coordinateBounds(map))}
+                  </p>
+                  <WorldMapViewer map={map} theme={theme} />
+                </section>
+              );
+            })}
+          </div>
         ) : (
           <Note tone="error">{WORLD_MAP_TEXT.noData}</Note>
         )}
       </ChartCard>
+
+      {maps.length > 0 && (
+        <ChartCard title={WORLD_MAP_TEXT.log.title}>
+          <WorldMapLog maps={maps} />
+        </ChartCard>
+      )}
 
       <ProsePanel sections={WORLD_MAP_CONTENT.sections} />
     </AppLayout>

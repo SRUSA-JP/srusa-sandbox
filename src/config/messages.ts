@@ -344,6 +344,7 @@ export const WORLD_MAP_TEXT = {
   },
 
   /** 地図の規模。見出しの下に出す。 */
+  dateSummary: (date: string, count: number) => `${date} の地図 ${formatInt(count)} 件を表示`,
   summary: (
     world: string,
     width: number,
