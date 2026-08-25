@@ -75,9 +75,19 @@ export function parseWorldMapDocument(raw: unknown): WorldMapDocument {
   const record = requireRecord(raw, 'world-map');
   const maps = record.maps;
   if (!Array.isArray(maps)) throw new WorldMapDataError(DATA_TEXT.notArray, 'maps');
+  const parsedMaps: WorldMap[] = [];
+  const issues: string[] = [];
+  maps.forEach((entry, index) => {
+    try {
+      parsedMaps.push(parseMap(entry, index));
+    } catch (cause) {
+      issues.push(cause instanceof Error ? cause.message : String(cause));
+    }
+  });
   return {
     generated_on: optionalString(record.generated_on, 'generated_on'),
     source: requireString(record.source, 'source'),
-    maps: maps.map(parseMap),
+    maps: parsedMaps,
+    issues,
   };
 }

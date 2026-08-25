@@ -151,6 +151,11 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
           ) : undefined
         }
       >
+        {document?.issues && document.issues.length > 0 && (
+          <div className="mb-md">
+            <NoticePanel title={APP_TEXT.disclaimer}>{WORLD_MAP_TEXT.partialData(document.issues.length)}</NoticePanel>
+          </div>
+        )}
         {dateMaps.length > 0 ? (
           <div className="grid gap-md">
             {dateMaps.map((map) => {

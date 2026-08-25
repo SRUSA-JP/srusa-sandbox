@@ -49,6 +49,7 @@ interface PointerTooltip {
  */
 export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
   const panZoom = usePanZoom(map.pixels.width, map.pixels.height, WORLD_MAP_ZOOM);
+  const [failedImage, setFailedImage] = useState<string | null>(null);
   const [pointed, setPointed] = useState<BlockPoint | null>(null);
   const [selected, setSelected] = useState<BlockPoint | null>(null);
   const [tooltip, setTooltip] = useState<PointerTooltip | null>(null);
@@ -68,6 +69,8 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
       : { x: tooltip.x, y: tooltip.y }
     : null;
   const placement = anchor ? tooltipPlacement(anchor, panZoom.box) : null;
+  const imagePath = `${import.meta.env.BASE_URL}${map.image}`;
+  const imageLoaded = failedImage !== map.image;
 
   return (
     <ViewportFrame
@@ -143,14 +146,21 @@ export function WorldMapViewer({ map, theme }: WorldMapViewerProps) {
           setTooltip(null);
         }}
       >
-        <img
-          src={`${import.meta.env.BASE_URL}${map.image}`}
-          alt={WORLD_MAP_TEXT.card.alt(world)}
-          width={map.pixels.width}
-          height={map.pixels.height}
-          draggable={false}
-          className="block h-full w-full max-w-none"
-        />
+        {imageLoaded ? (
+          <img
+            src={imagePath}
+            alt={WORLD_MAP_TEXT.card.alt(world)}
+            width={map.pixels.width}
+            height={map.pixels.height}
+            draggable={false}
+            className="block h-full w-full max-w-none"
+            onError={() => setFailedImage(map.image)}
+          />
+        ) : (
+          <div className="grid h-full w-full place-items-center bg-sunken p-md text-center text-sm text-muted">
+            {WORLD_MAP_TEXT.card.imageError(map.image)}
+          </div>
+        )}
 
         {/* 目印。拡大しても画面上の大きさが変わらないよう、寸法は拡大率で割ってある */}
         <svg

@@ -39,4 +39,6 @@ export interface WorldMapDocument {
   /** どのツールのどの出力から作ったか。 */
   source: string;
   maps: WorldMap[];
+  /** 壊れていて除外した地図エントリ。 */
+  issues?: string[];
 }

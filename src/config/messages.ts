@@ -319,12 +319,14 @@ export const WORLD_MAP_TEXT = {
   /** 地図データがまだ無いとき。 */
   noData:
     '地図データ（data/world-map.json）がありません。BlueMap でレンダリングしてから `npm run build:world-map` を実行してください。',
+  partialData: (count: number) => `読み込めない地図データ ${formatInt(count)} 件を除外して表示しています。`,
 
   card: {
     title: '2D マップ',
     note: '真上から見た地図です。掴んで動かすと移動、拡大すると 1 画素が 1 ブロックとして見えます。',
     /** 読み上げと、画像が出ないときの説明。 */
     alt: (world: string) => `${world}を真上から見た地図`,
+    imageError: (path: string) => `画像を読み込めません: ${path}`,
   },
 
   picker: {
