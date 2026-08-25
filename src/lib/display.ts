@@ -30,7 +30,7 @@ import type { NumericPlayerRowKey, RateBasis } from './selectors';
 import { formatDecimal, formatInt } from './format';
 import { PLAYSTYLE_IDS, type PlaystyleScore } from './statsExperience';
 import { STREAK_TEXT, ZUKAN_TEXT } from '../config/messages';
-import { ZUKAN_ATTRIBUTE_LIMIT } from '../config/dataRegistry';
+import { ZUKAN_ATTRIBUTE_LIMIT, ZUKAN_PRIORITY_ATTRIBUTES } from '../config/dataRegistry';
 import type { PlayStreak } from './playStreak';
 
 /* ------------------------------------------------------------------ *
@@ -202,7 +202,9 @@ export function playerCardContent(input: {
   /** 連続プレイ日数。ログに記録が無ければ null。 */
   streak: PlayStreak | null;
 }): { attributes: string[]; overflow: string; badges: string[] } {
-  const shown = input.attributes.slice(0, ZUKAN_ATTRIBUTE_LIMIT);
+  const priority = input.attributes.filter((attribute) => ZUKAN_PRIORITY_ATTRIBUTES.includes(attribute));
+  const rest = input.attributes.filter((attribute) => !ZUKAN_PRIORITY_ATTRIBUTES.includes(attribute));
+  const shown = [...priority, ...rest].slice(0, ZUKAN_ATTRIBUTE_LIMIT);
   const hidden = input.attributes.length - shown.length;
   const badges: string[] = [];
   /* 続いている人だけ日数を出す。途切れた日数を並べても比べる意味がない */

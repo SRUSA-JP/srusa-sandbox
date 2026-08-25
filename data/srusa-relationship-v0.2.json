@@ -104,6 +104,7 @@
     { "id": "shion_group", "name": "shion組", "type": "friend_group" },
     { "id": "k_company", "name": "K社", "type": "company" },
     { "id": "golf", "name": "ゴルフ", "type": "activity" },
+    { "id": "active_member", "name": "アクティブメンバー", "type": "activity" },
     { "id": "online_friend", "name": "ネット友", "type": "relationship_context" },
     { "id": "unknown", "name": "不明", "type": "unknown" }
   ],

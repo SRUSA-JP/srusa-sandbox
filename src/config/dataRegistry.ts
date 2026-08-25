@@ -32,3 +32,6 @@ export const PLAY_STREAK_WINDOW_DAYS = 21;
  * 上限を決め、あふれたぶんは「ほか n」とまとめる。
  */
 export const ZUKAN_ATTRIBUTE_LIMIT = 3;
+
+/** 図鑑カードで、所属数の上限があっても優先して見せるタグ。 */
+export const ZUKAN_PRIORITY_ATTRIBUTES = ['アクティブメンバー'];
