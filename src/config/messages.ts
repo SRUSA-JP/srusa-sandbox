@@ -281,6 +281,7 @@ export const STATS_TEXT = {
     xAxis: '横軸',
     yAxis: '縦軸',
     trendScope: '表示単位',
+    trendMode: '値の出し方',
     pointDisplay: '点の表示',
   },
 
@@ -308,6 +309,17 @@ export const STATS_TEXT = {
         'データが1日分しかないため、点が1つだけ表示されます。data/ に別の日付の minecraft-stats-YYYYMMDD.json を追加すると線になります。',
       perPlayer: (limit: number) => `最新日の上位${limit}人までを表示します。`,
       dateColumn: '日付',
+      /** 累計をそのまま出すときの断り。1 点が数日ぶんを含むことを明示する。 */
+      cumulativeNote:
+        'スナップショット時点の累計です。点と点の間が数日空いているときは、その間の増加がまとめて次の点に乗ります。',
+      /** 1日あたりの概算のときの説明。実測ではないことを必ず添える。 */
+      dailyAverageNote:
+        'スナップショット間の増加を、その間の日数で割って 1 日ずつに広げた概算です。実際にその日どれだけ動いたかの記録ではありません。',
+      /** 概算に切り替えると、プレイ時間での換算は使わない。 */
+      dailyAverageBasis: '値の基準（1時間あたりなど）は使いません。カレンダーの日数で割った値です。',
+      /** 概算にできるスナップショットが足りないとき。 */
+      needsTwoSnapshots:
+        '増分を計算できるスナップショットが 2 日分ありません。data/ に別の日付の minecraft-stats-YYYYMMDD.json を追加してください。',
     },
     scatter: {
       title: '2指標の関係（散布図）',

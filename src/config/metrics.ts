@@ -144,6 +144,20 @@ export const TREND_SCOPE_OPTIONS: Array<{ value: TrendScope; label: string }> = 
   { value: 'per_player', label: 'プレイヤー別' },
 ];
 
+/**
+ * 推移グラフの値の出し方。
+ *
+ * スナップショットは毎日は取っていない。累計をそのまま点にすると、数日ぶんの
+ * 増加が 1 点に乗って「その日にそれだけ動いた」ように読めてしまうので、
+ * 既定は増分を日数で割った概算にする。
+ */
+export type TrendMode = 'daily_average' | 'cumulative';
+
+export const TREND_MODE_OPTIONS: Array<{ value: TrendMode; label: string }> = [
+  { value: 'daily_average', label: '1日あたりの概算' },
+  { value: 'cumulative', label: '累計' },
+];
+
 export type ScatterPointDisplay = 'icon_name' | 'icon' | 'name';
 
 export const SCATTER_POINT_DISPLAY_OPTIONS: Array<{ value: ScatterPointDisplay; label: string }> = [
@@ -168,6 +182,7 @@ export const STATS_DEFAULTS = {
   trendMetric: 'playtime_hours',
   trendBasis: 'total',
   trendScope: 'total',
+  trendMode: 'daily_average',
 } satisfies {
   filterMetric: NumericPlayerRowKey;
   rankMetric: NumericPlayerRowKey;
@@ -184,6 +199,7 @@ export const STATS_DEFAULTS = {
   trendMetric: NumericPlayerRowKey;
   trendBasis: RateBasis;
   trendScope: TrendScope;
+  trendMode: TrendMode;
 };
 
 /** 表の左端に置くプレイヤー列。 */

@@ -37,10 +37,12 @@ import {
   SERIES_OPTIONS,
   STATS_DEFAULTS,
   STATS_TEXT,
+  TREND_MODE_OPTIONS,
   TREND_SCOPE_OPTIONS,
   type BreakdownId,
   type ScatterPointDisplay,
   type SeriesId,
+  type TrendMode,
   type TrendScope,
 } from '../config';
 import {
@@ -123,6 +125,7 @@ export function StatsPage({ theme }: StatsPageProps) {
   const [trendMetric, setTrendMetric] = useState<NumericPlayerRowKey>(STATS_DEFAULTS.trendMetric);
   const [trendBasis, setTrendBasis] = useState<RateBasis>(STATS_DEFAULTS.trendBasis);
   const [trendScope, setTrendScope] = useState<TrendScope>(STATS_DEFAULTS.trendScope);
+  const [trendMode, setTrendMode] = useState<TrendMode>(STATS_DEFAULTS.trendMode);
   /** 日付ごとの推移に使う全スナップショット。 */
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
 
@@ -276,8 +279,9 @@ export function StatsPage({ theme }: StatsPageProps) {
         players: playerNames,
         basis: trendBasis,
         perPlayer: trendScope === 'per_player',
+        mode: trendMode,
       }),
-    [snapshots, trendMetric, playerNames, trendBasis, trendScope],
+    [snapshots, trendMetric, playerNames, trendBasis, trendScope, trendMode],
   );
 
   const scatterPoints = useMemo(
@@ -626,7 +630,14 @@ export function StatsPage({ theme }: StatsPageProps) {
                 STATS_TEXT.card.trend.note(snapshots.length),
                 snapshots.length < 2 && STATS_TEXT.card.trend.singleSnapshot,
                 trendScope === 'per_player' && STATS_TEXT.card.trend.perPlayer(LIMITS.trendPlayers),
-                basisNote(trendBasis, STATS_TEXT.basisNote.subject.audience),
+                /* 1 点が何日ぶんかを必ず添える。ここを黙ると数日ぶんの増加を 1 日分と読まれる */
+                trendMode === 'daily_average'
+                  ? joinNotes(
+                      STATS_TEXT.card.trend.dailyAverageNote,
+                      STATS_TEXT.card.trend.dailyAverageBasis,
+                    )
+                  : STATS_TEXT.card.trend.cumulativeNote,
+                trendMode === 'cumulative' && basisNote(trendBasis, STATS_TEXT.basisNote.subject.audience),
                 ` 更新 ${trendDataDate}`,
               )}
               actions={
@@ -634,7 +645,8 @@ export function StatsPage({ theme }: StatsPageProps) {
                   <Picker
                     label={STATS_TEXT.picker.metric}
                     value={trendMetric}
-                    options={metricsFor(trendBasis)}
+                    /* 概算では換算しないので、換算できない指標も選べる */
+                    options={metricsFor(trendMode === 'daily_average' ? 'total' : trendBasis)}
                     onChange={setTrendMetric}
                   />
                   <Picker
@@ -644,11 +656,20 @@ export function StatsPage({ theme }: StatsPageProps) {
                     onChange={setTrendScope}
                   />
                   <Picker
-                    label={STATS_TEXT.picker.basis}
-                    value={trendBasis}
-                    options={BASIS_OPTIONS}
-                    onChange={changeTrendBasis}
+                    label={STATS_TEXT.picker.trendMode}
+                    value={trendMode}
+                    options={TREND_MODE_OPTIONS}
+                    onChange={setTrendMode}
                   />
+                  {/* 概算はカレンダーの日数で割るので、プレイ時間で割る換算とは重ねない */}
+                  {trendMode === 'cumulative' && (
+                    <Picker
+                      label={STATS_TEXT.picker.basis}
+                      value={trendBasis}
+                      options={BASIS_OPTIONS}
+                      onChange={changeTrendBasis}
+                    />
+                  )}
                 </>
               }
               tableRows={trendData.rows as Row[]}
@@ -666,7 +687,11 @@ export function StatsPage({ theme }: StatsPageProps) {
                   unit={unitFor(trendMetricOption.unit, trendBasis)}
                 />
               ) : (
-                <Note>{STATS_TEXT.empty.noSnapshots}</Note>
+                <Note>
+                  {trendMode === 'daily_average' && snapshots.length < 2
+                    ? STATS_TEXT.card.trend.needsTwoSnapshots
+                    : STATS_TEXT.empty.noSnapshots}
+                </Note>
               )}
             </ChartCard>
 

@@ -24,6 +24,7 @@ import {
   OTHER_ENTRY,
   TOTAL_SERIES,
 } from '../config/labels';
+import { addDays, daysBetween, isDayString } from './date';
 import { labelFor, prettifyId, stripNamespace } from './format';
 
 /** チャート・表で使う汎用の 1 行。 */
@@ -116,9 +117,12 @@ export function basisDivisor(hours: number, basis: RateBasis): number {
   }
 }
 
+/** 換算した値の小数点以下の桁数。率も概算も同じ細かさで揃える。 */
+const RATE_DIGITS = 3;
+
 /** 0 除算を避けて割る。分母が 0 以下なら 0 とする。 */
 export function perUnit(value: number, divisor: number): number {
-  return divisor > 0 ? round(value / divisor, 3) : 0;
+  return divisor > 0 ? round(value / divisor, RATE_DIGITS) : 0;
 }
 
 /** 基準に応じて 1 件の値を換算する。換算はすべてこの関数を通す。 */
@@ -598,19 +602,82 @@ export interface Snapshot {
 export const TIMELINE_CATEGORY_KEY = 'date';
 
 /**
+ * 推移の出し方。
+ *
+ * - `cumulative`: スナップショット時点の累計をそのまま点にする
+ * - `daily_average`: 前のスナップショットからの増分を、その間の日数で割って
+ *   1 日ずつに広げる
+ */
+export type TrendMode = 'cumulative' | 'daily_average';
+
+/** その日 1 日ぶんの概算値。 */
+interface DailyPoint {
+  /** `YYYY-MM-DD`。 */
+  date: string;
+  /** キー（合計なら total、プレイヤー別なら名前）ごとの 1 日あたりの概算。 */
+  values: Record<string, number>;
+}
+
+/**
+ * スナップショットの増分を、間に挟まる日へ均等に配る。
+ *
+ * スナップショットは毎日は取っていない。累計をそのまま点にすると、5 日ぶんの
+ * 増加が 1 点に乗って「その日にそれだけ動いた」ように見えてしまう。そこで
+ * 増分を日数で割り、その期間の各日に同じ値を置く（**概算**であって実測ではない）。
+ *
+ * 増分が負になる（データが取り直された）区間は 0 として扱う。マイナスの活動量は
+ * 意味を持たないので、線を跳ねさせるより落としたほうが読み違えにくい。
+ */
+function dailyAverages(
+  snapshots: Array<{ label: string; values: Record<string, number> }>,
+): DailyPoint[] {
+  const points: DailyPoint[] = [];
+
+  for (let index = 1; index < snapshots.length; index += 1) {
+    const previous = snapshots[index - 1];
+    const current = snapshots[index];
+    if (!isDayString(previous.label) || !isDayString(current.label)) continue;
+
+    const days = daysBetween(previous.label, current.label);
+    if (days <= 0) continue;
+
+    const perDay: Record<string, number> = {};
+    for (const key of Object.keys(current.values)) {
+      const delta = current.values[key] - (previous.values[key] ?? 0);
+      perDay[key] = Math.max(0, delta) / days;
+    }
+
+    for (let day = 1; day <= days; day += 1) {
+      points.push({ date: addDays(previous.label, day), values: perDay });
+    }
+  }
+
+  return points;
+}
+
+/**
  * 日付を横軸にした系列を作る。
  *
  * - `perPlayer` が false: 対象者の合計を 1 本の線にする
  * - `perPlayer` が true: プレイヤーごとに 1 本ずつ。色は 8 枠までなので上位のみ残す
  *
  * 1時間あたりへの換算は、合計値を合計プレイ時間で割る（各人の率の平均ではない）。
+ * `mode` が `daily_average` のときは、換算せずに増分を日数で割った概算を返す
+ * （プレイ時間で割る換算と、カレンダーの日数で割る概算を重ねない）。
  */
 export function metricTimeline(
   snapshots: Snapshot[],
   metric: NumericPlayerRowKey,
-  options: { players?: string[]; basis?: RateBasis; perPlayer?: boolean; limit?: number } = {},
+  options: {
+    players?: string[];
+    basis?: RateBasis;
+    perPlayer?: boolean;
+    limit?: number;
+    mode?: TrendMode;
+  } = {},
 ): StackedSeries {
-  const basis = options.basis ?? 'total';
+  const mode = options.mode ?? 'cumulative';
+  const basis = mode === 'daily_average' ? 'total' : (options.basis ?? 'total');
   const limit = options.limit ?? LIMITS.trendPlayers;
   const perSnapshot = snapshots.map((snapshot) => ({
     label: snapshot.label,
@@ -618,6 +685,20 @@ export function metricTimeline(
   }));
 
   if (!options.perPlayer) {
+    if (mode === 'daily_average') {
+      const totals = perSnapshot.map(({ label, rows: snapshotRows }) => ({
+        label,
+        values: { [TOTAL_SERIES.key]: snapshotRows.reduce((acc, row) => acc + row[metric], 0) },
+      }));
+      return {
+        series: [{ ...TOTAL_SERIES }],
+        rows: dailyAverages(totals).map((point) => ({
+          [TIMELINE_CATEGORY_KEY]: point.date,
+          [TOTAL_SERIES.key]: round(point.values[TOTAL_SERIES.key] ?? 0, RATE_DIGITS),
+        })),
+      };
+    }
+
     const rows = perSnapshot.map(({ label, rows: snapshotRows }) => {
       const value = snapshotRows.reduce((acc, row) => acc + row[metric], 0);
       const hours = snapshotRows.reduce((acc, row) => acc + row.playtime_hours, 0);
@@ -636,6 +717,24 @@ export function metricTimeline(
     .slice(0, limit)
     .map((row) => row.name);
 
+  const series = names.map((name) => ({ key: name, label: name }));
+
+  if (mode === 'daily_average') {
+    const byName = perSnapshot.map(({ label, rows: snapshotRows }) => ({
+      label,
+      values: Object.fromEntries(
+        names.map((name) => [name, snapshotRows.find((r) => r.name === name)?.[metric] ?? 0]),
+      ),
+    }));
+    return {
+      series,
+      rows: dailyAverages(byName).map((point) => ({
+        [TIMELINE_CATEGORY_KEY]: point.date,
+        ...Object.fromEntries(names.map((name) => [name, round(point.values[name] ?? 0, RATE_DIGITS)])),
+      })),
+    };
+  }
+
   const rows = perSnapshot.map(({ label, rows: snapshotRows }) => {
     const row: Record<string, string | number> = { [TIMELINE_CATEGORY_KEY]: label };
     for (const name of names) {
@@ -645,7 +744,7 @@ export function metricTimeline(
     return row;
   });
 
-  return { series: names.map((name) => ({ key: name, label: name })), rows };
+  return { series, rows };
 }
 
 /** 散布図用（任意の指標 × 任意の指標）。 */
