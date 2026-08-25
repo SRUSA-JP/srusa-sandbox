@@ -39,7 +39,7 @@ export function ClipCard({ clip, active, onSelect, onFilter }: ClipCardProps) {
               {clip.title}
             </div>
           )}
-          <span className="absolute inset-0 grid place-items-center bg-[rgb(0_0_0/0.20)] text-lg text-white">
+          <span className="absolute inset-0 grid place-items-center bg-overlay/70 text-lg text-heading">
             {playable ? 'Play' : '準備中'}
           </span>
         </div>

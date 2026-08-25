@@ -42,7 +42,7 @@ export function ClipsPage() {
             <label className={`${FIELD} min-w-0 flex-1`}>
               {CLIP_TEXT.customUrl}
               <input
-                className={`${CONTROL_BOX} min-w-[min(22rem,100%)] flex-1 px-md`}
+                className={`${CONTROL_BOX} min-w-0 flex-1 px-md sm:min-w-[var(--sr-layout-column-min-width)]`}
                 value={draftUrl}
                 placeholder="https://..."
                 onChange={(event) => setDraftUrl(event.target.value)}

@@ -31,13 +31,14 @@ srusa-portal 側は MkDocs のページに iframe で埋め込む前提だった
 ```bash
 npm install
 npm run dev             # 開発サーバー（--host 付き。スマホ実機からも開ける）
-npm run build           # 型検査 → ESLint → コントラスト検査 → dist/ に出力
+npm run build           # 型検査 → ESLint → UI/配色/デザイン検査 → dist/ に出力
 npm run preview         # ビルド成果物のプレビュー
 npm run deploy:preview  # Netlify の固定プレビューへデプロイ（本番公開しない）
 npm run typecheck       # tsc --noEmit
 npm run test:ui         # 公開ルートの初期レンダリングが壊れていないか確認
 npm run lint            # ESLint
 npm run check:contrast  # 配色の WCAG コントラスト検査
+npm run check:design    # UI層の色・寸法直書きやカード入れ子などの静的検査
 npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（BlueMap の出力が要る）
 npm run update:data     # AWS SSO 確認 → ../aws_minecraft の抽出 → sync:data
 npm run sync:data       # ../aws_minecraft と BlueMap の出力からデータを取り込む
@@ -103,6 +104,7 @@ npm run sync:data -- --dry-run    # 何をするかだけ出す
 - `player-db-*.json` はこのリポジトリでは作れない。`../aws_minecraft` 側で作り直して置く
 
 配色・スキン・コントラストのしきい値を変えたら、必ず `npm run check:contrast` を通すこと。
+UI層に色や寸法の実値を足したり、カード構造を変えたりしたら `npm run check:design` も通すこと。
 
 ### スラッシュコマンド
 
@@ -359,7 +361,7 @@ git rev-parse --abbrev-ref HEAD
 
 ## 変更時の確認
 
-- `npm run build`（型検査・ESLint・UI初期レンダリング・コントラスト検査を含む）が通ること。`/check` で一括実行できる
+- `npm run build`（型検査・ESLint・UI初期レンダリング・コントラスト比・デザイン静的検査を含む）が通ること。`/check` で一括実行できる
 - 追加した部品が正しい層（atoms / molecules / organisms / templates）に置かれ、
   下の層から上の層を import していないこと
 - **ウィンドウからはみ出していないこと**（DESIGN.md「ウィンドウからはみ出さない」）。

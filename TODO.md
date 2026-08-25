@@ -8,6 +8,13 @@
 
 #### 2026-08-25
 
+- 原文: `コントラスト比とかデザインもチェックできるようんい`
+  - `scripts/check-design.ts` を追加し、UI層の色直書き、トークンなしの任意値クラス、典型的なカード入れ子を検査できるようにした
+  - `npm run check:design` を追加し、`npm run build` と CI の検査列へ組み込んだ
+  - 既存の `npm run check:contrast` はコントラスト比の数値検査として継続し、CLAUDE.md / DESIGN.md に使い分けを追記した
+  - `ClipCard` の直書きオーバーレイ色と `ClipsPage` の入力欄幅をトークン・役割色経由に寄せた
+  - 確認: `npm run check:design`、`npm run check:contrast`、`npm run typecheck`、`npm run lint`、`npm run build` を実行し、すべて通ることを確認
+
 - 原文: `各UIのレンダリングとか，壊れていないかとかのテストが走るように`
   - `scripts/check-ui-render.tsx` を追加し、公開ルートと代表的なプレイヤーURLを React SSR で初期レンダリングするスモークテストを作った
   - `npm run test:ui` を追加し、`npm run build` の検査列にも組み込んだ
