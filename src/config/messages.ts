@@ -208,6 +208,22 @@ export const STATS_TEXT = {
         blocksMined: 'MINED',
         advancements: 'ADV',
       },
+      /**
+       * レーダーの軸に出す短い名前。
+       *
+       * 軸の名前は図の外側に置くので、長いと多角形がその分だけ小さくなる
+       * （lib/radar.ts が収まる半径を計算する）。4〜5 文字に収めること。
+       * 正式な名前は styles にあり、図の隣の一覧はそちらを使う。
+       */
+      stylesShort: {
+        miner: 'MINE',
+        builder: 'BUILD',
+        explorer: 'EXPL',
+        fighter: 'FIGHT',
+        farmer: 'FARM',
+        fisher: 'FISH',
+        trader: 'TRADE',
+      },
       styles: {
         miner: 'MINER',
         builder: 'BUILDER',

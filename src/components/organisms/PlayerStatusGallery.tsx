@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { BASIS_OPTIONS } from '../../config';
+import { RADAR } from '../../config/charts';
+import { skinnedFontSize } from '../../config/skins';
+import { radarLayout, radarPolygonPoints } from '../../lib/radar';
 import { playerDataHighlightColors, playerDataHighlightLevel } from '../../config/colors';
 import type { PlayerMetricId, PlayerStatus, PlayerStatusMetric, PlaystyleId } from '../../lib/statsExperience';
 import type { RateBasis } from '../../lib/selectors';
@@ -21,6 +24,8 @@ export interface PlayerStatusText {
   selectPlayerAlt: (name: string) => string;
   basis: string;
   styles: Record<PlaystyleId, string>;
+  /** レーダーの軸に出す短い名前。 */
+  stylesShort: Record<PlaystyleId, string>;
   descriptions: Record<PlaystyleId, string>;
   achievementTitles: Record<PlaystyleId | 'diamond' | 'fallen', string>;
   metrics: Record<PlayerMetricId, string>;
@@ -37,31 +42,14 @@ export interface PlayerStatusGalleryProps {
   profileHref?: (name: string) => string;
 }
 
-const RADAR_CENTER = 60;
-const RADAR_RADIUS = 34;
-const RADAR_LABEL_RADIUS = 53;
-const RADAR_RINGS = [0.25, 0.5, 0.75, 1] as const;
-
-function radarPoint(index: number, total: number, radius: number) {
-  const angle = -Math.PI / 2 + (Math.PI * 2 * index) / total;
-  return {
-    x: RADAR_CENTER + Math.cos(angle) * radius,
-    y: RADAR_CENTER + Math.sin(angle) * radius,
-  };
-}
-
-function radarPoints(total: number, radius: number): string {
-  return Array.from({ length: total }, (_, index) => {
-    const point = radarPoint(index, total, radius);
-    return `${point.x},${point.y}`;
-  }).join(' ');
-}
-
-function radarLabelAnchor(x: number): 'start' | 'middle' | 'end' {
-  const delta = x - RADAR_CENTER;
-  if (delta > 8) return 'start';
-  if (delta < -8) return 'end';
-  return 'middle';
+/**
+ * 軸に出す文字。
+ *
+ * 短い名前とその値を 1 つの文字列にする（幅の見積りと描画を同じ文字列で行うため）。
+ * 順位ではなく値を出すのは、形の膨らみと数字が同じものを指すようにするため。
+ */
+function axisLabel(name: string, value: number): string {
+  return `${name}:${value}`;
 }
 
 function PlaystyleRadar({
@@ -75,71 +63,83 @@ function PlaystyleRadar({
   accent: string;
   theme: VizTheme;
 }) {
-  /* 軸はプレイヤーによらず同じ順番。強弱は形と順位の数字で読ませる */
+  /* 軸はプレイヤーによらず同じ順番。強弱は形と、軸に添えた値で読ませる */
   const axisScores = playstyleAxisOrder(player.scores);
-  const points = axisScores
-    .map((score, index) => {
-      const point = radarPoint(index, axisScores.length, (score.value / 100) * RADAR_RADIUS);
-      return `${point.x},${point.y}`;
-    })
-    .join(' ');
+  /* 名前が枠からはみ出さない半径を先に決める。字数が増えれば多角形が小さくなる */
+  const layout = radarLayout({
+    labels: axisScores.map((score) => axisLabel(text.stylesShort[score.id], score.value)),
+    size: RADAR.size,
+    fontSize: skinnedFontSize(RADAR.fontSize),
+    padding: RADAR.padding,
+    gap: RADAR.labelGap,
+  });
   const ariaLabel = axisScores
     .map((score) => `${text.styles[score.id]} ${score.value}`)
     .join(' / ');
 
   return (
     <div className="border-hairline border-divider bg-sunken p-xs" aria-label={ariaLabel}>
-      <svg viewBox="0 0 120 120" role="img" className="aspect-square w-full">
-        {RADAR_RINGS.map((ring) => (
+      {/*
+        文字も SVG の座標で描くので、枠を広げると文字まで一緒に大きくなる。
+        図の設計寸法で頭打ちにして、どの画面でも同じ大きさで読ませる。
+      */}
+      <svg
+        viewBox={`0 0 ${layout.size} ${layout.size}`}
+        role="img"
+        className="mx-auto block aspect-square w-full max-w-[var(--sr-layout-playstyle-radar-size)]"
+      >
+        {RADAR.rings.map((ring) => (
           <polygon
             key={ring}
-            points={radarPoints(axisScores.length, RADAR_RADIUS * ring)}
+            points={radarPolygonPoints(layout, ring)}
             fill="none"
             stroke={theme.border}
-            strokeWidth="0.8"
+            strokeWidth={RADAR.gridStrokeWidth}
             vectorEffect="non-scaling-stroke"
           />
         ))}
-        {axisScores.map((score, index) => {
-          const axis = radarPoint(index, axisScores.length, RADAR_RADIUS);
-          const label = radarPoint(index, axisScores.length, RADAR_LABEL_RADIUS);
-          const anchor = radarLabelAnchor(label.x);
-          return (
-            <g key={score.id}>
-              <line
-                x1={RADAR_CENTER}
-                y1={RADAR_CENTER}
-                x2={axis.x}
-                y2={axis.y}
-                stroke={theme.border}
-                strokeWidth="0.8"
-                vectorEffect="non-scaling-stroke"
-              />
-              <text
-                x={label.x}
-                y={label.y}
-                textAnchor={anchor}
-                dominantBaseline="central"
-                fill={theme.textSecondary}
-                fontSize="5.4"
-                fontWeight="650"
-              >
-                <tspan>{score.rank}</tspan>
-                <tspan dx="1.5">{text.styles[score.id]}</tspan>
-              </text>
-            </g>
-          );
-        })}
+        {layout.axes.map((axis, index) => (
+          <g key={axisScores[index].id}>
+            <line
+              x1={layout.center}
+              y1={layout.center}
+              x2={axis.vertex.x}
+              y2={axis.vertex.y}
+              stroke={theme.border}
+              strokeWidth={RADAR.gridStrokeWidth}
+              vectorEffect="non-scaling-stroke"
+            />
+            <text
+              x={axis.labelPoint.x}
+              y={axis.labelPoint.y}
+              textAnchor={axis.anchor}
+              dominantBaseline="central"
+              fill={theme.textSecondary}
+              fontSize={layout.fontSize}
+              fontWeight={RADAR.labelFontWeight}
+            >
+              {axis.label}
+            </text>
+          </g>
+        ))}
         <polygon
-          points={points}
-          fill={withAlpha(accent, 0.24)}
+          points={radarPolygonPoints(layout, axisScores.map((score) => score.value / 100))}
+          fill={withAlpha(accent, RADAR.fillAlpha)}
           stroke={accent}
-          strokeWidth="2"
+          strokeWidth={RADAR.shapeStrokeWidth}
           vectorEffect="non-scaling-stroke"
         />
-        {axisScores.map((score, index) => {
-          const point = radarPoint(index, axisScores.length, (score.value / 100) * RADAR_RADIUS);
-          return <circle key={score.id} cx={point.x} cy={point.y} r="1.8" fill={accent} />;
+        {layout.axes.map((axis, index) => {
+          const ratio = axisScores[index].value / 100;
+          return (
+            <circle
+              key={axisScores[index].id}
+              cx={layout.center + (axis.vertex.x - layout.center) * ratio}
+              cy={layout.center + (axis.vertex.y - layout.center) * ratio}
+              r={RADAR.dotRadius}
+              fill={accent}
+            />
+          );
         })}
       </svg>
     </div>
@@ -263,7 +263,7 @@ function PlayerStatusCard({
         </div>
       </div>
 
-      <div className="grid min-w-0 gap-md sm:grid-cols-[minmax(160px,0.72fr)_minmax(0,1fr)]">
+      <div className="grid min-w-0 gap-md sm:grid-cols-[minmax(var(--sr-layout-playstyle-radar-size),0.72fr)_minmax(0,1fr)]">
         <PlaystyleRadar player={player} text={text} accent={accent} theme={theme} />
         <div className="grid content-center gap-xs border-hairline border-divider bg-sunken p-xs">
           <div className="mb-xxs grid gap-xxs border-b-hairline border-divider pb-xs">

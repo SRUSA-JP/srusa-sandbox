@@ -8,7 +8,7 @@
  * 色は持たない。色は theme/palette.ts が唯一の出どころ。
  * 共通の書体・余白・角丸は theme/tokens.ts から取り、値を重複させない。
  */
-import { BORDER, FONT_SIZE, RADIUS, SPACE } from '../theme/tokens';
+import { BORDER, FONT_SIZE, LAYOUT, RADIUS, SPACE } from '../theme/tokens';
 
 /** グラフ本体の高さ。 */
 export const CHART_HEIGHT = {
@@ -60,6 +60,38 @@ export const LEGEND = {
   fontSize: FONT_SIZE.sm,
   /** グラフ本体との距離。 */
   paddingTop: SPACE.md,
+} as const;
+
+/**
+ * プレイスタイルの多角形レーダー。
+ *
+ * 軸の名前を外側に置くので、字数が増えるほど多角形は小さくなる
+ * （収まる半径は lib/radar.ts が計算する）。名前を長くしすぎると図が
+ * 潰れるので、`minDiameterRatio` を下回っていないか check:layout で見る。
+ */
+export const RADAR = {
+  /** 図の一辺。表示もこの大きさで止めて、文字が伸び縮みしないようにする。 */
+  size: LAYOUT.playstyleRadarSize,
+  /** 軸の名前の大きさ。図の中の添え字なので、可読性の下限に合わせる。 */
+  fontSize: FONT_SIZE.xxs,
+  /** 枠の内側に必ず残す余白。 */
+  padding: SPACE.xxs,
+  /** 多角形の外周と軸の名前の間隔。 */
+  labelGap: SPACE.xs,
+  /** 目盛りの輪（中心からの比率）。 */
+  rings: [0.25, 0.5, 0.75, 1],
+  /** 頂点に置く点の半径。 */
+  dotRadius: 2,
+  /** 目盛りと軸の線の太さ。 */
+  gridStrokeWidth: 0.8,
+  /** 形をなぞる線の太さ。 */
+  shapeStrokeWidth: 2,
+  /** 形の塗りの濃さ。 */
+  fillAlpha: 0.24,
+  /** 軸の名前に使う太さ。 */
+  labelFontWeight: 650,
+  /** 図が潰れていないかの下限（一辺に対する多角形の直径の比）。 */
+  minDiameterRatio: 0.45,
 } as const;
 
 /** グラフ枠の内側の余白。グラフごとに軸ラベルの出方が違うので分けて持つ。 */
