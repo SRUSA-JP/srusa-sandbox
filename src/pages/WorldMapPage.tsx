@@ -22,6 +22,10 @@ function dateLabel(date: string, latestDate = ''): string {
   return latestDate && date === latestDate ? `最新 ${date}` : date;
 }
 
+function datePickerLabel(date: string, latestDate = ''): string {
+  return latestDate && date === latestDate ? `最新（${date}）` : date;
+}
+
 function mapLabel(map: WorldMap, fallbackDate = '', latestDate = ''): string {
   const dimension = mapDimension(map);
   const base = WORLD_LABELS[dimension] ?? WORLD_LABELS[map.id] ?? map.label ?? map.id;
@@ -158,7 +162,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
             <Picker
               label={WORLD_MAP_TEXT.picker.map}
               value={effectiveDate}
-              options={mapDates.map((date) => ({ value: date, label: date }))}
+              options={mapDates.map((date) => ({ value: date, label: datePickerLabel(date, latestDate) }))}
               onChange={setSelectedDate}
             />
           ) : undefined

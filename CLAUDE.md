@@ -86,6 +86,9 @@ npm run sync:data -- --dry-run    # 何をするかだけ出す
   伏せ忘れがあれば書き出す前に止まる（`redaction.forbiddenPatterns`）
 - ワールドを描き直すには先に `../srusa-portal/bluemap/render.sh`（Java が要る）を実行する。
   レンダリングはこのコマンドの外
+- ワールドマップの公開表示は BlueMap の通常地形色 PNG だけにする。`scripts/build-chunk-world-map.ts`
+  のようなチャンク分布の簡略 PNG は調査用で、`data/world-map.json` の公開マップ一覧に混ぜない。
+  広い範囲が必要な場合も BlueMap 側で通常地形色の地図としてレンダリングし、その成果物を取り込む
 - `player-db-*.json` はこのリポジトリでは作れない。`../aws_minecraft` 側で作り直して置く
 
 配色・スキン・コントラストのしきい値を変えたら、必ず `npm run check:contrast` を通すこと。

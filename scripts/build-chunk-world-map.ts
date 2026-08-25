@@ -1,17 +1,18 @@
 /**
- * `aws_minecraft` 側で抽出したチャンク一覧 JSON から、軽量な広域マップ PNG を作る。
+ * `aws_minecraft` 側で抽出したチャンク一覧 JSON から、調査用の軽量な広域マップ PNG を作る。
  *
  * BlueMap の地形色そのものではなく、生成済みチャンクの分布を 1px = 1chunk で描く。
- * 遠方探索の範囲確認に使うため、座標計算は通常のワールドマップと同じ形式へ揃える。
+ * 公開画面のワールドマップには混ぜず、遠方探索の範囲確認だけに使う。
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import dataConfig from '../data/data-registry.json';
 import { encodePng } from './png';
 
 const ROOT = process.cwd();
 const CHUNK_SIZE = 16;
 const BYTES_PER_PIXEL = 4;
+const DIAGNOSTIC_IMAGE_DIR = 'world-map-diagnostics';
+const DIAGNOSTIC_METADATA_PATH = 'data/world-map-diagnostics.json';
 
 interface Args {
   source: string;
@@ -141,12 +142,12 @@ function main() {
     drawSquare(data, width, height, x, y, container.diamond_equiv && container.diamond_equiv > 0 ? 2 : 1, container.diamond_equiv && container.diamond_equiv > 0 ? diamondColor : containerColor);
   }
 
-  const image = `${dataConfig.paths.worldMapImageDir}/${args.id}.png`;
+  const image = `${DIAGNOSTIC_IMAGE_DIR}/${args.id}.png`;
   const outPath = join(ROOT, 'public', image);
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, encodePng({ width, height, data }));
 
-  const metadataPath = join(ROOT, dataConfig.paths.worldMapMetadata);
+  const metadataPath = join(ROOT, DIAGNOSTIC_METADATA_PATH);
   const previous = existsSync(metadataPath)
     ? (JSON.parse(readFileSync(metadataPath, 'utf8')).maps as WorldMapEntry[])
     : [];
@@ -173,10 +174,11 @@ function main() {
   ].sort((a, b) => a.id.localeCompare(b.id));
   writeFileSync(
     metadataPath,
-    `${JSON.stringify({ generated_on: new Date().toISOString().slice(0, 10), source: 'BlueMap lowres + region chunk summary', maps: merged }, null, 2)}\n`,
+    `${JSON.stringify({ generated_on: new Date().toISOString().slice(0, 10), source: 'region chunk summary diagnostic', maps: merged }, null, 2)}\n`,
   );
 
   console.log(`${args.id}: ${width}x${height}px / X ${entry.bounds.minX}..${entry.bounds.maxX - 1} / Z ${entry.bounds.minZ}..${entry.bounds.maxZ - 1}`);
+  console.log(`${DIAGNOSTIC_METADATA_PATH} を更新した（公開ワールドマップには使わない）`);
 }
 
 main();

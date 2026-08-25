@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-25",
-  "source": "BlueMap lowres + region chunk summary",
+  "source": "BlueMap lowres terrain",
   "maps": [
     {
       "id": "end",
@@ -20,25 +20,6 @@
       },
       "blocksPerPixel": 1,
       "bytes": 281308
-    },
-    {
-      "id": "end-wide-20260825",
-      "dimension": "end",
-      "label": "End（2026-08-25）",
-      "updated_on": "2026-08-25",
-      "image": "world-map/end-wide-20260825.png",
-      "bounds": {
-        "minX": -17200,
-        "minZ": -1168,
-        "maxX": 1600,
-        "maxZ": 4592
-      },
-      "pixels": {
-        "width": 1175,
-        "height": 360
-      },
-      "blocksPerPixel": 16,
-      "bytes": 3820
     },
     {
       "id": "overworld",
@@ -81,7 +62,7 @@
     {
       "id": "overworld-current",
       "dimension": "overworld",
-      "label": "オーバーワールド（最新 2026-08-25）",
+      "label": "オーバーワールド",
       "updated_on": "2026-08-25",
       "image": "world-map/overworld-current.png",
       "bounds": {
@@ -96,25 +77,6 @@
       },
       "blocksPerPixel": 1,
       "bytes": 1240285
-    },
-    {
-      "id": "overworld-wide-20260825",
-      "dimension": "overworld",
-      "label": "Overworld（2026-08-25）",
-      "updated_on": "2026-08-25",
-      "image": "world-map/overworld-wide-20260825.png",
-      "bounds": {
-        "minX": -3872,
-        "minZ": -3776,
-        "maxX": 3264,
-        "maxZ": 3120
-      },
-      "pixels": {
-        "width": 446,
-        "height": 431
-      },
-      "blocksPerPixel": 16,
-      "bytes": 3549
     },
     {
       "id": "twilightforest",
