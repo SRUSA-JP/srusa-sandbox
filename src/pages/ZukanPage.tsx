@@ -33,7 +33,7 @@ export function ZukanPage({ theme }: ZukanPageProps) {
   const [error, setError] = useState('');
   const [attribute, setAttribute] = useState(ANY_ATTRIBUTE);
   const [kind, setKind] = useState<DirectoryKind>('all');
-  const [sort, setSort] = useState<DirectorySort>('name');
+  const [sort, setSort] = useState<DirectorySort>('related');
   const dataset = useMemo(() => listDatasets()[0], []);
 
   /* 統計は「統計あり」の札にしか使わないので、読み込みを待たずに一覧を出す */
