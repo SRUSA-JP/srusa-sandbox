@@ -223,6 +223,8 @@ export const LAYOUT_MODES = [
   { value: 'clusterHybrid', label: '所属ハイブリッド' },
   { value: 'community', label: '関係コミュニティ' },
   { value: 'stress', label: '距離ストレス' },
+  { value: 'attributeRadial', label: '所属リング' },
+  { value: 'corePeriphery', label: 'コア周辺' },
   { value: 'force', label: '力学' },
   { value: 'radial', label: '放射状' },
   { value: 'layered', label: '階層' },

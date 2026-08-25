@@ -305,6 +305,109 @@ function placeLayered(data: RelationshipData): PersonPlacement[] {
   return placements;
 }
 
+function groupPeopleByPrimaryAttribute(data: RelationshipData): Array<{ key: string; people: Person[] }> {
+  const byAttribute = new Map<string, Person[]>();
+  for (const person of data.people) {
+    const key = primaryAttribute(person) || UNASSIGNED.label;
+    const list = byAttribute.get(key) ?? [];
+    list.push(person);
+    byAttribute.set(key, list);
+  }
+
+  const degree = relationDegree(data.relations);
+  return [...byAttribute.entries()]
+    .map(([key, people]) => ({
+      key,
+      people: [...people].sort((a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) || a.id.localeCompare(b.id)),
+    }))
+    .sort((a, b) => b.people.length - a.people.length || a.key.localeCompare(b.key, 'ja'));
+}
+
+/**
+ * 所属を主語にして読む配置。
+ *
+ * Graphviz の osage / patchwork 的に「クラスタを先に置く」発想を、SVG 領域が
+ * 読みやすいよう円周上の小さなまとまりとして表す。
+ */
+function placeAttributeRadial(data: RelationshipData): PersonPlacement[] {
+  const groups = groupPeopleByPrimaryAttribute(data);
+  const outerRadius = Math.max(360, (groups.length * NODE.gapX) / (Math.PI * 1.6));
+  const placements: PersonPlacement[] = [];
+
+  groups.forEach((group, groupIndex) => {
+    const angle = -Math.PI / 2 + (Math.PI * 2 * groupIndex) / Math.max(groups.length, 1);
+    const center = {
+      x: Math.cos(angle) * outerRadius,
+      y: Math.sin(angle) * outerRadius,
+    };
+    const columns = Math.min(CLUSTER.maxColumns, Math.max(1, Math.ceil(Math.sqrt(group.people.length))));
+    const rows = Math.ceil(group.people.length / columns);
+    const width = (columns - 1) * NODE.gapX;
+    const height = (rows - 1) * NODE.gapY;
+
+    group.people.forEach((person, index) => {
+      const column = index % columns;
+      const row = Math.floor(index / columns);
+      placements.push({
+        person,
+        x: center.x + column * NODE.gapX - width / 2,
+        y: center.y + row * NODE.gapY - height / 2,
+        groupIds: [],
+      });
+    });
+  });
+
+  return placements;
+}
+
+/**
+ * つながりの多い人を中心に、周辺の人を外側へ出す配置。
+ *
+ * 関係数が少ない相関図では、純粋な力学配置より「誰がハブか」が読みやすい。
+ */
+function placeCorePeriphery(data: RelationshipData): PersonPlacement[] {
+  const degree = relationDegree(data.relations);
+  const people = [...data.people].sort(
+    (a, b) =>
+      (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) ||
+      primaryAttribute(a).localeCompare(primaryAttribute(b), 'ja') ||
+      a.id.localeCompare(b.id),
+  );
+  const ringSizes = [8, 18, 28];
+  const rings: Person[][] = [];
+  let cursor = 0;
+
+  for (const size of ringSizes) {
+    rings.push(people.slice(cursor, cursor + size));
+    cursor += size;
+  }
+  if (cursor < people.length) rings.push(people.slice(cursor));
+
+  const placements: PersonPlacement[] = [];
+  rings.forEach((members, ringIndex) => {
+    if (members.length === 0) return;
+    const radius = ringIndex === 0 ? 130 : 130 + ringIndex * 270;
+    const sorted = [...members].sort(
+      (a, b) =>
+        primaryAttribute(a).localeCompare(primaryAttribute(b), 'ja') ||
+        (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) ||
+        a.id.localeCompare(b.id),
+    );
+
+    sorted.forEach((person, index) => {
+      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / Math.max(sorted.length, 1);
+      placements.push({
+        person,
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius,
+        groupIds: [],
+      });
+    });
+  });
+
+  return placements;
+}
+
 function placeForce(data: RelationshipData): PersonPlacement[] {
   const people = sortedPeople(data);
   const positions = new Map(placeCircular(data).map((placement) => [placement.person.id, { x: placement.x, y: placement.y }]));
@@ -838,6 +941,8 @@ function placementsFor(data: RelationshipData, mode: LayoutMode, centerId: strin
   if (mode === 'clusterHybrid') return placeClusterHybrid(data);
   if (mode === 'community') return placeCommunity(data);
   if (mode === 'stress') return placeStress(data);
+  if (mode === 'attributeRadial') return placeAttributeRadial(data);
+  if (mode === 'corePeriphery') return placeCorePeriphery(data);
   if (mode === 'force') return placeForce(data);
   if (mode === 'radial') return placeRadial(data, centerId);
   if (mode === 'layered') return placeLayered(data);
