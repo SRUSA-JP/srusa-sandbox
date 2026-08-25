@@ -1,3 +1,4 @@
+export * from './ClipsPage';
 export * from './EventRankingsPage';
 export * from './MapPage';
 export * from './PlayerPage';

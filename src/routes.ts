@@ -7,7 +7,7 @@
  */
 import { MINECRAFT_SKIN, skinFor, type Skin } from './config/skins';
 
-export type RouteId = 'stats' | 'world-map' | 'relationships' | 'zukan' | 'events' | 'player';
+export type RouteId = 'stats' | 'world-map' | 'relationships' | 'zukan' | 'events' | 'clips' | 'player';
 
 export interface Route {
   id: RouteId;
@@ -47,6 +47,7 @@ export const ROUTES: Route[] = [
   { id: 'relationships', path: '#/relationships', label: '相関図', skinId: MINECRAFT_SKIN.id },
   { id: 'zukan', path: ZUKAN_PATH, label: 'SRUSA 図鑑', skinId: MINECRAFT_SKIN.id },
   { id: 'events', path: '#/events', label: 'イベント', skinId: MINECRAFT_SKIN.id },
+  { id: 'clips', path: '#/clips', label: 'Clips', skinId: MINECRAFT_SKIN.id },
 ];
 
 /** ハッシュが無い・知らないときに出す画面。 */
