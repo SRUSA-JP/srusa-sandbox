@@ -8,6 +8,13 @@
 
 #### 2026-08-25
 
+- 原文: `指数推移とかマップとか，ランキングとかデータを更新するたびに反映するところを洗い出しして，それをどう更新していくかっていうログ？を作ってほしい，あとはそれを自動で更新？最新にするコマンドとかも．`
+  - データ更新時に何がどこへ反映されるかを [docs/data-update-runbook.md](docs/data-update-runbook.md) に整理した
+  - `npm run refresh:data`（AWS再取得込み）と `npm run refresh:data:local`（抽出済みデータ同期のみ）を追加した
+  - `sync:data` / `update:data` の対象に `inventory` を追加し、所有資産の `build:inventory-assets` も自動派生に含めた
+  - `CLAUDE.md` のデータ取り込み手順に Runbook と `inventory` 対象を追記した
+  - 確認: `npm run refresh:data:local -- --dry-run`、`npm run refresh:data:local -- inventory --dry-run`、`npm run refresh:data:local -- --list`、`npm run refresh:data -- --dry-run`、`npm run typecheck`、`npm run lint` を実行し、引数転送も修正済み
+
 - 原文: `タグにアクティブメンバーってのも追加して．nodoame alias mitiglia detkent rik gurando natch kagyki shonenn juniama gotti panndasanngou(?) gomakusa t0myをそのタグで．`
   - 図鑑表示用の `data/player-db-20260823.json` と、相関図元データの
     `data/srusa-relationship-v0.2.json` に `アクティブメンバー` 属性を追加した

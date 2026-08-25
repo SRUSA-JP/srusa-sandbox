@@ -40,6 +40,8 @@ npm run check:contrast  # 配色の WCAG コントラスト検査
 npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（BlueMap の出力が要る）
 npm run update:data     # AWS SSO 確認 → ../aws_minecraft の抽出 → sync:data
 npm run sync:data       # ../aws_minecraft と BlueMap の出力からデータを取り込む
+npm run refresh:data    # update:data の分かりやすい別名。最新化するときの入口
+npm run refresh:data:local # sync:data の別名。手元の抽出済みデータだけ同期
 ```
 
 `npm run deploy:preview` は `npm run build` の後に Netlify CLI の `--alias preview` 付き deploy を実行する。
@@ -49,14 +51,16 @@ Netlify CLI のログイン確認が入る。本番公開は `main` への push 
 ### データの取り込み
 
 AWS からの再取得まで含む更新を頼まれたら、まず `npm run update:data` を使う。
+更新対象と反映先の洗い出しは [docs/data-update-runbook.md](docs/data-update-runbook.md) を見る。
 SSO セッションが切れている場合は `aws sso login --profile minecraft-cdk --use-device-code` を起動し、
 表示された URL とコード入力を利用者に任せてから続行する。
 `--dry-run` と `--list` は AWS 認証と抽出を飛ばし、`sync:data` の確認だけを行う。
 
 ```bash
 npm run update:data                  # 全部。AWS認証 → 抽出 → 取り込み
-npm run update:data -- daily logs    # 日別データとログだけ
+npm run update:data -- daily inventory logs # 日別データ、所有資産、ログだけ
 npm run update:data -- skins         # スキンと顔アイコンだけ
+npm run refresh:data                 # update:data と同じ
 npm run update:data -- --dry-run     # 取り込み予定だけ見る
 npm run update:data -- --list        # 取り込める元データを見る
 ```
@@ -80,6 +84,7 @@ npm run sync:data -- --dry-run    # 何をするかだけ出す
 | --- | --- | --- |
 | `stats` | Minecraft 統計 JSON | `../aws_minecraft/data/` |
 | `daily` | 日別データ。取り込み後に派生 JSON を作り直す | `../aws_minecraft/data/` |
+| `inventory` | 現在在庫から作る所有資産。装備・エンダーチェスト・バックパック内を換算 | `../aws_minecraft/data/` |
 | `logs` | サーバーログの日別集計 | `../aws_minecraft/data/` |
 | `skins` | スキンとアイコン（`public/player-skins/`） | `../aws_minecraft/data/` |
 | `map` / `2d` | ワールドマップ（2D）の PNG と範囲 JSON | `../srusa-portal/bluemap/web/` |

@@ -3,7 +3,7 @@
  *
  *   npm run update:data
  *   npm run update:data -- logs
- *   npm run update:data -- daily skins
+ *   npm run update:data -- daily inventory skins
  *   npm run update:data -- --dry-run
  *
  * AWS SSO は完全な無人化ができないので、期限切れのときだけ
@@ -15,7 +15,7 @@ import { spawnSync } from 'node:child_process';
 
 const ROOT = process.cwd();
 
-const TARGETS = ['stats', 'daily', 'logs', 'skins', 'map'];
+const TARGETS = ['stats', 'daily', 'inventory', 'logs', 'skins', 'map'];
 const MAP_ALIASES = ['2d', '2D', 'overworld', 'nether', 'end', 'twilightforest'];
 const EXTRACT_BY_TARGET = {
   daily: 'extract:player-data',
@@ -90,9 +90,10 @@ AWS SSO の確認 → ../aws_minecraft 側の抽出 → npm run sync:data を順
 対象を省略すると all です。
 
 対象:
-  all              stats / daily / logs / skins / map
+  all              stats / daily / inventory / logs / skins / map
   stats            既存の minecraft-stats-*.json を取り込む（抽出コマンドはまだ無し）
   daily            player-data-by-date を作って取り込む
+  inventory        最新在庫から所有資産を作って取り込む（抽出コマンドはまだ無し）
   logs             mc-log-daily-summary を作って取り込む
   skins            スキンと顔アイコンを取り直して取り込む
   map / 2d         BlueMap の 2D 出力を取り込む
@@ -114,7 +115,7 @@ AWS SSO の確認 → ../aws_minecraft 側の抽出 → npm run sync:data を順
 
 例:
   npm run update:data
-  npm run update:data -- daily logs
+  npm run update:data -- daily inventory logs
   npm run update:data -- skins --skip-login
   npm run update:data -- --dry-run`);
 }

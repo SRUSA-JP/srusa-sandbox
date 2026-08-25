@@ -11,6 +11,8 @@
     "preview": "vite preview",
     "deploy:preview": "npm run build && npx netlify-cli deploy --dir=dist --alias preview",
     "deplpy:preview": "npm run deploy:preview",
+    "refresh:data": "npm run update:data --",
+    "refresh:data:local": "npm run sync:data --",
     "typecheck": "tsc --noEmit",
     "check:contrast": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-contrast.ts --outfile=node_modules/.cache/check-contrast.mjs && node node_modules/.cache/check-contrast.mjs",
     "check:world-map": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-world-map.ts --outfile=node_modules/.cache/check-world-map.mjs && node node_modules/.cache/check-world-map.mjs",

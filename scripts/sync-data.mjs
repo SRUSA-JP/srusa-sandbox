@@ -3,8 +3,8 @@
  *
  * データの出どころは 2 つある。
  *
- *   統計・日別・スキン  ../aws_minecraft/data/ にある書き出し済みのファイル
- *   ワールドマップ      ../srusa-portal/bluemap/web/ にある BlueMap の出力
+ *   統計・日別・在庫・スキン  ../aws_minecraft/data/ にある書き出し済みのファイル
+ *   ワールドマップ            ../srusa-portal/bluemap/web/ にある BlueMap の出力
  *
  * どちらも「新しいファイルを持ってきて、日付つきの名前を差し替えて、
  * 派生する JSON を作り直す」までが 1 セットになる。手で順番にやると
@@ -14,7 +14,7 @@
  *   npm run sync:data                              # 全部
  *   npm run sync:data -- map                       # マップだけ
  *   npm run sync:data -- map --dimension overworld # オーバーワールドだけ
- *   npm run sync:data -- stats daily               # 統計と日別だけ
+ *   npm run sync:data -- stats daily inventory     # 統計・日別・所有資産だけ
  *   npm run sync:data -- --list                    # 取り込める元データを見るだけ
  *   npm run sync:data -- --dry-run                 # 何をするかだけ出す
  *
@@ -36,6 +36,7 @@ const registry = JSON.parse(readFileSync(REGISTRY_PATH, 'utf8'));
 const TARGETS = {
   stats: 'Minecraft 統計 JSON',
   daily: 'プレイヤー日別データと、そこから作る派生 JSON',
+  inventory: 'プレイヤーの現在在庫と、そこから作る所有資産 JSON',
   logs: 'サーバーログの日別集計',
   skins: 'プレイヤーのスキンとアイコン',
   map: 'ワールドマップ（2D）の PNG と範囲 JSON',
@@ -59,6 +60,22 @@ const SOURCE_FILES = [
   { target: 'stats', prefix: 'minecraft-stats', ext: 'json', registryKey: 'minecraftStats', redact: true },
   { target: 'daily', prefix: 'player-data-by-date', ext: 'json', registryKey: 'playerDataByDate' },
   { target: 'daily', prefix: 'player-data-by-date', ext: 'md', optional: true },
+  {
+    target: 'inventory',
+    prefix: 'item-inventory-stats',
+    suffix: '-latest-player',
+    ext: 'json',
+    registryKey: 'itemInventoryLatestPlayer',
+    externalOnly: true,
+  },
+  {
+    target: 'inventory',
+    prefix: 'item-inventory-stats',
+    suffix: '-latest-player-backpacks',
+    ext: 'json',
+    registryKey: 'itemInventoryLatestPlayerBackpacks',
+    externalOnly: true,
+  },
   { target: 'logs', prefix: 'mc-log-daily-summary', ext: 'json', registryKey: 'playLogSource', optional: true },
   { target: 'logs', prefix: 'mc-log-daily-summary', ext: 'csv', optional: true },
   { target: 'logs', prefix: 'mc-log-daily-summary', ext: 'md', optional: true },
@@ -82,6 +99,15 @@ const DERIVED_COMMANDS = ['build:player-daily', 'build:item-rankings'];
 const LOG_DERIVED = {
   files: [{ registryKey: 'playLog', prefix: 'play-days', ext: 'json' }],
   commands: ['build:play-days'],
+};
+
+/** 在庫データを取り込んだときに作り直す、公開用の軽量資産データ。 */
+const INVENTORY_DERIVED = {
+  files: [
+    { registryKey: 'playerInventoryAssets', prefix: 'player-inventory-assets', ext: 'json' },
+    { registryKey: 'playerInventoryAssetsDate' },
+  ],
+  commands: ['build:inventory-assets'],
 };
 
 /** このリポジトリでは作れない（../aws_minecraft 側で作る）もの。 */
@@ -160,14 +186,15 @@ ${registry.worldMaps.map((id) => `  ${id}`).join('\n')}
   npm run sync:data -- overworld       # オーバーワールドだけ作り直す
   npm run sync:data -- 2d              # 2D の地図を全部作り直す
   npm run sync:data -- nether end      # ネザーとエンドだけ
+  npm run sync:data -- inventory       # 所有資産だけ作り直す
   npm run sync:data -- stats daily     # 統計と日別だけ
   npm run sync:data -- --list`);
 }
 
 /** `名前-YYYYMMDD.拡張子` のうち、いちばん新しい日付のもの。 */
-function latestDated(dir, prefix, ext) {
+function latestDated(dir, prefix, ext, suffix = '') {
   if (!existsSync(dir)) return null;
-  const pattern = new RegExp(`^${prefix}-(\\d{8})\\.${ext}$`);
+  const pattern = new RegExp(`^${prefix}-(\\d{8})${suffix}\\.${ext}$`);
   const found = readdirSync(dir)
     .map((name) => ({ name, date: name.match(pattern)?.[1] }))
     .filter((entry) => entry.date)
@@ -273,13 +300,14 @@ function copyDirectory(from, to, { dryRun }) {
 
 /** `名前-旧日付.拡張子` の日付だけを差し替える。 */
 function withDate(path, date) {
-  return path.replace(/-\d{8}(\.[a-z]+)$/, `-${date}$1`);
+  if (/^\d{8}$/.test(path)) return date;
+  return path.replace(/-\d{8}((?:-[\w-]+)?\.[a-z]+)$/, `-${date}$1`);
 }
 
 function list(sourceDir, blueMapDir) {
   console.log(`取り込み元: ${sourceDir}${existsSync(sourceDir) ? '' : '（無い）'}`);
   for (const file of SOURCE_FILES) {
-    const found = latestDated(sourceDir, file.prefix, file.ext);
+    const found = latestDated(sourceDir, file.prefix, file.ext, file.suffix ?? '');
     console.log(`  ${file.prefix}.${file.ext}: ${found ? found.name : '見つからない'}`);
   }
 
@@ -293,7 +321,7 @@ function list(sourceDir, blueMapDir) {
   console.log(`\nいま使っているファイル（data-registry.json / version ${registry.version}）:`);
   for (const [key, value] of Object.entries(registry.paths)) {
     /* 取り込み元の場所と、public/ 配下の置き場は「いま使っているファイル」ではない */
-    if (value.startsWith('..') || key.endsWith('Dir')) continue;
+    if (value.startsWith('..') || key.endsWith('Dir') || key.endsWith('Date')) continue;
     console.log(`  ${key}: ${value}${existsSync(join(ROOT, value)) ? '' : '（無い）'}`);
   }
 }
@@ -349,7 +377,7 @@ function applyVersion(changed, { dryRun }) {
 
   /* current.ts は import 文に日付を直書きしている（Vite に静的に解決させるため） */
   let source = readFileSync(CURRENT_TS_PATH, 'utf8');
-  for (const key of ['playerFeaturedUsedItems', 'playerDailySummary', 'playerDb', 'playLog']) {
+  for (const key of ['playerFeaturedUsedItems', 'playerDailySummary', 'playerDb', 'playLog', 'playerInventoryAssets']) {
     const path = next.paths[key];
     source = source.replace(
       new RegExp(`\\.\\./\\.\\./data/${path.replace(/^data\//, '').replace(/-\d{8}(\.json)$/, '-\\d{8}$1')}`),
@@ -386,20 +414,26 @@ function main() {
   const changed = [];
   let dailyDate = null;
   let logsDate = null;
+  let inventoryDate = null;
 
-  for (const target of ['stats', 'daily', 'logs']) {
+  for (const target of ['stats', 'daily', 'inventory', 'logs']) {
     if (!options.targets.includes(target)) continue;
     console.log(`[${target}] ${TARGETS[target]}`);
     for (const file of SOURCE_FILES.filter((entry) => entry.target === target)) {
-      const found = latestDated(sourceDir, file.prefix, file.ext);
+      const found = latestDated(sourceDir, file.prefix, file.ext, file.suffix ?? '');
       if (!found) {
         if (!file.optional) throw new Error(`${file.prefix}-*.${file.ext} が ${sourceDir} に無い`);
         console.log(`  ! ${file.prefix}-*.${file.ext} が無いので飛ばす`);
         continue;
       }
-      copyFile(join(sourceDir, found.name), join(ROOT, 'data', found.name), options, file.redact === true);
+      if (file.externalOnly) {
+        console.log(`  = ${found.name}（元データを参照し、公開用の軽量JSONだけ作る）`);
+      } else {
+        copyFile(join(sourceDir, found.name), join(ROOT, 'data', found.name), options, file.redact === true);
+      }
       if (file.registryKey) changed.push({ registryKey: file.registryKey, date: found.date });
       if (file.registryKey === 'playerDataByDate') dailyDate = found.date;
+      if (file.registryKey === 'itemInventoryLatestPlayer') inventoryDate = found.date;
       if (file.registryKey === 'playLogSource') logsDate = found.date;
     }
     console.log('');
@@ -422,15 +456,19 @@ function main() {
     /* 派生 JSON は日別データから作るので、日付もそれに合わせる */
     changed.push(...DERIVED_FILES.map((file) => ({ registryKey: file.registryKey, date: dailyDate })));
   }
+  if (options.targets.includes('inventory') && inventoryDate) {
+    changed.push(...INVENTORY_DERIVED.files.map((file) => ({ registryKey: file.registryKey, date: inventoryDate })));
+  }
   if (changed.length > 0) {
     console.log('[version] data-registry.json の指し先を更新する');
     applyVersion(changed, options);
     console.log('');
   }
-  if (options.targets.includes('daily') || (options.targets.includes('logs') && logsDate)) {
+  if (options.targets.includes('daily') || options.targets.includes('inventory') || (options.targets.includes('logs') && logsDate)) {
     console.log('[derived] 派生する JSON を作り直す');
     const scripts = [
       ...(options.targets.includes('daily') ? DERIVED_COMMANDS : []),
+      ...(options.targets.includes('inventory') && inventoryDate ? INVENTORY_DERIVED.commands : []),
       ...(options.targets.includes('logs') && logsDate ? LOG_DERIVED.commands : []),
     ];
     for (const script of scripts) run(script, [], options);
