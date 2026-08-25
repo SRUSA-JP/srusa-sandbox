@@ -54,6 +54,13 @@ npm run refresh:data:local -- end
 ## 注意
 
 - 公開される統計JSONは UUID、AWSアカウント、EC2インスタンスID、リージョン、サーバーパスを伏せ字にする。
-- 所有資産の換算係数は `data/economy-assets.json` が唯一の管理場所。
+- 所有資産の換算係数と内訳の分類（原石・ブロック・鉱石・装備・ツール）は`data/economy-assets.json` が唯一の管理場所。アイテムを足すときは `category` も付ける。
 - BlueMap のレンダリング自体はこのリポジトリの外。通常地形色のマップを更新するには、先に BlueMap 側を再レンダリングしてから同期する。
+- **3D（hires）はワールド全体では作らない。** `../srusa-portal/bluemap/config/maps/*.conf` は
+  `enable-hires: false` を既定にする。取り込むのは 2D の lowres タイル（`tiles/1`）だけで、hires（`tiles/0`）は読まない。
+  全体で有効にするとレンダリングが大幅に遅くなり、出力の大半が使わない 3D データになる
+  （実測: overworld で hires 220MB に対し lowres 2.9MB）。無効化しても既存タイルは消えず、2D の取り込みには影響しない。
+- **3D で見せたい狭い範囲は専用のマップ設定を別に足す。** 現状は `overworld-spawn.conf`
+  （スポーン (0,0) から半径 256 ブロック＝16 チャンク、`enable-hires: true`）のみ。
+  BlueMap のビューアで見るためのマップなので、`data/data-registry.json` の `worldMaps` には入れない。
 - `player-db-YYYYMMDD.json` はこのリポジトリでは生成しない。必要なら `../aws_minecraft` 側で作ってから同期する。

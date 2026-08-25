@@ -98,6 +98,16 @@ npm run sync:data -- --dry-run    # 何をするかだけ出す
   伏せ忘れがあれば書き出す前に止まる（`redaction.forbiddenPatterns`）
 - ワールドを描き直すには先に `../srusa-portal/bluemap/render.sh`（Java が要る）を実行する。
   レンダリングはこのコマンドの外
+- **3D（hires）はワールド全体では作らない。** BlueMap の各マップ設定
+  （`../srusa-portal/bluemap/config/maps/*.conf`）は `enable-hires: false` を既定にする。
+  このアプリが取り込むのは真上から見た 2D の lowres タイル（`tiles/1`）だけで、hires（`tiles/0`）は読まない。
+  全体で有効にすると出力の大半が使わない 3D データになり（実測で overworld は hires 220MB に対し lowres 2.9MB）、
+  レンダリングも大幅に遅くなる。無効にしても既存タイルは消えず、2D の取り込みには影響しない
+- **3D で見せたい狭い範囲は、専用のマップ設定を別に足す。** 同じディメンションでも
+  `render-mask` で範囲を絞った別マップにすれば、2D 用のマップを重くせずに 3D を持てる。
+  現状は `overworld-spawn.conf`（スポーン (0,0) から半径 256 ブロック＝16 チャンク、`enable-hires: true`）だけ。
+  この種のマップは BlueMap のビューアで見るためのもので、`data/data-registry.json` の
+  `worldMaps` には入れない（入れると 2D の貼り合わせ対象になってしまう）
 - ワールドマップの公開表示は BlueMap の通常地形色 PNG だけにする。`scripts/build-chunk-world-map.ts`
   のようなチャンク分布の簡略 PNG は調査用で、`data/world-map.json` の公開マップ一覧に混ぜない。
   広い範囲が必要な場合も BlueMap 側で通常地形色の地図としてレンダリングし、その成果物を取り込む
