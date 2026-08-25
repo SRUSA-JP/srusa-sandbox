@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "check:contrast": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-contrast.ts --outfile=node_modules/.cache/check-contrast.mjs && node node_modules/.cache/check-contrast.mjs",
     "check:world-map": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/check-world-map.ts --outfile=node_modules/.cache/check-world-map.mjs && node node_modules/.cache/check-world-map.mjs",
+    "audit:bluemap": "node scripts/audit-bluemap-source.mjs",
     "lint": "eslint .",
     "update:data": "node scripts/update-data.mjs",
     "sync:data": "node scripts/sync-data.mjs",
