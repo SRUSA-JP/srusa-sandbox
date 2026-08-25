@@ -332,7 +332,10 @@ export const WORLD_MAP_TEXT = {
 
   picker: {
     view: '表示',
+    dimension: 'ディメンション',
+    allDimensions: 'すべて',
     map: '日付',
+    latestMaps: '最新',
     tooltips: 'ツールチップ',
     log: 'ログ',
   },
@@ -349,6 +352,7 @@ export const WORLD_MAP_TEXT = {
 
   /** 地図の規模。見出しの下に出す。 */
   dateSummary: (date: string, count: number) => `${date} の地図 ${formatInt(count)} 件を表示`,
+  latestSummary: (count: number) => `各ディメンションの最新地図 ${formatInt(count)} 件を表示`,
   summary: (
     world: string,
     width: number,
