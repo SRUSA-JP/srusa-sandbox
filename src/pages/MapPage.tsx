@@ -4,6 +4,8 @@ import { RELATIONSHIPS_CONTENT, builderSections, readerSections } from '../conte
 import { playerPathForRelationshipPerson } from '../data/playerDb';
 import { playerIconForRelationshipPerson } from '../config/playerIcons';
 import { joinNotes } from '../lib/display';
+import { downloadJson } from '../lib/download';
+import { applyTuning, readTuning, resetTuning } from '../config/tuning';
 import type { VizTheme } from '../theme/palette';
 import { APP_TEXT, MAP_TEXT, TECHNICAL_TEXT } from '../config/messages';
 import { RELATIONSHIP_MAP_DEFAULT_EDGE_MODE } from '../config/dataRegistry';
@@ -23,6 +25,7 @@ import { parseRelationshipData } from '../map/parse';
 import type { Point } from '../map/geometry';
 import type { RelationshipData } from '../map/schema';
 import { MapLegend } from '../components/organisms/MapLegend';
+import { TuningPanel } from '../components/organisms/TuningPanel';
 import { RelationshipMap } from '../components/organisms/RelationshipMap';
 import { ACTIONS } from '../components/classes';
 
@@ -119,12 +122,59 @@ export function MapPage({ theme }: MapPageProps) {
   const [importMessage, setImportMessage] = useState('');
 
   /*
+   * 調整つまみ（デバッグ用）。値そのものは config/tuning.ts が config へ
+   * 直接書き込むので、ここでは「何回変えたか」を数えて図を作り直させる。
+   * 値を state に持つと、config と二重に持つことになって食い違う。
+   */
+  const [tuning, setTuning] = useState(() => readTuning());
+  const [tuningRevision, setTuningRevision] = useState(0);
+  const [tuningMessage, setTuningMessage] = useState('');
+
+  const changeTuning = useCallback((id: string, value: number) => {
+    applyTuning({ [id]: value });
+    setTuning(readTuning());
+    setTuningRevision((previous) => previous + 1);
+    setTuningMessage('');
+  }, []);
+
+  const resetTuningValues = useCallback(() => {
+    resetTuning();
+    setTuning(readTuning());
+    setTuningRevision((previous) => previous + 1);
+    setTuningMessage('');
+  }, []);
+
+  const exportTuning = useCallback(() => {
+    downloadJson(MAP_TEXT.tuning.fileName(), readTuning());
+  }, []);
+
+  const importTuning = useCallback(async (file: File) => {
+    try {
+      const parsed = JSON.parse(await file.text()) as unknown;
+      if (typeof parsed !== 'object' || parsed === null) throw new Error(MAP_TEXT.tuning.notObject);
+      applyTuning(parsed as Record<string, unknown>);
+      setTuning(readTuning());
+      setTuningRevision((previous) => previous + 1);
+      setTuningMessage(MAP_TEXT.tuning.imported);
+    } catch (error) {
+      setTuningMessage(
+        MAP_TEXT.tuning.importFailed(error instanceof Error ? error.message : String(error)),
+      );
+    }
+  }, []);
+
+  /*
    * 掴んで動かした人の座標。動かした人だけを持ち、それ以外は buildLayout の結果を使う。
    * 全員ぶんを持つと、データが増えたときに古い座標が残って追随しなくなる。
    */
   const [positions, setPositions] = useState<Record<string, Point>>({});
 
-  const base = useMemo(() => (data ? buildLayout(data, layoutMode, centerId) : null), [centerId, data, layoutMode]);
+  /* tuningRevision は値そのものではなく「変わった合図」。config から読むので依存に要る */
+  const base = useMemo(
+    () => (data ? buildLayout(data, layoutMode, centerId) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [centerId, data, layoutMode, tuningRevision],
+  );
   const layout = useMemo(() => (base ? withPositions(base, positions) : null), [base, positions]);
 
   const movePerson = useCallback((personId: string, x: number, y: number) => {
@@ -154,13 +204,7 @@ export function MapPage({ theme }: MapPageProps) {
         edgeStyleId,
       },
     };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `srusa-relationship-layout-${new Date().toISOString().slice(0, 10)}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+    downloadJson(`srusa-relationship-layout-${new Date().toISOString().slice(0, 10)}.json`, payload);
   }, [
     affiliationMode,
     centerId,
@@ -422,6 +466,17 @@ export function MapPage({ theme }: MapPageProps) {
                 />
               ) : undefined
             }
+          />
+        </ChartCard>
+
+        <ChartCard title={MAP_TEXT.tuning.title} note={MAP_TEXT.tuning.note}>
+          <TuningPanel
+            values={tuning}
+            onChange={changeTuning}
+            onReset={resetTuningValues}
+            onExport={exportTuning}
+            onImport={importTuning}
+            message={tuningMessage}
           />
         </ChartCard>
 

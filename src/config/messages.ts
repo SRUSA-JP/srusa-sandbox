@@ -545,6 +545,21 @@ export const MAP_TEXT = {
     },
   },
 
+  /** 調整つまみ（デバッグ用）。 */
+  tuning: {
+    title: '調整（デバッグ用）',
+    note: '配置と配線の値をその場で変えて確かめられます。ここで変えた値は保存されません。持ち出したいときは JSON に書き出してください。',
+    export: '値を書き出す',
+    import: '値を読み込む',
+    reset: '元に戻す',
+    fileName: () => `srusa-relationship-tuning-${new Date().toISOString().slice(0, 10)}.json`,
+    imported: '読み込みました。',
+    notObject: 'JSON のオブジェクトではありません',
+    importFailed: (reason: string) => `読み込めませんでした: ${reason}`,
+    /** 読み上げ用。どのまとまりの何の値かが分かる形にする。 */
+    fieldLabel: (group: string, label: string) => `${group}の${label}`,
+  },
+
   /** 図の中に出す説明（ツールチップ）。 */
   tooltip: {
     group: (name: string, members: number) => `${name}: ${formatInt(members)} 人`,

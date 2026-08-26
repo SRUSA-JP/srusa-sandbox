@@ -1696,10 +1696,12 @@ function floorplanPlacements(data: RelationshipData): PersonPlacement[] {
   /* 中身の無い区画は置かない（線も囲いも出ないので、空きになるだけ） */
   const used = roots.filter((box) => countMembers(box) > 0);
   for (const box of used) layoutBox(box);
-  shelfPack(orderBoxes(used, data, hubs), FLOORPLAN.targetColumns);
+  const placed = orderBoxes(used, data, hubs);
+  shelfPack(placed.order, placed.targetColumns);
 
   const placements: PersonPlacement[] = [];
   for (const box of used) emitBox(box, 0, 0, placements);
+  refineSlots(used, placements, data, hubs);
   return placements;
 }
 
@@ -1713,8 +1715,12 @@ function floorplanPlacements(data: RelationshipData): PersonPlacement[] {
  * つぎに、2 つの区画の場所を入れ替えてみて総距離が縮むなら採る、を繰り返す。
  * 縮まなくなったら終わり。試す順は決まっているので、結果は毎回同じになる。
  */
-function orderBoxes(boxes: FloorBox[], data: RelationshipData, hubs: AffiliationHub[]): FloorBox[] {
-  if (boxes.length < 2) return boxes;
+function orderBoxes(
+  boxes: FloorBox[],
+  data: RelationshipData,
+  hubs: AffiliationHub[],
+): { order: FloorBox[]; targetColumns: number } {
+  if (boxes.length < 2) return { order: boxes, targetColumns: FLOORPLAN.minColumns };
 
   /* 誰がどの区画にいるか */
   const boxOf = new Map<string, FloorBox>();
@@ -1753,16 +1759,34 @@ function orderBoxes(boxes: FloorBox[], data: RelationshipData, hubs: Affiliation
     return { i, j, weight };
   });
 
+  /*
+   * はっきり書かれた関係が渡る区画の組。総距離とは別に、この中の
+   * いちばん長いものも短くする。総距離だけを縮めると、多くの線を少し
+   * 縮める代わりに 1 本が図を突っ切る形が選ばれてしまう。
+   */
+  const relationLinks = new Set<string>();
+  for (const relation of data.relations) {
+    const left = boxOf.get(relation.source);
+    const right = boxOf.get(relation.target);
+    if (!left || !right || left === right) continue;
+    const i = indexOf.get(left)!;
+    const j = indexOf.get(right)!;
+    relationLinks.add(i < j ? `${i}:${j}` : `${j}:${i}`);
+  }
+
   /**
    * その並びの良さ。小さいほど良い。
    *
-   * 配線の総距離を、図の大きさ（縦 + 横）で割った値。距離だけを見ると、
-   * 図を細長く広げて距離を稼いだ並びと、詰まった並びの区別が付かない。
-   * 「図の大きさに対して線が短いか」で見ると、線の短さと図の詰まり具合の
-   * 両方が同時に良くなる方へ進む。図に出る線の長さの測り方とも揃う。
+   * 配線の総距離を図の大きさ（縦 + 横）で割り、縦横の偏りで重みを付ける。
+   *
+   * 距離だけを見ると、図を細長く広げて距離を稼いだ並びと詰まった並びの
+   * 区別が付かないので、図の大きさで割る。ただし割るだけだと、今度は
+   * 縦一列に積んで「大きさ」を稼ぐほうが得になってしまう（実際に
+   * 584×5108 の帯になった）。画面に収まるのは正方形に近い形なので、
+   * 縦横が偏るほど点数を悪くする。
    */
-  const cost = (order: FloorBox[]): number => {
-    shelfPack(order, FLOORPLAN.targetColumns);
+  const cost = (order: FloorBox[], targetColumns: number): number => {
+    shelfPack(order, targetColumns);
     const center = new Map(
       order.map((box) => [
         indexOf.get(box)!,
@@ -1778,51 +1802,180 @@ function orderBoxes(boxes: FloorBox[], data: RelationshipData, hubs: Affiliation
     }
 
     let total = 0;
+    let longest = 0;
     for (const link of links) {
       const a = center.get(link.i)!;
       const b = center.get(link.j)!;
-      total += link.weight * (Math.abs(a.x - b.x) + Math.abs(a.y - b.y));
+      const distance = Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+      total += link.weight * distance;
+      if (relationLinks.has(link.i < link.j ? `${link.i}:${link.j}` : `${link.j}:${link.i}`)) {
+        longest = Math.max(longest, distance);
+      }
     }
-    return total / Math.max(1, width + height);
+    /* 本数を掛けて、総距離と釣り合う大きさにしてから足す */
+    total += FLOORPLAN.longestWeight * links.length * longest;
+
+    /* 正方形なら 1、細長いほど大きくなる */
+    const aspect = Math.max(width, height) / Math.max(1, Math.min(width, height));
+    const penalty = 1 + FLOORPLAN.aspectWeight * (aspect - 1);
+    return (total / Math.max(1, width + height)) * penalty;
   };
 
   /* 出発点は、人数の多い区画から。同数なら名前順にして毎回同じ並びから始める */
-  let order = [...boxes].sort(
+  const start = [...boxes].sort(
     (a, b) => countMembers(b) - countMembers(a) || (a.group?.name ?? '').localeCompare(b.group?.name ?? '', 'ja'),
   );
-  let best = cost(order);
 
-  for (let pass = 0; pass < FLOORPLAN.swapPasses; pass += 1) {
-    let improved = false;
-    for (let i = 0; i < order.length; i += 1) {
-      for (let j = 0; j < order.length; j += 1) {
-        if (i === j) continue;
+  /** ある折り返し幅で、並びをできるだけ良くする。 */
+  const improve = (targetColumns: number): { order: FloorBox[]; score: number } => {
+    let order = [...start];
+    let best = cost(order, targetColumns);
 
-        /* 入れ替えと、抜いて差し込み直しの両方を試す。
-           棚積みでは差し込みのほうが後ろの区画をまとめてずらせるので、
-           入れ替えだけでは届かない並びに届く */
-        const swapped = [...order];
-        [swapped[i], swapped[j]] = [swapped[j], swapped[i]];
+    for (let pass = 0; pass < FLOORPLAN.swapPasses; pass += 1) {
+      let improved = false;
+      for (let i = 0; i < order.length; i += 1) {
+        for (let j = 0; j < order.length; j += 1) {
+          if (i === j) continue;
 
-        const moved = [...order];
-        moved.splice(j, 0, moved.splice(i, 1)[0]);
+          /* 入れ替えと、抜いて差し込み直しの両方を試す。
+             棚積みでは差し込みのほうが後ろの区画をまとめてずらせるので、
+             入れ替えだけでは届かない並びに届く */
+          const swapped = [...order];
+          [swapped[i], swapped[j]] = [swapped[j], swapped[i]];
 
-        for (const candidate of [swapped, moved]) {
-          const score = cost(candidate);
-          if (score < best) {
-            best = score;
-            order = candidate;
-            improved = true;
+          const moved = [...order];
+          moved.splice(j, 0, moved.splice(i, 1)[0]);
+
+          for (const candidate of [swapped, moved]) {
+            const score = cost(candidate, targetColumns);
+            if (score < best) {
+              best = score;
+              order = candidate;
+              improved = true;
+            }
           }
         }
       }
+      if (!improved) break;
     }
-    if (!improved) break;
+    return { order, score: best };
+  };
+
+  /*
+   * 折り返す幅も探す。
+   *
+   * 幅を決め打ちにすると、人が 1 人増えただけで並びが別の形に落ち着き、
+   * 線の長さが大きく振れる（実際、uobaa の所属を直しただけで
+   * 関係線の長い線が 0 → 6 本になった）。幅を手で決め直すのは続かないので、
+   * いくつかの幅で並べてみて、いちばん良かったものを採る。
+   *
+   * 幅の範囲は中身の広さから出す。中身がほぼ正方形に収まる幅を真ん中にして、
+   * 細長いほうと平たいほうへ広げる。
+   */
+  const area = boxes.reduce((sum, box) => sum + box.columns * box.rows, 0);
+  const square = Math.max(FLOORPLAN.minColumns, Math.ceil(Math.sqrt(area)));
+  const widest = Math.max(...boxes.map((box) => box.columns));
+
+  let bestOrder = start;
+  let bestScore = Number.POSITIVE_INFINITY;
+  let bestColumns = square;
+
+  for (let step = -FLOORPLAN.widthSteps; step <= FLOORPLAN.widthSteps; step += 1) {
+    const targetColumns = Math.max(widest, square + step * FLOORPLAN.widthStep);
+    const result = improve(targetColumns);
+    if (result.score < bestScore) {
+      bestScore = result.score;
+      bestOrder = result.order;
+      bestColumns = targetColumns;
+    }
   }
 
-  /* 試した並びで column / row が書き換わっているので、採用した並びで置き直す */
-  cost(order);
-  return order;
+  /* 試した並びで column / row が書き換わっているので、採用した並びと幅で置き直す */
+  cost(bestOrder, bestColumns);
+  return { order: bestOrder, targetColumns: bestColumns };
+}
+
+/**
+ * 区画の中で人を入れ替えて、線をさらに短くする。
+ *
+ * 区画の並べ替えは区画の中心どうしの距離しか見ていないので、
+ * 同じ区画の中で「相手が遠いほうにいる人」が反対の隅に座ることがある。
+ * その 1 本が図を突っ切って見える。
+ *
+ * 升目そのものは動かさず、誰がどの升目に座るかだけを入れ替える。
+ * 区画の形も並びも変わらないまま、線だけが短くなる。
+ */
+function refineSlots(
+  boxes: FloorBox[],
+  placements: PersonPlacement[],
+  data: RelationshipData,
+  hubs: AffiliationHub[],
+): void {
+  const byId = new Map(placements.map((placement) => [placement.person.id, placement]));
+
+  /** 誰と誰が線で繋がっているか。関係線は重く見る（区画の並べ替えと同じ扱い）。 */
+  const neighbours = new Map<string, Array<{ id: string; weight: number }>>();
+  const link = (a: string, b: string, weight: number) => {
+    if (!byId.has(a) || !byId.has(b)) return;
+    neighbours.set(a, [...(neighbours.get(a) ?? []), { id: b, weight }]);
+    neighbours.set(b, [...(neighbours.get(b) ?? []), { id: a, weight }]);
+  };
+  for (const relation of data.relations) {
+    link(relation.source, relation.target, FLOORPLAN.relationWeight);
+  }
+  for (const hub of hubs) {
+    for (const memberId of hub.memberIds) link(hub.hubId, memberId, 1);
+  }
+
+  /** その人から出ている線の長さの合計。 */
+  const wireLength = (id: string): number => {
+    const place = byId.get(id);
+    if (!place) return 0;
+    let total = 0;
+    for (const other of neighbours.get(id) ?? []) {
+      const target = byId.get(other.id);
+      if (!target) continue;
+      total += other.weight * (Math.abs(place.x - target.x) + Math.abs(place.y - target.y));
+    }
+    return total;
+  };
+
+  /* 同じ区画にいる人だけを入れ替える。区画をまたぐと囲いが崩れる */
+  const groups: PersonPlacement[][] = [];
+  const collect = (box: FloorBox) => {
+    const members = box.slots
+      .map((slot) => byId.get(slot.person.id))
+      .filter((place): place is PersonPlacement => Boolean(place));
+    if (members.length > 1) groups.push(members);
+    for (const child of box.children) collect(child);
+  };
+  for (const box of boxes) collect(box);
+
+  for (const members of groups) {
+    for (let pass = 0; pass < FLOORPLAN.slotPasses; pass += 1) {
+      let improved = false;
+      for (let i = 0; i < members.length; i += 1) {
+        for (let j = i + 1; j < members.length; j += 1) {
+          const a = members[i];
+          const b = members[j];
+          const before = wireLength(a.person.id) + wireLength(b.person.id);
+
+          [a.x, b.x] = [b.x, a.x];
+          [a.y, b.y] = [b.y, a.y];
+          const after = wireLength(a.person.id) + wireLength(b.person.id);
+
+          if (after < before) {
+            improved = true;
+            continue;
+          }
+          /* 縮まなかったので戻す */
+          [a.x, b.x] = [b.x, a.x];
+          [a.y, b.y] = [b.y, a.y];
+        }
+      }
+      if (!improved) break;
+    }
+  }
 }
 
 function countMembers(box: FloorBox): number {

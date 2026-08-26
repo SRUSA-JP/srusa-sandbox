@@ -110,6 +110,12 @@ export function RelationshipMap({
         /* 表示枠側の「掴んで動かす」を起こさない。起こすと図ごと動いてしまう */
         event.stopPropagation();
         event.currentTarget.setPointerCapture(event.pointerId);
+        /*
+         * 指を捕まえるとこの指の出来事は表示枠に届かなくなる。表示枠は指の
+         * 本数でつまむ操作を見分けているので、本数だけは知らせておく。
+         * 知らせないと、1 本目が人物の上にあるときにつまんで拡大できない。
+         */
+        panZoom.externalPointer.down(event);
         const point = panZoom.toContentPoint(event.clientX, event.clientY);
         drag.current = {
           personId,
@@ -127,6 +133,14 @@ export function RelationshipMap({
         const state = drag.current;
         if (!state || state.personId !== personId) return;
         event.stopPropagation();
+        panZoom.externalPointer.move(event);
+
+        /* 2 本目の指が来たら、人を動かすのをやめてつまむ操作に譲る */
+        if (panZoom.pointerCount() >= 2) {
+          drag.current = null;
+          setGrabbedId(null);
+          return;
+        }
 
         /* 指で触れると数 px は動くので、しきい値を越えるまでは掴んだだけとみなす */
         if (!state.moved) {
@@ -146,6 +160,7 @@ export function RelationshipMap({
       onPointerUp: (event: React.PointerEvent<SVGGElement>) => {
         const state = drag.current;
         event.stopPropagation();
+        panZoom.externalPointer.up(event);
         /* 動かしていなければ「押した」とみなして人物の吹き出しを出す */
         if (state && !state.moved) setActivePersonId(personId);
         drag.current = null;

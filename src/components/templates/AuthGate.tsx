@@ -1,9 +1,9 @@
 import { type FormEvent, type ReactNode, useId, useState } from 'react';
+import { AUTH_PASSWORD } from '../../config/auth';
 import { APP_TEXT } from '../../config/messages';
 import { CONTROL, CONTROL_DISABLED, CONTROL_HOVER } from '../classes';
 import { PasswordField } from '../molecules';
 
-const AUTH_PASSWORD = 'Srusa1234！';
 const AUTH_STORAGE_KEY = 'srusa-authenticated';
 const AUTH_LOG_STORAGE_KEY = 'srusa-auth-login-at';
 const AUTH_COOKIE_NAME = 'srusa_auth';
