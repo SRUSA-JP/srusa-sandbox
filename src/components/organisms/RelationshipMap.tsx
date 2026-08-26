@@ -7,6 +7,7 @@ import { clampToCanvas, personLabel, regionPaintOrder } from '../../map/display'
 import type { EdgeStyleId } from '../../map/config';
 import type { MapLayout, PersonPlacement } from '../../map/layout';
 import type { VizTheme } from '../../theme/palette';
+import { AffiliationEdge } from '../molecules/AffiliationEdge';
 import { GroupRegion } from '../molecules/GroupRegion';
 import { PersonNode } from '../molecules/PersonNode';
 import { PersonProfileTooltip } from '../molecules/PersonProfileTooltip';
@@ -22,6 +23,8 @@ export interface RelationshipMapProps {
   highlightedGroupId: string;
   /** 描画する関係線。呼び出し側が絞り込んだものを渡す。 */
   edges: MapLayout['edges'];
+  /** 所属から導いた線を出すか。消すとはっきり書かれた関係だけになる。 */
+  showAffiliationEdges?: boolean;
   nameMode: string;
   profileHref: (placement: PersonPlacement) => string;
   /** 人を掴んで動かせるようにする。動かした先の座標を受け取る。 */
@@ -63,6 +66,7 @@ export function RelationshipMap({
   centerId,
   highlightedGroupId,
   edges,
+  showAffiliationEdges = true,
   nameMode,
   profileHref,
   onMovePerson,
@@ -196,6 +200,20 @@ export function RelationshipMap({
                   region={region}
                   theme={theme}
                   highlighted={region.group.id === highlightedGroupId}
+                  showTooltip={showTooltips}
+                />
+              ))}
+            </g>
+          )}
+          {showAffiliationEdges && (
+            <g>
+              {layout.affiliationEdges.map((edge) => (
+                <AffiliationEdge
+                  key={`${edge.group.id}-${edge.hubId}-${edge.memberId}`}
+                  edge={edge}
+                  theme={theme}
+                  dimmed={highlightedGroupId !== '' && edge.group.id !== highlightedGroupId}
+                  nameOf={nameOf}
                   showTooltip={showTooltips}
                 />
               ))}

@@ -351,3 +351,39 @@ export function cursorFill(theme: VizTheme): string {
 export function mutedFill(theme: VizTheme): string {
   return mix(theme.textSecondary, theme.surface, 0.62);
 }
+
+/**
+ * バイオームの色。
+ *
+ * 相関図のグループを「その場所らしい風景」の色で塗り分けるために持つ。
+ * 分類ごとの通し番号（categorical）で塗ると、隣り合った囲いが
+ * ただの色違いにしか見えない。海・山岳・洞窟のように場所の性格が色に出ると、
+ * どのまとまりがどこかを色だけで思い出せる。
+ *
+ * ここにあるのは基準の色で、実際に描く色は背景に対して
+ * `ensureContrast` を通してから使う（明るい配色でも暗い配色でも読めるように）。
+ */
+export const BIOME_COLORS = {
+  ocean: '#1f6fb8',
+  coral_reef: '#e0655f',
+  windswept_hills: '#6e7f8d',
+  lush_caves: '#4a8f3c',
+  dripstone_caves: '#9a6b4a',
+  deep_dark: '#3b4a5e',
+  desert: '#c9a44e',
+  plains: '#7cae4b',
+  meadow: '#86b04a',
+  flower_forest: '#d1568f',
+  birch_forest: '#9fbf6a',
+  forest: '#3f7a34',
+  taiga: '#2f6b5a',
+  jungle: '#38a05a',
+  savanna: '#b3944a',
+  badlands: '#c2643a',
+  dark_forest: '#46592f',
+  cherry_grove: '#e08cb4',
+  the_end: '#7d6bb0',
+  stony_shore: '#8a8d90',
+} as const;
+
+export type BiomeId = keyof typeof BIOME_COLORS;

@@ -1,8 +1,8 @@
 import { edgeStyle, relationLabel } from '../../map/display';
-import { manhattanPath } from '../../map/geometry';
 import type { EdgeStyleId } from '../../map/config';
 import type { EdgePlacement } from '../../map/layout';
 import type { VizTheme } from '../../theme/palette';
+import { WireLine } from '../atoms/WireLine';
 
 export interface RelationEdgeProps {
   edge: EdgePlacement;
@@ -17,12 +17,11 @@ export interface RelationEdgeProps {
 /**
  * 人物同士の関係線。
  *
- * 基盤の配線のように、縦横だけで繋ぐ。斜めに引くと線が四方八方を向いて
- * どれがどこへ繋がっているのか追いにくいので、向きを揃える。
+ * データにはっきり書かれている関係（一緒に何かをした、など）だけを引く。
+ * 所属から導いた線は AffiliationEdge が別に引く。
  *
- * 芯の下に一回り太い被覆を敷く。基盤の配線もレッドストーンも細い芯の
- * まわりに層があり、こうすると線が交差しても筋を追える。
- * 色・太さ・粉の間隔は display.ts（設定は config.ts）が決める。
+ * 引き方そのものは WireLine が持つ。ここが決めるのは
+ * 「関係の色と太さ」と「指したときに出す説明」だけ。
  */
 export function RelationEdge({
   edge,
@@ -32,36 +31,14 @@ export function RelationEdge({
   showTooltip = true,
   style: styleId,
 }: RelationEdgeProps) {
-  const style = edgeStyle(edge.relation, theme, highlighted, styleId);
-  const path = manhattanPath(edge.from, edge.to, style.elbow, edge.channelOffset);
-
   return (
-    <g>
-      {style.casing && (
-        <path
-          d={path}
-          fill="none"
-          stroke={style.casing.stroke}
-          strokeWidth={style.casing.strokeWidth}
-          strokeLinecap="butt"
-          strokeLinejoin="miter"
-          opacity={style.casing.opacity}
-          vectorEffect="non-scaling-stroke"
-        />
-      )}
-      <path
-        d={path}
-        fill="none"
-        stroke={style.stroke}
-        strokeWidth={style.strokeWidth}
-        strokeDasharray={style.strokeDasharray}
-        strokeLinecap="butt"
-        strokeLinejoin="miter"
-        opacity={style.opacity}
-        vectorEffect="non-scaling-stroke"
-      >
-        {showTooltip && <title>{relationLabel(edge.relation, nameOf)}</title>}
-      </path>
-    </g>
+    <WireLine
+      from={edge.from}
+      to={edge.to}
+      channelOffset={edge.channelOffset}
+      style={edgeStyle(edge.relation, theme, highlighted, styleId)}
+    >
+      {showTooltip && <title>{relationLabel(edge.relation, nameOf)}</title>}
+    </WireLine>
   );
 }

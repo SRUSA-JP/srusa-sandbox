@@ -1,4 +1,5 @@
 import { avatarFor, nodeStyle, personLabel, personTooltip, type NodeState } from '../../map/display';
+import { PixelAvatar } from '../atoms/PixelAvatar';
 import type { PersonPlacement } from '../../map/layout';
 import type { VizTheme } from '../../theme/palette';
 
@@ -25,7 +26,7 @@ export interface PersonNodeProps {
   showTooltip?: boolean;
 }
 
-/** アイコンの中身。画像・イニシャル・人型のどれをどの寸法で描くかは display.ts が決める。 */
+/** アイコンの中身。画像・顔・イニシャル・人型のどれをどの寸法で描くかは display.ts が決める。 */
 function AvatarContentShape({
   placement,
   nameMode,
@@ -39,7 +40,15 @@ function AvatarContentShape({
   color: string;
   clipId: string;
 }) {
-  const content = avatarFor(placement.person, nameMode, radius);
+  const content = avatarFor(placement.person, nameMode, radius, color);
+
+  if (content.kind === 'pixel') {
+    return (
+      <g clipPath={`url(#${clipId})`}>
+        <PixelAvatar pixels={content.pixels} size={radius * 2} />
+      </g>
+    );
+  }
 
   if (content.kind === 'image') {
     return (

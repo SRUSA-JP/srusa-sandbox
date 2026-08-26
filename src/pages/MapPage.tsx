@@ -42,12 +42,14 @@ interface RelationshipWorkspaceExport {
     layoutMode?: LayoutMode;
     showTooltips?: boolean;
     showRegions?: boolean;
+    showAffiliationEdges?: boolean;
     edgeStyleId?: EdgeStyleId;
   };
 }
 
 type TooltipMode = 'on' | 'off';
 type RegionMode = 'on' | 'off';
+type AffiliationMode = 'on' | 'off';
 
 const TOOLTIP_OPTIONS: Array<{ value: TooltipMode; label: string }> = [
   { value: 'on', label: MAP_TEXT.picker.tooltipOn },
@@ -57,6 +59,11 @@ const TOOLTIP_OPTIONS: Array<{ value: TooltipMode; label: string }> = [
 const REGION_OPTIONS: Array<{ value: RegionMode; label: string }> = [
   { value: 'on', label: MAP_TEXT.picker.regionOn },
   { value: 'off', label: MAP_TEXT.picker.regionOff },
+];
+
+const AFFILIATION_OPTIONS: Array<{ value: AffiliationMode; label: string }> = [
+  { value: 'on', label: MAP_TEXT.picker.affiliationOn },
+  { value: 'off', label: MAP_TEXT.picker.affiliationOff },
 ];
 
 function isPoint(value: unknown): value is Point {
@@ -104,9 +111,10 @@ export function MapPage({ theme }: MapPageProps) {
   const [centerId, setCenterId] = useState(data?.view?.centerPersonId ?? data?.project.defaultCenterPersonId ?? '');
   const [highlightedGroupId, setHighlightedGroupId] = useState('');
   const [edgeMode, setEdgeMode] = useState<EdgeMode>(RELATIONSHIP_MAP_DEFAULT_EDGE_MODE);
-  const [layoutMode, setLayoutMode] = useState<LayoutMode>('cluster');
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('floorplan');
   const [tooltipMode, setTooltipMode] = useState<TooltipMode>('on');
   const [regionMode, setRegionMode] = useState<RegionMode>('on');
+  const [affiliationMode, setAffiliationMode] = useState<AffiliationMode>('on');
   const [edgeStyleId, setEdgeStyleId] = useState<EdgeStyleId>('wire');
   const [importMessage, setImportMessage] = useState('');
 
@@ -142,6 +150,7 @@ export function MapPage({ theme }: MapPageProps) {
         layoutMode,
         showTooltips: tooltipMode === 'on',
         showRegions: regionMode === 'on',
+        showAffiliationEdges: affiliationMode === 'on',
         edgeStyleId,
       },
     };
@@ -152,7 +161,18 @@ export function MapPage({ theme }: MapPageProps) {
     link.download = `srusa-relationship-layout-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(url);
-  }, [centerId, data, edgeMode, edgeStyleId, highlightedGroupId, layoutMode, positions, regionMode, tooltipMode]);
+  }, [
+    affiliationMode,
+    centerId,
+    data,
+    edgeMode,
+    edgeStyleId,
+    highlightedGroupId,
+    layoutMode,
+    positions,
+    regionMode,
+    tooltipMode,
+  ]);
 
   const importWorkspace = useCallback(async (file: File) => {
     try {
@@ -178,6 +198,7 @@ export function MapPage({ theme }: MapPageProps) {
       const nextLayoutMode = wrapped.layout?.layoutMode;
       const nextShowTooltips = wrapped.layout?.showTooltips;
       const nextShowRegions = wrapped.layout?.showRegions;
+      const nextShowAffiliation = wrapped.layout?.showAffiliationEdges;
       const nextEdgeStyle = wrapped.layout?.edgeStyleId;
       const validEdgeMode: EdgeMode =
         wrapped.schemaVersion === 'srusa-relationship-workspace-v1' &&
@@ -188,7 +209,7 @@ export function MapPage({ theme }: MapPageProps) {
         wrapped.schemaVersion === 'srusa-relationship-workspace-v1' &&
         LAYOUT_MODES.some((mode) => mode.value === nextLayoutMode)
           ? nextLayoutMode as LayoutMode
-          : 'cluster';
+          : 'floorplan';
 
       setPositions(nextPositions);
       setCenterId(validCenter);
@@ -201,6 +222,7 @@ export function MapPage({ theme }: MapPageProps) {
       setLayoutMode(validLayoutMode);
       setTooltipMode(nextShowTooltips === false ? 'off' : 'on');
       setRegionMode(nextShowRegions === false ? 'off' : 'on');
+      setAffiliationMode(nextShowAffiliation === false ? 'off' : 'on');
       setEdgeStyleId(
         EDGE_STYLES.some((entry) => entry.value === nextEdgeStyle) ? (nextEdgeStyle as EdgeStyleId) : 'wire',
       );
@@ -354,6 +376,13 @@ export function MapPage({ theme }: MapPageProps) {
               />
               <Picker
                 showLabel
+                label={MAP_TEXT.picker.affiliationEdges}
+                value={affiliationMode}
+                options={AFFILIATION_OPTIONS}
+                onChange={setAffiliationMode}
+              />
+              <Picker
+                showLabel
                 label={MAP_TEXT.picker.regions}
                 value={regionMode}
                 options={REGION_OPTIONS}
@@ -382,6 +411,7 @@ export function MapPage({ theme }: MapPageProps) {
             onMovePerson={movePerson}
             showTooltips={tooltipMode === 'on'}
             showRegions={regionMode === 'on'}
+            showAffiliationEdges={affiliationMode === 'on'}
             edgeStyleId={edgeStyleId}
             actions={
               Object.keys(positions).length > 0 ? (
