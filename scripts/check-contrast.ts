@@ -9,7 +9,7 @@ import {
   CONTRAST_MIN_LARGE, CONTRAST_MIN_TEXT, DARK_THEME, LIGHT_THEME,
   chartText, contrastRatio, readableTextOn, tooltipSurface,
 } from '../src/theme/palette';
-import { GROUP_TYPE_SETTINGS } from '../src/map/config';
+import { GROUP_BIOMES, GROUP_TYPE_SETTINGS } from '../src/map/config';
 import { SKINS, applySkin } from '../src/config/skins';
 import { roleColors } from '../src/config/colors';
 import { edgeStyle, nodeStyle, regionStyle } from '../src/map/display';
@@ -77,11 +77,21 @@ for (const { label, theme } of cases) {
 /* 相関図: 領域・ノード・関係線の色も同じ基準で検査する */
 for (const { label, theme } of cases) {
   console.log(`\n--- 相関図 / ${label} ---`);
-  for (const type of Object.keys(GROUP_TYPE_SETTINGS)) {
-    const group = { id: type, name: type, type };
+  /*
+   * 囲いの色はグループごとのバイオームで決まるので、分類ではなくバイオームを
+   * 全部見る。使われていないバイオームも検査しておく（グループが増えたときに
+   * 割り当てても、読めない色にならないように）。
+   */
+  for (const [id, biome] of Object.entries(GROUP_BIOMES)) {
+    const group = { id, name: id, type: 'unknown' as const };
     const style = regionStyle(group, theme, false);
-    check(`領域 ${type} 枠線 / 背景`, style.stroke, theme.surface, CONTRAST_MIN_LARGE);
-    check(`領域 ${type} ラベル / 背景`, style.labelColor, theme.surface, CONTRAST_MIN_TEXT);
+    check(`領域 ${biome} 枠線 / 背景`, style.stroke, theme.surface, CONTRAST_MIN_LARGE);
+    check(`領域 ${biome} ラベル / 背景`, style.labelColor, theme.surface, CONTRAST_MIN_TEXT);
+  }
+  for (const type of Object.keys(GROUP_TYPE_SETTINGS)) {
+    const group = { id: `type:${type}`, name: type, type };
+    const style = regionStyle(group, theme, false);
+    check(`領域 分類${type} 枠線 / 背景`, style.stroke, theme.surface, CONTRAST_MIN_LARGE);
   }
   for (const state of [
     { isCenter: true, isRelated: false, isDimmed: false },
