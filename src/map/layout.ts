@@ -861,19 +861,24 @@ function separateNodes(placements: PersonPlacement[], centerId: string): void {
         const need = radiusOf(a) + radiusOf(b) + SEPARATION.padding;
         const dx = a.x - b.x;
         const dy = a.y - b.y;
-        const distance = Math.hypot(dx, dy);
-        if (distance >= need) continue;
+        /*
+         * アイコンは四角なので、縦か横のどちらかが離れていれば重ならない。
+         * 円のつもりで中心の距離だけを見ると、角どうしが重なったまま通ってしまう。
+         */
+        const overlapX = need - Math.abs(dx);
+        const overlapY = need - Math.abs(dy);
+        if (overlapX <= 0 || overlapY <= 0) continue;
 
-        /* 真上に重なったときは決まった向きへ逃がす（毎回同じ結果にするため） */
-        const angle = (a.person.id.charCodeAt(0) % REGION.strictDirections) * ((Math.PI * 2) / REGION.strictDirections);
-        const nx = distance > 0 ? dx / distance : Math.cos(angle);
-        const ny = distance > 0 ? dy / distance : Math.sin(angle);
-        const push = (need - distance) / 2;
-
-        a.x += nx * push;
-        a.y += ny * push;
-        b.x -= nx * push;
-        b.y -= ny * push;
+        /* 動かす量が少なくて済む向きへ逃がす。重なったままなら決まった向きへ */
+        if (overlapX <= overlapY) {
+          const sign = dx !== 0 ? Math.sign(dx) : a.person.id < b.person.id ? -1 : 1;
+          a.x += (sign * overlapX) / 2;
+          b.x -= (sign * overlapX) / 2;
+        } else {
+          const sign = dy !== 0 ? Math.sign(dy) : a.person.id < b.person.id ? -1 : 1;
+          a.y += (sign * overlapY) / 2;
+          b.y -= (sign * overlapY) / 2;
+        }
         moved = true;
       }
     }

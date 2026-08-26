@@ -123,12 +123,21 @@ export function PersonNode({
       }
     >
       {showTooltip && <title>{personTooltip(placement.person, nameMode)}</title>}
+      {/* Minecraft のスキンが四角なので、囲いも四角にして顔が欠けないようにする */}
       <defs>
         <clipPath id={clipId}>
-          <circle r={style.radius} />
+          <rect x={-style.radius} y={-style.radius} width={style.size} height={style.size} />
         </clipPath>
       </defs>
-      <circle r={style.radius} fill={style.fill} stroke={style.ring} strokeWidth={style.ringWidth} />
+      <rect
+        x={-style.radius}
+        y={-style.radius}
+        width={style.size}
+        height={style.size}
+        fill={style.fill}
+        stroke={style.ring}
+        strokeWidth={style.ringWidth}
+      />
       <AvatarContentShape
         placement={placement}
         nameMode={nameMode}
@@ -136,8 +145,11 @@ export function PersonNode({
         color={style.glyphColor}
         clipId={clipId}
       />
-      <circle
-        r={style.radius}
+      <rect
+        x={-style.radius}
+        y={-style.radius}
+        width={style.size}
+        height={style.size}
         fill="none"
         stroke={style.ring}
         strokeWidth={style.ringWidth}

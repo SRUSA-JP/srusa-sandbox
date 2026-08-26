@@ -62,12 +62,19 @@ function checkOverlap() {
   let worst = { pair: '', gap: Infinity };
   let overlaps = 0;
 
+  /*
+   * アイコンは四角なので、中心の距離ではなく縦横のすきまで見る。
+   * 円のつもりで測ると、角どうしが重なっているのを見落とす。
+   */
   for (let i = 0; i < people.length; i += 1) {
     for (let j = i + 1; j < people.length; j += 1) {
       const a = people[i];
       const b = people[j];
-      const gap =
-        Math.hypot(a.x - b.x, a.y - b.y) - (radiusOf(a.person.id) + radiusOf(b.person.id));
+      const need = radiusOf(a.person.id) + radiusOf(b.person.id);
+      const gapX = Math.abs(a.x - b.x) - need;
+      const gapY = Math.abs(a.y - b.y) - need;
+      /* 四角どうしは、縦か横のどちらかが離れていれば重ならない */
+      const gap = Math.max(gapX, gapY);
       if (gap < 0) overlaps += 1;
       if (gap < worst.gap) worst = { pair: `${a.person.onlineName} / ${b.person.onlineName}`, gap };
     }
