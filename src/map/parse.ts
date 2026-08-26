@@ -42,6 +42,7 @@ function parsePerson(raw: unknown, index: number): Person {
     aliases: stringArray(raw.aliases, `${field}.aliases`),
     attributes: stringArray(raw.attributes, `${field}.attributes`),
     nicknames: stringArray(raw.nicknames, `${field}.nicknames`),
+    joinedOn: raw.joinedOn === undefined ? undefined : requireString(raw.joinedOn, `${field}.joinedOn`),
     avatarUrl: raw.avatarUrl === undefined ? undefined : requireString(raw.avatarUrl, `${field}.avatarUrl`),
   };
 }

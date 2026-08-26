@@ -18,6 +18,12 @@ export interface HistoryEntry {
   title: string;
   detail: string;
   status: HistoryStatus;
+  /** 日付が「〜ごろ」のとき。画面でもそう見せる。 */
+  approximate: boolean;
+  /** 同じ催しを何回やったか。1 回なら 1。 */
+  count: number;
+  /** 参加した人（相関図の人物 ID）。分かっているものだけ。 */
+  participants: string[];
 }
 
 export interface HistoryDocument {
@@ -36,6 +42,9 @@ function parseEntry(value: unknown): HistoryEntry | null {
   const title = textAt(source, 'title');
   if (!id || !title) return null;
 
+  const count = source.count;
+  const participants = Array.isArray(source.participants) ? source.participants : [];
+
   return {
     id,
     date: textAt(source, 'date'),
@@ -43,6 +52,9 @@ function parseEntry(value: unknown): HistoryEntry | null {
     detail: textAt(source, 'detail'),
     /* 知らない値は todo 側に倒す。確かめられていないものを confirmed にしない */
     status: textAt(source, 'status') === 'confirmed' ? 'confirmed' : 'todo',
+    approximate: source.approximate === true,
+    count: typeof count === 'number' && Number.isFinite(count) && count > 0 ? Math.round(count) : 1,
+    participants: participants.filter((entry): entry is string => typeof entry === 'string'),
   };
 }
 

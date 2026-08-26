@@ -1,33 +1,67 @@
 {
   "schemaVersion": "srusa-history-v1",
-  "note": "SRUSA というインカレサークルそのもののあゆみ。Minecraft サーバーのログとは別で、こちらは人が書いて残すもの。分からないことは status を todo にして、埋まるまで画面にもそのまま出す。",
+  "note": "SRUSA というインカレサークルそのものの年表。Minecraft サーバーのログとは別で、こちらは人が書いて残すもの。開催した事実は分かっていても年月や参加者が分かっていないものは status を todo にして、埋まるまで画面にもそのまま出す。",
   "entries": [
     {
       "id": "founding",
+      "date": "2020-04",
+      "title": "SRUSA 創設",
+      "detail": "初期メンバーは nodoame・mitiglia・alias の 3 人。",
+      "status": "confirmed",
+      "participants": ["nodoame", "mitiglia", "alias"]
+    },
+    {
+      "id": "snowboard-2021",
+      "date": "2021-03",
+      "title": "スノボ",
+      "detail": "創設の翌年 3 月ごろ。正確な日と参加者はまだ分かっていない。",
+      "status": "todo",
+      "approximate": true
+    },
+    {
+      "id": "cottage-summer",
       "date": "",
-      "title": "SRUSA が始まった時期",
-      "detail": "いつ・どういうきっかけで始まったかが分かっていない。分かったら date に年月（YYYY-MM）を入れる。",
+      "title": "コテージ",
+      "detail": "夏に行ったことは分かっているが、どの年の夏かと参加者がまだ分かっていない。",
       "status": "todo"
     },
     {
-      "id": "intercollegiate",
+      "id": "offline-custom",
       "date": "",
-      "title": "インカレサークルとしての形になった時期",
-      "detail": "1 つの大学の中から、複数の大学にまたがる形になった時期。相関図では 3 つの大学が出てくるが、それがいつからかは記録が無い。",
-      "status": "todo"
+      "title": "オフラインカスタム",
+      "detail": "2 回開催。それぞれの年月と参加者がまだ分かっていない。",
+      "status": "todo",
+      "count": 2
+    },
+    {
+      "id": "villa-nomi",
+      "date": "",
+      "title": "貸別荘呑み",
+      "detail": "2 回開催。それぞれの年月と参加者がまだ分かっていない。",
+      "status": "todo",
+      "count": 2
+    },
+    {
+      "id": "nikuzushi-nomi",
+      "date": "",
+      "title": "肉寿司呑み",
+      "detail": "1 回開催。年月と参加者がまだ分かっていない。",
+      "status": "todo",
+      "count": 1
+    },
+    {
+      "id": "apex-custom",
+      "date": "",
+      "title": "APEX カスタム",
+      "detail": "2 回開催。それぞれの年月と参加者がまだ分かっていない。",
+      "status": "todo",
+      "count": 2
     },
     {
       "id": "minecraft-server",
       "date": "",
       "title": "Minecraft サーバーを立てた日",
       "detail": "日別ログは 2026-08-02 から残っているが、それはログが残っている最初の日であって、サーバーを立てた日とは限らない。",
-      "status": "todo"
-    },
-    {
-      "id": "activities",
-      "date": "",
-      "title": "ふだんの活動",
-      "detail": "何をしているサークルなのか（活動の内容・頻度・場所）。推測で書かず、分かっているものだけを足す。",
       "status": "todo"
     }
   ]
