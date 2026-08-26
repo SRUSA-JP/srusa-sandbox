@@ -187,6 +187,7 @@
   shape-rendering: crispEdges;
 }
 
-[data-skin='minecraft'] img {
+/* スキンの画像も、相関図の中の <image> も、ドットのまま出す */
+[data-skin='minecraft'] :is(img, image) {
   image-rendering: pixelated;
 }

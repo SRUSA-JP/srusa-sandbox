@@ -51,3 +51,18 @@ export const PLAYER_SKIN_IMAGES: Record<string, string> = {
 export function playerIconImage(name: string): string | undefined {
   return PLAYER_ICON_OVERRIDES[name] ?? PLAYER_ICON_IMAGES[name] ?? playerIconPath(name);
 }
+
+/**
+ * 相関図の人物に対応する Minecraft のアイコン。
+ *
+ * 相関図は人物 ID で人を指し、スキンは player-db の名前で持っているので、
+ * player-db の relationship_id を頼りに繋ぐ。サーバーに入っていない人には
+ * スキンが無いので undefined を返し、呼び出し側が代替の人型を出す。
+ */
+export function playerIconForRelationshipPerson(
+  personId: string,
+  fallbackName: string,
+): string | undefined {
+  const record = allPlayerRecords().find((entry) => entry.sources.relationship_id === personId);
+  return playerIconImage(record?.username ?? fallbackName);
+}

@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { AppLayout, Button, ChartCard, NoticePanel, Note, Picker, ProsePanel, TechnicalDetails } from '../components';
 import { RELATIONSHIPS_CONTENT, builderSections, readerSections } from '../content';
 import { playerPathForRelationshipPerson } from '../data/playerDb';
+import { playerIconForRelationshipPerson } from '../config/playerIcons';
 import { joinNotes } from '../lib/display';
 import type { VizTheme } from '../theme/palette';
 import { APP_TEXT, MAP_TEXT, TECHNICAL_TEXT } from '../config/messages';
@@ -67,11 +68,28 @@ function importedPositions(raw: unknown): Record<string, Point> {
   );
 }
 
+/**
+ * 相関図の人物に Minecraft のアイコンを結び付ける。
+ *
+ * 相関図のデータはスキンを知らないので、ここで player-db を頼りに繋ぐ。
+ * サーバーに入っていない人はアイコンが無いままで、描画側が人型を出す。
+ */
+function withPlayerIcons(data: RelationshipData): RelationshipData {
+  return {
+    ...data,
+    people: data.people.map((person) => ({
+      ...person,
+      avatarUrl: person.avatarUrl ?? playerIconForRelationshipPerson(person.id, person.onlineName),
+    })),
+  };
+}
+
 /** SRUSA の相関図の画面。 */
 export function MapPage({ theme }: MapPageProps) {
   const source = useMemo(() => loadRelationshipData(), []);
   const [customData, setCustomData] = useState<RelationshipData | null>(null);
-  const data = customData ?? source?.data ?? null;
+  const raw = customData ?? source?.data ?? null;
+  const data = useMemo(() => (raw ? withPlayerIcons(raw) : null), [raw]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [centerId, setCenterId] = useState(data?.view?.centerPersonId ?? data?.project.defaultCenterPersonId ?? '');
