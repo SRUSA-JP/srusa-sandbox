@@ -90,6 +90,47 @@ export function enclosingPolygon(points: Point[], padding: number): Point[] {
   return polygonArea(expanded) < padding * padding ? inflatedBox(points, padding) : expanded;
 }
 
+/**
+ * 点列を閉じた滑らかな曲線の SVG パスにする。
+ *
+ * 角丸の多角形だと、囲いの直線が図の中を横切って「境界線」に見えてしまう。
+ * 曲線で囲うと、同じ所属の人をふわりと包んだ形になり、重なりも読み取りやすい。
+ *
+ * 各点を通る Catmull-Rom スプラインを 3 次ベジェに置き換えて繋ぐ。
+ * `tension` は 0 で直線、1 で標準的な滑らかさ。
+ */
+export function smoothClosedPath(points: Point[], tension = 1): string {
+  if (points.length === 0) return '';
+  if (points.length < 3) return roundedPolygonPath(points, 0);
+
+  const count = points.length;
+  const commands = [`M ${round(points[0].x)} ${round(points[0].y)}`];
+
+  for (let i = 0; i < count; i += 1) {
+    const previous = points[(i - 1 + count) % count];
+    const current = points[i];
+    const next = points[(i + 1) % count];
+    const after = points[(i + 2) % count];
+
+    /* 前後の点の向きから、その点での接線を決める（Catmull-Rom の制御点） */
+    const control1 = {
+      x: current.x + ((next.x - previous.x) / 6) * tension,
+      y: current.y + ((next.y - previous.y) / 6) * tension,
+    };
+    const control2 = {
+      x: next.x - ((after.x - current.x) / 6) * tension,
+      y: next.y - ((after.y - current.y) / 6) * tension,
+    };
+
+    commands.push(
+      `C ${round(control1.x)} ${round(control1.y)} ${round(control2.x)} ${round(control2.y)} ${round(next.x)} ${round(next.y)}`,
+    );
+  }
+
+  commands.push('Z');
+  return commands.join(' ');
+}
+
 /** 多角形を角丸の SVG パスにする。 */
 export function roundedPolygonPath(points: Point[], radius: number): string {
   if (points.length === 0) return '';

@@ -87,7 +87,8 @@ export interface RegionStyle {
   fill: string;
   labelColor: string;
   strokeWidth: number;
-  cornerRadius: number;
+  /** 囲いの曲がり具合。0 で直線の多角形、1 で滑らかな曲線。 */
+  curveTension: number;
   labelFontSize: number;
   labelOffsetY: number;
   labelFontWeight: number;
@@ -109,7 +110,7 @@ export function regionStyle(group: Group, theme: VizTheme, highlighted: boolean)
     fill: withAlpha(stroke, highlighted ? REGION.highlightFillAlpha : REGION.fillAlpha),
     labelColor: ensureContrast(base, colors.background, CONTRAST_MIN_TEXT),
     strokeWidth: REGION.strokeWidth,
-    cornerRadius: REGION.cornerRadius,
+    curveTension: REGION.curveTension,
     labelFontSize: skinnedFontSize(REGION.labelFontSize),
     labelOffsetY: REGION.labelOffsetY,
     labelFontWeight: REGION.labelFontWeight,
