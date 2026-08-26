@@ -698,23 +698,29 @@ export const TABLE_TEXT = {
 } as const;
 
 /**
- * サーバーのあゆみ（年表）の文言。
+ * Minecraft の活動カレンダーの文言。
  *
  * この画面が扱えるのは日別ログに残っている日だけ。サーバーがいつ建ったか、
  * その日に何があったかはログからは分からないので、そう読めてしまう
  * 言い方（「はじまりの日」など）は使わない。
  */
-export const TIMELINE_TEXT = {
-  title: 'あゆみ',
-  lead: 'サーバーのログに残っている日を、古いほうから並べています。誰がいつはじめて来たか、どの日に人が集まったかを、記録そのものから拾っています。',
+export const CALENDAR_TEXT = {
+  title: '活動カレンダー',
+  lead: 'サーバーのログに残っている日を暦に並べています。色が濃い日ほど多くの人が入っていて、印の付いた日には初参加や記録の更新があります。',
   note: (from: string, to: string) => `${from} 〜 ${to} の記録から作っています。`,
 
   /** 記録の限界。ここは推測で埋めない。 */
   disclaimer:
     'ここに出るのは、日別ログに残っている日だけです。サーバーがいつ建ったか、記録より前に何があったかは、このデータからは分かりません。',
 
-  /** 日ごとの並びの見出し。ページの名前と同じにすると重なって見える。 */
+  /** 日ごとの並びの見出し。 */
   daysTitle: '日ごとの記録',
+  /** 出来事だけを拾った一覧の見出し。暦の枠には入りきらないため別に出す。 */
+  marksTitle: '記録に残っている出来事',
+
+  /** 週の見出し（日曜はじまり）。 */
+  weekdays: ['日', '月', '火', '水', '木', '金', '土'] as const,
+  month: (year: number, month: number) => `${year}年 ${month}月`,
 
   kpi: {
     span: '記録のある日数',
@@ -732,8 +738,11 @@ export const TIMELINE_TEXT = {
     joins: (count: number) => `入室 ${formatInt(count)}`,
     deaths: (count: number) => `死亡 ${formatInt(count)}`,
     firstSeen: (time: string) => `最初の入室 ${time}`,
-    /** 誰も入らなかった日は記録に残らないので、飛んだ日をこう伝える。 */
-    gap: (days: number) => `${formatInt(days)} 日ぶん、記録がありません`,
+    /** 暦の枠を指したときに出す説明。 */
+    tooltip: (date: string, people: number, joins: number, deaths: number) =>
+      `${date}: ${formatInt(people)} 人 / 入室 ${formatInt(joins)} / 死亡 ${formatInt(deaths)}`,
+    /** 誰も入らなかった日。 */
+    empty: (date: string) => `${date}: 記録なし`,
   },
 
   /** その日の出来事。数と名前は呼び出し側が渡す。 */
@@ -743,4 +752,43 @@ export const TIMELINE_TEXT = {
     peopleRecord: (count: number) => `ここまででいちばん多い ${formatInt(count)} 人が集まった日`,
     deathRecord: (count: number) => `ここまででいちばん多い ${formatInt(count)} 回の死亡があった日`,
   },
+} as const;
+
+/**
+ * SRUSA のあゆみ（サークルそのもの）の文言。
+ *
+ * Minecraft のログからは「サークルがいつ始まったか」は出てこない。
+ * 分かっていないことは分かっていないと書く。それらしい文で埋めない。
+ */
+export const HISTORY_TEXT = {
+  title: 'SRUSA のあゆみ',
+  lead: 'SRUSA というインカレサークルそのもののあゆみです。Minecraft サーバーの日ごとの記録は「活動カレンダー」にあります。',
+
+  reach: {
+    title: 'いま分かっていること',
+    note: '相関図に載っている人の所属から数えた数です。サークルの成り立ちや活動そのものは、ここからは分かりません。',
+    universities: '出てくる大学',
+    universitiesUnit: '校',
+    known: '学校が分かっている人',
+    knownUnit: '人',
+    bridging: '学校を 2 つ以上またぐ人',
+    bridgingUnit: '人',
+    /** どの大学かを並べる。 */
+    universityList: (names: string[]) => names.join('・'),
+  },
+
+  timeline: {
+    title: '年表',
+    /** まだ 1 件も埋まっていないときに出す。 */
+    empty: 'まだ確かめられた出来事がありません。下の「これから埋めること」にあるものが分かったら、data/srusa-history-v0.1.json に足してください。',
+  },
+
+  todo: {
+    title: 'これから埋めること',
+    note: '分からないものを推測で書かず、そのまま出しています。分かった時点で data/srusa-history-v0.1.json の status を confirmed にすると、上の年表へ移ります。',
+    badge: '未記入',
+  },
+
+  /** 日付が入っていない項目の表示。 */
+  undated: '時期が不明',
 } as const;

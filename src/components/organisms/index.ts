@@ -32,5 +32,6 @@ export * from './WorldMapGallery';
 export * from './WorldMapLog';
 export * from './WorldMapViewer';
 export * from './PlayerStreakPanel';
-export * from './TimelineList';
+export * from './ActivityCalendar';
 export * from './TuningPanel';
+export * from './HistoryTimeline';

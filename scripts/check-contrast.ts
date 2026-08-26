@@ -13,6 +13,7 @@ import { GROUP_BIOMES, GROUP_TYPE_SETTINGS } from '../src/map/config';
 import { SKINS, applySkin } from '../src/config/skins';
 import { roleColors } from '../src/config/colors';
 import { edgeStyle, nodeStyle, regionStyle } from '../src/map/display';
+import { calendarDayColors, calendarMarkAccent } from '../src/lib/display';
 
 /** 検査する配色の組み合わせ（スキン × ライト / ダーク）。 */
 const cases = SKINS.flatMap((skin) =>
@@ -104,6 +105,17 @@ for (const { label, theme } of cases) {
     check(`ノード ${name} 人型 / アイコン背景`, style.glyphColor, style.fill, CONTRAST_MIN_LARGE);
     check(`ノード ${name} 枠線 / 背景`, style.ring, theme.surface, CONTRAST_MIN_LARGE);
   }
+  check('活動カレンダー 出来事の札 / 背景', calendarMarkAccent(theme), theme.surface, CONTRAST_MIN_TEXT);
+  /*
+   * 暦の枠は人数で濃さが変わる。薄い日と濃い日で文字色の選び方が変わるので、
+   * 両端と真ん中を見る。ここを外すと、混み合った日だけ数字が読めなくなる。
+   */
+  for (const [label, people] of [['薄い日', 1], ['中くらいの日', 6], ['濃い日', 11]] as const) {
+    const day = { date: '', people, joins: 0, deaths: 0, firstSeen: '', marks: [] };
+    const cell = calendarDayColors(day, 11, theme);
+    check(`活動カレンダー ${label}の数字 / 枠`, cell.text, cell.background, CONTRAST_MIN_TEXT);
+  }
+
   const relation = { source: 'a', target: 'b', type: 'friend' };
   check('関係線 通常 / 背景', edgeStyle(relation, theme, false).stroke, theme.surface, CONTRAST_MIN_LARGE);
   check('関係線 強調 / 背景', edgeStyle(relation, theme, true).stroke, theme.surface, CONTRAST_MIN_LARGE);

@@ -11,6 +11,6 @@ export * from './PlayerIconPlaceholder';
 export * from './RankingPreviewCard';
 export * from './RelationEdge';
 export * from './SectionHeader';
-export * from './TimelineDayRow';
-export * from './TimelineMarkTag';
+export * from './CalendarDayCell';
+export * from './CalendarMarkTag';
 export * from './ViewportControls';
