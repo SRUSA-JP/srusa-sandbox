@@ -39,6 +39,7 @@ export const WORLD_MAP_CONTENT: PageContent = {
     },
     {
       heading: '2D だけを載せている理由',
+      audience: 'builder',
       blocks: [
         {
           kind: 'paragraph',
@@ -75,6 +76,7 @@ export const WORLD_MAP_CONTENT: PageContent = {
     },
     {
       heading: '決めること',
+      audience: 'builder',
       blocks: [
         {
           kind: 'table',
@@ -96,6 +98,7 @@ export const WORLD_MAP_CONTENT: PageContent = {
     },
     {
       heading: '手元で作り直す手順',
+      audience: 'builder',
       note: 'レンダリング環境は srusa-portal リポジトリの bluemap/ にあります。',
       blocks: [
         {

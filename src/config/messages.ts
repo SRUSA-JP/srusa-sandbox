@@ -10,19 +10,6 @@
 import { formatInt, formatMegabytes } from '../lib/format';
 import { OTHER_ENTRY } from './labels';
 
-/**
- * 最低限の認証（合言葉）の画面。
- *
- * クライアント側だけの確認だと分かるように、文言でも「本物の認証ではない」ことを
- * ごまかさない（config/auth.ts 参照）。
- */
-export const AUTH_TEXT = {
-  note: '合言葉を知っている人だけ見られるようにしています。',
-  label: '合言葉',
-  submit: '入る',
-  error: '合言葉が違います。',
-} as const;
-
 /** 画面の外枠（サイト名・タブ・配色の切り替え）。 */
 export const APP_TEXT = {
   /** ブラウザのタブと画面左上に出す名前。 */
@@ -30,13 +17,14 @@ export const APP_TEXT = {
   /** ホーム画面に追加したときなど、短く出す名前。 */
   shortName: 'SRUSA',
   /** サイト名の下に出す説明。 */
-  siteNote: 'SRUSA の試験用コンテンツを公開している場所です。Minecraft サーバーの統計と、メンバーの相関図があります。',
+  siteNote:
+    'SRUSA の試験用コンテンツを公開している場所です。Minecraft サーバーの統計、ワールドマップ、相関図、SRUSA 図鑑、ギャラリーがあります。',
   /**
    * 検索結果やホーム画面に出る説明。
    * 画面に出る siteNote と役割が違う（こちらは中身を見ずに読まれる）ので別に持つ。
    */
   siteDescription:
-    'SRUSA の試験用コンテンツを公開しているサイトです。Minecraft サーバーの統計と、メンバーの相関図を置いています。掲載内容と公開範囲は検討中です。',
+    'SRUSA の試験用コンテンツを公開しているサイトです。Minecraft サーバーの統計、ワールドマップ、相関図、SRUSA 図鑑、ギャラリーを置いています。掲載内容と公開範囲は検討中です。',
   /** タブ全体の読み上げ名。 */
   navLabel: 'ページ',
   /** ページ全体にかかる注意書きの見出し。本文の下に出す。 */
@@ -48,6 +36,51 @@ export const APP_TEXT = {
   theme: {
     toDark: '暗い配色に切り替える',
     toLight: '明るい配色に切り替える',
+  },
+  /** フロントエンドだけでかける簡易ロック。 */
+  auth: {
+    title: 'ログイン',
+    passwordLabel: 'パスワード',
+    showPassword: '表示',
+    hidePassword: '隠す',
+    submit: 'ログイン',
+    error: 'パスワードが違います。',
+  },
+} as const;
+
+/**
+ * ページの末尾にたたんで置く、作り手向けの詳細の文言。
+ *
+ * 生成ログ・出典・検証結果・JSON の読み書きのように、
+ * 見に来た人の目当てではないものの見出しをここに集める。
+ * 主役（画像・グラフ）を上に出すための置き場所なので、
+ * ここに入れた文言は画面の上部では使わない。
+ */
+export const TECHNICAL_TEXT = {
+  stats: {
+    title: 'データの詳細',
+    note: '出どころ・検証結果・JSON の読み書き・実装の構成',
+    source: '出どころ',
+    validation: '検証結果',
+    validationOk: '合計値の食い違いはありません。',
+    io: 'JSON の読み込みと書き出し',
+    ioNote: '手元の統計 JSON を読み込んで表示したり、いま見ている一覧を書き出したりできます。',
+  },
+  worldMap: {
+    title: '地図の詳細',
+    note: (count: number) => `生成ログ ${formatInt(count)} 件・作り方・決めること`,
+  },
+  relationships: {
+    title: 'データの詳細',
+    note: '不整合・配置の書き出しと読み込み・実装の構成',
+    issues: '読み込み時の不整合',
+    noIssues: '読み込み時の不整合はありません。',
+    io: '配置の書き出しと読み込み',
+    ioNote: '画面で動かした配置を JSON に書き出し、あとで同じ並びに戻せます。',
+  },
+  clips: {
+    title: 'URL を指定して表示',
+    note: '動画・画像の URL を直接開く',
   },
 } as const;
 
@@ -137,6 +170,113 @@ export const STATS_TEXT = {
     distance: '合計移動距離',
     deaths: '合計死亡回数',
     deathsValue: (count: number) => `${formatInt(count)} 回`,
+    blocksMined: '採掘ブロック',
+    mobKills: 'mob 撃破数',
+    diamonds: 'ダイヤ鉱石',
+  },
+
+  experience: {
+    hero: {
+      server: 'SRUSA',
+      title: 'STATS',
+      season: 'Season 2026',
+      inventory: 'INV',
+      display: '表示',
+    },
+    overview: 'SERVER OVERVIEW',
+    discovery: {
+      title: 'SERVER DISCOVERY',
+      note: '集計値の中から、その日いちばん目立っている記録を自動で拾っています。',
+      display: '表示',
+      anomaly: 'ANOMALY FOUND',
+      kinds: {
+        playtime: 'LONGEST LOGIN',
+        blocksMined: 'DEEP DIGGER',
+        distance: 'FARTHEST TRAVEL',
+        deaths: 'MOST DEATHS',
+        mobKills: 'MOB HUNTER',
+        diamonds: 'DIAMOND KING',
+        outlier: 'ANOMALY FOUND',
+      },
+    },
+    playstyle: {
+      title: 'PLAYER STATUS',
+      note: '複数の統計を組み合わせて、プレイヤーごとの遊び方をスコア化しています。',
+      level: (level: number) => `Lv. ${formatInt(level)}`,
+      skinAlt: (name: string) => `${name} の Minecraft スキン`,
+      selectPlayer: 'プレイヤー切替',
+      selectPlayerAlt: (name: string) => `${name} のステータスを見る`,
+      basis: '評価基準',
+      primary: 'PRIMARY STYLE',
+      rarest: 'RAREST STAT',
+      metrics: {
+        playtime: 'PLAY',
+        distance: 'TRAVEL',
+        deaths: 'DEATHS',
+        mobKills: 'KILLS',
+        blocksMined: 'MINED',
+        advancements: 'ADV',
+      },
+      /**
+       * レーダーの軸に出す短い名前。
+       *
+       * 軸の名前は図の外側に置くので、長いと多角形がその分だけ小さくなる
+       * （lib/radar.ts が収まる半径を計算する）。4〜5 文字に収めること。
+       * 正式な名前は styles にあり、図の隣の一覧はそちらを使う。
+       */
+      stylesShort: {
+        miner: 'MINE',
+        builder: 'BUILD',
+        explorer: 'EXPL',
+        fighter: 'FIGHT',
+        farmer: 'FARM',
+        fisher: 'FISH',
+        trader: 'TRADE',
+      },
+      styles: {
+        miner: 'MINER',
+        builder: 'BUILDER',
+        explorer: 'EXPLORER',
+        fighter: 'FIGHTER',
+        farmer: 'FARMER',
+        fisher: 'FISHER',
+        trader: 'TRADER',
+      },
+      descriptions: {
+        miner: '地下にこもって資源を掘り抜く採掘職人タイプ',
+        builder: 'クラフトと設置で拠点を育てる建築担当タイプ',
+        explorer: '遠くまで足跡を残して世界を広げる冒険者タイプ',
+        fighter: '危険地帯でも前に出る戦闘担当タイプ',
+        farmer: '食料・動物・釣り場を整える暮らし担当タイプ',
+        fisher: '水辺の記録だけ妙に濃い釣り人タイプ',
+        trader: '村人経済を回して装備と物資を整える商人タイプ',
+      },
+    },
+    daily: {
+      title: 'PLAYER DAILY LOG',
+      note: 'バックアップ間の差分から、プレイヤーごとの伸び方を日付別に見ます。',
+      player: 'プレイヤー',
+      metric: '指標',
+      lastActive: '直近活動',
+      total: '期間合計',
+      empty: 'この期間の活動はありません',
+      playerList: 'プレイヤー一覧',
+    },
+    achievement: {
+      title: 'ACHIEVEMENT BOARD',
+      note: '上位記録をゲーム内実績のように並べています。',
+      titles: {
+        miner: 'THE MINER',
+        builder: 'THE BUILDER',
+        explorer: 'THE WANDERER',
+        fighter: 'MOB HUNTER',
+        farmer: 'FARM MASTER',
+        fisher: 'RIVER KEEPER',
+        trader: 'EMERALD BROKER',
+        diamond: 'DIAMOND KING',
+        fallen: 'THE FALLEN',
+      },
+    },
   },
 
   /** グラフ上のプルダウン。 */
@@ -150,6 +290,8 @@ export const STATS_TEXT = {
     xAxis: '横軸',
     yAxis: '縦軸',
     trendScope: '表示単位',
+    trendMode: '値の出し方',
+    pointDisplay: '点の表示',
   },
 
   /** 各グラフの見出しと注記。 */
@@ -176,11 +318,58 @@ export const STATS_TEXT = {
         'データが1日分しかないため、点が1つだけ表示されます。data/ に別の日付の minecraft-stats-YYYYMMDD.json を追加すると線になります。',
       perPlayer: (limit: number) => `最新日の上位${limit}人までを表示します。`,
       dateColumn: '日付',
+      /** 累計をそのまま出すときの断り。1 点が数日ぶんを含むことを明示する。 */
+      cumulativeNote:
+        'スナップショット時点の累計です。点と点の間が数日空いているときは、その間の増加がまとめて次の点に乗ります。',
+      /** 1日あたりの概算のときの説明。実測ではないことを必ず添える。 */
+      dailyAverageNote:
+        'スナップショット間の増加を、その間の日数で割って 1 日ずつに広げた概算です。実際にその日どれだけ動いたかの記録ではありません。',
+      /** 概算に切り替えると、プレイ時間での換算は使わない。 */
+      dailyAverageBasis: '値の基準（1時間あたりなど）は使いません。カレンダーの日数で割った値です。',
+      /** 概算にできるスナップショットが足りないとき。 */
+      needsTwoSnapshots:
+        '増分を計算できるスナップショットが 2 日分ありません。data/ に別の日付の minecraft-stats-YYYYMMDD.json を追加してください。',
     },
     scatter: {
       title: '2指標の関係（散布図）',
       note: '横軸・縦軸の指標をそれぞれ選べます。同じ指標を選ぶと対角線になります。',
       bothAxes: (note: string) => `両軸とも${note}`,
+    },
+    economy: {
+      title: 'SRUSA鉱物指数',
+      note:
+        'ダイヤとエメラルドを資産バスケットとして見ます。所有ベースでは装備・ツール・エンダーチェスト・所有者別バックパック内の在庫も換算します。',
+      total: '総資産',
+      rate: 'DI/EM レート',
+      index: '指数',
+      diamond: 'ダイヤ',
+      emerald: 'エメラルド',
+      ranking: '資産ランキング',
+      rankingMode: '表示',
+      rankingModes: {
+        total: '合計と内訳',
+        diamond: 'ダイヤの内訳',
+        emerald: 'エメラルドの内訳',
+      },
+      /** 合計と内訳のとき。ダイヤとエメラルドの積み上げ。 */
+      rankingNote: 'ダイヤとエメラルドを同じ 1 単位として積み上げた、プレイヤー別の資産量です。',
+      /** 1 資産だけを見るとき。装備・ツールなどの分類に分けた積み上げ。 */
+      categoryNote: (asset: string, categories: string) =>
+        `${asset}の資産量を${categories}に分けた内訳です。`,
+      /** 装備やツールを含むときだけ足す注記。 */
+      craftedNote: '装備とツールは、素材何個分かに換算した値で数えます。',
+      /** 表と CSV の列。 */
+      totalColumn: '合計',
+      /** 換算後の資産量の単位。ダイヤとエメラルドを同じ 1 単位として数える。 */
+      unit: '個',
+      trend: '指数推移',
+      trendNote: '算出元を切り替えると、指数の元になる資産量の数え方も変わります。',
+      trendColumn: 'スナップショット',
+      source: '算出元',
+      noRate: '算出なし',
+      base: (base: number) => `最初のスナップショットを ${formatInt(base)} として指数化`,
+      rateValue: (rate: string) => `1 DI = ${rate} EM`,
+      rateNote: '選択中の算出元から見た簡易レート',
     },
   },
 
@@ -208,6 +397,8 @@ export const STATS_TEXT = {
     breakdown: (breakdown: string, basis: string) => `breakdown-${breakdown}-${basis}.csv`,
     series: (series: string, basis: string) => `series-${series}-${basis}.csv`,
     trend: (metric: string, basis: string) => `trend-${metric}-${basis}.csv`,
+    economyRanking: (mode: string) => `economy-ranking-${mode}.csv`,
+    economyIndex: (source: string) => `economy-index-${source}.csv`,
     scatter: (x: string, y: string, basis: string) => `scatter-${x}-${y}-${basis}.csv`,
   },
 } as const;
@@ -217,29 +408,71 @@ export const WORLD_MAP_TEXT = {
   /** 地図データがまだ無いとき。 */
   noData:
     '地図データ（data/world-map.json）がありません。BlueMap でレンダリングしてから `npm run build:world-map` を実行してください。',
+  partialData: (count: number) => `読み込めない地図データ ${formatInt(count)} 件を除外して表示しています。`,
 
   card: {
     title: '2D マップ',
-    note: '真上から見た地図です。掴んで動かすと移動、拡大すると 1 画素が 1 ブロックとして見えます。タップ / クリックすると、その場所の座標を固定します。',
+    note: '真上から見た地図です。掴んで動かすと移動、拡大すると 1 画素が 1 ブロックとして見えます。',
     /** 読み上げと、画像が出ないときの説明。 */
     alt: (world: string) => `${world}を真上から見た地図`,
+    imageError: (path: string) => `画像を読み込めません: ${path}`,
   },
 
-  /** 複数の地図があるときの切り替え。 */
-  mapPicker: '地図',
+  picker: {
+    view: '表示',
+    dimension: 'ディメンション',
+    allDimensions: 'すべて',
+    map: '日付',
+    latestMaps: '最新',
+    tooltips: 'ツールチップ',
+    log: 'ログ',
+  },
+
+  log: {
+    title: '生成ログ',
+    dimension: 'DIM',
+    area: '範囲',
+    bounds: '座標',
+    pixels: 'PNG',
+    size: 'SIZE',
+    updated: '更新',
+  },
 
   /** 地図の規模。見出しの下に出す。 */
-  summary: (world: string, width: number, height: number, bytes: number) =>
-    `${world} / ${formatInt(width)} × ${formatInt(height)} ブロック（${formatMegabytes(bytes)}）`,
+  dateSummary: (date: string, count: number) => `${date} の地図 ${formatInt(count)} 件を表示`,
+  latestSummary: (count: number) => `各ディメンションの最新地図 ${formatInt(count)} 件を表示`,
+  mapSelectionSummary: (shown: number, total: number) =>
+    `${formatInt(shown)} ワールドを表示（保存済み地図 ${formatInt(total)} 件）`,
+  summary: (
+    world: string,
+    width: number,
+    height: number,
+    bytes: number,
+    bounds: { minX: number; maxX: number; minZ: number; maxZ: number },
+  ) =>
+    `${world} / ${formatInt(width)} × ${formatInt(height)} ブロック（${formatMegabytes(bytes)}） / X ${formatInt(bounds.minX)}..${formatInt(bounds.maxX)} / Z ${formatInt(bounds.minZ)}..${formatInt(bounds.maxZ)}`,
 
   /** 指している場所の座標。 */
   pointer: (x: number, z: number) => `X ${formatInt(x)} / Z ${formatInt(z)}`,
-  /** タップ / クリックで固定した座標。 */
-  pinned: (x: number, z: number) => `固定 X ${formatInt(x)} / Z ${formatInt(z)}`,
+  /** クリックして選んだ場所の座標。 */
+  selected: (x: number, z: number) => `選択 X ${formatInt(x)} / Z ${formatInt(z)}`,
   /** 指していないときに出す、画面の中心の座標。 */
   center: (x: number, z: number) => `中心 X ${formatInt(x)} / Z ${formatInt(z)}`,
-  /** 対応する次元の座標（例: ネザーはオーバーワールドの 1/8）。 */
-  correlation: (world: string, x: number, z: number) => `${world}: X ${formatInt(x)} / Z ${formatInt(z)}`,
+  tooltip: {
+    title: '座標',
+    current: (x: number, z: number) => `X ${formatInt(x)} / Z ${formatInt(z)}`,
+  },
+
+  /**
+   * 対になるワールドの座標（Minecraft の 1:8 換算）。
+   *
+   * 換算が成り立つのはオーバーワールドとネザーのあいだだけなので、
+   * ジ・エンドと黄昏の森では出さない。
+   */
+  paired: {
+    nether: (x: number, z: number) => `ネザー X ${formatInt(x)} / Z ${formatInt(z)}`,
+    overworld: (x: number, z: number) => `通常世界 X ${formatInt(x)} / Z ${formatInt(z)}`,
+  },
 
   /**
    * 3D の見た目を写真で見せる節。
@@ -267,6 +500,10 @@ export const MAP_TEXT = {
   picker: {
     center: '中心人物',
     group: '強調するグループ',
+    layout: '配置',
+    tooltips: 'ツールチップ',
+    tooltipOn: '表示',
+    tooltipOff: '非表示',
     noHighlight: '強調しない',
     /** グループのプルダウンに出す 1 件分の説明。 */
     groupOption: (name: string, type: string, members: number) =>
@@ -277,13 +514,19 @@ export const MAP_TEXT = {
   /** 掴んで動かした配置を元に戻すボタン。 */
   resetPositions: '配置を戻す',
 
+  /** 配置の持ち出しと持ち込み。作り手向けなのでページ末尾の詳細に置く。 */
+  action: {
+    exportLayout: '配置を書き出す',
+    importLayout: '配置を読み込む',
+  },
+
   card: {
     map: {
       title: '相関図',
       note: [
         '所属の組み合わせが同じ人をまとめて配置し、各グループをその所属者を囲う領域として描いています。',
         '複数の所属は領域の重なりで表れます。',
-        '人を掴んで動かすと配置を変えられます（領域と関係線も追従します）。押すとその人が中心になります。',
+        '人を掴んで動かすと配置を変えられます（領域と関係線も追従します）。押すと紹介へのリンクを出します。',
       ].join(''),
       center: (name: string) => `中心人物: ${name}`,
       ariaLabel: 'SRUSA の相関図',
@@ -299,6 +542,8 @@ export const MAP_TEXT = {
     group: (name: string, members: number) => `${name}: ${formatInt(members)} 人`,
     person: (name: string, attributes: string[]) =>
       attributes.length > 0 ? `${name}（${attributes.join('・')}）` : name,
+    profileLink: '紹介を見る',
+    close: '閉じる',
     relation: (from: string, to: string, context?: string, uncertain?: boolean) =>
       `${from} ↔ ${to}${context ? `（${context}）` : ''}${uncertain ? ' ※確度が低い関係' : ''}`,
   },
@@ -331,6 +576,89 @@ export const DATA_TEXT = {
     unknownPerson: (source: string, target: string) =>
       `関係 ${source} → ${target} に未登録の人物が含まれます。`,
   },
+} as const;
+
+/**
+ * 連続プレイ日数。プレイヤー紹介ページに出す。
+ *
+ * 数え方の元はサーバーログの日別記録で、「その日サーバーに入ったか」だけを見る。
+ * 何時間遊んだかは見ないので、少し覗いた日も 1 日として数える。
+ */
+export const STREAK_TEXT = {
+  title: '連続プレイ日数',
+  note: 'サーバーのログから、その日ログインしたかどうかで数えています。',
+  current: '現在の連続',
+  /** 途切れている人には「現在」と出さない（最後に続いた長さなので）。 */
+  lastRun: '最後の連続',
+  longest: '最長の連続',
+  totalDays: '遊んだ日数',
+  lastPlayed: '最後にログイン',
+  days: (count: number) => `${count} 日`,
+  /** 帯の見出し。何日ぶんを並べているか。 */
+  recent: (count: number) => `直近 ${count} 日`,
+  /** 連なりが途切れているとき。 */
+  broken: '途切れています',
+  /** 続いているとき。 */
+  active: '継続中',
+  /** 一度もログインの記録が無い人。 */
+  empty: 'ログインの記録がまだありません。',
+  /** 帯の 1 マスの読み上げ。 */
+  markAlt: (date: string, played: boolean) => `${date} ${played ? 'ログインあり' : 'ログインなし'}`,
+} as const;
+
+/**
+ * SRUSA 図鑑。人をまとめて並べ、ひとりずつの紹介ページへ渡す入口。
+ *
+ * 名前は相関図のデータにある表記のまま出す。頭文字だけの人はそのまま頭文字で出し、
+ * ここで本名に近づける言い換えをしないこと（相関図の匿名化を弱めないため）。
+ */
+export const ZUKAN_TEXT = {
+  title: 'SRUSA 図鑑',
+  note: '相関図と Minecraft のデータにいる人をまとめた名簿です。',
+  lead: '名前を選ぶと、その人の紹介ページへ移ります。所属や、Minecraft に参加しているかで絞り込めます。',
+  /** 絞り込みのプルダウン。 */
+  filter: {
+    attribute: '所属',
+    kind: '種類',
+    sort: '並び替え',
+    /** 絞り込まないときの選択肢。 */
+    any: 'すべて',
+  },
+  /** 種類での絞り込み。 */
+  kind: {
+    all: 'すべての人',
+    minecraft: 'Minecraft に参加',
+    relationship: '相関図のみ',
+  },
+  /** 並び替え。 */
+  sort: {
+    name: '名前順',
+    minecraft: 'Minecraft 参加を先',
+    relationship: '相関図のみを先',
+    playtime: 'プレイ時間が長い順',
+    streak: '連続ログインが長い順',
+    related: 'つながりが多い人順',
+  },
+  /** 見出しの下に出す人数。 */
+  count: (shown: number, total: number) => `${total} 人中 ${shown} 人`,
+  /** 絞り込んだ結果が空のとき。 */
+  empty: '条件に合う人がいません。絞り込みを緩めてください。',
+  /** カードに付ける札。 */
+  badge: {
+    stats: '統計あり',
+    daily: '日別ログ',
+    streak: (days: number) => `継続 ${days} 日`,
+  },
+  /** 所属が多すぎて省いたとき。 */
+  moreAttributes: (count: number) => `ほか ${count}`,
+  /** カード全体の読み上げ。 */
+  open: (name: string) => `${name} の紹介ページを開く`,
+  /** 他のページから図鑑へ飛ぶボタン。 */
+  link: '図鑑を見る',
+  /** 紹介ページから図鑑へ戻るボタン。 */
+  back: '図鑑へ戻る',
+  /** 知らない名前で紹介ページを開いたとき。 */
+  notFound: 'その名前の人は見つかりませんでした。下の図鑑から選び直せます。',
 } as const;
 
 /** 表（DataTable）。統計ビューアと相関図で共用する。 */

@@ -64,6 +64,12 @@ export interface VizTheme {
 
   /** カテゴリ系列の色。順番に使う（9 色目は作らず「その他」に畳む）。 */
   categorical: string[];
+
+  /** Minecraft 資産の意味色。 */
+  economyAssets: {
+    diamond: string;
+    emerald: string;
+  };
 }
 
 /**
@@ -92,6 +98,10 @@ export const LIGHT_THEME: VizTheme = {
   accentSubtle: '#eaf1fb',
   danger: '#c8322f',
   categorical: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#4a3aa7', '#e34948'],
+  economyAssets: {
+    diamond: '#008fbd',
+    emerald: '#168a52',
+  },
 };
 
 /**
@@ -119,6 +129,10 @@ export const DARK_THEME: VizTheme = {
   accentSubtle: '#182838',
   danger: '#e66767',
   categorical: ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'],
+  economyAssets: {
+    diamond: '#4cc9f0',
+    emerald: '#32c978',
+  },
 };
 
 export function themeFor(mode: ThemeMode): VizTheme {

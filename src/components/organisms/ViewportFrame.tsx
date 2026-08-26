@@ -11,6 +11,8 @@ export interface ViewportFrameProps {
   status?: ReactNode;
   /** 操作の列の左に足すもの。 */
   actions?: ReactNode;
+  /** 図の上に重ねる補助表示。 */
+  overlay?: ReactNode;
   /** 表示枠の中に置く図そのもの。位置と拡大は呼び出し側が transform で当てる。 */
   children: ReactNode;
 }
@@ -25,7 +27,7 @@ export interface ViewportFrameProps {
  * ボタンは枠の外側の兄弟として重ねる。枠の中に入れると、ボタンを押した指が
  * そのまま「掴んで動かす」と解釈されてしまうため。
  */
-export function ViewportFrame({ panZoom, label, status, actions, children }: ViewportFrameProps) {
+export function ViewportFrame({ panZoom, label, status, actions, overlay, children }: ViewportFrameProps) {
   const helpId = useId();
 
   /*
@@ -47,6 +49,8 @@ export function ViewportFrame({ panZoom, label, status, actions, children }: Vie
         >
           {children}
         </div>
+
+        {overlay}
 
         {/* 操作ボタン。図の右上に重ねる（地図の作法に合わせる） */}
         <div className="absolute top-md right-md flex items-center gap-xs">

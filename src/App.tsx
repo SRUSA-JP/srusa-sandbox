@@ -1,17 +1,21 @@
 import type { ReactElement } from 'react';
-import { AppShell, PasswordGate } from './components';
+import { AppShell, AuthGate } from './components';
 import { useHashRoute } from './hooks/useHashRoute';
-import { MapPage, StatsPage, WorldMapPage } from './pages';
-import { skinForRoute, type RouteId } from './routes';
+import { ClipsPage, EventRankingsPage, MapPage, PlayerPage, StatsPage, WorldMapPage, ZukanPage } from './pages';
+import { skinForRoute, type Route, type RouteId } from './routes';
 import { setActiveSkin } from './config/skins';
 import { useAppTheme } from './theme/useThemeMode';
 import type { VizTheme } from './theme/palette';
 
 /** 画面 ID → 中身。並び順と URL は routes.ts が持つ。 */
-const PAGES: Record<RouteId, (props: { theme: VizTheme }) => ReactElement> = {
+const PAGES: Record<RouteId, (props: { theme: VizTheme; route: Route }) => ReactElement> = {
   stats: StatsPage,
   'world-map': WorldMapPage,
   relationships: MapPage,
+  zukan: ZukanPage,
+  events: EventRankingsPage,
+  clips: ClipsPage,
+  player: PlayerPage,
 };
 
 /**
@@ -19,7 +23,6 @@ const PAGES: Record<RouteId, (props: { theme: VizTheme }) => ReactElement> = {
  *
  * 画面の切り替え（routes.ts）と、その画面の見た目（config/skins.ts）と
  * 配色（theme/）を結びつけるだけで、画面の中身には関わらない。
- * PasswordGate が合言葉を通すまで、その先（AppShell とページ）は描かない。
  */
 export function App() {
   const { route, navigate } = useHashRoute();
@@ -35,10 +38,10 @@ export function App() {
   const Page = PAGES[route.id];
 
   return (
-    <PasswordGate>
+    <AuthGate>
       <AppShell route={route} onNavigate={navigate} mode={mode} onToggleTheme={toggle}>
-        <Page theme={theme} />
+        <Page theme={theme} route={route} />
       </AppShell>
-    </PasswordGate>
+    </AuthGate>
   );
 }

@@ -27,9 +27,6 @@ import {
  *   キーボード   矢印で移動、+ - で拡大縮小、0 で全体表示
  *   ボタン       ViewportControls（molecules）
  *
- * `onTap` を渡すと、動かさずに離した（掴んで動かしたのではない）ときだけ呼ぶ。
- * ワールドマップで、タップ / クリックした場所の座標を固定するのに使う。
- *
  * ホイール単体でページのスクロールを奪わないのは、記事の途中に図が
  * 埋まっているため。図の上を通っただけで記事が読めなくなるのを防ぐ。
  * 操作の説明は図の外（下）にだけ置く。図の上に重ねると地図が隠れる。
@@ -77,12 +74,7 @@ function midpoint(points: Point[]): Point {
   return { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 };
 }
 
-export function usePanZoom(
-  contentWidth: number,
-  contentHeight: number,
-  zoom: ZoomRange,
-  onTap?: (point: Point) => void,
-): PanZoom {
+export function usePanZoom(contentWidth: number, contentHeight: number, zoom: ZoomRange): PanZoom {
   const surfaceRef = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState<Size>({ width: 0, height: 0 });
   const [view, setView] = useState<Viewport>({ scale: 1, x: 0, y: 0 });
@@ -96,10 +88,6 @@ export function usePanZoom(
 
   const pointers = useRef<Pointers>(new Map());
   const pinchDistance = useRef(0);
-  /** 掴み始めた位置（画面座標）。onTap の判定に使う。 */
-  const tapStart = useRef<Point | null>(null);
-  /** 2 本指に触れたことがあるか。あればつまむ操作なので、離してもタップとは見なさない。 */
-  const wasMultiTouch = useRef(false);
 
   /* ---------------------------------------------------------------- *
    * 表示枠の大きさを測る
@@ -175,15 +163,8 @@ export function usePanZoom(
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    if (pointers.current.size === 1) {
-      setIsPanning(true);
-      tapStart.current = { x: event.clientX, y: event.clientY };
-      wasMultiTouch.current = false;
-    }
-    if (pointers.current.size === 2) {
-      pinchDistance.current = distance([...pointers.current.values()]);
-      wasMultiTouch.current = true;
-    }
+    if (pointers.current.size === 1) setIsPanning(true);
+    if (pointers.current.size === 2) pinchDistance.current = distance([...pointers.current.values()]);
   }, []);
 
   const onPointerMove = useCallback(
@@ -211,25 +192,14 @@ export function usePanZoom(
     [content, box, range, localPoint],
   );
 
-  const endPointer = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
-      pointers.current.delete(event.pointerId);
-      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-        event.currentTarget.releasePointerCapture(event.pointerId);
-      }
-      if (pointers.current.size < 2) pinchDistance.current = 0;
-      if (pointers.current.size === 0) {
-        setIsPanning(false);
-        const start = tapStart.current;
-        tapStart.current = null;
-        if (onTap && start && !wasMultiTouch.current) {
-          const moved = Math.hypot(event.clientX - start.x, event.clientY - start.y);
-          if (moved < VIEWPORT.dragThreshold) onTap(toContent(view, localPoint(event.clientX, event.clientY)));
-        }
-      }
-    },
-    [onTap, view, localPoint],
-  );
+  const endPointer = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    pointers.current.delete(event.pointerId);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (pointers.current.size < 2) pinchDistance.current = 0;
+    if (pointers.current.size === 0) setIsPanning(false);
+  }, []);
 
   const onDoubleClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {

@@ -16,6 +16,13 @@ export interface AppLayoutProps {
   children: ReactNode;
   /** 本文のあとに出す注意書き（試験的である、など）。 */
   footnotes?: ReactNode;
+  /**
+   * 作り手向けの詳細（生成ログ・出典・検証結果・JSON の読み書き）。
+   *
+   * 見に来た人の目当てではないので、注意書きより下・出典より上に置く。
+   * たたんでおくかどうかは中身（TechnicalDetails）が決める。
+   */
+  technical?: ReactNode;
   /** 画面の末尾に出す出典。 */
   footer?: ReactNode;
 }
@@ -23,7 +30,7 @@ export interface AppLayoutProps {
 /**
  * 画面 1 枚の骨格。
  *
- * 上から「見出し → 知らせ → 要約 → 本文 → 注意書き → 出典」の順に置く。
+ * 上から「見出し → 知らせ → 要約 → 本文 → 注意書き → 作り手向けの詳細 → 出典」の順に置く。
  * 主役（グラフ・図）を先に見せ、読まなくても困らない詳細は下へ回す。
  * 何を出すかはページ（pages/）が決め、この層は中身を知らない。
  * サイト全体の枠（タブ・配色の切り替え）は AppShell が持つ。
@@ -36,6 +43,7 @@ export function AppLayout({
   lead,
   children,
   footnotes,
+  technical,
   footer,
 }: AppLayoutProps) {
   return (
@@ -55,6 +63,8 @@ export function AppLayout({
       <main>{children}</main>
 
       {footnotes}
+
+      {technical}
 
       {footer && (
         <footer className="flex flex-col gap-xxs border-t-hairline border-divider pt-lg text-sm text-subtle">

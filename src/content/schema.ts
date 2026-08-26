@@ -30,9 +30,20 @@ export type ProseBlock =
       tag?: string;
     };
 
+/**
+ * その節を誰に向けて書いたか。
+ *
+ * 'reader' は見に来た人向け（既定）。'builder' は作り手向けで、
+ * ファイルの大きさ・作り直す手順・TODO のように、読まなくても
+ * ページを使うのに困らないもの。ページの末尾にたたんで置く。
+ */
+export type ProseAudience = 'reader' | 'builder';
+
 export interface ProseSection {
   /** 節の見出し。 */
   heading: string;
+  /** 誰向けの節か。省略したら 'reader'。 */
+  audience?: ProseAudience;
   /** 見出しの下に出す短い注記。 */
   note?: string;
   blocks: ProseBlock[];

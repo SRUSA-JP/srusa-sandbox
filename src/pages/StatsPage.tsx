@@ -6,30 +6,43 @@ import {
   AppLayout,
   Button,
   ChartCard,
+  DiscoveryBoard,
+  EconomyIndexPanel,
+  FeaturedItemUseColumns,
   FilterPanel,
   KpiGrid,
   KpiTile,
   MetricScatter,
+  MinecraftHero,
   NoticePanel,
   Note,
   Picker,
+  PlayerDailyTimeline,
+  PlayerStatusGallery,
   ProsePanel,
   RankBarChart,
   SeriesBarChart,
+  TechnicalDetails,
   TrendLineChart,
 } from '../components';
-import { MINECRAFT_CONTENT } from '../content';
-import { APP_TEXT } from '../config/messages';
+import { ACTIONS } from '../components/classes';
+import { MINECRAFT_CONTENT, builderSections, readerSections } from '../content';
+import { APP_TEXT, TECHNICAL_TEXT } from '../config/messages';
 import {
   BASIS_OPTIONS,
   BREAKDOWNS,
   LIMITS,
   PLAYER_COLUMN,
+  SCATTER_POINT_DISPLAY_OPTIONS,
   SERIES_OPTIONS,
+  STATS_DEFAULTS,
   STATS_TEXT,
+  TREND_MODE_OPTIONS,
   TREND_SCOPE_OPTIONS,
   type BreakdownId,
+  type ScatterPointDisplay,
   type SeriesId,
+  type TrendMode,
   type TrendScope,
 } from '../config';
 import {
@@ -68,6 +81,9 @@ import {
   type RateBasis,
   type Snapshot,
 } from '../lib/selectors';
+import { playerStatuses, serverDiscoveries, serverInventory } from '../lib/statsExperience';
+import { loadPlayerDailyDocument } from '../data/playerDaily';
+import { playerPath } from '../data/playerProfiles';
 import { downloadJson, type Row } from '../lib/export';
 import { formatDecimal, formatHours } from '../lib/format';
 import { useChartMetrics } from '../hooks/useChartMetrics';
@@ -88,24 +104,28 @@ export function StatsPage({ theme }: StatsPageProps) {
   const fileInput = useRef<HTMLInputElement>(null);
 
   // 全グラフ共通の絞り込み
-  const [filterMetric, setFilterMetric] = useState<NumericPlayerRowKey>('playtime_hours');
+  const [filterMetric, setFilterMetric] = useState<NumericPlayerRowKey>(STATS_DEFAULTS.filterMetric);
   /** 利用者が動かした範囲。null なら指標の全範囲（＝絞り込みなし）。 */
   const [filterBounds, setFilterBounds] = useState<{ min: number; max: number } | null>(null);
 
   // 各グラフのパラメータ
-  const [rankMetric, setRankMetric] = useState<NumericPlayerRowKey>('playtime_hours');
-  const [rankBasis, setRankBasis] = useState<RateBasis>('total');
-  const [breakdown, setBreakdown] = useState<BreakdownId>('kills');
+  const [rankMetric, setRankMetric] = useState<NumericPlayerRowKey>(STATS_DEFAULTS.rankMetric);
+  const [rankBasis, setRankBasis] = useState<RateBasis>(STATS_DEFAULTS.rankBasis);
+  const [breakdown, setBreakdown] = useState<BreakdownId>(STATS_DEFAULTS.breakdown);
   const [breakdownPlayer, setBreakdownPlayer] = useState('');
-  const [breakdownBasis, setBreakdownBasis] = useState<RateBasis>('total');
-  const [seriesId, setSeriesId] = useState<SeriesId>('movement');
-  const [seriesBasis, setSeriesBasis] = useState<RateBasis>('total');
-  const [scatterX, setScatterX] = useState<NumericPlayerRowKey>('playtime_hours');
-  const [scatterY, setScatterY] = useState<NumericPlayerRowKey>('mob_kills');
-  const [scatterBasis, setScatterBasis] = useState<RateBasis>('total');
-  const [trendMetric, setTrendMetric] = useState<NumericPlayerRowKey>('playtime_hours');
-  const [trendBasis, setTrendBasis] = useState<RateBasis>('total');
-  const [trendScope, setTrendScope] = useState<TrendScope>('total');
+  const [breakdownBasis, setBreakdownBasis] = useState<RateBasis>(STATS_DEFAULTS.breakdownBasis);
+  const [seriesId, setSeriesId] = useState<SeriesId>(STATS_DEFAULTS.seriesId);
+  const [seriesBasis, setSeriesBasis] = useState<RateBasis>(STATS_DEFAULTS.seriesBasis);
+  const [statusBasis, setStatusBasis] = useState<RateBasis>(STATS_DEFAULTS.statusBasis);
+  const [statusPlayerName, setStatusPlayerName] = useState('');
+  const [scatterX, setScatterX] = useState<NumericPlayerRowKey>(STATS_DEFAULTS.scatterX);
+  const [scatterY, setScatterY] = useState<NumericPlayerRowKey>(STATS_DEFAULTS.scatterY);
+  const [scatterBasis, setScatterBasis] = useState<RateBasis>(STATS_DEFAULTS.scatterBasis);
+  const [scatterPointDisplay, setScatterPointDisplay] = useState<ScatterPointDisplay>(STATS_DEFAULTS.scatterPointDisplay);
+  const [trendMetric, setTrendMetric] = useState<NumericPlayerRowKey>(STATS_DEFAULTS.trendMetric);
+  const [trendBasis, setTrendBasis] = useState<RateBasis>(STATS_DEFAULTS.trendBasis);
+  const [trendScope, setTrendScope] = useState<TrendScope>(STATS_DEFAULTS.trendScope);
+  const [trendMode, setTrendMode] = useState<TrendMode>(STATS_DEFAULTS.trendMode);
   /** 日付ごとの推移に使う全スナップショット。 */
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
 
@@ -124,6 +144,10 @@ export function StatsPage({ theme }: StatsPageProps) {
     setScatterBasis(basis);
     setScatterX((metric) => keepRatable(metric, basis));
     setScatterY((metric) => keepRatable(metric, basis));
+  }, []);
+
+  const openPlayerProfile = useCallback((name: string) => {
+    window.location.hash = playerPath(name);
   }, []);
 
   useEffect(() => {
@@ -199,9 +223,15 @@ export function StatsPage({ theme }: StatsPageProps) {
       playtime: rows.reduce((acc, row) => acc + row.playtime_hours, 0),
       distance: rows.reduce((acc, row) => acc + row.distance_km, 0),
       deaths: rows.reduce((acc, row) => acc + row.deaths, 0),
+      blocksMined: rows.reduce((acc, row) => acc + row.blocks_mined, 0),
+      mobKills: rows.reduce((acc, row) => acc + row.mob_kills, 0),
     }),
     [rows],
   );
+  const inventoryRecords = useMemo(() => (doc ? serverInventory(doc) : []), [doc]);
+  const discoveries = useMemo(() => (doc ? serverDiscoveries(doc) : []), [doc]);
+  const statusCards = useMemo(() => (doc ? playerStatuses(doc, undefined, statusBasis) : []), [doc, statusBasis]);
+  const playerDaily = useMemo(() => loadPlayerDailyDocument(), []);
 
   const rankOption = metricOption(rankMetric);
   const scatterXOption = metricOption(scatterX);
@@ -209,6 +239,10 @@ export function StatsPage({ theme }: StatsPageProps) {
   const trendMetricOption = metricOption(trendMetric);
   const currentBreakdown = breakdownOption(breakdown);
   const currentSeries = seriesOption(seriesId);
+  const statsDataDate = doc?.generated_on ?? '';
+  const trendDataDate = snapshots.length > 0
+    ? `${snapshots[0].label} - ${snapshots[snapshots.length - 1].label}`
+    : statsDataDate;
 
   const rankData = useMemo(
     () => rankBy(rows, rankMetric, { basis: rankBasis }),
@@ -245,8 +279,9 @@ export function StatsPage({ theme }: StatsPageProps) {
         players: playerNames,
         basis: trendBasis,
         perPlayer: trendScope === 'per_player',
+        mode: trendMode,
       }),
-    [snapshots, trendMetric, playerNames, trendBasis, trendScope],
+    [snapshots, trendMetric, playerNames, trendBasis, trendScope, trendMode],
   );
 
   const scatterPoints = useMemo(
@@ -262,77 +297,89 @@ export function StatsPage({ theme }: StatsPageProps) {
           ? STATS_TEXT.source({ generatedOn: doc.generated_on, players: allRows.length })
           : undefined
       }
-      lead={MINECRAFT_CONTENT.lead}
       actions={
-        <>
-          {datasets.length > 1 && (
-            <Picker
-              label={STATS_TEXT.action.dataset}
-              value={datasetId}
-              options={datasets.map((dataset) => ({ value: dataset.id, label: dataset.label }))}
-              onChange={setDatasetId}
-            />
-          )}
-          <input
-            ref={fileInput}
-            type="file"
-            accept="application/json,.json"
-            hidden
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (file) void importFile(file);
-              event.target.value = '';
-            }}
+        /* 見る日付の切り替えだけを上に残す。JSON の読み書きは下の「データの詳細」へ回す */
+        datasets.length > 1 ? (
+          <Picker
+            label={STATS_TEXT.action.dataset}
+            value={datasetId}
+            options={datasets.map((dataset) => ({ value: dataset.id, label: dataset.label }))}
+            onChange={setDatasetId}
           />
-          <Button
-            label={STATS_TEXT.action.importJson}
-            icon="upload"
-            onClick={() => fileInput.current?.click()}
-          />
-          <Button
-            label={STATS_TEXT.action.exportSummary}
-            icon="download"
-            disabled={!doc}
-            onClick={() =>
-              doc && downloadJson(STATS_TEXT.file.summary(doc.generated_on), playerRows(doc))
-            }
-          />
-        </>
+        ) : undefined
       }
-      messages={
-        <>
-          {error && <Note tone="error">{STATS_TEXT.error.load(error)}</Note>}
-          {mismatches.length > 0 && (
-            <Note tone="error">{STATS_TEXT.error.totalsMismatch(mismatches.map((m) => m.field))}</Note>
-          )}
-        </>
-      }
+      messages={error ? <Note tone="error">{STATS_TEXT.error.load(error)}</Note> : undefined}
       footnotes={
         MINECRAFT_CONTENT.disclaimer ? (
           <NoticePanel title={APP_TEXT.disclaimer}>{MINECRAFT_CONTENT.disclaimer}</NoticePanel>
         ) : undefined
       }
-      footer={
-        doc && (
-          <>
-            <span>
-              {STATS_TEXT.footer.dataset({
-                version: doc.source.minecraft_version,
-                loader: doc.source.loader,
-                difficulty: doc.source.difficulty,
-                file: sourceLabel,
-              })}
-            </span>
-            <span>
-              {STATS_TEXT.footer.source(
-                doc.source.path,
-                doc.source.retrieved_via,
-                doc.source.instance_id,
-              )}
-            </span>
-            <span>{doc.units.playtime}</span>
-          </>
-        )
+      technical={
+        <TechnicalDetails title={TECHNICAL_TEXT.stats.title} note={TECHNICAL_TEXT.stats.note}>
+          {doc && (
+            <section className="grid gap-xxs text-sm text-subtle">
+              <h3 className="text-md font-medium text-heading">{TECHNICAL_TEXT.stats.source}</h3>
+              <span>
+                {STATS_TEXT.footer.dataset({
+                  version: doc.source.minecraft_version,
+                  loader: doc.source.loader,
+                  difficulty: doc.source.difficulty,
+                  file: sourceLabel,
+                })}
+              </span>
+              <span>
+                {STATS_TEXT.footer.source(
+                  doc.source.path,
+                  doc.source.retrieved_via,
+                  doc.source.instance_id,
+                )}
+              </span>
+              <span>{doc.units.playtime}</span>
+            </section>
+          )}
+
+          <section className="grid gap-xxs text-sm text-subtle">
+            <h3 className="text-md font-medium text-heading">{TECHNICAL_TEXT.stats.validation}</h3>
+            {mismatches.length > 0 ? (
+              <Note tone="error">{STATS_TEXT.error.totalsMismatch(mismatches.map((m) => m.field))}</Note>
+            ) : (
+              <span>{TECHNICAL_TEXT.stats.validationOk}</span>
+            )}
+          </section>
+
+          <section className="grid gap-sm text-sm text-subtle">
+            <h3 className="text-md font-medium text-heading">{TECHNICAL_TEXT.stats.io}</h3>
+            <span>{TECHNICAL_TEXT.stats.ioNote}</span>
+            <div className={ACTIONS}>
+              <input
+                ref={fileInput}
+                type="file"
+                accept="application/json,.json"
+                hidden
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) void importFile(file);
+                  event.target.value = '';
+                }}
+              />
+              <Button
+                label={STATS_TEXT.action.importJson}
+                icon="upload"
+                onClick={() => fileInput.current?.click()}
+              />
+              <Button
+                label={STATS_TEXT.action.exportSummary}
+                icon="download"
+                disabled={!doc}
+                onClick={() =>
+                  doc && downloadJson(STATS_TEXT.file.summary(doc.generated_on), playerRows(doc))
+                }
+              />
+            </div>
+          </section>
+
+          <ProsePanel sections={builderSections(MINECRAFT_CONTENT.sections)} />
+        </TechnicalDetails>
       }
     >
         {!doc && !error && datasets.length === 0 && (
@@ -342,7 +389,12 @@ export function StatsPage({ theme }: StatsPageProps) {
 
         {doc && (
           <>
-            {/* 主役は数字とグラフ。操作（絞り込み）はその手前に 1 つだけ置く */}
+            <MinecraftHero
+              text={STATS_TEXT.experience.hero}
+              records={inventoryRecords}
+              theme={theme}
+            />
+
             <KpiGrid>
               <KpiTile
                 label={STATS_TEXT.kpi.players}
@@ -355,7 +407,60 @@ export function StatsPage({ theme }: StatsPageProps) {
                 value={`${formatDecimal(kpi.distance)}${metricOption('distance_km').unit}`}
               />
               <KpiTile label={STATS_TEXT.kpi.deaths} value={STATS_TEXT.kpi.deathsValue(kpi.deaths)} />
+              <KpiTile
+                label={STATS_TEXT.kpi.blocksMined}
+                value={`${formatDecimal(kpi.blocksMined)}${metricOption('blocks_mined').unit}`}
+              />
+              <KpiTile
+                label={STATS_TEXT.kpi.mobKills}
+                value={`${formatDecimal(kpi.mobKills)}${metricOption('mob_kills').unit}`}
+              />
             </KpiGrid>
+
+            <EconomyIndexPanel
+              doc={doc}
+              snapshots={snapshots}
+              players={playerNames}
+              theme={theme}
+            />
+
+            <FeaturedItemUseColumns theme={theme} />
+
+            <DiscoveryBoard
+              discoveries={discoveries}
+              text={STATS_TEXT.experience.discovery}
+              theme={theme}
+            />
+
+            <div>
+              <PlayerStatusGallery
+                players={statusCards}
+                text={{
+                  ...STATS_TEXT.experience.playstyle,
+                  note: joinNotes(
+                    STATS_TEXT.experience.playstyle.note,
+                    basisNote(statusBasis, STATS_TEXT.basisNote.subject.each),
+                  ),
+                  achievementTitles: STATS_TEXT.experience.achievement.titles,
+                }}
+                theme={theme}
+                basis={statusBasis}
+                onBasisChange={setStatusBasis}
+                selectedName={statusPlayerName}
+                onSelectedNameChange={setStatusPlayerName}
+                profileHref={playerPath}
+              />
+            </div>
+
+            <PlayerDailyTimeline
+              doc={playerDaily}
+              text={{
+                ...STATS_TEXT.experience.daily,
+                skinAlt: STATS_TEXT.experience.playstyle.skinAlt,
+              }}
+              theme={theme}
+              profileHref={playerPath}
+            />
 
             <FilterPanel
               metric={filterMetric}
@@ -370,7 +475,10 @@ export function StatsPage({ theme }: StatsPageProps) {
 
             <ChartCard
               title={STATS_TEXT.card.ranking.title}
-              note={basisNote(rankBasis, STATS_TEXT.basisNote.subject.each) || STATS_TEXT.card.ranking.note}
+              note={joinNotes(
+                basisNote(rankBasis, STATS_TEXT.basisNote.subject.each) || STATS_TEXT.card.ranking.note,
+                ` 更新 ${statsDataDate}`,
+              )}
               actions={
                 <>
                   <Picker
@@ -419,6 +527,7 @@ export function StatsPage({ theme }: StatsPageProps) {
                     basisNote(breakdownBasis, STATS_TEXT.basisNote.subject.target),
                     formatDecimal(breakdownHours),
                   ),
+                ` 更新 ${statsDataDate}`,
               )}
               actions={
                 <>
@@ -478,6 +587,7 @@ export function StatsPage({ theme }: StatsPageProps) {
               note={joinNotes(
                 currentSeries.note || STATS_TEXT.card.series.note,
                 basisNote(seriesBasis, STATS_TEXT.basisNote.subject.each),
+                ` 更新 ${statsDataDate}`,
               )}
               actions={
                 <>
@@ -520,14 +630,23 @@ export function StatsPage({ theme }: StatsPageProps) {
                 STATS_TEXT.card.trend.note(snapshots.length),
                 snapshots.length < 2 && STATS_TEXT.card.trend.singleSnapshot,
                 trendScope === 'per_player' && STATS_TEXT.card.trend.perPlayer(LIMITS.trendPlayers),
-                basisNote(trendBasis, STATS_TEXT.basisNote.subject.audience),
+                /* 1 点が何日ぶんかを必ず添える。ここを黙ると数日ぶんの増加を 1 日分と読まれる */
+                trendMode === 'daily_average'
+                  ? joinNotes(
+                      STATS_TEXT.card.trend.dailyAverageNote,
+                      STATS_TEXT.card.trend.dailyAverageBasis,
+                    )
+                  : STATS_TEXT.card.trend.cumulativeNote,
+                trendMode === 'cumulative' && basisNote(trendBasis, STATS_TEXT.basisNote.subject.audience),
+                ` 更新 ${trendDataDate}`,
               )}
               actions={
                 <>
                   <Picker
                     label={STATS_TEXT.picker.metric}
                     value={trendMetric}
-                    options={metricsFor(trendBasis)}
+                    /* 概算では換算しないので、換算できない指標も選べる */
+                    options={metricsFor(trendMode === 'daily_average' ? 'total' : trendBasis)}
                     onChange={setTrendMetric}
                   />
                   <Picker
@@ -537,11 +656,20 @@ export function StatsPage({ theme }: StatsPageProps) {
                     onChange={setTrendScope}
                   />
                   <Picker
-                    label={STATS_TEXT.picker.basis}
-                    value={trendBasis}
-                    options={BASIS_OPTIONS}
-                    onChange={changeTrendBasis}
+                    label={STATS_TEXT.picker.trendMode}
+                    value={trendMode}
+                    options={TREND_MODE_OPTIONS}
+                    onChange={setTrendMode}
                   />
+                  {/* 概算はカレンダーの日数で割るので、プレイ時間で割る換算とは重ねない */}
+                  {trendMode === 'cumulative' && (
+                    <Picker
+                      label={STATS_TEXT.picker.basis}
+                      value={trendBasis}
+                      options={BASIS_OPTIONS}
+                      onChange={changeTrendBasis}
+                    />
+                  )}
                 </>
               }
               tableRows={trendData.rows as Row[]}
@@ -559,7 +687,11 @@ export function StatsPage({ theme }: StatsPageProps) {
                   unit={unitFor(trendMetricOption.unit, trendBasis)}
                 />
               ) : (
-                <Note>{STATS_TEXT.empty.noSnapshots}</Note>
+                <Note>
+                  {trendMode === 'daily_average' && snapshots.length < 2
+                    ? STATS_TEXT.card.trend.needsTwoSnapshots
+                    : STATS_TEXT.empty.noSnapshots}
+                </Note>
               )}
             </ChartCard>
 
@@ -567,9 +699,12 @@ export function StatsPage({ theme }: StatsPageProps) {
               title={STATS_TEXT.card.scatter.title}
               note={
                 scatterBasis === 'total'
-                  ? STATS_TEXT.card.scatter.note
-                  : STATS_TEXT.card.scatter.bothAxes(
-                      basisNote(scatterBasis, STATS_TEXT.basisNote.subject.each),
+                  ? joinNotes(STATS_TEXT.card.scatter.note, ` 更新 ${statsDataDate}`)
+                  : joinNotes(
+                      STATS_TEXT.card.scatter.bothAxes(
+                        basisNote(scatterBasis, STATS_TEXT.basisNote.subject.each),
+                      ),
+                      ` 更新 ${statsDataDate}`,
                     )
               }
               actions={
@@ -591,6 +726,12 @@ export function StatsPage({ theme }: StatsPageProps) {
                     value={scatterBasis}
                     options={BASIS_OPTIONS}
                     onChange={changeScatterBasis}
+                  />
+                  <Picker
+                    label={STATS_TEXT.picker.pointDisplay}
+                    value={scatterPointDisplay}
+                    options={SCATTER_POINT_DISPLAY_OPTIONS}
+                    onChange={setScatterPointDisplay}
                   />
                 </>
               }
@@ -614,12 +755,14 @@ export function StatsPage({ theme }: StatsPageProps) {
                 yLabel={scatterYOption.label}
                 xUnit={unitFor(scatterXOption.unit, scatterBasis)}
                 yUnit={unitFor(scatterYOption.unit, scatterBasis)}
+                pointDisplay={scatterPointDisplay}
+                onPointClick={(point) => openPlayerProfile(point.name)}
               />
             </ChartCard>
           </>
         )}
 
-        <ProsePanel sections={MINECRAFT_CONTENT.sections} />
+        <ProsePanel sections={readerSections(MINECRAFT_CONTENT.sections)} />
     </AppLayout>
   );
 }

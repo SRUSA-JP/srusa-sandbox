@@ -31,9 +31,11 @@ export interface RankBarChartProps {
   height?: number;
   /** 縦棒にする場合は false。 */
   horizontal?: boolean;
+  /** true のときは全ての棒ラベルへ単位を付ける。 */
+  showUnitOnAllLabels?: boolean;
 }
 
-/** 単一系列のランキング用棒グラフ。最大値のみ直接ラベルを出す。 */
+/** 単一系列のランキング用棒グラフ。全ての棒に直接ラベルを出す。 */
 export function RankBarChart({
   data,
   theme,
@@ -42,6 +44,7 @@ export function RankBarChart({
   unit = '',
   height,
   horizontal = true,
+  showUnitOnAllLabels = false,
 }: RankBarChartProps) {
   const metrics = useChartMetrics();
   const colors = figureColors(theme);
@@ -123,14 +126,16 @@ export function RankBarChart({
           {data.map((entry) => (
             <Cell key={entry.key} fill={highlightKey && entry.key !== highlightKey ? colors.dimmed : base} />
           ))}
-          {/* 全ての棒に数値を出す。単位は最大値にだけ付けて横幅を抑える */}
+          {/* 全ての棒に数値を出す。既定では単位は最大値にだけ付けて横幅を抑える */}
           <LabelList
             dataKey="value"
             position={horizontal ? 'right' : 'top'}
             fill={colors.axis}
             fontSize={skinnedFontSize(AXIS.fontSize)}
             formatter={(value) =>
-              Number(value) === max ? formatWithUnit(Number(value), unit) : formatValue(Number(value))
+              showUnitOnAllLabels || Number(value) === max
+                ? formatWithUnit(Number(value), unit)
+                : formatValue(Number(value))
             }
           />
         </Bar>

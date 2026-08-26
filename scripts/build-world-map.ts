@@ -13,26 +13,30 @@
  * （補間用の重なり）なので落とす。
  *
  *   npm run build:world-map
- *   npm run build:world-map -- --source ../srusa-portal/bluemap/web --map overworld
+ *   npm run build:world-map -- --source ../srusa-portal/bluemap/web --map nether
  *
  * BlueMap の出力自体はこのリポジトリに置かない（数百 MB あるため）。
  * ワールドを再レンダリングしたら、このコマンドを流し直して成果物を差し替える。
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+import dataConfig from '../data/data-registry.json';
 import { decodePng, encodePng } from './png';
 
 /* npm script から実行する前提。束ねた成果物の位置ではなくリポジトリの根を基準にする */
 const ROOT = process.cwd();
 
 /** BlueMap の出力（web/）の既定の場所。レンダリング環境は srusa-portal 側にある。 */
-const DEFAULT_SOURCE = '../srusa-portal/bluemap/web';
+const DEFAULT_SOURCE = dataConfig.paths.blueMapSource;
 
 /** 貼り合わせた PNG の置き場所（public/ からの相対）。 */
-const IMAGE_DIR = 'world-map';
+const IMAGE_DIR = dataConfig.paths.worldMapImageDir;
 
 /** 地図の位置と縮尺を書き出す先。アプリはこの JSON を読んで座標を計算する。 */
-const METADATA_PATH = 'data/world-map.json';
+const METADATA_PATH = dataConfig.paths.worldMapMetadata;
+
+/** 指定なしで作り直す BlueMap の代表的なマップ。 */
+const DEFAULT_MAPS = dataConfig.worldMaps;
 
 /** 読み込む lowres の段。1 が最も細かい（1 画素 = 1 ブロック）。 */
 const LOD = 1;
@@ -52,7 +56,15 @@ function parseArgs(argv: string[]): Args {
     else if (argv[i] === '--map') maps.push(argv[++i]);
     else throw new Error(`知らない引数: ${argv[i]}`);
   }
-  return { source, maps: maps.length > 0 ? maps : ['overworld'] };
+  return { source, maps: maps.length > 0 ? maps : DEFAULT_MAPS };
+}
+
+function normalizeDimension(value: unknown, fallback: string): string {
+  if (typeof value !== 'string' || value.length === 0) return fallback;
+  const key = value.split(':').pop() ?? value;
+  if (key === 'the_nether') return 'nether';
+  if (key === 'the_end') return 'end';
+  return key;
 }
 
 /** タイルの置き場所（tiles/1/x-2/z3.png）から座標を取り出す。 */
@@ -155,6 +167,9 @@ function trim(canvas: Canvas): Canvas {
 
 interface WorldMapEntry {
   id: string;
+  dimension?: string;
+  label?: string;
+  updated_on: string;
   image: string;
   bounds: { minX: number; minZ: number; maxX: number; maxZ: number };
   pixels: { width: number; height: number };
@@ -182,6 +197,9 @@ function buildMap(sourceDir: string, id: string): WorldMapEntry {
 
   return {
     id,
+    dimension: normalizeDimension(settings.dimension, id),
+    label: typeof settings.name === 'string' ? settings.name : undefined,
+    updated_on: new Date().toISOString().slice(0, 10),
     image,
     bounds: {
       minX: canvas.originX,
@@ -216,7 +234,7 @@ function main() {
 
   writeFileSync(
     metadataPath,
-    `${JSON.stringify({ source: `BlueMap lowres LOD${LOD}`, maps: merged }, null, 2)}\n`,
+    `${JSON.stringify({ generated_on: new Date().toISOString().slice(0, 10), source: `BlueMap lowres LOD${LOD}`, maps: merged }, null, 2)}\n`,
   );
   console.log(`${METADATA_PATH} を更新した`);
 }

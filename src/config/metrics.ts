@@ -144,5 +144,63 @@ export const TREND_SCOPE_OPTIONS: Array<{ value: TrendScope; label: string }> = 
   { value: 'per_player', label: 'プレイヤー別' },
 ];
 
+/**
+ * 推移グラフの値の出し方。
+ *
+ * スナップショットは毎日は取っていない。累計をそのまま点にすると、数日ぶんの
+ * 増加が 1 点に乗って「その日にそれだけ動いた」ように読めてしまうので、
+ * 既定は増分を日数で割った概算にする。
+ */
+export type TrendMode = 'daily_average' | 'cumulative';
+
+export const TREND_MODE_OPTIONS: Array<{ value: TrendMode; label: string }> = [
+  { value: 'daily_average', label: '1日あたりの概算' },
+  { value: 'cumulative', label: '累計' },
+];
+
+export type ScatterPointDisplay = 'icon_name' | 'icon' | 'name';
+
+export const SCATTER_POINT_DISPLAY_OPTIONS: Array<{ value: ScatterPointDisplay; label: string }> = [
+  { value: 'icon_name', label: 'アイコン＋名前' },
+  { value: 'icon', label: 'アイコン' },
+  { value: 'name', label: '名前' },
+];
+
+export const STATS_DEFAULTS = {
+  filterMetric: 'playtime_hours',
+  rankMetric: 'playtime_hours',
+  rankBasis: 'total',
+  breakdown: 'kills',
+  breakdownBasis: 'total',
+  seriesId: 'movement',
+  seriesBasis: 'total',
+  statusBasis: 'per_playtime_hour',
+  scatterX: 'playtime_hours',
+  scatterY: 'mob_kills',
+  scatterBasis: 'total',
+  scatterPointDisplay: 'icon_name',
+  trendMetric: 'playtime_hours',
+  trendBasis: 'total',
+  trendScope: 'total',
+  trendMode: 'daily_average',
+} satisfies {
+  filterMetric: NumericPlayerRowKey;
+  rankMetric: NumericPlayerRowKey;
+  rankBasis: RateBasis;
+  breakdown: BreakdownId;
+  breakdownBasis: RateBasis;
+  seriesId: SeriesId;
+  seriesBasis: RateBasis;
+  statusBasis: RateBasis;
+  scatterX: NumericPlayerRowKey;
+  scatterY: NumericPlayerRowKey;
+  scatterBasis: RateBasis;
+  scatterPointDisplay: ScatterPointDisplay;
+  trendMetric: NumericPlayerRowKey;
+  trendBasis: RateBasis;
+  trendScope: TrendScope;
+  trendMode: TrendMode;
+};
+
 /** 表の左端に置くプレイヤー列。 */
 export const PLAYER_COLUMN = { key: 'player', label: 'プレイヤー', align: 'left' } as const;

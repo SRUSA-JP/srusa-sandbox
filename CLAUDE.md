@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 
-SRUSA の **Minecraft サーバー統計** と **メンバー相関図** を 1 つにまとめた単体の Web アプリ。
+SRUSA の **Minecraft サーバー統計**、**ワールドマップ**、**相関図**、**SRUSA 図鑑** を 1 つにまとめた単体の Web アプリ。
 
 コンテンツとビューアの実装は [srusa-portal](../srusa-portal)（MkDocs サイト）から移植した。
 srusa-portal 側は MkDocs のページに iframe で埋め込む前提だったが、こちらは**単体で動く SPA** として作り直している。
@@ -31,15 +31,92 @@ srusa-portal 側は MkDocs のページに iframe で埋め込む前提だった
 ```bash
 npm install
 npm run dev             # 開発サーバー（--host 付き。スマホ実機からも開ける）
-npm run build           # 型検査 → ESLint → コントラスト検査 → dist/ に出力
+npm run build           # 型検査 → ESLint → UI/配色/デザイン検査 → dist/ に出力
 npm run preview         # ビルド成果物のプレビュー
+npm run deploy:preview  # Netlify の固定プレビューへデプロイ（本番公開しない）
 npm run typecheck       # tsc --noEmit
+npm run test:ui         # 公開ルートの初期レンダリングが壊れていないか確認
 npm run lint            # ESLint
 npm run check:contrast  # 配色の WCAG コントラスト検査
+npm run check:design    # UI層の色・寸法直書きやカード入れ子などの静的検査
+npm run check:layout    # 図の文字が枠からはみ出さない・小さすぎないかの検査
 npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（BlueMap の出力が要る）
+npm run update:data     # AWS SSO 確認 → ../aws_minecraft の抽出 → sync:data
+npm run sync:data       # ../aws_minecraft と BlueMap の出力からデータを取り込む
+npm run refresh:data    # update:data の分かりやすい別名。最新化するときの入口
+npm run refresh:data:local # sync:data の別名。手元の抽出済みデータだけ同期
 ```
 
+`npm run deploy:preview` は `npm run build` の後に Netlify CLI の `--alias preview` 付き deploy を実行する。
+確認先は固定で <https://preview--srusa-sandbox.netlify.app/>。初回やセッション切れのときは
+Netlify CLI のログイン確認が入る。本番公開は `main` への push に任せる。
+
+### データの取り込み
+
+AWS からの再取得まで含む更新を頼まれたら、まず `npm run update:data` を使う。
+更新対象と反映先の洗い出しは [docs/data-update-runbook.md](docs/data-update-runbook.md) を見る。
+SSO セッションが切れている場合は `aws sso login --profile minecraft-cdk --use-device-code` を起動し、
+表示された URL とコード入力を利用者に任せてから続行する。
+`--dry-run` と `--list` は AWS 認証と抽出を飛ばし、`sync:data` の確認だけを行う。
+
+```bash
+npm run update:data                  # 全部。AWS認証 → 抽出 → 取り込み
+npm run update:data -- daily inventory logs # 日別データ、所有資産、ログだけ
+npm run update:data -- skins         # スキンと顔アイコンだけ
+npm run refresh:data                 # update:data と同じ
+npm run update:data -- --dry-run     # 取り込み予定だけ見る
+npm run update:data -- --list        # 取り込める元データを見る
+```
+
+`npm run sync:data` が、元データの取り込みから派生 JSON の作り直しまでをまとめて行う。
+データ更新・再取得・差し替えを頼まれたら、まず `../aws_minecraft` を確認する。
+Minecraft 統計、日別データ、ログ集計、スキン、BlueMap 用に作った中間データは
+`../aws_minecraft/data/` やその配下に追加されていることがある。
+
+```bash
+npm run sync:data                 # 全部
+npm run sync:data -- 2d           # 2D の地図を全部作り直す（map と同じ）
+npm run sync:data -- overworld    # オーバーワールドだけ
+npm run sync:data -- nether end   # ネザーとエンドだけ
+npm run sync:data -- stats daily  # 統計と日別だけ
+npm run sync:data -- --list       # 取り込める元データを見るだけ
+npm run sync:data -- --dry-run    # 何をするかだけ出す
+```
+
+| 対象 | 何が入るか | 出どころ |
+| --- | --- | --- |
+| `stats` | Minecraft 統計 JSON | `../aws_minecraft/data/` |
+| `daily` | 日別データ。取り込み後に派生 JSON を作り直す | `../aws_minecraft/data/` |
+| `inventory` | 現在在庫から作る所有資産。装備・エンダーチェスト・バックパック内を換算 | `../aws_minecraft/data/` |
+| `logs` | サーバーログの日別集計 | `../aws_minecraft/data/` |
+| `skins` | スキンとアイコン（`public/player-skins/`） | `../aws_minecraft/data/` |
+| `map` / `2d` | ワールドマップ（2D）の PNG と範囲 JSON | `../srusa-portal/bluemap/web/` |
+| 地図の名前 | その 1 枚だけ（`overworld` / `nether` / `end` / `twilightforest`） | `../srusa-portal/bluemap/web/` |
+
+- 取り込み先・伏せ字の規則・マップの一覧は [data/data-registry.json](data/data-registry.json) が持つ
+- **統計 JSON は取り込むときに必ず伏せ字にする。** 元データはプレイヤーの UUID、
+  EC2 のインスタンス ID、AWS アカウント、リージョン、サーバー上のパスを生で持っている。
+  伏せ忘れがあれば書き出す前に止まる（`redaction.forbiddenPatterns`）
+- ワールドを描き直すには先に `../srusa-portal/bluemap/render.sh`（Java が要る）を実行する。
+  レンダリングはこのコマンドの外
+- **3D（hires）はワールド全体では作らない。** BlueMap の各マップ設定
+  （`../srusa-portal/bluemap/config/maps/*.conf`）は `enable-hires: false` を既定にする。
+  このアプリが取り込むのは真上から見た 2D の lowres タイル（`tiles/1`）だけで、hires（`tiles/0`）は読まない。
+  全体で有効にすると出力の大半が使わない 3D データになり（実測で overworld は hires 220MB に対し lowres 2.9MB）、
+  レンダリングも大幅に遅くなる。無効にしても既存タイルは消えず、2D の取り込みには影響しない
+- **3D で見せたい狭い範囲は、専用のマップ設定を別に足す。** 同じディメンションでも
+  `render-mask` で範囲を絞った別マップにすれば、2D 用のマップを重くせずに 3D を持てる。
+  現状は `overworld-spawn.conf`（スポーン (0,0) から半径 256 ブロック＝16 チャンク、`enable-hires: true`）だけ。
+  この種のマップは BlueMap のビューアで見るためのもので、`data/data-registry.json` の
+  `worldMaps` には入れない（入れると 2D の貼り合わせ対象になってしまう）
+- ワールドマップの公開表示は BlueMap の通常地形色 PNG だけにする。`scripts/build-chunk-world-map.ts`
+  のようなチャンク分布の簡略 PNG は調査用で、`data/world-map.json` の公開マップ一覧に混ぜない。
+  広い範囲が必要な場合も BlueMap 側で通常地形色の地図としてレンダリングし、その成果物を取り込む
+- `player-db-*.json` はこのリポジトリでは作れない。`../aws_minecraft` 側で作り直して置く
+
 配色・スキン・コントラストのしきい値を変えたら、必ず `npm run check:contrast` を通すこと。
+UI層に色や寸法の実値を足したり、カード構造を変えたりしたら `npm run check:design` も通すこと。
+図（SVG）の寸法・軸の名前・文字の大きさを触ったら `npm run check:layout` も通すこと。
 
 ### スラッシュコマンド
 
@@ -51,6 +128,7 @@ npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合�
 | `/check` | 型・ESLint・配色・実値の直書き・層の向きをまとめて検査する |
 | `/commit` | `/check` を通してから、変更を論理単位に分けてコミットする |
 | `/preview` | ビルドしてプレビューを起動する（スマホ実機の確認込み） |
+| `/deploy-preview` | Netlify のプレビューデプロイを作成する（本番公開しない） |
 
 `.claude/settings.json` は共有する権限設定（読み取り系と `git add` / `git commit` は許可、
 `push` / `checkout` / `reset --hard` / `rm -rf` は拒否）。
@@ -67,9 +145,13 @@ public/images/            # BlueMap の 3D 表示のスクリーンショット
 public/world-map/         # 貼り合わせた 2D のワールドマップ（build:world-map が作る）
 public/icons/             # アプリのアイコン（タブ・ホーム画面）
 netlify.toml              # 公開設定（https://srusa-sandbox.netlify.app/）
+scripts/sync-data.mjs     # ../aws_minecraft と BlueMap の出力からのデータ取り込み
 scripts/check-contrast.ts # 配色の検査
+scripts/check-layout.ts   # 図の文字のはみ出し・大きさの検査
+scripts/svg-text-fit.ts   # 描き上がった SVG から、はみ出した文字を見つける
 scripts/build-world-map.ts # BlueMap の 2D タイルの貼り合わせ
 scripts/png.ts            # PNG の読み書き（画像ライブラリを入れないための最小実装）
+.githooks/pre-commit      # main への直接コミットを止める git フック
 .claude/                  # 共有の権限設定とスラッシュコマンド
 .github/workflows/ci.yml  # push と Pull Request で走る検査
 src/
@@ -77,7 +159,7 @@ src/
   App.tsx                 # 画面の切り替えとスキン・配色の結びつけ
   routes.ts               # 画面の一覧・URL・タブ名・使うスキン
   hooks/                  # ハッシュによる画面切り替え、画面幅の問い合わせ、掴んで動かす・拡大縮小
-  pages/                  # 画面そのもの（StatsPage / WorldMapPage / MapPage）
+  pages/                  # 画面そのもの（StatsPage / WorldMapPage / MapPage / ZukanPage / PlayerPage / EventRankingsPage）
   components/             # アトミックデザイン（atoms → molecules → organisms → templates）
     classes.ts            # 部品をまたいで共有する Tailwind クラスの組み合わせ
   config/                 # 指標・文言・グラフ設定・色の割り当て・スキン
@@ -103,6 +185,10 @@ src/
 
 1. **画面はアトミックデザインの層で組む**（下の層は上の層を知らない）
 2. **見た目の値は一元管理する**（コンポーネントに色・px・文字列を直書きしない）
+
+Claude でも Codex でも、このリポジトリで UI を触るときは必ずアトミックデザインを前提にする。
+新しい表示を足す場合も、いきなり page に JSX を厚く書かず、必要な atom / molecule / organism に分けてから
+page で組み合わせる。
 
 見た目そのものの決まり（文字の大きさの段、余白の目盛り、色の役割、ページの並び、
 レスポンシブの境目）は [DESIGN.md](DESIGN.md) にまとめてある。
@@ -152,6 +238,11 @@ src/
 | ページの解説文 | [src/content/](src/content/) |
 | タブ名・URL | [src/routes.ts](src/routes.ts) |
 | サイト名・説明・アイコン（タブとホーム画面） | [src/config/pwa.ts](src/config/pwa.ts) |
+
+相関図の配置パターンは [src/map/config.ts](src/map/config.ts) の `LAYOUT_MODES` と
+[src/map/layout.ts](src/map/layout.ts) に集約する。新しい配置を試すときは、人物座標だけを変え、
+グループ領域と関係線は既存の再計算処理に通す。配置を切り替えたときは手動移動済みの座標をリセットし、
+別アルゴリズムの座標を混ぜない。
 
 どの値をどう使い分けるかは [DESIGN.md](DESIGN.md) に書いてある。
 
@@ -222,6 +313,7 @@ src/
 
 ユーザーの明示的な指示がない限り、以下を**実行しない**。
 
+- `main` ブランチでの編集・コミット（下の「main ブランチは保護する」）
 - `git commit` / `git push`（`--force` は指示があっても再確認する）
 - `git checkout` / `git switch` によるブランチ切替・ファイルの復元
 - `git reset --hard` / `git clean` / `git stash drop` / `git rm`
@@ -229,6 +321,31 @@ src/
 - リベース・ブランチ削除・タグ削除など履歴を書き換える操作
 
 迷ったら実行せず、必ずユーザーに確認する。
+
+## main ブランチは保護する
+
+**`main` では作業しない。** 編集・コミットは必ず作業用ブランチ（`edit` など）で行い、
+`main` へはマージで入れる。うっかり `main` で作業してしまう事故を防ぐため、
+git 側でもコミットを止めてある。
+
+| 仕組み | 場所 | 内容 |
+| --- | --- | --- |
+| pre-commit フック | [.githooks/pre-commit](.githooks/pre-commit) | `main` / `master` でのコミットを拒否する |
+| フックの有効化 | `package.json` の `prepare` | `npm install` のたびに `core.hooksPath` を `.githooks` に向ける |
+| 迂回の禁止 | `.claude/settings.json` の `deny` | `git commit --no-verify` と `core.hooksPath` の変更を拒否する |
+
+初回だけ手で有効にするなら次を実行する（`npm install` 済みなら不要）。
+
+```bash
+git config core.hooksPath .githooks
+```
+
+作業を始める前に、必ず今のブランチを確かめる。`main` にいたら作業用ブランチへ移る
+（ブランチの切替はユーザーの指示があるときだけ行う）。
+
+```bash
+git rev-parse --abbrev-ref HEAD
+```
 
 ## コミット規則
 
@@ -245,14 +362,20 @@ src/
 
 - ユーザー向けの説明、ドキュメント、コミットメッセージ、コード内のコメントは日本語で書く
 - 作業前に README とこのファイル、既存の差分を確認する
+- 作業ログ・引き継ぎ・TODO/DONE の残し方は `work-log` skill にも置く。
+  Codex でログ更新や運用ルールの相談を受けたら、その skill と [TODO.md](TODO.md) の `RULES` を参照する
+- 繰り返し出てくる作業、更新手順、判断基準、失敗しやすい注意点は、場当たり的に会話だけで終わらせず、
+  必要に応じて `.codex/skills/` の skill として育てる。既存 skill に合うなら追記し、独立した手順になったら
+  新しい skill を作る。CLAUDE.md には入口と方針、skill には実行時に読む具体手順を置く
 - 団体、活動、日程、場所、連絡先などの事実を推測で補わない。不明なものは TODO として明示する
 - 個人情報の扱いに注意する。相関図のデータは頭文字表記で、統計 JSON の UUID と AWS 情報は伏字になっている。
-  この匿名化を弱める変更をしない
+  この匿名化を弱める変更をしない。伏字は `npm run sync:data` が取り込み時にかけるので、
+  統計 JSON を手でコピーして持ち込まない
 - token、secret、credential、private key、個人用 `.env` を追加しない
 
 ## 変更時の確認
 
-- `npm run build`（型検査・ESLint・コントラスト検査を含む）が通ること。`/check` で一括実行できる
+- `npm run build`（型検査・ESLint・UI初期レンダリング・コントラスト比・デザイン静的検査・図のはみ出し検査を含む）が通ること。`/check` で一括実行できる
 - 追加した部品が正しい層（atoms / molecules / organisms / templates）に置かれ、
   下の層から上の層を import していないこと
 - **ウィンドウからはみ出していないこと**（DESIGN.md「ウィンドウからはみ出さない」）。

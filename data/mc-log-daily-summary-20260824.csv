@@ -1,0 +1,24 @@
+date,line_count,source_files,starts,ready,stops,joins,leaves,deaths,failed_logins,warnings,errors,active_players,failed_login_players
+2026-08-02,347,2026-08-02-1.log.gz 2026-08-02-2.log.gz 2026-08-02-3.log.gz 2026-08-02-4.log.gz,3,3,0,10,10,7,0,54,0,dekkaishi Kenshi_www natch_1105 OCTBEE,
+2026-08-03,404,2026-08-03-1.log.gz 2026-08-03-2.log.gz 2026-08-03-3.log.gz 2026-08-03-4.log.gz,4,4,0,8,8,7,9,78,0,Boi0331 Kenshi_www Mitigli4 nodoamenn OCTBEE,Mitigli4 RameshChoudary
+2026-08-04,162,2026-08-04-1.log.gz 2026-08-04-2.log.gz,2,2,0,2,2,1,0,35,0,Boi0331 Kenshi_www,
+2026-08-05,101,2026-08-05-1.log.gz,1,1,0,4,4,3,0,16,1,Boi0331 Kenshi_www Mitigli4,
+2026-08-06,205,2026-08-06-1.log.gz,1,1,0,16,15,6,0,24,0,Boi0331 kagyki Mitigli4 tibepianegt46,
+2026-08-07,549,2026-08-06-1.log.gz 2026-08-07-1.log.gz 2026-08-07-2.log.gz 2026-08-07-3.log.gz 2026-08-07-4.log.gz 2026-08-07-5.log.gz 2026-08-07-6.log.gz,4,4,0,26,22,19,0,78,0,Boi0331 dekkaishi kagyki Mitigli4 nodoamenn tibepianegt46,
+2026-08-08,859,2026-08-07-6.log.gz 2026-08-08-1.log.gz 2026-08-08-2.log.gz,2,2,0,81,82,87,4,145,0,Boi0331 dekkaishi detkent kagyki Kenshi_www Mitigli4 nodoamenn OCTBEE tibepianegt46,detkent
+2026-08-09,917,2026-08-08-2.log.gz 2026-08-09-1.log.gz 2026-08-09-2.log.gz,2,2,0,53,52,150,0,225,0,Boi0331 dekkaishi detkent gurando0302 kagyki Kenshi_www Mitigli4 natch_1105 nodoamenn tibepianegt46,
+2026-08-10,488,2026-08-09-2.log.gz 2026-08-10-1.log.gz 2026-08-10-2.log.gz,2,2,0,29,32,46,0,102,0,Boi0331 detkent gurando0302 kagyki Kenshi_www Mitigli4 nodoamenn tibepianegt46,
+2026-08-11,1142,2026-08-10-2.log.gz 2026-08-11-1.log.gz 2026-08-11-2.log.gz 2026-08-11-3.log.gz,3,3,0,94,95,88,2,155,2,Boi0331 dekkaishi detkent gaburichan gottigoti gurando0302 kagyki natch_1105 nodoamenn panndasanngou tibepianegt46,panndasanngou
+2026-08-12,540,2026-08-11-3.log.gz 2026-08-12-1.log.gz 2026-08-12-2.log.gz 2026-08-12-3.log.gz,3,3,0,21,22,28,0,78,0,detkent gaburichan kagyki nodoamenn panndasanngou sukmkms,
+2026-08-13,97,2026-08-13-1.log.gz,1,1,0,2,0,0,0,19,0,nodoamenn tibepianegt46,
+2026-08-14,285,2026-08-13-1.log.gz 2026-08-14-1.log.gz,1,1,0,7,7,62,0,62,0,Boi0331 kagyki natch_1105 nodoamenn tibepianegt46,
+2026-08-15,328,2026-08-14-1.log.gz 2026-08-14-2.log.gz 2026-08-15-1.log.gz,2,2,0,15,15,4,0,38,0,Boi0331 kagyki nodoamenn tibepianegt46,
+2026-08-16,1162,2026-08-15-1.log.gz 2026-08-16-1.log.gz 2026-08-16-2.log.gz 2026-08-16-3.log.gz 2026-08-16-4.log.gz 2026-08-16-5.log.gz,4,4,0,43,45,125,15,215,1,Boi0331 dekkaishi detkent gaburichan kagyki Mitigli4 natch_1105 nodoamenn panndasanngou tibepianegt46,Boi0331 dekkaishi detkent kagyki Mitigli4 natch_1105 nodoamenn
+2026-08-17,372,2026-08-17-1.log.gz 2026-08-17-2.log.gz,2,2,0,10,8,4,0,81,2,Boi0331 kagyki Mitigli4 natch_1105 nodoamenn,
+2026-08-18,460,2026-08-17-2.log.gz 2026-08-18-1.log.gz 2026-08-18-2.log.gz 2026-08-18-3.log.gz,3,3,0,12,13,1,0,73,3,Boi0331 kagyki Mitigli4 natch_1105 nodoamenn tibepianegt46,
+2026-08-19,229,2026-08-18-3.log.gz 2026-08-19-1.log.gz,1,1,0,10,9,14,0,30,1,Boi0331 kagyki Mitigli4 nodoamenn tibepianegt46,
+2026-08-20,465,2026-08-19-1.log.gz 2026-08-20-1.log.gz 2026-08-20-2.log.gz,2,2,0,10,8,26,0,149,2,Boi0331 kagyki natch_1105 nodoamenn tibepianegt46,
+2026-08-21,430,2026-08-20-2.log.gz 2026-08-21-1.log.gz 2026-08-21-2.log.gz,2,2,0,12,12,8,0,88,2,Boi0331 kagyki Mitigli4 natch_1105 nodoamenn tibepianegt46,
+2026-08-22,821,2026-08-21-2.log.gz 2026-08-22-1.log.gz 2026-08-22-2.log.gz,2,2,1,37,35,33,4,109,2,Boi0331 detkent gaburichan kagyki Mitigli4 natch_1105 nodoamenn OCTBEE tibepianegt46,gaburichan OCTBEE
+2026-08-23,838,2026-08-22-2.log.gz 2026-08-23-1.log.gz,1,1,0,25,31,12,0,373,1,dekkaishi detkent kagyki Mitigli4 natch_1105 nodoamenn tibepianegt46,
+2026-08-24,371,2026-08-24-1.log.gz latest.log,2,2,0,6,5,0,0,138,2,kagyki natch_1105 nodoamenn,

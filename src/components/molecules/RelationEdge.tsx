@@ -8,6 +8,7 @@ export interface RelationEdgeProps {
   theme: VizTheme;
   highlighted: boolean;
   nameOf: (personId: string) => string;
+  showTooltip?: boolean;
 }
 
 /**
@@ -16,7 +17,7 @@ export interface RelationEdgeProps {
  * 直線だと同じ相手へ集まる線が重なるので、長さに応じた弧を描く。
  * 曲がり具合は display.ts（設定は config.ts）が決める。
  */
-export function RelationEdge({ edge, theme, highlighted, nameOf }: RelationEdgeProps) {
+export function RelationEdge({ edge, theme, highlighted, nameOf, showTooltip = true }: RelationEdgeProps) {
   const length = Math.hypot(edge.to.x - edge.from.x, edge.to.y - edge.from.y);
   const style = edgeStyle(edge.relation, theme, highlighted, length);
 
@@ -31,7 +32,7 @@ export function RelationEdge({ edge, theme, highlighted, nameOf }: RelationEdgeP
       opacity={style.opacity}
       vectorEffect="non-scaling-stroke"
     >
-      <title>{relationLabel(edge.relation, nameOf)}</title>
+      {showTooltip && <title>{relationLabel(edge.relation, nameOf)}</title>}
     </path>
   );
 }
