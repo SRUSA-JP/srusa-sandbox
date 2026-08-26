@@ -66,6 +66,19 @@ const TOPIC_TAGS = ['highlight', 'accident', 'teamwork', 'tutorial', 'memorial']
  */
 export const CLIP_ENTRIES: ClipEntry[] = [
   {
+    /*
+     * 動画を埋め込んで出せるかの試し置き。
+     * タイトル・ゲーム・プレイヤー・タグは中身を見てから決めるものなので、
+     * ここは仮のまま置いている。決まったらこの 1 件を書き換える。
+     */
+    id: 'trial-youtube',
+    title: '（仮）YouTube 動画の表示確認',
+    sourceUrl: 'https://youtu.be/3IXqfIS8A_Y',
+    category: 'trial',
+    tags: ['highlight'],
+    note: '埋め込みの表示を確かめるために置いた動画です。タイトルとタグは仮です。',
+  },
+  {
     id: 'screenshot-spawn',
     title: 'スポーン地点の空撮',
     sourceUrl: 'images/bluemap-overworld-spawn.png',
