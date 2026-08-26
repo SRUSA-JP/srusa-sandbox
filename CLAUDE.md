@@ -40,6 +40,7 @@ npm run lint            # ESLint
 npm run check:contrast  # 配色の WCAG コントラスト検査
 npm run check:design    # UI層の色・寸法直書きやカード入れ子などの静的検査
 npm run check:layout    # 図の文字が枠からはみ出さない・小さすぎないかの検査
+npm run check:map       # 相関図の重なり・入れ子・関係線の長さ・囲いの広がりの検査
 npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（BlueMap の出力が要る）
 npm run update:data     # AWS SSO 確認 → ../aws_minecraft の抽出 → sync:data
 npm run sync:data       # ../aws_minecraft と BlueMap の出力からデータを取り込む
@@ -117,6 +118,9 @@ npm run sync:data -- --dry-run    # 何をするかだけ出す
 配色・スキン・コントラストのしきい値を変えたら、必ず `npm run check:contrast` を通すこと。
 UI層に色や寸法の実値を足したり、カード構造を変えたりしたら `npm run check:design` も通すこと。
 図（SVG）の寸法・軸の名前・文字の大きさを触ったら `npm run check:layout` も通すこと。
+相関図の配置（`src/map/layout.ts`・`src/map/config.ts`）や所属データを触ったら
+`npm run check:map` も通すこと。しきい値を緩めないと通らない変更は、しきい値ではなく
+配置のほうを見直す。
 
 ### スラッシュコマンド
 
