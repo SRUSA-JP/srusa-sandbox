@@ -502,6 +502,10 @@ export const MAP_TEXT = {
     tooltips: 'ツールチップ',
     tooltipOn: '表示',
     tooltipOff: '非表示',
+    /** 所属を囲う曲線の表示切り替え。消すと人と関係線だけになる。 */
+    regions: '所属の囲い',
+    regionOn: '表示',
+    regionOff: '非表示',
     noHighlight: '強調しない',
     /** グループのプルダウンに出す 1 件分の説明。 */
     groupOption: (name: string, type: string, members: number) =>
