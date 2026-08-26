@@ -165,7 +165,7 @@ function checkWiring() {
   let segments = 0;
 
   for (const edge of layout.edges) {
-    const path = manhattanPath(edge.from, edge.to, EDGE.elbow);
+    const path = manhattanPath(edge.from, edge.to, EDGE.elbow, edge.channelOffset);
     const points = path
       .replace(/^M /, '')
       .split(' L ')
@@ -190,6 +190,33 @@ function checkWiring() {
     return;
   }
   console.log(`OK  配線は縦横だけ（${layout.edges.length} 本 / 線分 ${segments} 本）`);
+}
+
+/**
+ * 折り返す位置が重なっていないか。
+ *
+ * 同じ列（行）で折り返す線どうしは 1 本に見えてしまう。
+ * 隣り合わせてずらせているかを確かめる。
+ */
+function checkChannels() {
+  const lanes = new Map<string, number>();
+  let shared = 0;
+
+  for (const edge of layout.edges) {
+    const horizontal = Math.abs(edge.to.x - edge.from.x) >= Math.abs(edge.to.y - edge.from.y);
+    const middle = horizontal ? (edge.from.x + edge.to.x) / 2 : (edge.from.y + edge.to.y) / 2;
+    /* 実際に描かれる折り返し位置（ずらしたあと） */
+    const lane = `${horizontal ? 'x' : 'y'}:${Math.round((middle + edge.channelOffset) / EDGE.channelGap)}`;
+    const count = (lanes.get(lane) ?? 0) + 1;
+    lanes.set(lane, count);
+    if (count > 1) shared += 1;
+  }
+
+  if (shared > 0) {
+    fail('関係線', '配線の重なり', `${shared} 本が他の線と同じ位置で折り返しています`);
+    return;
+  }
+  console.log(`OK  配線の折り返しは全て別の位置（${lanes.size} 通り / 間隔 ${EDGE.channelGap}）`);
 }
 
 /* ------------------------------------------------------------------ *
@@ -230,6 +257,7 @@ checkOverlap();
 checkNesting();
 checkEdges();
 checkWiring();
+checkChannels();
 checkRegions();
 
 if (findings.length === 0) {

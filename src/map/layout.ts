@@ -12,6 +12,7 @@
 import {
   CANVAS,
   CLUSTER,
+  EDGE,
   FALLBACK_GROUP_TYPE,
   GROUP_RELAX,
   groupTypeSetting,
@@ -45,6 +46,12 @@ export interface EdgePlacement {
   relation: Relation;
   from: Point;
   to: Point;
+  /**
+   * 折り返す位置をずらす量（座標単位）。
+   *
+   * 同じ場所で折り返す線どうしが 1 本に見えないよう、隣り合わせて走らせる。
+   */
+  channelOffset: number;
 }
 
 export interface MapLayout {
@@ -1043,15 +1050,56 @@ function placeLeftovers(people: Person[], placements: PersonPlacement[]): void {
   });
 }
 
+/**
+ * 配線が重ならないように、折り返す位置をずらす。
+ *
+ * 縦横だけで繋ぐと、どの線も中点で折り返すので、近くを走る線どうしが
+ * 同じ列（または行）に乗って 1 本に見えてしまう。基盤の配線が隣り合って
+ * 走るように、同じ折り返し位置になる線を見つけて少しずつ横へずらす。
+ *
+ * ずらす順は 0 → +1 → -1 → +2 … と中心から交互に広げる。
+ * 並び順は関係の並びで決まるので、何度作り直しても同じ配線になる。
+ */
+function assignEdgeChannels(edges: EdgePlacement[]): void {
+  /* すでに使った折り返し位置。基盤の配線のように一定の間隔に載せる */
+  const taken = new Set<string>();
+
+  for (const edge of edges) {
+    const horizontal = Math.abs(edge.to.x - edge.from.x) >= Math.abs(edge.to.y - edge.from.y);
+    /* 折り返す線の位置。ここが同じ線どうしが重なる */
+    const middle = horizontal ? (edge.from.x + edge.to.x) / 2 : (edge.from.y + edge.to.y) / 2;
+    const axis = horizontal ? 'x' : 'y';
+    const base = Math.round(middle / EDGE.channelGap);
+
+    /* 本来の位置から近い順に、空いているところを探す */
+    for (let step = 0; step <= EDGE.channelSearch; step += 1) {
+      const candidates = step === 0 ? [base] : [base + step, base - step];
+      const free = candidates.find((lane) => !taken.has(`${axis}:${lane}`));
+      if (free === undefined) continue;
+      taken.add(`${axis}:${free}`);
+      edge.channelOffset = free * EDGE.channelGap - middle;
+      break;
+    }
+  }
+}
+
 function buildEdges(relations: Relation[], byId: Map<string, PersonPlacement>): EdgePlacement[] {
-  return relations
+  const edges = relations
     .map((relation) => {
       const from = byId.get(relation.source);
       const to = byId.get(relation.target);
       if (!from || !to) return null;
-      return { relation, from: { x: from.x, y: from.y }, to: { x: to.x, y: to.y } };
+      return {
+        relation,
+        from: { x: from.x, y: from.y },
+        to: { x: to.x, y: to.y },
+        channelOffset: 0,
+      };
     })
     .filter((edge): edge is EdgePlacement => edge !== null);
+
+  assignEdgeChannels(edges);
+  return edges;
 }
 
 function assignGroupIds(people: PersonPlacement[], groups: Group[]): void {
@@ -1345,8 +1393,15 @@ export function withPositions(layout: MapLayout, positions: Record<string, Point
     const from = byId.get(edge.relation.source);
     const to = byId.get(edge.relation.target);
     if (!from || !to) return edge;
-    return { relation: edge.relation, from: { x: from.x, y: from.y }, to: { x: to.x, y: to.y } };
+    return {
+      relation: edge.relation,
+      from: { x: from.x, y: from.y },
+      to: { x: to.x, y: to.y },
+      channelOffset: 0,
+    };
   });
+  /* 人を動かすと折り返す位置も変わるので、配線のずらし方を決め直す */
+  assignEdgeChannels(edges);
 
   return { ...layout, people, byId, regions, edges };
 }

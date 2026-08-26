@@ -194,8 +194,10 @@ export function pointInPolygon(point: Point, polygon: Point[]): boolean {
  * 長いほうの向きから始めると、折れ曲がりが目立たない。
  *
  * `elbow` は角を丸める半径（0 ならカクカクのまま）。
+ * `channelOffset` は折り返す位置をずらす量。近くを走る線どうしが同じ列に
+ * 乗って 1 本に見えるのを避け、基盤の配線のように隣り合わせるのに使う。
  */
-export function manhattanPath(from: Point, to: Point, elbow = 0): string {
+export function manhattanPath(from: Point, to: Point, elbow = 0, channelOffset = 0): string {
   const run = Math.abs(to.x - from.x);
   const rise = Math.abs(to.y - from.y);
 
@@ -204,16 +206,16 @@ export function manhattanPath(from: Point, to: Point, elbow = 0): string {
     return `M ${round(from.x)} ${round(from.y)} L ${round(to.x)} ${round(to.y)}`;
   }
 
-  /* 真ん中で折り返す。長いほうの向きから始める */
+  /* 真ん中で折り返す。長いほうの向きから始め、ずらす量だけ折り返しを動かす */
   const corners: Point[] =
     run >= rise
       ? [
-          { x: (from.x + to.x) / 2, y: from.y },
-          { x: (from.x + to.x) / 2, y: to.y },
+          { x: (from.x + to.x) / 2 + channelOffset, y: from.y },
+          { x: (from.x + to.x) / 2 + channelOffset, y: to.y },
         ]
       : [
-          { x: from.x, y: (from.y + to.y) / 2 },
-          { x: to.x, y: (from.y + to.y) / 2 },
+          { x: from.x, y: (from.y + to.y) / 2 + channelOffset },
+          { x: to.x, y: (from.y + to.y) / 2 + channelOffset },
         ];
 
   const points = [from, ...corners, to];
