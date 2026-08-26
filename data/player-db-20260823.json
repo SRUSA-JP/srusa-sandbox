@@ -521,6 +521,7 @@
       },
       "relationship": {
         "attributes": [
+          "K高校",
           "テニス部"
         ],
         "related_ids": []
@@ -1200,7 +1201,7 @@
       }
     },
     "mark": {
-      "username": "mark",
+      "username": "yung ikiri boi",
       "slug": "mark",
       "aliases": [],
       "sources": {
