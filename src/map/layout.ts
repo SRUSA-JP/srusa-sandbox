@@ -1026,8 +1026,16 @@ function assignGroupIds(people: PersonPlacement[], groups: Group[]): void {
  * その塊の中心へ入り、複数持つ人はそれぞれの塊の間に落ち着く（＝領域が重なる）。
  * 研究室のように所属者が大学の一部であるときは、内側の小さな塊が
  * 外側の塊の中に自然に収まる。
+ *
+ * あわせて、関係線でつながっている人どうしも引き寄せる。所属より関係線を
+ * 優先したいので、こちらを強く効かせる。図を横切る長い関係線が減り、
+ * 「誰と誰が繋がっているか」を追いやすくなる。
  */
-function relaxGroupClusters(placements: PersonPlacement[], groups: Group[]): void {
+function relaxGroupClusters(
+  placements: PersonPlacement[],
+  groups: Group[],
+  relations: Relation[],
+): void {
   /* 場所を表す所属だけがまとまりを作る（アクティブメンバーのような札は効かせない） */
   const groupNames = new Set(
     groups.filter((group) => groupTypeSetting(group.type).binds).map((group) => group.name),
@@ -1071,6 +1079,29 @@ function relaxGroupClusters(placements: PersonPlacement[], groups: Group[]): voi
       }
     }
 
+    /*
+     * 関係線でつながっている人どうしを、ちょうどよい距離へ寄せる。
+     * 所属より優先したいので、所属の引きより強く効かせる。
+     */
+    const byId = new Map(placements.map((placement) => [placement.person.id, placement]));
+    for (const relation of relations) {
+      const a = byId.get(relation.source);
+      const b = byId.get(relation.target);
+      if (!a || !b) continue;
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      const distance = Math.max(1, Math.hypot(dx, dy));
+      const force = ((distance - GROUP_RELAX.edgeDistance) * GROUP_RELAX.edgeAttraction * cooling) / 2;
+      const moveX = (dx / distance) * force;
+      const moveY = (dy / distance) * force;
+      const moveA = delta.get(a.person.id)!;
+      const moveB = delta.get(b.person.id)!;
+      moveA.x -= moveX;
+      moveA.y -= moveY;
+      moveB.x += moveX;
+      moveB.y += moveY;
+    }
+
     /* 近づきすぎた人どうしを離す（ノードが重なると誰が誰だか読めなくなる） */
     for (let i = 0; i < placements.length; i += 1) {
       for (let j = i + 1; j < placements.length; j += 1) {
@@ -1106,7 +1137,7 @@ function clusteredPlacements(data: RelationshipData): PersonPlacement[] {
   const affiliated = data.people.filter((person) => person.attributes.length > 0);
   const clusters = orderClusters(buildClusters(affiliated), data.relations);
   const placements = placePeople(packBlocks(buildBlocks(clusters, data.groups, data.relations)));
-  relaxGroupClusters(placements, data.groups);
+  relaxGroupClusters(placements, data.groups, data.relations);
   return placements;
 }
 
