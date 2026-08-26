@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import { AppShell, AuthGate } from './components';
 import { useHashRoute } from './hooks/useHashRoute';
+import { useScrollRestoration } from './hooks/useScrollRestoration';
 import { ClipsPage, EventRankingsPage, MapPage, PlayerPage, StatsPage, WorldMapPage, ZukanPage } from './pages';
 import { skinForRoute, type Route, type RouteId } from './routes';
 import { setActiveSkin } from './config/skins';
@@ -33,6 +34,9 @@ export function App() {
    * 中身が描かれる前に切り替えておく。
    */
   setActiveSkin(skin);
+
+  /* 図鑑からひとりの紹介ページへ入って戻ったとき、見ていた高さへ返す */
+  useScrollRestoration(route.path);
 
   const { theme, mode, toggle } = useAppTheme(skin);
   const Page = PAGES[route.id];
