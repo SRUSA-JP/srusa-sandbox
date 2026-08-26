@@ -4,5 +4,6 @@ export * from './IconButton';
 export * from './Note';
 export * from './NumberField';
 export * from './Picker';
+export * from './PixelAvatar';
 export * from './Swatch';
 export * from './WireLine';
