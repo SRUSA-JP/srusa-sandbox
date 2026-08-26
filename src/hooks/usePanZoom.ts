@@ -54,6 +54,23 @@ export interface PanZoom {
   };
   /** いま掴んで動かしている最中か（見た目を変えるのに使う）。 */
   isPanning: boolean;
+  /**
+   * 図の中の部品（相関図の人物など）が受け取った指を、表示枠にも知らせる口。
+   *
+   * 部品が指を捕まえる（setPointerCapture）と、その指の出来事は表示枠に
+   * 届かなくなる。表示枠は指の本数でつまむ操作を見分けているので、
+   * 知らせないと「1 本目が人物の上」のときにつまんで拡大できなくなる。
+   *
+   * ここへ渡した指では図を動かさない（部品が自分で動かすため）。
+   * 2 本目が来たらつまむ操作として扱う。
+   */
+  externalPointer: {
+    down: (event: { pointerId: number; clientX: number; clientY: number }) => void;
+    move: (event: { pointerId: number; clientX: number; clientY: number }) => void;
+    up: (event: { pointerId: number }) => void;
+  };
+  /** いま触れている指の本数。部品が「つまむ操作に切り替わった」と気づくのに使う。 */
+  pointerCount: () => number;
   zoomIn: () => void;
   zoomOut: () => void;
   fit: () => void;
@@ -167,8 +184,14 @@ export function usePanZoom(contentWidth: number, contentHeight: number, zoom: Zo
     if (pointers.current.size === 2) pinchDistance.current = distance([...pointers.current.values()]);
   }, []);
 
-  const onPointerMove = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
+  /**
+   * 指が動いたときの共通処理。
+   *
+   * 2 本以上ならつまんで拡大、1 本なら図を動かす。図の中の部品が受け取った
+   * 指（`allowPan` が false）では動かさないが、本数には数える。
+   */
+  const movePointer = useCallback(
+    (event: { pointerId: number; clientX: number; clientY: number }, allowPan: boolean) => {
       const previous = pointers.current.get(event.pointerId);
       if (!previous) return;
       const next = { x: event.clientX, y: event.clientY };
@@ -187,19 +210,50 @@ export function usePanZoom(contentWidth: number, contentHeight: number, zoom: Zo
         return;
       }
 
+      if (!allowPan) return;
       setView((current) => panBy(current, next.x - previous.x, next.y - previous.y, content, box));
     },
     [content, box, range, localPoint],
   );
 
-  const endPointer = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    pointers.current.delete(event.pointerId);
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
+  const onPointerMove = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => movePointer(event, true),
+    [movePointer],
+  );
+
+  const forgetPointer = useCallback((pointerId: number) => {
+    pointers.current.delete(pointerId);
     if (pointers.current.size < 2) pinchDistance.current = 0;
     if (pointers.current.size === 0) setIsPanning(false);
   }, []);
+
+  const endPointer = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+      forgetPointer(event.pointerId);
+    },
+    [forgetPointer],
+  );
+
+  /* 図の中の部品が受け取った指。本数には数えるが、これでは図を動かさない */
+  const externalPointer = useMemo(
+    () => ({
+      down: (event: { pointerId: number; clientX: number; clientY: number }) => {
+        pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        if (pointers.current.size === 2) {
+          pinchDistance.current = distance([...pointers.current.values()].slice(0, 2));
+        }
+      },
+      move: (event: { pointerId: number; clientX: number; clientY: number }) =>
+        movePointer(event, false),
+      up: (event: { pointerId: number }) => forgetPointer(event.pointerId),
+    }),
+    [movePointer, forgetPointer],
+  );
+
+  const pointerCount = useCallback(() => pointers.current.size, []);
 
   const onDoubleClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -263,6 +317,8 @@ export function usePanZoom(contentWidth: number, contentHeight: number, zoom: Zo
       onKeyDown,
     },
     isPanning,
+    externalPointer,
+    pointerCount,
     zoomIn,
     zoomOut,
     fit,
