@@ -508,6 +508,10 @@ export const MAP_TEXT = {
     regions: '所属の囲い',
     regionOn: '表示',
     regionOff: '非表示',
+    /** 所属から導いた線の表示切り替え。同じ所属の人がグループの色で繋がる。 */
+    affiliationEdges: '所属の線',
+    affiliationOn: '表示',
+    affiliationOff: '非表示',
     noHighlight: '強調しない',
     /** グループのプルダウンに出す 1 件分の説明。 */
     groupOption: (name: string, type: string, members: number) =>
@@ -550,6 +554,8 @@ export const MAP_TEXT = {
     close: '閉じる',
     relation: (from: string, to: string, context?: string, uncertain?: boolean) =>
       `${from} ↔ ${to}${context ? `（${context}）` : ''}${uncertain ? ' ※確度が低い関係' : ''}`,
+    /** 所属から導いた線。親（線の集まる人）とその所属者を結ぶ。 */
+    affiliation: (hub: string, member: string, group: string) => `${hub} ─ ${member}（${group}）`,
   },
 } as const;
 

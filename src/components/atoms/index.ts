@@ -5,3 +5,4 @@ export * from './Note';
 export * from './NumberField';
 export * from './Picker';
 export * from './Swatch';
+export * from './WireLine';

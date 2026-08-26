@@ -1,3 +1,4 @@
+export * from './AffiliationEdge';
 export * from './ClipCard';
 export * from './ChartTooltip';
 export * from './DateStepper';
