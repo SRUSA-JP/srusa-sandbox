@@ -9,6 +9,7 @@
  * ここでは「何番目の色スロットを使うか」だけを決める。
  * 文字の大きさ・太さは theme/tokens.ts のトークンを使い、値を重複させない。
  */
+import type { BiomeId } from '../theme/palette';
 import { FONT_SIZE, FONT_WEIGHT, LAYOUT } from '../theme/tokens';
 import type { GroupType } from './schema';
 
@@ -39,7 +40,13 @@ export const NODE = {
   /** 中心人物の枠線を太くする倍率。 */
   centerRingScale: 2,
   /** アイコン画像が無いときの代替表示。 */
-  fallback: 'silhouette' as 'silhouette' | 'initial',
+  /**
+   * スキン画像が無い人に何を出すか。
+   *
+   * `pixel` は名前から顔を作る（図鑑と同じ絵）。全員が違う顔になるので、
+   * 図の中で人を見分けられる。`silhouette` と `initial` は同じ絵が並ぶ。
+   */
+  fallback: 'pixel' as 'pixel' | 'silhouette' | 'initial',
 } as const;
 
 /**
@@ -153,6 +160,32 @@ export const GROUP_RELAX = {
  * どれも少しずつ違う行・列を走って、基盤や路線図の「揃った」見え方にならない。
  * 格子の交点に載せると、同じ行・列に並ぶ人が増えて線の向きが揃う。
  */
+/**
+ * 区画（floorplan）の並べ方。
+ *
+ * 基盤の設計と同じ考え方で組む。まず部品（グループ）を四角い区画として置き、
+ * 区画と区画のあいだに空けた道を配線が通る。所属の入れ子（研究室 ⊂ 大学）は
+ * 区画の入れ子でそのまま表す。緩和計算と違って、同じ所属の人が必ず隣り合う。
+ */
+export const FLOORPLAN = {
+  /** 1 つの区画に横へ並べる人数の上限。これを超えると次の段へ折り返す。 */
+  maxColumns: 4,
+  /** 区画の縁の余白（升目の数）。囲いの線と人のあいだに空ける。 */
+  padding: 1,
+  /** 区画と区画のあいだに空ける道（升目の数）。ここを配線が通る。 */
+  channel: 1,
+  /**
+   * 区画を入れ替えて配線を短くする、繰り返しの上限。
+   *
+   * 総距離が縮まなくなればそこで止まるので、普通はこの回数まで回らない。
+   */
+  /** 区画を並べるとき、関係線 1 本を所属の線の何本ぶんとして数えるか。 */
+  relationWeight: 3,
+  swapPasses: 12,
+  /** 全体を折り返す目安の幅（升目の数）。図がほぼ正方形になる値を選ぶ。 */
+  targetColumns: 18,
+} as const;
+
 export const GRID = {
   /** 交点の間隔。アイコンと名前が入る幅を取る。 */
   cell: 62,
@@ -176,6 +209,14 @@ export const CANVAS = {
 
 /** グループを囲う領域。 */
 export const REGION = {
+  /**
+   * 囲いの形。`rect` で四角、`curve` で点を包む曲線。
+   *
+   * 四角にすると区画の並びと縁が揃い、基盤の区画割りのように読める。
+   */
+  shape: 'rect' as 'rect' | 'curve',
+  /** 四角のとき、名前を左上の角からどれだけ内側に置くか。 */
+  labelInset: 10,
   /** ノードの外側に取る余白。入れ子を見せるため分類ごとに縮める。 */
   padding: 34,
   /** 入れ子 1 段ごとに余白を詰める量。 */
@@ -305,6 +346,59 @@ export interface GroupTypeSetting {
   binds: boolean;
 }
 
+/**
+ * グループごとのバイオーム。
+ *
+ * 囲いをその場所らしい風景の色で塗るための割り当て。
+ * 入れ子のグループは、親の風景の中にありそうなものを選ぶ
+ * （山岳の中の研究室は洞窟、海の中の部活はサンゴ礁）。
+ *
+ * ここに無いグループは分類ごとの既定（GROUP_TYPE_BIOMES）を使う。
+ * 色そのものは theme/palette.ts の BIOME_COLORS が持つ。
+ */
+export const GROUP_BIOMES: Record<string, BiomeId> = {
+  k_high: 'ocean',
+  tennis: 'coral_reef',
+  m_univ: 'windswept_hills',
+  y_lab: 'lush_caves',
+  s_lab: 'dripstone_caves',
+  m_lab: 'deep_dark',
+  juku: 'desert',
+  kindergarten: 'flower_forest',
+  elementary: 'plains',
+  junior_high: 'birch_forest',
+  high_unknown: 'forest',
+  d_univ: 'taiga',
+  j_univ: 'jungle',
+  univ_unknown: 'savanna',
+  k_company: 'badlands',
+  shion_group: 'dark_forest',
+  active_member: 'cherry_grove',
+  online_friend: 'the_end',
+  golf: 'meadow',
+  unknown: 'stony_shore',
+};
+
+/** 一覧に無いグループが増えたときに使う、分類ごとの既定のバイオーム。 */
+export const GROUP_TYPE_BIOMES: Record<GroupType, BiomeId> = {
+  university: 'windswept_hills',
+  lab: 'lush_caves',
+  school: 'ocean',
+  school_stage: 'plains',
+  education: 'desert',
+  company: 'badlands',
+  club: 'coral_reef',
+  friend_group: 'dark_forest',
+  activity: 'meadow',
+  relationship_context: 'the_end',
+  unknown: 'stony_shore',
+};
+
+/** そのグループの囲いに使うバイオーム。 */
+export function groupBiome(group: { id: string; type: GroupType }): BiomeId {
+  return GROUP_BIOMES[group.id] ?? GROUP_TYPE_BIOMES[group.type] ?? 'stony_shore';
+}
+
 export const GROUP_TYPE_SETTINGS: Record<GroupType, GroupTypeSetting> = {
   university: { label: '大学', colorSlot: 0, depth: 0, order: 10, binds: true },
   lab: { label: '研究室', colorSlot: 3, depth: 1, order: 60, binds: true },
@@ -357,6 +451,7 @@ export type EdgeMode = (typeof EDGE_MODES)[number]['value'];
 
 /** 相関図の配置アルゴリズム。 */
 export const LAYOUT_MODES = [
+  { value: 'floorplan', label: '区画' },
   { value: 'cluster', label: '所属クラスタ' },
   { value: 'clusterHybrid', label: '所属ハイブリッド' },
   { value: 'community', label: '関係コミュニティ' },

@@ -14,6 +14,7 @@ import {
   CLUSTER,
   EDGE,
   FALLBACK_GROUP_TYPE,
+  FLOORPLAN,
   GRID,
   GROUP_RELAX,
   groupTypeSetting,
@@ -24,7 +25,7 @@ import {
   UNASSIGNED,
   type LayoutMode,
 } from './config';
-import { centroid, enclosingPolygon, pointInPolygon, polygonArea, type Point } from './geometry';
+import { centroid, enclosingPolygon, inflatedBox, pointInPolygon, polygonArea, type Point } from './geometry';
 import type { Group, Person, Relation, RelationshipData } from './schema';
 
 export interface PersonPlacement {
@@ -33,6 +34,14 @@ export interface PersonPlacement {
   y: number;
   /** 所属グループの ID（描画時の強調判定に使う）。 */
   groupIds: string[];
+  /**
+   * この人を置いた区画のグループ ID。
+   *
+   * 複数の所属を持つ人は 1 か所にしか置けないので、囲いをどこまで広げるかは
+   * 「持ち場」で決める。持ち場でない所属との繋がりは、所属の線が引き受ける。
+   * 区画（floorplan）以外の並べ方では持たない。
+   */
+  homeGroupId?: string;
 }
 
 export interface RegionPlacement {
@@ -84,6 +93,17 @@ export interface MapLayout {
   /** 所属から導いた線。関係線とは別に持ち、画面側で出し分ける。 */
   affiliationEdges: AffiliationEdgePlacement[];
   byId: Map<string, PersonPlacement>;
+}
+
+/**
+ * 囲いの形。四角にするか、点を包む多角形にするか。
+ *
+ * 四角にすると、区画（floorplan）の並びと縁が揃って基盤の区画割りのように読める。
+ * 形の選択は REGION.shape が持ち、ここ以外では決めない。
+ */
+function regionPolygon(points: Point[], padding: number): Point[] {
+  if (points.length === 0) return [];
+  return REGION.shape === 'rect' ? inflatedBox(points, padding) : enclosingPolygon(points, padding);
 }
 
 /** 所属が無い人をまとめるための仮グループ。 */
@@ -820,12 +840,45 @@ function regionPadding(type: string): number {
   return Math.max(REGION.padding - depth * REGION.nestedPaddingStep, REGION.nestedPaddingStep);
 }
 
+/**
+ * その区画に置かれた人（自分の区画と、その中の区画にいる人）。
+ *
+ * 囲いの形はこの人たちだけで決める。持ち場が別のところにある所属者まで
+ * 囲おうとすると、四角が図を横切るほど広がって、どこが何のまとまりか読めなくなる。
+ * 囲いに入らない所属は、その所属の色の線が繋いで見せる。
+ */
+function homeMembers(group: Group, groups: Group[], placements: PersonPlacement[]): PersonPlacement[] {
+  const ids = new Set([group.id]);
+  for (let added = true; added; ) {
+    added = false;
+    for (const candidate of groups) {
+      if (candidate.parentGroupId && ids.has(candidate.parentGroupId) && !ids.has(candidate.id)) {
+        ids.add(candidate.id);
+        added = true;
+      }
+    }
+  }
+  return placements.filter((placement) => placement.homeGroupId && ids.has(placement.homeGroupId));
+}
+
 function buildRegions(groups: Group[], placements: PersonPlacement[]): RegionPlacement[] {
+  /* 区画で並べたときだけ持ち場が入る。他の並べ方では今まで通り所属者全員で囲う */
+  const hasHomes = placements.some((placement) => placement.homeGroupId);
+
   const regions = groups.map((group) => {
     const members = placements.filter((placement) => placement.person.attributes.includes(group.name));
+    const shaping = hasHomes ? homeMembers(group, groups, placements) : members;
+    /*
+     * 持ち場がこのグループにある人が 1 人もいないときは、囲いを描かない。
+     *
+     * 全員が他のグループの区画に住んでいるということなので（S塾 は全員が
+     * K高校 か M大学 に住んでいる）、散らばった人を四角で囲うと図を横切る
+     * 大きさになり、どこが何のまとまりか読めなくなる。
+     * そういうグループの繋がりは、そのグループの色の線が引き受ける。
+     */
     const padding = regionPadding(group.type);
-    const polygon = enclosingPolygon(
-      members.map((member) => ({ x: member.x, y: member.y })),
+    const polygon = regionPolygon(
+      shaping.map((member) => ({ x: member.x, y: member.y })),
       padding,
     );
     return {
@@ -839,7 +892,7 @@ function buildRegions(groups: Group[], placements: PersonPlacement[]): RegionPla
   if (UNASSIGNED.showRegion) {
     const members = placements.filter((placement) => placement.person.attributes.length === 0);
     if (members.length > 0) {
-      const polygon = enclosingPolygon(
+      const polygon = regionPolygon(
         members.map((member) => ({ x: member.x, y: member.y })),
         REGION.padding,
       );
@@ -852,7 +905,10 @@ function buildRegions(groups: Group[], placements: PersonPlacement[]): RegionPla
     }
   }
 
-  /* 所属者が 0 人のグループは描かない（参照切れは parse.ts が報告済み） */
+  /*
+   * 所属者が 0 人のグループは描かない（参照切れは parse.ts が報告済み）。
+   * 囲いを描かないグループも一覧には残す。凡例と強調の対象からは外さない。
+   */
   return regions.filter((region) => region.memberIds.length > 0).sort((a, b) => b.area - a.area);
 }
 
@@ -1403,6 +1459,376 @@ function relaxGroupClusters(
   }
 }
 
+/* ------------------------------------------------------------------ *
+ * 区画（floorplan）
+ * ------------------------------------------------------------------ */
+
+/**
+ * 区画の箱。グループ 1 つぶん。
+ *
+ * 中に子グループの箱（研究室 ⊂ 大学）と、そのグループ「そのもの」に
+ * 属する人の升目を持つ。大きさは升目の数で数え、実際の座標は最後にまとめて出す。
+ */
+interface FloorBox {
+  group: Group | null;
+  /** この箱に直接置く人（子グループに属さない人）。 */
+  members: Person[];
+  children: FloorBox[];
+  /** 親の中での左上（升目）。 */
+  column: number;
+  row: number;
+  columns: number;
+  rows: number;
+  /** 中に置く人の、箱の中での位置（升目）。 */
+  slots: Array<{ person: Person; column: number; row: number }>;
+}
+
+/**
+ * n 人をできるだけ整った長方形に並べるときの列数。
+ *
+ * 余りが出ない形を優先し、同じなら正方形に近いほうを選ぶ。
+ * 8 人なら 4×2、3 人なら 3×1 のように、段の欠けない形になる。
+ */
+function gridColumns(count: number): number {
+  if (count <= 1) return 1;
+  const limit = Math.min(count, FLOORPLAN.maxColumns);
+  let best = 1;
+  let bestScore = Number.POSITIVE_INFINITY;
+  for (let columns = 1; columns <= limit; columns += 1) {
+    const rows = Math.ceil(count / columns);
+    /*
+     * 欠けた升目を嫌いつつ、正方形に近い形を選ぶ。
+     *
+     * 欠けを重く見すぎると、1 列（必ず欠けが 0）がいつでも勝ってしまい、
+     * 11 人が 1×11 の細長い帯になる。欠け 1 つと縦横の差 3 が釣り合うくらいにする。
+     * 同じ点数なら横に広いほうを採り、3 人なら縦 1 列ではなく横 1 行にする。
+     */
+    const score = (rows * columns - count) * 3 + Math.abs(columns - rows);
+    if (score <= bestScore) {
+      bestScore = score;
+      best = columns;
+    }
+  }
+  return best;
+}
+
+/**
+ * 箱を横に並べ、幅を超えたら次の段へ折り返す（棚積み）。
+ *
+ * 箱の `column` / `row` を埋めて、並べ終わった全体の大きさを返す。
+ */
+function shelfPack(
+  boxes: FloorBox[],
+  targetColumns: number,
+): { columns: number; rows: number } {
+  let column = 0;
+  let row = 0;
+  let shelfRows = 0;
+  let widest = 0;
+
+  for (const box of boxes) {
+    if (column > 0 && column + box.columns > targetColumns) {
+      row += shelfRows + FLOORPLAN.channel;
+      column = 0;
+      shelfRows = 0;
+    }
+    box.column = column;
+    box.row = row;
+    column += box.columns + FLOORPLAN.channel;
+    shelfRows = Math.max(shelfRows, box.rows);
+    widest = Math.max(widest, column - FLOORPLAN.channel);
+  }
+
+  return { columns: widest, rows: row + shelfRows };
+}
+
+/** 箱の中身（子の箱 → 自分の人）を並べ、箱の大きさを決める。 */
+function layoutBox(box: FloorBox): void {
+  for (const child of box.children) layoutBox(child);
+
+  const inner = FLOORPLAN.padding;
+  /*
+   * 中の区画は、全体と同じ幅で折り返すと親が横に間延びする
+   * （M大学 の中に研究室 3 つを並べると、右半分が空いた横長の四角になる）。
+   * 中身の広さから、ほぼ正方形になる幅を出してそこで折り返す。
+   */
+  const childArea =
+    box.children.length > 0
+      ? shelfPack(
+          box.children,
+          Math.max(
+            ...box.children.map((child) => child.columns),
+            Math.ceil(Math.sqrt(box.children.reduce((sum, child) => sum + child.columns * child.rows, 0))),
+          ),
+        )
+      : { columns: 0, rows: 0 };
+
+  /* 子の箱は縁の余白のぶんだけ内側へ寄せる */
+  for (const child of box.children) {
+    child.column += inner;
+    child.row += inner;
+  }
+
+  /* 自分の人は、子の箱の下に長方形で並べる */
+  const columns = gridColumns(box.members.length);
+  const memberRows = Math.ceil(box.members.length / columns);
+  const memberTop = childArea.rows > 0 ? inner + childArea.rows + FLOORPLAN.channel : inner;
+
+  box.slots = box.members.map((person, index) => ({
+    person,
+    column: inner + (index % columns),
+    row: memberTop + Math.floor(index / columns),
+  }));
+
+  const usedColumns = Math.max(childArea.columns, box.members.length > 0 ? columns : 0);
+  const usedRows = (box.members.length > 0 ? memberTop + memberRows : inner + childArea.rows) - inner;
+
+  box.columns = usedColumns + inner * 2;
+  box.rows = Math.max(usedRows, 1) + inner * 2;
+}
+
+/** 箱を実際の座標へ展開する。 */
+function emitBox(box: FloorBox, originColumn: number, originRow: number, into: PersonPlacement[]): void {
+  const column = originColumn + box.column;
+  const row = originRow + box.row;
+
+  for (const slot of box.slots) {
+    into.push({
+      person: slot.person,
+      x: (column + slot.column) * NODE.gapX,
+      y: (row + slot.row) * NODE.gapY,
+      groupIds: [],
+      homeGroupId: box.group?.id,
+    });
+  }
+  for (const child of box.children) emitBox(child, column, row, into);
+}
+
+/**
+ * 人の「持ち場」になるグループを決める。
+ *
+ * 複数の所属を持つ人は 1 か所にしか置けない。いちばん内側（研究室 > 大学）の
+ * 所属を持ち場にして、そこの区画に入れる。他の所属との繋がりは、
+ * 所属の線（グループの色）が引き受けるので、区画が離れていても読める。
+ */
+function homeGroupOf(person: Person, groups: Group[]): Group | null {
+  const byName = new Map(groups.map((group) => [group.name, group]));
+  const byId = new Map(groups.map((group) => [group.id, group]));
+
+  const depthOf = (group: Group): number => {
+    let depth = 0;
+    let current: Group | undefined = group;
+    const seen = new Set<string>();
+    while (current?.parentGroupId && !seen.has(current.id)) {
+      seen.add(current.id);
+      current = byId.get(current.parentGroupId);
+      depth += 1;
+    }
+    return depth;
+  };
+
+  /* 場所を表す所属だけを持ち場にする（アクティブメンバーのような札は持ち場にしない） */
+  const candidates = person.attributes
+    .map((name) => byName.get(name))
+    .filter((group): group is Group => Boolean(group) && groupTypeSetting(group!.type).binds);
+  if (candidates.length === 0) return null;
+
+  return candidates.reduce((best, group) => {
+    const a = depthOf(group);
+    const b = depthOf(best);
+    if (a !== b) return a > b ? group : best;
+    const orderA = groupTypeSetting(group.type).order;
+    const orderB = groupTypeSetting(best.type).order;
+    if (orderA !== orderB) return orderA < orderB ? group : best;
+    return group.name.localeCompare(best.name, 'ja') < 0 ? group : best;
+  });
+}
+
+/**
+ * 区画として並べる。
+ *
+ * 基盤の設計と同じ順で組む。部品（グループ）を四角い区画にまとめ、
+ * 入れ子の所属は区画の入れ子にし、区画のあいだに配線の通る道を空ける。
+ * 緩和計算と違って結果が座標の端数に散らないので、人が縦横に揃う。
+ */
+function floorplanPlacements(data: RelationshipData): PersonPlacement[] {
+  const hubs = affiliationHubs(data);
+  const home = new Map(data.people.map((person) => [person.id, homeGroupOf(person, data.groups)]));
+
+  const boxes = new Map<string, FloorBox>();
+  for (const group of data.groups) {
+    boxes.set(group.id, {
+      group,
+      members: data.people.filter((person) => home.get(person.id)?.id === group.id),
+      children: [],
+      column: 0,
+      row: 0,
+      columns: 0,
+      rows: 0,
+      slots: [],
+    });
+  }
+
+  /* 親子を繋ぐ。親が見つからない子は根として扱う */
+  const roots: FloorBox[] = [];
+  for (const group of data.groups) {
+    const box = boxes.get(group.id)!;
+    const parent = group.parentGroupId ? boxes.get(group.parentGroupId) : undefined;
+    if (parent && parent !== box) parent.children.push(box);
+    else roots.push(box);
+  }
+
+  /* 持ち場の無い人（札しか持たない人・所属の無い人）はまとめて 1 つの区画にする */
+  const homeless = data.people.filter((person) => !home.get(person.id));
+  if (homeless.length > 0) {
+    roots.push({
+      group: null,
+      members: homeless,
+      children: [],
+      column: 0,
+      row: 0,
+      columns: 0,
+      rows: 0,
+      slots: [],
+    });
+  }
+
+  /* 中身の無い区画は置かない（線も囲いも出ないので、空きになるだけ） */
+  const used = roots.filter((box) => countMembers(box) > 0);
+  for (const box of used) layoutBox(box);
+  shelfPack(orderBoxes(used, data, hubs), FLOORPLAN.targetColumns);
+
+  const placements: PersonPlacement[] = [];
+  for (const box of used) emitBox(box, 0, 0, placements);
+  return placements;
+}
+
+/**
+ * 区画を置く順を決める。
+ *
+ * 基盤の設計でいう「フロアプラン」。部品をどこに置くかで配線の総距離が決まるので、
+ * 人を動かすのではなく区画の並びを直して線を短くする。
+ *
+ * まず、区画と区画のあいだに何本の線が渡るか（つながりの重さ）を数える。
+ * つぎに、2 つの区画の場所を入れ替えてみて総距離が縮むなら採る、を繰り返す。
+ * 縮まなくなったら終わり。試す順は決まっているので、結果は毎回同じになる。
+ */
+function orderBoxes(boxes: FloorBox[], data: RelationshipData, hubs: AffiliationHub[]): FloorBox[] {
+  if (boxes.length < 2) return boxes;
+
+  /* 誰がどの区画にいるか */
+  const boxOf = new Map<string, FloorBox>();
+  const walk = (box: FloorBox, root: FloorBox) => {
+    for (const person of box.members) boxOf.set(person.id, root);
+    for (const child of box.children) walk(child, root);
+  };
+  for (const box of boxes) walk(box, box);
+
+  /* 区画と区画のあいだに渡る線の本数。関係線も所属の線も 1 本は 1 本として数える */
+  const weights = new Map<string, number>();
+  const indexOf = new Map(boxes.map((box, index) => [box, index] as const));
+  const connect = (a: string, b: string, weight: number) => {
+    const left = boxOf.get(a);
+    const right = boxOf.get(b);
+    if (!left || !right || left === right) return;
+    const i = indexOf.get(left)!;
+    const j = indexOf.get(right)!;
+    const key = i < j ? `${i}:${j}` : `${j}:${i}`;
+    weights.set(key, (weights.get(key) ?? 0) + weight);
+  };
+  /*
+   * はっきり書かれた関係を、所属から導いた線より重く見る。
+   * 所属の線は 92 本、関係線は 26 本しかないので、同じ重さで数えると
+   * 関係線の都合が所属の線に押し切られて、実際の関係が図を横切ってしまう。
+   */
+  for (const relation of data.relations) {
+    connect(relation.source, relation.target, FLOORPLAN.relationWeight);
+  }
+  for (const hub of hubs) {
+    for (const memberId of hub.memberIds) connect(hub.hubId, memberId, 1);
+  }
+
+  const links = [...weights.entries()].map(([key, weight]) => {
+    const [i, j] = key.split(':').map(Number);
+    return { i, j, weight };
+  });
+
+  /**
+   * その並びの良さ。小さいほど良い。
+   *
+   * 配線の総距離を、図の大きさ（縦 + 横）で割った値。距離だけを見ると、
+   * 図を細長く広げて距離を稼いだ並びと、詰まった並びの区別が付かない。
+   * 「図の大きさに対して線が短いか」で見ると、線の短さと図の詰まり具合の
+   * 両方が同時に良くなる方へ進む。図に出る線の長さの測り方とも揃う。
+   */
+  const cost = (order: FloorBox[]): number => {
+    shelfPack(order, FLOORPLAN.targetColumns);
+    const center = new Map(
+      order.map((box) => [
+        indexOf.get(box)!,
+        { x: box.column + box.columns / 2, y: box.row + box.rows / 2 },
+      ]),
+    );
+
+    let width = 0;
+    let height = 0;
+    for (const box of order) {
+      width = Math.max(width, box.column + box.columns);
+      height = Math.max(height, box.row + box.rows);
+    }
+
+    let total = 0;
+    for (const link of links) {
+      const a = center.get(link.i)!;
+      const b = center.get(link.j)!;
+      total += link.weight * (Math.abs(a.x - b.x) + Math.abs(a.y - b.y));
+    }
+    return total / Math.max(1, width + height);
+  };
+
+  /* 出発点は、人数の多い区画から。同数なら名前順にして毎回同じ並びから始める */
+  let order = [...boxes].sort(
+    (a, b) => countMembers(b) - countMembers(a) || (a.group?.name ?? '').localeCompare(b.group?.name ?? '', 'ja'),
+  );
+  let best = cost(order);
+
+  for (let pass = 0; pass < FLOORPLAN.swapPasses; pass += 1) {
+    let improved = false;
+    for (let i = 0; i < order.length; i += 1) {
+      for (let j = 0; j < order.length; j += 1) {
+        if (i === j) continue;
+
+        /* 入れ替えと、抜いて差し込み直しの両方を試す。
+           棚積みでは差し込みのほうが後ろの区画をまとめてずらせるので、
+           入れ替えだけでは届かない並びに届く */
+        const swapped = [...order];
+        [swapped[i], swapped[j]] = [swapped[j], swapped[i]];
+
+        const moved = [...order];
+        moved.splice(j, 0, moved.splice(i, 1)[0]);
+
+        for (const candidate of [swapped, moved]) {
+          const score = cost(candidate);
+          if (score < best) {
+            best = score;
+            order = candidate;
+            improved = true;
+          }
+        }
+      }
+    }
+    if (!improved) break;
+  }
+
+  /* 試した並びで column / row が書き換わっているので、採用した並びで置き直す */
+  cost(order);
+  return order;
+}
+
+function countMembers(box: FloorBox): number {
+  return box.members.length + box.children.reduce((sum, child) => sum + countMembers(child), 0);
+}
+
 function clusteredPlacements(data: RelationshipData): PersonPlacement[] {
   /* 所属のある人はクラスタとして配置し、所属の無い人は後から相手のそばへ置く */
   const affiliated = data.people.filter((person) => person.attributes.length > 0);
@@ -1486,6 +1912,7 @@ function placeClusterHybrid(data: RelationshipData): PersonPlacement[] {
 }
 
 function placementsFor(data: RelationshipData, mode: LayoutMode, centerId: string): PersonPlacement[] {
+  if (mode === 'floorplan') return floorplanPlacements(data);
   if (mode === 'clusterHybrid') return placeClusterHybrid(data);
   if (mode === 'community') return placeCommunity(data);
   if (mode === 'stress') return placeStress(data);
@@ -1498,7 +1925,7 @@ function placementsFor(data: RelationshipData, mode: LayoutMode, centerId: strin
   return clusteredPlacements(data);
 }
 
-export function buildLayout(data: RelationshipData, mode: LayoutMode = 'cluster', centerId = ''): MapLayout {
+export function buildLayout(data: RelationshipData, mode: LayoutMode = 'floorplan', centerId = ''): MapLayout {
   const effectiveCenterId = centerId || data.view?.centerPersonId || data.project.defaultCenterPersonId || data.people[0]?.id || '';
   const people = placementsFor(data, mode, effectiveCenterId);
   assignGroupIds(people, data.groups);
@@ -1522,11 +1949,17 @@ export function buildLayout(data: RelationshipData, mode: LayoutMode = 'cluster'
    * 重なりの解消は最後にまとめて行う。囲いのはみ出しを直すと人が動くので、
    * その後にもう一度離してから、動いた位置で囲いを引き直す。
    */
-  separateNodes(people, effectiveCenterId);
-  enforceStrictRegions(data.groups, people);
-  separateNodes(people, effectiveCenterId);
-  /* 整列は最後。ここで動かす量は交点 1 つぶん以内なので、囲いの入れ子は崩れない */
-  alignToGrid(people);
+  /*
+   * 区画で並べたときは、もう升目の上に整列していて入れ子も区画の入れ子で
+   * 表せている。押し離しも整列もかけると、せっかく揃った並びが崩れる。
+   */
+  if (mode !== 'floorplan') {
+    separateNodes(people, effectiveCenterId);
+    enforceStrictRegions(data.groups, people);
+    separateNodes(people, effectiveCenterId);
+    /* 整列は最後。ここで動かす量は交点 1 つぶん以内なので、囲いの入れ子は崩れない */
+    alignToGrid(people);
+  }
   const regions = buildRegions(data.groups, people);
   const { width, height } = normalize(people, regions);
   const byId = new Map(people.map((placement) => [placement.person.id, placement]));
@@ -1566,7 +1999,7 @@ export function withPositions(layout: MapLayout, positions: Record<string, Point
         .map((id) => byId.get(id))
         .filter((placement): placement is PersonPlacement => placement !== undefined)
         .map((placement) => ({ x: placement.x, y: placement.y }));
-      const polygon = enclosingPolygon(points, regionPadding(region.group.type));
+      const polygon = regionPolygon(points, regionPadding(region.group.type));
       return { ...region, polygon, area: polygonArea(polygon) };
     })
     .sort((a, b) => b.area - a.area);
