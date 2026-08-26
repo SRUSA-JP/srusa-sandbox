@@ -225,22 +225,12 @@ export interface EdgeStyle {
   strokeWidth: number;
   strokeDasharray?: string;
   opacity: number;
-  /** 弧の膨らみ（座標単位）。0 なら直線。 */
-  bow: number;
+  /** 折れ線の角の丸め（座標単位）。0 ならカクカクのまま。 */
+  elbow: number;
 }
 
-/** 線の長さから弧の膨らみを決める。長い線ほど曲げて、束になった線をほどく。 */
-function bowFor(length: number): number {
-  return Math.min(length * EDGE.curvature, EDGE.maxBow);
-}
-
-/** 関係線の見た目。長さを渡すと、その長さに応じた弧の膨らみも返す。 */
-export function edgeStyle(
-  relation: Relation,
-  theme: VizTheme,
-  highlighted: boolean,
-  length = 0,
-): EdgeStyle {
+/** 関係線の見た目。 */
+export function edgeStyle(relation: Relation, theme: VizTheme, highlighted: boolean): EdgeStyle {
   const colors = figureColors(theme);
   return {
     stroke: highlighted
@@ -249,6 +239,6 @@ export function edgeStyle(
     strokeWidth: highlighted ? EDGE.highlightWidth : EDGE.width,
     strokeDasharray: relation.uncertain ? EDGE.uncertainDash : undefined,
     opacity: EDGE.opacity,
-    bow: bowFor(length),
+    elbow: EDGE.elbow,
   };
 }

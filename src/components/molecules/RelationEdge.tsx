@@ -1,5 +1,5 @@
 import { edgeStyle, relationLabel } from '../../map/display';
-import { arcPath } from '../../map/geometry';
+import { orthogonalPath } from '../../map/geometry';
 import type { EdgePlacement } from '../../map/layout';
 import type { VizTheme } from '../../theme/palette';
 
@@ -14,21 +14,22 @@ export interface RelationEdgeProps {
 /**
  * 人物同士の関係線。
  *
- * 直線だと同じ相手へ集まる線が重なるので、長さに応じた弧を描く。
- * 曲がり具合は display.ts（設定は config.ts）が決める。
+ * 路線図のように、直角と 45 度だけで繋ぐ。斜めに引くと線が四方八方を向いて
+ * どれがどこへ繋がっているのか追いにくいので、向きを揃える。
+ * 角の丸めは display.ts（設定は config.ts）が決める。
  */
 export function RelationEdge({ edge, theme, highlighted, nameOf, showTooltip = true }: RelationEdgeProps) {
-  const length = Math.hypot(edge.to.x - edge.from.x, edge.to.y - edge.from.y);
-  const style = edgeStyle(edge.relation, theme, highlighted, length);
+  const style = edgeStyle(edge.relation, theme, highlighted);
 
   return (
     <path
-      d={arcPath(edge.from, edge.to, style.bow)}
+      d={orthogonalPath(edge.from, edge.to, style.elbow)}
       fill="none"
       stroke={style.stroke}
       strokeWidth={style.strokeWidth}
       strokeDasharray={style.strokeDasharray}
-      strokeLinecap="round"
+      strokeLinecap="butt"
+      strokeLinejoin="miter"
       opacity={style.opacity}
       vectorEffect="non-scaling-stroke"
     >

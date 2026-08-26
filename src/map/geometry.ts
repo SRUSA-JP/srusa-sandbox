@@ -184,22 +184,47 @@ export function pointInPolygon(point: Point, polygon: Point[]): boolean {
 }
 
 /**
- * 2 点を結ぶ弧の SVG パス。
+ * 路線図のように、45 度と直角だけで 2 点を繋ぐ折れ線。
  *
- * 直線だと同じ相手に集まる線が重なって読めないので、線ごとに一定方向へ膨らませる。
- * `bow` が 0 なら直線と同じ。
+ * 斜めに引くと線が四方八方を向いて、どれがどこへ繋がっているのか
+ * 追いにくい。向きを直角と 45 度に限ると、線が揃って読み取りやすくなる。
+ *
+ * 長いほうの向きへまっすぐ進んでから、残りを 45 度で詰める。
+ * `elbow` は角を丸める半径（0 ならカクカクのまま）。
  */
-export function arcPath(from: Point, to: Point, bow: number): string {
-  if (bow === 0) return `M ${from.x} ${from.y} L ${to.x} ${to.y}`;
-  const midX = (from.x + to.x) / 2;
-  const midY = (from.y + to.y) / 2;
+export function orthogonalPath(from: Point, to: Point, elbow = 0): string {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
-  const length = Math.hypot(dx, dy) || 1;
-  /* 線分に垂直な向きへ膨らませる */
-  const controlX = midX - (dy / length) * bow;
-  const controlY = midY + (dx / length) * bow;
-  return `M ${from.x} ${from.y} Q ${controlX} ${controlY} ${to.x} ${to.y}`;
+  const stepX = Math.sign(dx);
+  const stepY = Math.sign(dy);
+  const run = Math.abs(dx);
+  const rise = Math.abs(dy);
+
+  /* ほぼ真っ直ぐなら、そのまま 1 本で引く */
+  if (run === 0 || rise === 0) {
+    return `M ${round(from.x)} ${round(from.y)} L ${round(to.x)} ${round(to.y)}`;
+  }
+
+  /* 曲がる点。長いほうの向きへ進み、短いほうの長さだけ残して 45 度に入る */
+  const diagonal = Math.min(run, rise);
+  const corner =
+    run > rise
+      ? { x: to.x - stepX * diagonal, y: from.y }
+      : { x: from.x, y: to.y - stepY * diagonal };
+
+  if (elbow <= 0) {
+    return `M ${round(from.x)} ${round(from.y)} L ${round(corner.x)} ${round(corner.y)} L ${round(to.x)} ${round(to.y)}`;
+  }
+
+  /* 角の手前と先を、実際の辺より長く削らない範囲で丸める */
+  const before = shorten(corner, from, Math.min(elbow, Math.hypot(corner.x - from.x, corner.y - from.y) / 2));
+  const after = shorten(corner, to, Math.min(elbow, Math.hypot(to.x - corner.x, to.y - corner.y) / 2));
+  return [
+    `M ${round(from.x)} ${round(from.y)}`,
+    `L ${round(before.x)} ${round(before.y)}`,
+    `Q ${round(corner.x)} ${round(corner.y)} ${round(after.x)} ${round(after.y)}`,
+    `L ${round(to.x)} ${round(to.y)}`,
+  ].join(' ');
 }
 
 /** 多角形の面積（描画順の判定に使う）。 */
