@@ -12,7 +12,8 @@ export type RouteId =
   | 'world-map'
   | 'relationships'
   | 'zukan'
-  | 'timeline'
+  | 'calendar'
+  | 'history'
   | 'events'
   | 'clips'
   | 'player';
@@ -51,10 +52,17 @@ export const ROUTES: Route[] = [
     label: 'ワールドマップ',
     skinId: MINECRAFT_SKIN.id,
   },
+  /* 活動カレンダーはサーバーのログから作るので、Minecraft のまとまりに置く */
+  {
+    id: 'calendar',
+    path: '#/minecraft/calendar',
+    label: '活動カレンダー',
+    skinId: MINECRAFT_SKIN.id,
+  },
   /* 相関図も Minecraft のページと同じドット絵風にする（サイト全体の雰囲気を揃えるため） */
   { id: 'relationships', path: '#/relationships', label: '相関図', skinId: MINECRAFT_SKIN.id },
   { id: 'zukan', path: ZUKAN_PATH, label: 'SRUSA 図鑑', skinId: MINECRAFT_SKIN.id },
-  { id: 'timeline', path: '#/timeline', label: 'あゆみ', skinId: MINECRAFT_SKIN.id },
+  { id: 'history', path: '#/history', label: 'あゆみ', skinId: MINECRAFT_SKIN.id },
   { id: 'events', path: '#/events', label: 'イベント', skinId: MINECRAFT_SKIN.id },
   { id: 'clips', path: '#/gallery', label: 'ギャラリー', skinId: MINECRAFT_SKIN.id },
 ];

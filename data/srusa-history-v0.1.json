@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "srusa-history-v1",
+  "note": "SRUSA というインカレサークルそのもののあゆみ。Minecraft サーバーのログとは別で、こちらは人が書いて残すもの。分からないことは status を todo にして、埋まるまで画面にもそのまま出す。",
+  "entries": [
+    {
+      "id": "founding",
+      "date": "",
+      "title": "SRUSA が始まった時期",
+      "detail": "いつ・どういうきっかけで始まったかが分かっていない。分かったら date に年月（YYYY-MM）を入れる。",
+      "status": "todo"
+    },
+    {
+      "id": "intercollegiate",
+      "date": "",
+      "title": "インカレサークルとしての形になった時期",
+      "detail": "1 つの大学の中から、複数の大学にまたがる形になった時期。相関図では 3 つの大学が出てくるが、それがいつからかは記録が無い。",
+      "status": "todo"
+    },
+    {
+      "id": "minecraft-server",
+      "date": "",
+      "title": "Minecraft サーバーを立てた日",
+      "detail": "日別ログは 2026-08-02 から残っているが、それはログが残っている最初の日であって、サーバーを立てた日とは限らない。",
+      "status": "todo"
+    },
+    {
+      "id": "activities",
+      "date": "",
+      "title": "ふだんの活動",
+      "detail": "何をしているサークルなのか（活動の内容・頻度・場所）。推測で書かず、分かっているものだけを足す。",
+      "status": "todo"
+    }
+  ]
+}
