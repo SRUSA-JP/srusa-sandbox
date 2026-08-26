@@ -64,7 +64,7 @@
       },
       "relationship": {
         "attributes": [
-          "塾",
+          "S塾",
           "D大学",
           "アクティブメンバー"
         ],
@@ -987,7 +987,7 @@
       },
       "relationship": {
         "attributes": [
-          "塾",
+          "S塾",
           "M大学",
           "アクティブメンバー"
         ],
@@ -1024,7 +1024,7 @@
       "relationship": {
         "attributes": [
           "K高校",
-          "塾",
+          "S塾",
           "アクティブメンバー"
         ],
         "related_ids": []
@@ -1119,7 +1119,8 @@
       },
       "relationship": {
         "attributes": [
-          "高校"
+          "高校",
+          "アクティブメンバー"
         ],
         "related_ids": [
           "rik"
@@ -1318,7 +1319,7 @@
       "relationship": {
         "attributes": [
           "K高校",
-          "塾",
+          "S塾",
           "アクティブメンバー"
         ],
         "related_ids": [
@@ -1355,7 +1356,7 @@
       "relationship": {
         "attributes": [
           "K高校",
-          "塾",
+          "S塾",
           "アクティブメンバー"
         ],
         "related_ids": [
@@ -1426,7 +1427,7 @@
           "幼稚園",
           "小学校",
           "中学校",
-          "塾"
+          "S塾"
         ],
         "related_ids": []
       },
@@ -1492,7 +1493,7 @@
       "relationship": {
         "attributes": [
           "K高校",
-          "塾",
+          "S塾",
           "アクティブメンバー"
         ],
         "related_ids": []
@@ -1560,7 +1561,7 @@
           "M大学",
           "Y研究室",
           "K高校",
-          "塾",
+          "S塾",
           "アクティブメンバー"
         ],
         "related_ids": []
@@ -1661,7 +1662,7 @@
           "幼稚園",
           "小学校",
           "中学校",
-          "塾"
+          "S塾"
         ],
         "related_ids": []
       },
@@ -2005,7 +2006,7 @@
         "attributes": [
           "K高校",
           "shion組",
-          "塾"
+          "S塾"
         ],
         "related_ids": [
           "pitan"
@@ -2075,7 +2076,7 @@
       "relationship": {
         "attributes": [
           "K高校",
-          "塾"
+          "S塾"
         ],
         "related_ids": []
       },
