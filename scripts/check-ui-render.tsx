@@ -35,7 +35,7 @@ const PAGES: Record<RouteId, PageRenderer> = {
   relationships: ({ route }) => <MapPage theme={themeFor(route)} />,
   zukan: ({ route }) => <ZukanPage theme={themeFor(route)} />,
   calendar: ({ route }) => <CalendarPage theme={themeFor(route)} />,
-  history: () => <HistoryPage />,
+  history: ({ route }) => <HistoryPage theme={themeFor(route)} />,
   events: ({ route }) => <EventRankingsPage theme={themeFor(route)} />,
   clips: () => <ClipsPage />,
   player: ({ route }) => <PlayerPage theme={themeFor(route)} route={route} />,

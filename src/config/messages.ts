@@ -755,14 +755,14 @@ export const CALENDAR_TEXT = {
 } as const;
 
 /**
- * SRUSA のあゆみ（サークルそのもの）の文言。
+ * SRUSA の年表（サークルそのもの）の文言。
  *
  * Minecraft のログからは「サークルがいつ始まったか」は出てこない。
  * 分かっていないことは分かっていないと書く。それらしい文で埋めない。
  */
 export const HISTORY_TEXT = {
-  title: 'SRUSA のあゆみ',
-  lead: 'SRUSA というインカレサークルそのもののあゆみです。Minecraft サーバーの日ごとの記録は「活動カレンダー」にあります。',
+  title: 'SRUSA 年表',
+  lead: 'SRUSA というインカレサークルそのものの年表です。Minecraft サーバーの日ごとの記録は「活動カレンダー」にあります。',
 
   reach: {
     title: 'いま分かっていること',
@@ -773,20 +773,38 @@ export const HISTORY_TEXT = {
     knownUnit: '人',
     bridging: '学校を 2 つ以上またぐ人',
     bridgingUnit: '人',
-    /** どの大学かを並べる。 */
     universityList: (names: string[]) => names.join('・'),
+  },
+
+  growth: {
+    title: '人数の推移',
+    note: (known: number, total: number) =>
+      `加入時期が分かっている ${formatInt(known)} 人ぶんだけの線です（相関図に載っているのは ${formatInt(total)} 人）。`,
+    /** 点が足りなくて線にならないときに出す。 */
+    tooFew: (known: number, total: number) =>
+      `加入時期が分かっているのは ${formatInt(known)} 人 / ${formatInt(total)} 人で、まだ 1 つの時期にしか点が立ちません。data/srusa-relationship-*.json の人物に joinedOn（YYYY-MM）を足すと、そのぶんが自動で線になります。`,
+    seriesLabel: '人数',
+    unit: '人',
   },
 
   timeline: {
     title: '年表',
-    /** まだ 1 件も埋まっていないときに出す。 */
     empty: 'まだ確かめられた出来事がありません。下の「これから埋めること」にあるものが分かったら、data/srusa-history-v0.1.json に足してください。',
   },
 
   todo: {
     title: 'これから埋めること',
-    note: '分からないものを推測で書かず、そのまま出しています。分かった時点で data/srusa-history-v0.1.json の status を confirmed にすると、上の年表へ移ります。',
+    note: '開催したことは分かっていても、年月や参加者がまだ分かっていないものです。推測で書かず、そのまま出しています。分かった時点で data/srusa-history-v0.1.json の status を confirmed にすると、上の年表へ移ります。',
     badge: '未記入',
+  },
+
+  entry: {
+    /** 「2021-03 ごろ」のように、はっきりしない時期をそう見せる。 */
+    approximate: (date: string) => `${date} ごろ`,
+    /** 同じ催しを何回やったか。 */
+    count: (times: number) => `${formatInt(times)} 回`,
+    /** 参加した人。 */
+    participants: (names: string[]) => `参加: ${names.join('・')}`,
   },
 
   /** 日付が入っていない項目の表示。 */
