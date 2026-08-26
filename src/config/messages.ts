@@ -189,6 +189,8 @@ export const STATS_TEXT = {
       note: '集計値の中から、その日いちばん目立っている記録を自動で拾っています。',
       display: '表示',
       anomaly: 'ANOMALY FOUND',
+      /** 誰の記録かを見分けるアイコンの読み上げ。名前は隣に文字でも出る。 */
+      iconAlt: (name: string) => `${name} のアイコン`,
       kinds: {
         playtime: 'LONGEST LOGIN',
         blocksMined: 'DEEP DIGGER',
