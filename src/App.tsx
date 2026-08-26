@@ -2,7 +2,16 @@ import type { ReactElement } from 'react';
 import { AppShell, AuthGate } from './components';
 import { useHashRoute } from './hooks/useHashRoute';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
-import { ClipsPage, EventRankingsPage, MapPage, PlayerPage, StatsPage, WorldMapPage, ZukanPage } from './pages';
+import {
+  ClipsPage,
+  EventRankingsPage,
+  MapPage,
+  PlayerPage,
+  StatsPage,
+  TimelinePage,
+  WorldMapPage,
+  ZukanPage,
+} from './pages';
 import { skinForRoute, type Route, type RouteId } from './routes';
 import { setActiveSkin } from './config/skins';
 import { useAppTheme } from './theme/useThemeMode';
@@ -14,6 +23,7 @@ const PAGES: Record<RouteId, (props: { theme: VizTheme; route: Route }) => React
   'world-map': WorldMapPage,
   relationships: MapPage,
   zukan: ZukanPage,
+  timeline: TimelinePage,
   events: EventRankingsPage,
   clips: ClipsPage,
   player: PlayerPage,

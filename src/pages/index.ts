@@ -5,3 +5,4 @@ export * from './PlayerPage';
 export * from './StatsPage';
 export * from './WorldMapPage';
 export * from './ZukanPage';
+export * from './TimelinePage';
