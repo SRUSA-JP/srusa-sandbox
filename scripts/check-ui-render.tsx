@@ -11,7 +11,16 @@
  */
 import { renderToString } from 'react-dom/server';
 import type { ReactElement } from 'react';
-import { ClipsPage, EventRankingsPage, MapPage, PlayerPage, StatsPage, WorldMapPage, ZukanPage } from '../src/pages';
+import {
+  ClipsPage,
+  EventRankingsPage,
+  MapPage,
+  PlayerPage,
+  StatsPage,
+  TimelinePage,
+  WorldMapPage,
+  ZukanPage,
+} from '../src/pages';
 import { ROUTES, routeFromHash, skinForRoute, type Route, type RouteId } from '../src/routes';
 import { setActiveSkin } from '../src/config/skins';
 import { buildTheme } from '../src/theme/useThemeMode';
@@ -24,6 +33,7 @@ const PAGES: Record<RouteId, PageRenderer> = {
   'world-map': ({ route }) => <WorldMapPage theme={themeFor(route)} />,
   relationships: ({ route }) => <MapPage theme={themeFor(route)} />,
   zukan: ({ route }) => <ZukanPage theme={themeFor(route)} />,
+  timeline: ({ route }) => <TimelinePage theme={themeFor(route)} />,
   events: ({ route }) => <EventRankingsPage theme={themeFor(route)} />,
   clips: () => <ClipsPage />,
   player: ({ route }) => <PlayerPage theme={themeFor(route)} route={route} />,

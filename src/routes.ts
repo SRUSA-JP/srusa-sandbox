@@ -7,7 +7,15 @@
  */
 import { MINECRAFT_SKIN, skinFor, type Skin } from './config/skins';
 
-export type RouteId = 'stats' | 'world-map' | 'relationships' | 'zukan' | 'events' | 'clips' | 'player';
+export type RouteId =
+  | 'stats'
+  | 'world-map'
+  | 'relationships'
+  | 'zukan'
+  | 'timeline'
+  | 'events'
+  | 'clips'
+  | 'player';
 
 export interface Route {
   id: RouteId;
@@ -46,6 +54,7 @@ export const ROUTES: Route[] = [
   /* 相関図も Minecraft のページと同じドット絵風にする（サイト全体の雰囲気を揃えるため） */
   { id: 'relationships', path: '#/relationships', label: '相関図', skinId: MINECRAFT_SKIN.id },
   { id: 'zukan', path: ZUKAN_PATH, label: 'SRUSA 図鑑', skinId: MINECRAFT_SKIN.id },
+  { id: 'timeline', path: '#/timeline', label: 'あゆみ', skinId: MINECRAFT_SKIN.id },
   { id: 'events', path: '#/events', label: 'イベント', skinId: MINECRAFT_SKIN.id },
   { id: 'clips', path: '#/gallery', label: 'ギャラリー', skinId: MINECRAFT_SKIN.id },
 ];

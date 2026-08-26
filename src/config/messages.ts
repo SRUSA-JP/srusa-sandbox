@@ -681,3 +681,51 @@ export const TABLE_TEXT = {
   /** グラフと表の切り替えボタン。押すと切り替わる先を出す。 */
   toggle: { toChart: 'グラフ', toTable: '表' },
 } as const;
+
+/**
+ * サーバーのあゆみ（年表）の文言。
+ *
+ * この画面が扱えるのは日別ログに残っている日だけ。サーバーがいつ建ったか、
+ * その日に何があったかはログからは分からないので、そう読めてしまう
+ * 言い方（「はじまりの日」など）は使わない。
+ */
+export const TIMELINE_TEXT = {
+  title: 'あゆみ',
+  lead: 'サーバーのログに残っている日を、古いほうから並べています。誰がいつはじめて来たか、どの日に人が集まったかを、記録そのものから拾っています。',
+  note: (from: string, to: string) => `${from} 〜 ${to} の記録から作っています。`,
+
+  /** 記録の限界。ここは推測で埋めない。 */
+  disclaimer:
+    'ここに出るのは、日別ログに残っている日だけです。サーバーがいつ建ったか、記録より前に何があったかは、このデータからは分かりません。',
+
+  /** 日ごとの並びの見出し。ページの名前と同じにすると重なって見える。 */
+  daysTitle: '日ごとの記録',
+
+  kpi: {
+    span: '記録のある日数',
+    spanUnit: '日',
+    people: '記録に出た人数',
+    peopleUnit: '人',
+    joins: 'サーバーに入った回数',
+    joinsUnit: '回',
+    deaths: '亡くなった回数',
+    deathsUnit: '回',
+  },
+
+  day: {
+    people: (count: number) => `${formatInt(count)} 人`,
+    joins: (count: number) => `入室 ${formatInt(count)}`,
+    deaths: (count: number) => `死亡 ${formatInt(count)}`,
+    firstSeen: (time: string) => `最初の入室 ${time}`,
+    /** 誰も入らなかった日は記録に残らないので、飛んだ日をこう伝える。 */
+    gap: (days: number) => `${formatInt(days)} 日ぶん、記録がありません`,
+  },
+
+  /** その日の出来事。数と名前は呼び出し側が渡す。 */
+  mark: {
+    first: '記録が残っているいちばん古い日',
+    newcomer: (names: string[]) => `${names.join('・')} がはじめて記録に出た日`,
+    peopleRecord: (count: number) => `ここまででいちばん多い ${formatInt(count)} 人が集まった日`,
+    deathRecord: (count: number) => `ここまででいちばん多い ${formatInt(count)} 回の死亡があった日`,
+  },
+} as const;

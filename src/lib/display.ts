@@ -32,6 +32,9 @@ import { PLAYSTYLE_IDS, type PlaystyleScore } from './statsExperience';
 import { STREAK_TEXT, ZUKAN_TEXT } from '../config/messages';
 import { ZUKAN_ATTRIBUTE_LIMIT, ZUKAN_PRIORITY_ATTRIBUTES } from '../config/dataRegistry';
 import type { PlayStreak } from './playStreak';
+import type { TimelineDay } from './timeline';
+import { roleColors } from '../config/colors';
+import { CONTRAST_MIN_LARGE, ensureContrast, type VizTheme } from '../theme/palette';
 
 /* ------------------------------------------------------------------ *
  * 値の表示
@@ -219,4 +222,33 @@ export function playerCardContent(input: {
     overflow: hidden > 0 ? ZUKAN_TEXT.moreAttributes(hidden) : '',
     badges,
   };
+}
+
+/* ------------------------------------------------------------------ *
+ * サーバーのあゆみ（年表）
+ * ------------------------------------------------------------------ */
+
+/**
+ * 年表の 1 日の色。
+ *
+ * 出来事のある日だけ強調色にして、それ以外は目盛りの色に落とす。
+ * 全部に色を付けると、どの日が節目なのか分からなくなる。
+ */
+export function timelineDayAccent(day: TimelineDay, theme: VizTheme): string {
+  const roles = roleColors(theme);
+  if (day.marks.length === 0) return roles.border;
+  return ensureContrast(roles.accent, roles.surface, CONTRAST_MIN_LARGE);
+}
+
+/**
+ * 前の日との空き（日数）。
+ *
+ * 誰も入らなかった日はログに残らないので、日付が飛ぶ。飛んだことを
+ * 出さないと、連なって見えて「毎日遊んでいた」ように読めてしまう。
+ */
+export function timelineGapDays(previous: string | undefined, current: string): number {
+  if (!previous) return 0;
+  const day = 24 * 60 * 60 * 1000;
+  const gap = Math.round((Date.parse(current) - Date.parse(previous)) / day) - 1;
+  return Number.isFinite(gap) && gap > 0 ? gap : 0;
 }
