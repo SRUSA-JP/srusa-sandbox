@@ -33,7 +33,7 @@ export function RelationEdge({
   style: styleId,
 }: RelationEdgeProps) {
   const style = edgeStyle(edge.relation, theme, highlighted, styleId);
-  const path = manhattanPath(edge.from, edge.to, style.elbow);
+  const path = manhattanPath(edge.from, edge.to, style.elbow, edge.channelOffset);
 
   return (
     <g>
