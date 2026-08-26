@@ -11,11 +11,29 @@
  *
  * このファイルは両者を組み合わせるだけで、独自の色コードや数値を持たない。
  */
-import { CONTRAST_MIN_LARGE, CONTRAST_MIN_TEXT, ensureContrast, withAlpha, type VizTheme } from '../theme/palette';
+import {
+  BIOME_COLORS,
+  CONTRAST_MIN_LARGE,
+  CONTRAST_MIN_TEXT,
+  ensureContrast,
+  withAlpha,
+  type VizTheme,
+} from '../theme/palette';
 import { figureColors } from '../config/colors';
 import { skinnedFontSize } from '../config/skins';
 import { MAP_TEXT } from '../config/messages';
-import { AVATAR, CANVAS, EDGE, NODE, REGION, groupTypeSetting, type EdgeStyleId } from './config';
+import { playerIconPixels } from '../lib/playerIcon';
+import {
+  AVATAR,
+  CANVAS,
+  EDGE,
+  NODE,
+  REGION,
+  groupBiome,
+  groupTypeSetting,
+  type EdgeStyleId,
+} from './config';
+import { roundedPolygonPath, smoothClosedPath, type Point } from './geometry';
 import type { Group, Person, Relation } from './schema';
 
 /* ------------------------------------------------------------------ *
@@ -87,6 +105,8 @@ export interface RegionStyle {
   fill: string;
   labelColor: string;
   strokeWidth: number;
+  /** 囲いの形。四角か、点を包む曲線か。 */
+  shape: 'rect' | 'curve';
   /** 囲いの曲がり具合。0 で直線の多角形、1 で滑らかな曲線。 */
   curveTension: number;
   labelFontSize: number;
@@ -100,21 +120,69 @@ export interface RegionStyle {
  * 枠線と塗りは分類ごとの色スロットから作り、文字色は背景に対して
  * コントラスト比を満たすところまで寄せる。
  */
+/**
+ * そのグループの基準の色。
+ *
+ * バイオーム（海・山岳・洞窟…）の色を使う。分類ごとの通し番号で塗ると
+ * 隣り合った囲いがただの色違いにしか見えないが、場所の性格が色に出ると
+ * どのまとまりがどこかを色だけで思い出せる。
+ *
+ * 囲いも、その所属から引いた線も、同じここを通す。線の色と囲いの色が
+ * 揃うので、囲いを消していても線をたどれば所属が分かる。
+ */
+function groupBaseColor(group: Group): string {
+  return BIOME_COLORS[groupBiome(group)];
+}
+
 export function regionStyle(group: Group, theme: VizTheme, highlighted: boolean): RegionStyle {
   const colors = figureColors(theme);
-  const setting = groupTypeSetting(group.type);
-  const base = colors.slot(setting.colorSlot);
+  const base = groupBaseColor(group);
   const stroke = ensureContrast(base, colors.background, CONTRAST_MIN_LARGE);
   return {
     stroke,
     fill: withAlpha(stroke, highlighted ? REGION.highlightFillAlpha : REGION.fillAlpha),
     labelColor: ensureContrast(base, colors.background, CONTRAST_MIN_TEXT),
     strokeWidth: REGION.strokeWidth,
+    shape: REGION.shape,
     curveTension: REGION.curveTension,
     labelFontSize: skinnedFontSize(REGION.labelFontSize),
     labelOffsetY: REGION.labelOffsetY,
     labelFontWeight: REGION.labelFontWeight,
   };
+}
+
+/**
+ * 囲いの線。
+ *
+ * 四角のときは折れ線のまま引く。角を丸めたり曲線にしたりすると、
+ * 区画の縁が揃わなくなって基盤の区画割りに見えなくなる。
+ * 点が無いとき（囲いを描かないグループ）は空の線を返す。
+ */
+export function regionPath(polygon: Point[], style: RegionStyle): string {
+  if (polygon.length === 0) return '';
+  return style.shape === 'rect' ? roundedPolygonPath(polygon, 0) : smoothClosedPath(polygon, style.curveTension);
+}
+
+/**
+ * 囲いの名前を置く場所。
+ *
+ * 四角のときは左上の角の内側に寄せる。四角のいちばん上は辺なので、
+ * 真ん中に置くと辺の上に文字が乗って線と重なる。
+ */
+export function regionLabelPlacement(
+  polygon: Point[],
+  style: RegionStyle,
+): { x: number; y: number; anchor: 'start' | 'middle' } {
+  if (polygon.length === 0) return { x: 0, y: 0, anchor: 'middle' };
+
+  if (style.shape === 'rect') {
+    const minX = Math.min(...polygon.map((point) => point.x));
+    const minY = Math.min(...polygon.map((point) => point.y));
+    return { x: minX + REGION.labelInset, y: minY + style.labelOffsetY, anchor: 'start' };
+  }
+
+  const top = polygon.reduce((best, point) => (point.y < best.y ? point : best), polygon[0]);
+  return { x: top.x, y: top.y + style.labelOffsetY, anchor: 'middle' };
 }
 
 /** 領域の重ね順。面積が大きいものを先に描き、内側のグループを上に載せる。 */
@@ -182,6 +250,8 @@ export function nodeStyle(theme: VizTheme, state: NodeState): NodeStyle {
  */
 export type AvatarContent =
   | { kind: 'image'; src: string }
+  /** 名前から作る顔。図鑑と同じ絵を出すために使う。 */
+  | { kind: 'pixel'; pixels: string[] }
   | { kind: 'initial'; text: string; fontSize: number; fontWeight: number }
   | { kind: 'silhouette'; shape: SilhouetteShape };
 
@@ -207,8 +277,23 @@ function silhouetteShape(radius: number): SilhouetteShape {
   };
 }
 
-export function avatarFor(person: Person, nameMode: string, radius: number): AvatarContent {
+/**
+ * ノードに出す絵を決める。
+ *
+ * スキン画像があるのは 82 人中 15 人だけなので、無い人には図鑑と同じ
+ * 「名前から作る顔」を出す。全員が違う顔になり、図の中で人を見分けられる。
+ * どちらも無いときだけ、config の代替表示（人型 / イニシャル）に落ちる。
+ */
+export function avatarFor(
+  person: Person,
+  nameMode: string,
+  radius: number,
+  accent: string,
+): AvatarContent {
   if (person.avatarUrl) return { kind: 'image', src: person.avatarUrl };
+  if (NODE.fallback === 'pixel') {
+    return { kind: 'pixel', pixels: playerIconPixels(personLabel(person, nameMode), accent) };
+  }
   if (NODE.fallback === 'initial') {
     return {
       kind: 'initial',
@@ -245,7 +330,7 @@ export interface EdgeStyle {
  */
 export function affiliationEdgeStyle(group: Group, theme: VizTheme, dimmed: boolean): EdgeStyle {
   const colors = figureColors(theme);
-  const base = colors.slot(groupTypeSetting(group.type).colorSlot);
+  const base = groupBaseColor(group);
   const stroke = dimmed ? colors.dimmed : ensureContrast(base, colors.background, CONTRAST_MIN_LARGE);
   const strokeWidth = EDGE.width * EDGE.affiliationScale;
 
