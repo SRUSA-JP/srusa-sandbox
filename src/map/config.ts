@@ -187,7 +187,7 @@ export const EDGE = {
   /**
    * 角の丸め（座標単位）。
    *
-   * 路線図のように直角と 45 度だけで繋ぐので、角はそのままだと尖る。
+   * 基盤の配線のように縦横だけで繋ぐので、角はそのままだと尖る。
    * ドット絵風の見た目に合わせて、0 にすればカクカクのままにできる。
    */
   elbow: 0,
@@ -196,7 +196,35 @@ export const EDGE = {
   opacity: 0.75,
   /** 中心人物に繋がる線の強調幅。 */
   highlightWidth: 2.5,
+  /**
+   * 線の下に敷く被覆の太さ（本体に対する倍率）。
+   *
+   * 基盤の配線もレッドストーンも、細い芯のまわりに一回り太い層がある。
+   * 下に敷いてから芯を重ねると、線が交差しても筋が追える。
+   */
+  casingScale: 2.6,
+  /** 被覆の濃さ。芯より薄くして、重なっても潰れないようにする。 */
+  casingOpacity: 0.3,
+  /**
+   * レッドストーンの粉の間隔と大きさ（本体の幅に対する倍率）。
+   *
+   * Minecraft のレッドストーンは粉が点々と続く。破線で粉の粒を表す。
+   */
+  redstoneDust: { size: 1.1, gap: 2.2 },
 } as const;
+
+/**
+ * 関係線の見せ方。
+ *
+ * 増やすときはここに 1 行足し、map/display.ts の edgeStyle に色の作り方を書く。
+ * 画面のプルダウンはこの並びから作るので、他は触らなくてよい。
+ */
+export const EDGE_STYLES = [
+  { value: 'wire', label: '配線' },
+  { value: 'redstone', label: 'レッドストーン' },
+] as const;
+
+export type EdgeStyleId = (typeof EDGE_STYLES)[number]['value'];
 
 /** 凡例。 */
 export const LEGEND = {

@@ -4,6 +4,7 @@ import { RELATIONSHIP_ZOOM, VIEWPORT } from '../../config/viewport';
 import { usePanZoom } from '../../hooks/usePanZoom';
 import { toScreen, transformStyle } from '../../lib/viewport';
 import { clampToCanvas, personLabel, regionPaintOrder } from '../../map/display';
+import type { EdgeStyleId } from '../../map/config';
 import type { MapLayout, PersonPlacement } from '../../map/layout';
 import type { VizTheme } from '../../theme/palette';
 import { GroupRegion } from '../molecules/GroupRegion';
@@ -31,6 +32,8 @@ export interface RelationshipMapProps {
   showTooltips?: boolean;
   /** 所属を囲う曲線を出すか。消すと人と関係線だけになる。 */
   showRegions?: boolean;
+  /** 関係線の見せ方（map/config.ts の EDGE_STYLES）。 */
+  edgeStyleId?: EdgeStyleId;
 }
 
 /** 掴んでいる最中の人物。動いたかどうかで「押した」と「動かした」を分ける。 */
@@ -66,6 +69,7 @@ export function RelationshipMap({
   actions,
   showTooltips = true,
   showRegions = true,
+  edgeStyleId,
 }: RelationshipMapProps) {
   const panZoom = usePanZoom(layout.width, layout.height, RELATIONSHIP_ZOOM);
   const drag = useRef<DragState | null>(null);
@@ -205,6 +209,7 @@ export function RelationshipMap({
                 theme={theme}
                 highlighted={edge.relation.source === centerId || edge.relation.target === centerId}
                 nameOf={nameOf}
+                style={edgeStyleId}
                 showTooltip={showTooltips}
               />
             ))}

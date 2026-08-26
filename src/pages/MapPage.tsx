@@ -7,7 +7,15 @@ import { joinNotes } from '../lib/display';
 import type { VizTheme } from '../theme/palette';
 import { APP_TEXT, MAP_TEXT, TECHNICAL_TEXT } from '../config/messages';
 import { RELATIONSHIP_MAP_DEFAULT_EDGE_MODE } from '../config/dataRegistry';
-import { EDGE_MODES, ISSUE_PREVIEW_COUNT, LAYOUT_MODES, type EdgeMode, type LayoutMode } from '../map/config';
+import {
+  EDGE_MODES,
+  EDGE_STYLES,
+  ISSUE_PREVIEW_COUNT,
+  LAYOUT_MODES,
+  type EdgeMode,
+  type EdgeStyleId,
+  type LayoutMode,
+} from '../map/config';
 import { loadRelationshipData } from '../map/data';
 import { groupTypeLabel, personLabel } from '../map/display';
 import { buildLayout, withPositions } from '../map/layout';
@@ -34,6 +42,7 @@ interface RelationshipWorkspaceExport {
     layoutMode?: LayoutMode;
     showTooltips?: boolean;
     showRegions?: boolean;
+    edgeStyleId?: EdgeStyleId;
   };
 }
 
@@ -98,6 +107,7 @@ export function MapPage({ theme }: MapPageProps) {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('cluster');
   const [tooltipMode, setTooltipMode] = useState<TooltipMode>('on');
   const [regionMode, setRegionMode] = useState<RegionMode>('on');
+  const [edgeStyleId, setEdgeStyleId] = useState<EdgeStyleId>('wire');
   const [importMessage, setImportMessage] = useState('');
 
   /*
@@ -132,6 +142,7 @@ export function MapPage({ theme }: MapPageProps) {
         layoutMode,
         showTooltips: tooltipMode === 'on',
         showRegions: regionMode === 'on',
+        edgeStyleId,
       },
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -141,7 +152,7 @@ export function MapPage({ theme }: MapPageProps) {
     link.download = `srusa-relationship-layout-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(url);
-  }, [centerId, data, edgeMode, highlightedGroupId, layoutMode, positions, regionMode, tooltipMode]);
+  }, [centerId, data, edgeMode, edgeStyleId, highlightedGroupId, layoutMode, positions, regionMode, tooltipMode]);
 
   const importWorkspace = useCallback(async (file: File) => {
     try {
@@ -167,6 +178,7 @@ export function MapPage({ theme }: MapPageProps) {
       const nextLayoutMode = wrapped.layout?.layoutMode;
       const nextShowTooltips = wrapped.layout?.showTooltips;
       const nextShowRegions = wrapped.layout?.showRegions;
+      const nextEdgeStyle = wrapped.layout?.edgeStyleId;
       const validEdgeMode: EdgeMode =
         wrapped.schemaVersion === 'srusa-relationship-workspace-v1' &&
         EDGE_MODES.some((mode) => mode.value === nextEdgeMode)
@@ -189,6 +201,9 @@ export function MapPage({ theme }: MapPageProps) {
       setLayoutMode(validLayoutMode);
       setTooltipMode(nextShowTooltips === false ? 'off' : 'on');
       setRegionMode(nextShowRegions === false ? 'off' : 'on');
+      setEdgeStyleId(
+        EDGE_STYLES.some((entry) => entry.value === nextEdgeStyle) ? (nextEdgeStyle as EdgeStyleId) : 'wire',
+      );
       setImportMessage(
         parsed.issues.length > 0
           ? `インポートしました。不整合 ${parsed.issues.length} 件を読み込み時に補正しています。`
@@ -332,6 +347,13 @@ export function MapPage({ theme }: MapPageProps) {
               />
               <Picker
                 showLabel
+                label={MAP_TEXT.picker.edgeStyle}
+                value={edgeStyleId}
+                options={EDGE_STYLES.map((entry) => ({ value: entry.value, label: entry.label }))}
+                onChange={setEdgeStyleId}
+              />
+              <Picker
+                showLabel
                 label={MAP_TEXT.picker.regions}
                 value={regionMode}
                 options={REGION_OPTIONS}
@@ -360,6 +382,7 @@ export function MapPage({ theme }: MapPageProps) {
             onMovePerson={movePerson}
             showTooltips={tooltipMode === 'on'}
             showRegions={regionMode === 'on'}
+            edgeStyleId={edgeStyleId}
             actions={
               Object.keys(positions).length > 0 ? (
                 <Button

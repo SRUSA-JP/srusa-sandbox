@@ -502,6 +502,8 @@ export const MAP_TEXT = {
     tooltips: 'ツールチップ',
     tooltipOn: '表示',
     tooltipOff: '非表示',
+    /** 関係線の見せ方（配線・レッドストーン）。 */
+    edgeStyle: '線の種類',
     /** 所属を囲う曲線の表示切り替え。消すと人と関係線だけになる。 */
     regions: '所属の囲い',
     regionOn: '表示',

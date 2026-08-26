@@ -15,7 +15,7 @@ import { CONTRAST_MIN_LARGE, CONTRAST_MIN_TEXT, ensureContrast, withAlpha, type 
 import { figureColors } from '../config/colors';
 import { skinnedFontSize } from '../config/skins';
 import { MAP_TEXT } from '../config/messages';
-import { AVATAR, CANVAS, EDGE, NODE, REGION, groupTypeSetting } from './config';
+import { AVATAR, CANVAS, EDGE, NODE, REGION, groupTypeSetting, type EdgeStyleId } from './config';
 import type { Group, Person, Relation } from './schema';
 
 /* ------------------------------------------------------------------ *
@@ -227,18 +227,62 @@ export interface EdgeStyle {
   opacity: number;
   /** 折れ線の角の丸め（座標単位）。0 ならカクカクのまま。 */
   elbow: number;
+  /**
+   * 芯の下に敷く被覆。
+   *
+   * 先に太く敷いてから芯を重ねると、線が交差しても筋を追える。
+   * 被覆が要らない見せ方では undefined を返す。
+   */
+  casing?: { stroke: string; strokeWidth: number; opacity: number };
 }
 
-/** 関係線の見た目。 */
-export function edgeStyle(relation: Relation, theme: VizTheme, highlighted: boolean): EdgeStyle {
+/**
+ * 関係線の見た目。
+ *
+ * 見せ方（config.ts の EDGE_STYLES）ごとに色と太さの作り方をここで決める。
+ * 部品は返ってきた値を属性へ渡すだけで、自分では色を選ばない。
+ */
+export function edgeStyle(
+  relation: Relation,
+  theme: VizTheme,
+  highlighted: boolean,
+  style: EdgeStyleId = 'wire',
+): EdgeStyle {
   const colors = figureColors(theme);
+  const strokeWidth = highlighted ? EDGE.highlightWidth : EDGE.width;
+  const uncertainDash = relation.uncertain ? EDGE.uncertainDash : undefined;
+
+  if (style === 'redstone') {
+    /* レッドストーンの粉。芯を粒の連なりにして、下に薄い赤を敷く */
+    const core = ensureContrast(theme.danger, colors.background, CONTRAST_MIN_LARGE);
+    const dust = `${strokeWidth * EDGE.redstoneDust.size} ${strokeWidth * EDGE.redstoneDust.gap}`;
+    return {
+      stroke: core,
+      strokeWidth,
+      strokeDasharray: uncertainDash ?? dust,
+      opacity: 1,
+      elbow: EDGE.elbow,
+      casing: {
+        stroke: core,
+        strokeWidth: strokeWidth * EDGE.casingScale,
+        opacity: EDGE.casingOpacity,
+      },
+    };
+  }
+
+  const core = highlighted
+    ? ensureContrast(colors.primary, colors.background, CONTRAST_MIN_LARGE)
+    : colors.axis;
   return {
-    stroke: highlighted
-      ? ensureContrast(colors.primary, colors.background, CONTRAST_MIN_LARGE)
-      : colors.axis,
-    strokeWidth: highlighted ? EDGE.highlightWidth : EDGE.width,
-    strokeDasharray: relation.uncertain ? EDGE.uncertainDash : undefined,
+    stroke: core,
+    strokeWidth,
+    strokeDasharray: uncertainDash,
     opacity: EDGE.opacity,
     elbow: EDGE.elbow,
+    casing: {
+      stroke: core,
+      strokeWidth: strokeWidth * EDGE.casingScale,
+      opacity: EDGE.casingOpacity,
+    },
   };
 }
