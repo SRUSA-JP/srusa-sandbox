@@ -237,6 +237,32 @@ export interface EdgeStyle {
 }
 
 /**
+ * 所属から引いた線の見た目。
+ *
+ * 色はその所属の囲いと同じにする。線をたどれば「どの所属で繋がっているか」が
+ * 色で分かるので、囲いを消していても繋がりの意味が読める。
+ * 関係線より細く薄くして、実際の関係が埋もれないようにする。
+ */
+export function affiliationEdgeStyle(group: Group, theme: VizTheme, dimmed: boolean): EdgeStyle {
+  const colors = figureColors(theme);
+  const base = colors.slot(groupTypeSetting(group.type).colorSlot);
+  const stroke = dimmed ? colors.dimmed : ensureContrast(base, colors.background, CONTRAST_MIN_LARGE);
+  const strokeWidth = EDGE.width * EDGE.affiliationScale;
+
+  return {
+    stroke,
+    strokeWidth,
+    opacity: dimmed ? EDGE.affiliationDimmedOpacity : EDGE.affiliationOpacity,
+    elbow: EDGE.elbow,
+    casing: {
+      stroke,
+      strokeWidth: strokeWidth * EDGE.casingScale,
+      opacity: EDGE.casingOpacity * (dimmed ? EDGE.affiliationDimmedOpacity : 1),
+    },
+  };
+}
+
+/**
  * 関係線の見た目。
  *
  * 見せ方（config.ts の EDGE_STYLES）ごとに色と太さの作り方をここで決める。

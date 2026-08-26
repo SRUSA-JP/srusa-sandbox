@@ -14,6 +14,7 @@ import {
   CLUSTER,
   EDGE,
   FALLBACK_GROUP_TYPE,
+  GRID,
   GROUP_RELAX,
   groupTypeSetting,
   NODE,
@@ -42,8 +43,8 @@ export interface RegionPlacement {
   memberIds: string[];
 }
 
-export interface EdgePlacement {
-  relation: Relation;
+/** 2 点を繋ぐ 1 本の配線。関係線も所属の線も、配線としては同じもの。 */
+export interface WirePlacement {
   from: Point;
   to: Point;
   /**
@@ -54,12 +55,34 @@ export interface EdgePlacement {
   channelOffset: number;
 }
 
+export interface EdgePlacement extends WirePlacement {
+  relation: Relation;
+}
+
+/**
+ * 所属から引く線。
+ *
+ * 同じ所属の人を総当たりで繋ぐと読めない量になるので（この規模で 570 本）、
+ * グループごとに「親」を 1 人決めて、そこから他の所属者へ引く。
+ * 親は所属の数がいちばん多い人。多くのグループに顔を出す人が
+ * 自然に何本もの線の集まる場所になる。
+ */
+export interface AffiliationEdgePlacement extends WirePlacement {
+  group: Group;
+  /** 親（そのグループで所属数がいちばん多い人）。 */
+  hubId: string;
+  /** 親から線を引かれる側。 */
+  memberId: string;
+}
+
 export interface MapLayout {
   width: number;
   height: number;
   people: PersonPlacement[];
   regions: RegionPlacement[];
   edges: EdgePlacement[];
+  /** 所属から導いた線。関係線とは別に持ち、画面側で出し分ける。 */
+  affiliationEdges: AffiliationEdgePlacement[];
   byId: Map<string, PersonPlacement>;
 }
 
@@ -1039,6 +1062,48 @@ function placeSatellites(
   return remaining;
 }
 
+/**
+ * 座標を格子の交点に載せて、人を縦横に整列させる。
+ *
+ * 緩和計算のあとの座標は端数だらけなので、縦横に引いた配線がどれも
+ * 少しずつ違う行・列を走る。基盤や路線図のように見えるのは線の向きが
+ * 揃っているからで、そのためには線の端（＝人）が揃っている必要がある。
+ *
+ * 同じ交点に 2 人乗ると重なるので、近い交点から順に空きを探す。
+ * 探す順は上から下・左から右で固定し、何度作り直しても同じ結果にする。
+ */
+function alignToGrid(placements: PersonPlacement[]): void {
+  const taken = new Set<string>();
+  /* 並び順を固定する。座標が同じときは ID で決めて、計算のたびに入れ替わらないようにする */
+  const order = [...placements].sort(
+    (a, b) => a.y - b.y || a.x - b.x || a.person.id.localeCompare(b.person.id),
+  );
+
+  for (const placement of order) {
+    const column = Math.round(placement.x / GRID.cell);
+    const row = Math.round(placement.y / GRID.cell);
+
+    /* 本来の位置から近い交点から順に、空いているところを探す */
+    let best: { column: number; row: number } | null = null;
+    for (let ring = 0; ring <= GRID.search && !best; ring += 1) {
+      for (let dy = -ring; dy <= ring && !best; dy += 1) {
+        for (let dx = -ring; dx <= ring && !best; dx += 1) {
+          /* いま見ている輪の縁だけを調べる（内側は前の輪で調べ済み） */
+          if (Math.max(Math.abs(dx), Math.abs(dy)) !== ring) continue;
+          const key = `${column + dx}:${row + dy}`;
+          if (taken.has(key)) continue;
+          taken.add(key);
+          best = { column: column + dx, row: row + dy };
+        }
+      }
+    }
+
+    if (!best) continue;
+    placement.x = best.column * GRID.cell;
+    placement.y = best.row * GRID.cell;
+  }
+}
+
 /** 関係も所属も無い人を、図の下に 1 行で並べる。 */
 function placeLeftovers(people: Person[], placements: PersonPlacement[]): void {
   if (people.length === 0) return;
@@ -1051,6 +1116,88 @@ function placeLeftovers(people: Person[], placements: PersonPlacement[]): void {
 }
 
 /**
+ * 所属から線を導く。
+ *
+ * グループごとに「親」を 1 人決めて、そこから他の所属者へ線を引く。
+ * 親は所属の数がいちばん多い人（同数なら ID 順）。多くのグループに顔を出す人が、
+ * 自然に何本もの線が集まる場所になる。
+ *
+ * 総当たりで繋がないのは、読める量に収めるため。同じ所属の人を全部繋ぐと
+ * この規模で 570 本になり、線が面になって何も読み取れなくなる。
+ */
+/** グループ名 → そのグループの親と所属者。線を引くのも引き寄せるのも、この結果を使う。 */
+export interface AffiliationHub {
+  group: Group;
+  hubId: string;
+  memberIds: string[];
+}
+
+/**
+ * グループごとの親と所属者を求める。
+ *
+ * 親は所属の数がいちばん多い人（同数なら ID 順）。並び順を決めておくことで、
+ * 何度計算しても同じ人が親になり、図が作り直しのたびに変わらない。
+ * 所属者が 1 人だけのグループは、繋ぐ相手がいないので含めない。
+ */
+export function affiliationHubs(data: RelationshipData): AffiliationHub[] {
+  const groupNames = new Set(data.groups.map((group) => group.name));
+  /** その人が持つ所属の数。親を選ぶ基準にする。 */
+  const affiliationCount = new Map(
+    data.people.map((person) => [
+      person.id,
+      person.attributes.filter((name) => groupNames.has(name)).length,
+    ]),
+  );
+
+  const hubs: AffiliationHub[] = [];
+  for (const group of data.groups) {
+    const members = data.people.filter((person) => person.attributes.includes(group.name));
+    if (members.length < 2) continue;
+
+    const hub = members.reduce((best, person) => {
+      const a = affiliationCount.get(person.id) ?? 0;
+      const b = affiliationCount.get(best.id) ?? 0;
+      if (a !== b) return a > b ? person : best;
+      return person.id < best.id ? person : best;
+    });
+
+    hubs.push({
+      group,
+      hubId: hub.id,
+      memberIds: members.filter((person) => person.id !== hub.id).map((person) => person.id),
+    });
+  }
+  return hubs;
+}
+
+function buildAffiliationEdges(
+  data: RelationshipData,
+  byId: Map<string, PersonPlacement>,
+): AffiliationEdgePlacement[] {
+  const edges: AffiliationEdgePlacement[] = [];
+
+  for (const { group, hubId, memberIds } of affiliationHubs(data)) {
+    const hubPlace = byId.get(hubId);
+    if (!hubPlace) continue;
+
+    for (const memberId of memberIds) {
+      const place = byId.get(memberId);
+      if (!place) continue;
+      edges.push({
+        group,
+        hubId,
+        memberId,
+        from: { x: hubPlace.x, y: hubPlace.y },
+        to: { x: place.x, y: place.y },
+        channelOffset: 0,
+      });
+    }
+  }
+
+  return edges;
+}
+
+/**
  * 配線が重ならないように、折り返す位置をずらす。
  *
  * 縦横だけで繋ぐと、どの線も中点で折り返すので、近くを走る線どうしが
@@ -1060,7 +1207,7 @@ function placeLeftovers(people: Person[], placements: PersonPlacement[]): void {
  * ずらす順は 0 → +1 → -1 → +2 … と中心から交互に広げる。
  * 並び順は関係の並びで決まるので、何度作り直しても同じ配線になる。
  */
-function assignEdgeChannels(edges: EdgePlacement[]): void {
+function assignEdgeChannels(edges: WirePlacement[]): void {
   /* すでに使った折り返し位置。基盤の配線のように一定の間隔に載せる */
   const taken = new Set<string>();
 
@@ -1098,7 +1245,7 @@ function buildEdges(relations: Relation[], byId: Map<string, PersonPlacement>): 
     })
     .filter((edge): edge is EdgePlacement => edge !== null);
 
-  assignEdgeChannels(edges);
+  /* ずらしの割り当ては呼び出し側が、所属の線とまとめて行う */
   return edges;
 }
 
@@ -1131,6 +1278,7 @@ function relaxGroupClusters(
   placements: PersonPlacement[],
   groups: Group[],
   relations: Relation[],
+  hubs: AffiliationHub[],
 ): void {
   /* 場所を表す所属だけがまとまりを作る（アクティブメンバーのような札は効かせない） */
   const groupNames = new Set(
@@ -1198,6 +1346,33 @@ function relaxGroupClusters(
       moveB.y += moveY;
     }
 
+    /*
+     * 所属の親のそばへ集める。
+     *
+     * 所属の線は親から放射状に出るので、親の近くに集まっていれば線が短く済み、
+     * 「この人を中心にこのグループが繋がっている」形がそのまま図に出る。
+     */
+    for (const { hubId, memberIds } of hubs) {
+      const hub = byId.get(hubId);
+      if (!hub) continue;
+      for (const memberId of memberIds) {
+        const member = byId.get(memberId);
+        if (!member) continue;
+        const dx = member.x - hub.x;
+        const dy = member.y - hub.y;
+        const distance = Math.max(1, Math.hypot(dx, dy));
+        const force = ((distance - GROUP_RELAX.hubDistance) * GROUP_RELAX.hubAttraction * cooling) / 2;
+        const moveX = (dx / distance) * force;
+        const moveY = (dy / distance) * force;
+        const moveHub = delta.get(hubId)!;
+        const moveMember = delta.get(memberId)!;
+        moveMember.x -= moveX;
+        moveMember.y -= moveY;
+        moveHub.x += moveX;
+        moveHub.y += moveY;
+      }
+    }
+
     /* 近づきすぎた人どうしを離す（ノードが重なると誰が誰だか読めなくなる） */
     for (let i = 0; i < placements.length; i += 1) {
       for (let j = i + 1; j < placements.length; j += 1) {
@@ -1233,7 +1408,7 @@ function clusteredPlacements(data: RelationshipData): PersonPlacement[] {
   const affiliated = data.people.filter((person) => person.attributes.length > 0);
   const clusters = orderClusters(buildClusters(affiliated), data.relations);
   const placements = placePeople(packBlocks(buildBlocks(clusters, data.groups, data.relations)));
-  relaxGroupClusters(placements, data.groups, data.relations);
+  relaxGroupClusters(placements, data.groups, data.relations, affiliationHubs(data));
   return placements;
 }
 
@@ -1350,11 +1525,18 @@ export function buildLayout(data: RelationshipData, mode: LayoutMode = 'cluster'
   separateNodes(people, effectiveCenterId);
   enforceStrictRegions(data.groups, people);
   separateNodes(people, effectiveCenterId);
+  /* 整列は最後。ここで動かす量は交点 1 つぶん以内なので、囲いの入れ子は崩れない */
+  alignToGrid(people);
   const regions = buildRegions(data.groups, people);
   const { width, height } = normalize(people, regions);
   const byId = new Map(people.map((placement) => [placement.person.id, placement]));
 
-  return { width, height, people, regions, edges: buildEdges(data.relations, byId), byId };
+  /* 配線のずらしは関係線と所属の線をまとめて決める。別々に決めると互いに重なる */
+  const edges = buildEdges(data.relations, byId);
+  const affiliationEdges = buildAffiliationEdges(data, byId);
+  assignEdgeChannels([...edges, ...affiliationEdges]);
+
+  return { width, height, people, regions, edges, affiliationEdges, byId };
 }
 
 /**
@@ -1400,8 +1582,21 @@ export function withPositions(layout: MapLayout, positions: Record<string, Point
       channelOffset: 0,
     };
   });
-  /* 人を動かすと折り返す位置も変わるので、配線のずらし方を決め直す */
-  assignEdgeChannels(edges);
 
-  return { ...layout, people, byId, regions, edges };
+  const affiliationEdges = layout.affiliationEdges.map((edge) => {
+    const from = byId.get(edge.hubId);
+    const to = byId.get(edge.memberId);
+    if (!from || !to) return edge;
+    return {
+      ...edge,
+      from: { x: from.x, y: from.y },
+      to: { x: to.x, y: to.y },
+      channelOffset: 0,
+    };
+  });
+
+  /* 人を動かすと折り返す位置も変わるので、配線のずらし方を決め直す */
+  assignEdgeChannels([...edges, ...affiliationEdges]);
+
+  return { ...layout, people, byId, regions, edges, affiliationEdges };
 }
