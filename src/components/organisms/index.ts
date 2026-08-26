@@ -35,3 +35,4 @@ export * from './PlayerStreakPanel';
 export * from './ActivityCalendar';
 export * from './TuningPanel';
 export * from './HistoryTimeline';
+export * from './HistoryAxisScrubber';

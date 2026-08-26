@@ -787,6 +787,23 @@ export const HISTORY_TEXT = {
     unit: '人',
   },
 
+  axis: {
+    title: '時系列で見る',
+    note: 'つまみを右へ動かすと、その時点までの出来事とメンバーの数が出てきます。',
+    /** つまみの読み上げ。 */
+    sliderLabel: '見る時点',
+    play: '進める',
+    pause: '止める',
+    reset: '最初へ',
+    /** いま見ている時点。 */
+    at: (month: string) => `${month} 時点`,
+    members: (count: number) => `メンバー ${formatInt(count)} 人`,
+    /** 時期が分かっていない出来事は軸に乗らないので、その数を添える。 */
+    undatedCount: (count: number) => `時期が分かっていない出来事が ${formatInt(count)} 件あり、この軸には出ません。`,
+    /** 軸に乗せられる出来事がまだ足りないとき。 */
+    tooFew: '時期の分かっている出来事がまだ 1 件しかないので、軸になりません。data/srusa-history-v0.1.json に日付を入れると伸びます。',
+  },
+
   timeline: {
     title: '年表',
     empty: 'まだ確かめられた出来事がありません。下の「これから埋めること」にあるものが分かったら、data/srusa-history-v0.1.json に足してください。',

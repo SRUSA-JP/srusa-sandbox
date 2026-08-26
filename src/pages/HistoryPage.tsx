@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import {
   AppLayout,
   ChartCard,
+  HistoryAxisScrubber,
   HistoryTimeline,
   KpiGrid,
   KpiTile,
@@ -58,6 +59,9 @@ export function HistoryPage({ theme }: HistoryPageProps) {
       }
     : null;
 
+  /* 軸の右端は「いま」。データが増えても右端が過去に留まらないようにする */
+  const currentMonth = useMemo(() => new Date().toISOString().slice(0, 7), []);
+
   const confirmed = history.entries.filter((entry) => entry.status === 'confirmed');
   const pending = history.entries.filter((entry) => entry.status === 'todo');
   const text = HISTORY_TEXT;
@@ -100,6 +104,17 @@ export function HistoryPage({ theme }: HistoryPageProps) {
           ) : (
             <Note>{text.growth.tooFew(growth.known, growth.total)}</Note>
           )}
+        </ChartCard>
+      )}
+
+      {growth && (
+        <ChartCard title={text.axis.title} note={text.axis.note}>
+          <HistoryAxisScrubber
+            entries={history.entries}
+            growth={growth}
+            until={currentMonth}
+            theme={theme}
+          />
         </ChartCard>
       )}
 

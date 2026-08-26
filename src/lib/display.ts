@@ -277,6 +277,30 @@ export function calendarDayColors(
 }
 
 /**
+ * 年表の横軸の色。
+ *
+ * 進んだところと、これから来るところを塗り分ける。まだ来ていない印も
+ * 薄く置いて「この先にもある」ことを見せるので、その薄さもここで決める。
+ */
+export function historyAxisColors(theme: VizTheme): {
+  track: string;
+  progress: string;
+  mark: string;
+  markPending: string;
+  block: string;
+} {
+  const roles = roleColors(theme);
+  const accent = ensureContrast(roles.accent, roles.surface, CONTRAST_MIN_LARGE);
+  return {
+    track: roles.sunken,
+    progress: accent,
+    mark: ensureContrast(roles.danger, roles.surface, CONTRAST_MIN_LARGE),
+    markPending: roles.border,
+    block: accent,
+  };
+}
+
+/**
  * 出来事の札の色（暦の外に並べるとき）。
  *
  * 暦の枠の中の印は「その日の面」に載るが、下に並べる一覧は
