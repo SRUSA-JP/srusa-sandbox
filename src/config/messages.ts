@@ -362,9 +362,6 @@ export const STATS_TEXT = {
       totalColumn: '合計',
       /** 換算後の資産量の単位。ダイヤとエメラルドを同じ 1 単位として数える。 */
       unit: '個',
-      trend: '指数推移',
-      trendNote: '算出元を切り替えると、指数の元になる資産量の数え方も変わります。',
-      trendColumn: 'スナップショット',
       source: '算出元',
       noRate: '算出なし',
       base: (base: number) => `最初のスナップショットを ${formatInt(base)} として指数化`,
@@ -398,7 +395,6 @@ export const STATS_TEXT = {
     series: (series: string, basis: string) => `series-${series}-${basis}.csv`,
     trend: (metric: string, basis: string) => `trend-${metric}-${basis}.csv`,
     economyRanking: (mode: string) => `economy-ranking-${mode}.csv`,
-    economyIndex: (source: string) => `economy-index-${source}.csv`,
     scatter: (x: string, y: string, basis: string) => `scatter-${x}-${y}-${basis}.csv`,
   },
 } as const;

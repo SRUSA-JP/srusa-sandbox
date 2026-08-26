@@ -11,23 +11,18 @@ import {
   economyIndexTimeline,
   economySummary,
   playerEconomyRows,
-  TIMELINE_CATEGORY_KEY,
   type Snapshot,
 } from '../../lib/selectors';
 import { joinNotes } from '../../lib/display';
 import { formatDecimal, formatInt } from '../../lib/format';
-import { useChartMetrics } from '../../hooks/useChartMetrics';
-import type { Row } from '../../lib/export';
 import type { StatsDocument } from '../../data/schema';
 import { playerInventoryAssetRows, playerInventoryAssetsGeneratedOn } from '../../data/playerInventoryAssets';
 import type { VizTheme } from '../../theme/palette';
 import { Picker } from '../atoms';
 import { KpiTile, SectionHeader } from '../molecules';
 import { SECTION } from '../classes';
-import { ChartCard } from './ChartCard';
 import { EconomyRankingCard, type EconomyRankingMode } from './EconomyRankingCard';
 import { KpiGrid } from './KpiGrid';
-import { TrendLineChart } from './TrendLineChart';
 
 export interface EconomyIndexPanelProps {
   doc: StatsDocument;
@@ -42,7 +37,6 @@ function sourceNote(source: EconomySourceMetric): string {
 
 /** ダイヤ・エメラルドから作る、サーバー内の簡易経済指標。 */
 export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyIndexPanelProps) {
-  const chart = useChartMetrics();
   const [source, setSource] = useState<EconomySourceMetric>(ECONOMY_DEFAULT_SOURCE);
   const [rankingMode, setRankingMode] = useState<EconomyRankingMode>('total');
   const inventoryGeneratedOn = playerInventoryAssetsGeneratedOn();
@@ -55,6 +49,10 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
     () => playerEconomyRows(doc, { players, source, inventoryRows }),
     [doc, players, source, inventoryRows],
   );
+  /*
+   * 推移そのものは画面に出さないが、指数タイルに出す「いまの値」は
+   * 最初のスナップショットを基準にした相対値なので、経過を辿らないと出せない。
+   */
   const trend = useMemo(
     () =>
       economyIndexTimeline(snapshots, {
@@ -111,29 +109,6 @@ export function EconomyIndexPanel({ doc, snapshots, players, theme }: EconomyInd
         theme={theme}
         note={updatedNote}
       />
-
-      <ChartCard
-        title={STATS_TEXT.card.economy.trend}
-        note={joinNotes(STATS_TEXT.card.economy.trendNote, updatedNote)}
-        tableRows={trend.rows.map<Row>((row) => ({
-          date: String(row[TIMELINE_CATEGORY_KEY] ?? ''),
-          index: Number(row.index ?? 0),
-        }))}
-        tableColumns={[
-          { key: 'date', label: STATS_TEXT.card.economy.trendColumn, align: 'left' },
-          { key: 'index', label: STATS_TEXT.card.economy.index },
-        ]}
-        csvName={STATS_TEXT.file.economyIndex(source)}
-      >
-        <TrendLineChart
-          data={trend}
-          theme={theme}
-          categoryKey={TIMELINE_CATEGORY_KEY}
-          unit=""
-          height={chart.height.base}
-          showValueLabels={snapshots.length <= 4}
-        />
-      </ChartCard>
     </section>
   );
 }
