@@ -184,47 +184,61 @@ export function pointInPolygon(point: Point, polygon: Point[]): boolean {
 }
 
 /**
- * 路線図のように、45 度と直角だけで 2 点を繋ぐ折れ線。
+ * 基盤の配線のように、縦横だけで 2 点を繋ぐ折れ線（マンハッタン配線）。
  *
- * 斜めに引くと線が四方八方を向いて、どれがどこへ繋がっているのか
- * 追いにくい。向きを直角と 45 度に限ると、線が揃って読み取りやすくなる。
+ * 斜めに引くと線が四方八方を向いて、どれがどこへ繋がっているのか追いにくい。
+ * 向きを縦と横だけに限ると、線が揃って基盤や路線図のように読み取れる。
  *
- * 長いほうの向きへまっすぐ進んでから、残りを 45 度で詰める。
+ * 途中で 1 回だけ折り返す 3 本の線にする（横 → 縦 → 横、または縦 → 横 → 縦）。
+ * 端から曲がるのではなく真ん中で曲がるので、ノードのすぐ脇を線が這わない。
+ * 長いほうの向きから始めると、折れ曲がりが目立たない。
+ *
  * `elbow` は角を丸める半径（0 ならカクカクのまま）。
  */
-export function orthogonalPath(from: Point, to: Point, elbow = 0): string {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const stepX = Math.sign(dx);
-  const stepY = Math.sign(dy);
-  const run = Math.abs(dx);
-  const rise = Math.abs(dy);
+export function manhattanPath(from: Point, to: Point, elbow = 0): string {
+  const run = Math.abs(to.x - from.x);
+  const rise = Math.abs(to.y - from.y);
 
-  /* ほぼ真っ直ぐなら、そのまま 1 本で引く */
+  /* すでに縦か横に揃っているなら、そのまま 1 本で引く */
   if (run === 0 || rise === 0) {
     return `M ${round(from.x)} ${round(from.y)} L ${round(to.x)} ${round(to.y)}`;
   }
 
-  /* 曲がる点。長いほうの向きへ進み、短いほうの長さだけ残して 45 度に入る */
-  const diagonal = Math.min(run, rise);
-  const corner =
-    run > rise
-      ? { x: to.x - stepX * diagonal, y: from.y }
-      : { x: from.x, y: to.y - stepY * diagonal };
+  /* 真ん中で折り返す。長いほうの向きから始める */
+  const corners: Point[] =
+    run >= rise
+      ? [
+          { x: (from.x + to.x) / 2, y: from.y },
+          { x: (from.x + to.x) / 2, y: to.y },
+        ]
+      : [
+          { x: from.x, y: (from.y + to.y) / 2 },
+          { x: to.x, y: (from.y + to.y) / 2 },
+        ];
 
+  const points = [from, ...corners, to];
   if (elbow <= 0) {
-    return `M ${round(from.x)} ${round(from.y)} L ${round(corner.x)} ${round(corner.y)} L ${round(to.x)} ${round(to.y)}`;
+    return `M ${points.map((point) => `${round(point.x)} ${round(point.y)}`).join(' L ')}`;
   }
 
   /* 角の手前と先を、実際の辺より長く削らない範囲で丸める */
-  const before = shorten(corner, from, Math.min(elbow, Math.hypot(corner.x - from.x, corner.y - from.y) / 2));
-  const after = shorten(corner, to, Math.min(elbow, Math.hypot(to.x - corner.x, to.y - corner.y) / 2));
-  return [
-    `M ${round(from.x)} ${round(from.y)}`,
-    `L ${round(before.x)} ${round(before.y)}`,
-    `Q ${round(corner.x)} ${round(corner.y)} ${round(after.x)} ${round(after.y)}`,
-    `L ${round(to.x)} ${round(to.y)}`,
-  ].join(' ');
+  const commands = [`M ${round(from.x)} ${round(from.y)}`];
+  for (let i = 1; i < points.length - 1; i += 1) {
+    const previous = points[i - 1];
+    const corner = points[i];
+    const next = points[i + 1];
+    const radius = Math.min(
+      elbow,
+      Math.hypot(corner.x - previous.x, corner.y - previous.y) / 2,
+      Math.hypot(next.x - corner.x, next.y - corner.y) / 2,
+    );
+    const before = shorten(corner, previous, radius);
+    const after = shorten(corner, next, radius);
+    commands.push(`L ${round(before.x)} ${round(before.y)}`);
+    commands.push(`Q ${round(corner.x)} ${round(corner.y)} ${round(after.x)} ${round(after.y)}`);
+  }
+  commands.push(`L ${round(to.x)} ${round(to.y)}`);
+  return commands.join(' ');
 }
 
 /** 多角形の面積（描画順の判定に使う）。 */

@@ -13,8 +13,8 @@
  * 直せない変更をするときは、しきい値ではなく配置のほうを見直すこと。
  */
 import { readFileSync } from 'node:fs';
-import { NODE, SEPARATION } from '../src/map/config';
-import { pointInPolygon } from '../src/map/geometry';
+import { EDGE, NODE, SEPARATION } from '../src/map/config';
+import { manhattanPath, pointInPolygon } from '../src/map/geometry';
 import { buildLayout } from '../src/map/layout';
 import { parseRelationshipData } from '../src/map/parse';
 import type { Group } from '../src/map/schema';
@@ -148,6 +148,51 @@ function checkEdges() {
 }
 
 /* ------------------------------------------------------------------ *
+ * 配線が縦横だけになっているか
+ * ------------------------------------------------------------------ */
+
+/** 直線の縦横判定に使う許容誤差（座標を丸めるので、ぴったり 0 にはならない）。 */
+const AXIS_TOLERANCE = 0.51;
+
+function checkWiring() {
+  /* 角を丸めていると曲線が混ざるので、そのときは判定しない */
+  if (EDGE.elbow > 0) {
+    console.log(`SKIP 配線の向き（角を丸めているため / EDGE.elbow = ${EDGE.elbow}）`);
+    return;
+  }
+
+  let diagonal = 0;
+  let segments = 0;
+
+  for (const edge of layout.edges) {
+    const path = manhattanPath(edge.from, edge.to, EDGE.elbow);
+    const points = path
+      .replace(/^M /, '')
+      .split(' L ')
+      .map((pair) => pair.trim().split(/\s+/).map(Number));
+
+    for (let i = 1; i < points.length; i += 1) {
+      const [x1, y1] = points[i - 1];
+      const [x2, y2] = points[i];
+      const dx = Math.abs(x2 - x1);
+      const dy = Math.abs(y2 - y1);
+      if (dx < AXIS_TOLERANCE || dy < AXIS_TOLERANCE) {
+        segments += 1;
+        continue;
+      }
+      diagonal += 1;
+      segments += 1;
+    }
+  }
+
+  if (diagonal > 0) {
+    fail('関係線', '斜め', `縦にも横にも沿っていない線分が ${diagonal} 本あります（全 ${segments} 本）`);
+    return;
+  }
+  console.log(`OK  配線は縦横だけ（${layout.edges.length} 本 / 線分 ${segments} 本）`);
+}
+
+/* ------------------------------------------------------------------ *
  * 囲いの広がり
  * ------------------------------------------------------------------ */
 
@@ -184,6 +229,7 @@ checkData();
 checkOverlap();
 checkNesting();
 checkEdges();
+checkWiring();
 checkRegions();
 
 if (findings.length === 0) {
