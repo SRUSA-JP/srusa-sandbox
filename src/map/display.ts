@@ -242,6 +242,36 @@ export function nodeStyle(theme: VizTheme, state: NodeState): NodeStyle {
 }
 
 /**
+ * 人物ノードの枠線の色。所属 1 つにつき 1 本、外側から順に返す。
+ *
+ * 枠線を所属の線と同じ色にすると、線をたどらなくてもアイコンを見ただけで
+ * 「この人はどこの人か」が分かる。複数の所属を持つ人は枠線も複数になり、
+ * 何本あるかで掛け持ちの数まで読める。
+ *
+ * 並び順は分類の順（大学 → 高校 → …）で固定する。同じ人がいつ見ても
+ * 同じ色の並びになり、図を作り直しても枠線が入れ替わらない。
+ * 多すぎると顔が埋まるので上限を置き、そこから先は出さない。
+ */
+export function nodeRingColors(
+  groups: Group[],
+  theme: VizTheme,
+  state: NodeState,
+): string[] {
+  const colors = figureColors(theme);
+  if (state.isDimmed) return [colors.dimmed];
+  if (groups.length === 0) return [];
+
+  return [...groups]
+    .sort(
+      (a, b) =>
+        groupTypeSetting(a.type).order - groupTypeSetting(b.type).order ||
+        a.name.localeCompare(b.name, 'ja'),
+    )
+    .slice(0, NODE.maxRings)
+    .map((group) => ensureContrast(groupBaseColor(group), colors.background, CONTRAST_MIN_LARGE));
+}
+
+/**
  * ノードに出す絵の指定。
  *
  * 画像 URL があれば画像、無ければ config の代替表示（人型 / イニシャル）。

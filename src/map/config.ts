@@ -37,6 +37,13 @@ export const NODE = {
   centerLabelFontWeight: FONT_WEIGHT.medium,
   /** 枠線の太さ。 */
   ringWidth: 1.5,
+  /**
+   * 枠線を何本まで出すか。
+   *
+   * 所属 1 つにつき 1 本、内側へ重ねて描く。多すぎると顔が埋まるので止める。
+   * いちばん多い人（nodoame）で 5 つの所属があるが、4 本でも掛け持ちの多さは伝わる。
+   */
+  maxRings: 4,
   /** 中心人物の枠線を太くする倍率。 */
   centerRingScale: 2,
   /** アイコン画像が無いときの代替表示。 */

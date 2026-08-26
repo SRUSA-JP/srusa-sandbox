@@ -3,9 +3,16 @@ import { MAP_TEXT, VIEWPORT_TEXT } from '../../config/messages';
 import { RELATIONSHIP_ZOOM, VIEWPORT } from '../../config/viewport';
 import { usePanZoom } from '../../hooks/usePanZoom';
 import { toScreen, transformStyle } from '../../lib/viewport';
-import { clampToCanvas, personLabel, regionPaintOrder } from '../../map/display';
+import {
+  clampToCanvas,
+  nodeRingColors,
+  personLabel,
+  regionPaintOrder,
+  type NodeState,
+} from '../../map/display';
 import type { EdgeStyleId } from '../../map/config';
 import type { MapLayout, PersonPlacement } from '../../map/layout';
+import type { Group } from '../../map/schema';
 import type { VizTheme } from '../../theme/palette';
 import { AffiliationEdge } from '../molecules/AffiliationEdge';
 import { GroupRegion } from '../molecules/GroupRegion';
@@ -96,6 +103,25 @@ export function RelationshipMap({
   const activePoint = activePlacement
     ? toScreen(panZoom.view, { x: activePlacement.x, y: activePlacement.y })
     : null;
+
+  /*
+   * 枠線の色。所属の線と同じ色にして、アイコンを見ただけで所属が分かるようにする。
+   * どのグループがどの色かは display.ts が決め、ここは人と所属を結びつけるだけ。
+   */
+  const groupById = new Map(layout.regions.map((region) => [region.group.id, region.group]));
+  const nodeStateFor = (placement: PersonPlacement): NodeState => ({
+    isCenter: placement.person.id === centerId,
+    isRelated: relatedIds.has(placement.person.id),
+    isDimmed: highlightedGroupId !== '' && !highlightedMembers.has(placement.person.id),
+  });
+  const ringColorsFor = (placement: PersonPlacement) =>
+    nodeRingColors(
+      placement.groupIds
+        .map((id) => groupById.get(id))
+        .filter((group): group is Group => group !== undefined),
+      theme,
+      nodeStateFor(placement),
+    );
 
   /* ---------------------------------------------------------------- *
    * 人を掴んで動かす
@@ -254,12 +280,9 @@ export function RelationshipMap({
                 placement={placement}
                 theme={theme}
                 nameMode={nameMode}
-                state={{
-                  isCenter: placement.person.id === centerId,
-                  isRelated: relatedIds.has(placement.person.id),
-                  isDimmed: highlightedGroupId !== '' && !highlightedMembers.has(placement.person.id),
-                }}
+                state={nodeStateFor(placement)}
                 onSelect={setActivePersonId}
+                ringColors={ringColorsFor(placement)}
                 pointer={pointerFor(placement)}
                 grabbed={grabbedId === placement.person.id}
                 showTooltip={showTooltips}

@@ -17,6 +17,9 @@
 import { readFileSync } from 'node:fs';
 import { EDGE, GRID, NODE, SEPARATION } from '../src/map/config';
 import { manhattanPath } from '../src/map/geometry';
+import { affiliationEdgeStyle, nodeRingColors } from '../src/map/display';
+import { activeSkin } from '../src/config/skins';
+import { buildTheme } from '../src/theme/useThemeMode';
 import { buildLayout } from '../src/map/layout';
 import { parseRelationshipData } from '../src/map/parse';
 import type { Group } from '../src/map/schema';
@@ -347,6 +350,50 @@ function checkAffiliationEdges() {
 }
 
 /* ------------------------------------------------------------------ *
+ * 枠線の色
+ * ------------------------------------------------------------------ */
+
+/**
+ * 人物アイコンの枠線が、その所属の線と同じ色になっているか。
+ *
+ * 枠線を所属の線と同じ色にしてあるからこそ、線をたどらなくても
+ * アイコンだけで所属が読める。片方の色の決め方だけ変えると、
+ * 見た目は成立したまま意味だけが崩れる（気づきにくい）ので測る。
+ */
+function checkRingColors() {
+  const theme = buildTheme('light', activeSkin());
+  const state = { isCenter: false, isRelated: false, isDimmed: false };
+  const groupById = new Map(data.groups.map((group) => [group.id, group]));
+
+  let checked = 0;
+  for (const placement of layout.people) {
+    const groups = placement.groupIds
+      .map((id) => groupById.get(id))
+      .filter((group): group is Group => group !== undefined);
+    if (groups.length === 0) continue;
+
+    const rings = nodeRingColors(groups, theme, state);
+    for (const color of rings) {
+      /* その色を持つ所属が、その人の所属の中にあるか */
+      const match = groups.some(
+        (group) => affiliationEdgeStyle(group, theme, false).stroke === color,
+      );
+      if (!match) {
+        fail(
+          '枠線の色',
+          '所属の線と違う',
+          `${placement.person.onlineName} の枠線 ${color} に合う所属の線がありません`,
+        );
+        return;
+      }
+    }
+    checked += 1;
+  }
+
+  console.log(`OK  枠線の色は所属の線と同じ（${checked} 人ぶんを確認）`);
+}
+
+/* ------------------------------------------------------------------ *
  * 区画の形
  * ------------------------------------------------------------------ */
 
@@ -503,6 +550,7 @@ checkNesting();
 checkEdges();
 checkAffiliationEdges();
 checkAffiliationLength();
+checkRingColors();
 checkBlockShape();
 checkAlignment();
 checkWiring();
