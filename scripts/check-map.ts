@@ -16,7 +16,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { EDGE, GRID, NODE, SEPARATION } from '../src/map/config';
-import { manhattanPath, pointInPolygon } from '../src/map/geometry';
+import { manhattanPath } from '../src/map/geometry';
 import { buildLayout } from '../src/map/layout';
 import { parseRelationshipData } from '../src/map/parse';
 import type { Group } from '../src/map/schema';
@@ -49,12 +49,22 @@ const MAX_LONG_EDGES = 2;
  */
 const MIN_ALIGNED_RATIO = 0.8;
 
+/** 子の囲いが親からはみ出してよい量（座標を丸めるぶん）。 */
+const NESTING_TOLERANCE = 1;
+
+/** 区画の縦横の比の上限。これを超えると帯に見える。 */
+const MAX_BLOCK_RATIO = 4;
+
+/** 区画の形を見る、いちばん少ない人数。2〜3 人はどう並べても細長い。 */
+const MIN_BLOCK_MEMBERS = 4;
+
 /**
  * 所属の線の長さの平均の上限（対角線に対する割合）。
  *
  * 本数ではなく平均で測る。長い線の本数は、配置が崩れて図が広がると
  * かえって減ることがあり（対角線も伸びるため）、崩れの目印にならない。
- * いまは 16%。親への引き寄せを外すと 21% まで伸びるので、その手前に置く。
+ *
+ * いまは 15%。区画の並べ替えをやめると 29% を超えるので、その手前に置く。
  */
 const MAX_AFFILIATION_MEAN = 0.19;
 
@@ -64,7 +74,7 @@ const MAX_REGION_COVERAGE = 1.6;
 const raw = JSON.parse(readFileSync('data/srusa-relationship-v0.2.json', 'utf8'));
 const parsed = parseRelationshipData(raw);
 const data = parsed.data;
-const layout = buildLayout(data, 'cluster', '');
+const layout = buildLayout(data, 'floorplan', '');
 const diagonal = Math.hypot(layout.width, layout.height);
 const canvas = layout.width * layout.height;
 /* 関係線と所属の線は同じ折り返しの列を取り合うので、配線の検査はまとめて行う */
@@ -113,9 +123,23 @@ function checkOverlap() {
  * 入れ子（parentGroupId が指す親の中に入っているか）
  * ------------------------------------------------------------------ */
 
+/**
+ * 入れ子の所属（研究室 ⊂ 大学、部活 ⊂ 高校）が、囲いごと親の中に入っているか。
+ *
+ * 見ている人が読み取るのは描かれた四角なので、点の位置ではなく囲いそのものが
+ * 親の囲いに収まっているかを確かめる。区画で並べれば構造として入れ子になるが、
+ * 余白や並べ方を変えたときに、子の囲いが親からはみ出すことがある。
+ */
 function checkNesting() {
   const byId = new Map(data.groups.map((group) => [group.id, group]));
   const regionOf = (group: Group) => layout.regions.find((region) => region.group.id === group.id);
+
+  const boundsOf = (polygon: Array<{ x: number; y: number }>) => ({
+    minX: Math.min(...polygon.map((point) => point.x)),
+    maxX: Math.max(...polygon.map((point) => point.x)),
+    minY: Math.min(...polygon.map((point) => point.y)),
+    maxY: Math.max(...polygon.map((point) => point.y)),
+  });
 
   for (const child of data.groups) {
     if (!child.parentGroupId) continue;
@@ -125,22 +149,26 @@ function checkNesting() {
     const childRegion = regionOf(child);
     const parentRegion = regionOf(parent);
     if (!childRegion || !parentRegion) continue;
+    if (childRegion.polygon.length === 0 || parentRegion.polygon.length === 0) continue;
 
-    const outside = childRegion.memberIds.filter((id) => {
-      const place = layout.byId.get(id);
-      return place && !pointInPolygon({ x: place.x, y: place.y }, parentRegion.polygon);
-    });
+    const inner = boundsOf(childRegion.polygon);
+    const outer = boundsOf(parentRegion.polygon);
+    const overhang = Math.max(
+      outer.minX - inner.minX,
+      inner.maxX - outer.maxX,
+      outer.minY - inner.minY,
+      inner.maxY - outer.maxY,
+    );
 
-    if (outside.length > 0) {
-      const names = outside.map((id) => layout.byId.get(id)?.person.onlineName ?? id);
+    if (overhang > NESTING_TOLERANCE) {
       fail(
         `${child.name} ⊂ ${parent.name}`,
         '入れ子',
-        `${outside.length} 人が ${parent.name} の外にいます（${names.join(', ')}）`,
+        `囲いが ${parent.name} から ${overhang.toFixed(0)}px はみ出しています`,
       );
       continue;
     }
-    console.log(`OK  ${child.name} の ${childRegion.memberIds.length} 人が ${parent.name} の中`);
+    console.log(`OK  ${child.name} の囲いが ${parent.name} の中（${childRegion.memberIds.length} 人）`);
   }
 }
 
@@ -319,6 +347,61 @@ function checkAffiliationEdges() {
 }
 
 /* ------------------------------------------------------------------ *
+ * 区画の形
+ * ------------------------------------------------------------------ */
+
+/**
+ * グループの区画が、細長い帯になっていないか。
+ *
+ * 同じグループの人は 1 列や 2×4 のような整った長方形に並べたい。
+ * 並べ方の点数の付け方をひとつ間違えると（欠けた升目を重く見すぎるなど）、
+ * 11 人が 1×11 の帯になって図が縦に伸びる。見た目には気づきにくいので測る。
+ */
+function checkBlockShape() {
+  const worst: Array<{ name: string; ratio: number; columns: number; rows: number }> = [];
+
+  for (const region of layout.regions) {
+    /* 子の区画を持つグループは、子の形に引っぱられるので対象外 */
+    if (data.groups.some((group) => group.parentGroupId === region.group.id)) continue;
+    if (region.memberIds.length < MIN_BLOCK_MEMBERS) continue;
+
+    const points = region.memberIds
+      .map((id) => layout.byId.get(id))
+      .filter((place): place is NonNullable<typeof place> => Boolean(place));
+    const columns = new Set(points.map((place) => place.x)).size;
+    const rows = new Set(points.map((place) => place.y)).size;
+    if (columns === 0 || rows === 0) continue;
+
+    worst.push({
+      name: region.group.name,
+      ratio: Math.max(columns, rows) / Math.min(columns, rows),
+      columns,
+      rows,
+    });
+  }
+
+  if (worst.length === 0) return;
+  worst.sort((a, b) => b.ratio - a.ratio);
+  const bad = worst.filter((entry) => entry.ratio > MAX_BLOCK_RATIO);
+
+  if (bad.length > 0) {
+    const detail = bad
+      .slice(0, 3)
+      .map((entry) => `${entry.name} ${entry.columns}×${entry.rows}`)
+      .join(', ');
+    fail(
+      '区画の形',
+      '細長い',
+      `縦横の比が ${MAX_BLOCK_RATIO} を超える区画が ${bad.length} 個（${detail}）`,
+    );
+    return;
+  }
+  console.log(
+    `OK  区画の形（いちばん細長いのは ${worst[0].name} の ${worst[0].columns}×${worst[0].rows} / 上限 ${MAX_BLOCK_RATIO} 倍）`,
+  );
+}
+
+/* ------------------------------------------------------------------ *
  * 整列
  * ------------------------------------------------------------------ */
 
@@ -420,6 +503,7 @@ checkNesting();
 checkEdges();
 checkAffiliationEdges();
 checkAffiliationLength();
+checkBlockShape();
 checkAlignment();
 checkWiring();
 checkChannels();
