@@ -18,6 +18,7 @@ import {
   NODE,
   REGION,
   SATELLITE,
+  SEPARATION,
   UNASSIGNED,
   type LayoutMode,
 } from './config';
@@ -839,6 +840,48 @@ function intrudingRegions(placement: PersonPlacement, regions: RegionPlacement[]
  * 凸包で作った領域は読みやすい一方、近くに置かれた非所属者を包み込むことがある。
  * 非所属者が領域内に入ったら外側へ押し出し、所属している領域だけに残るよう再計算する。
  */
+/**
+ * 人のノードが重ならないように離す。
+ *
+ * 置き方はいくつもあり（所属のまとまり・衛星・はみ出しの押し出し）、どれか 1 つを
+ * 直しても別の経路で重なりが残る。最後にここを通して、重なっている組を必ず離す。
+ * 中心人物はアイコンが大きいので、その分も見込む。
+ */
+function separateNodes(placements: PersonPlacement[], centerId: string): void {
+  const radiusOf = (placement: PersonPlacement) =>
+    (placement.person.id === centerId ? NODE.size * NODE.centerScale : NODE.size) / 2;
+
+  for (let pass = 0; pass < SEPARATION.passes; pass += 1) {
+    let moved = false;
+
+    for (let i = 0; i < placements.length; i += 1) {
+      for (let j = i + 1; j < placements.length; j += 1) {
+        const a = placements[i];
+        const b = placements[j];
+        const need = radiusOf(a) + radiusOf(b) + SEPARATION.padding;
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance >= need) continue;
+
+        /* 真上に重なったときは決まった向きへ逃がす（毎回同じ結果にするため） */
+        const angle = (a.person.id.charCodeAt(0) % REGION.strictDirections) * ((Math.PI * 2) / REGION.strictDirections);
+        const nx = distance > 0 ? dx / distance : Math.cos(angle);
+        const ny = distance > 0 ? dy / distance : Math.sin(angle);
+        const push = (need - distance) / 2;
+
+        a.x += nx * push;
+        a.y += ny * push;
+        b.x -= nx * push;
+        b.y -= ny * push;
+        moved = true;
+      }
+    }
+
+    if (!moved) break;
+  }
+}
+
 function enforceStrictRegions(groups: Group[], placements: PersonPlacement[]): RegionPlacement[] {
   let regions = buildRegions(groups, placements);
 
@@ -1247,7 +1290,14 @@ export function buildLayout(data: RelationshipData, mode: LayoutMode = 'cluster'
     placeLeftovers(leftovers, people);
   }
 
-  const regions = enforceStrictRegions(data.groups, people);
+  /*
+   * 重なりの解消は最後にまとめて行う。囲いのはみ出しを直すと人が動くので、
+   * その後にもう一度離してから、動いた位置で囲いを引き直す。
+   */
+  separateNodes(people, effectiveCenterId);
+  enforceStrictRegions(data.groups, people);
+  separateNodes(people, effectiveCenterId);
+  const regions = buildRegions(data.groups, people);
   const { width, height } = normalize(people, regions);
   const byId = new Map(people.map((placement) => [placement.person.id, placement]));
 
