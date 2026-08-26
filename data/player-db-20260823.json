@@ -554,7 +554,8 @@
       },
       "relationship": {
         "attributes": [
-          "M大学"
+          "M大学",
+          "アクティブメンバー"
         ],
         "related_ids": []
       },
