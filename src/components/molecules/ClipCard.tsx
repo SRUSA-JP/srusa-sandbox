@@ -1,6 +1,6 @@
 import {
   CLIP_TEXT,
-  capFirst,
+  gameLabel,
   clipKeywordLabel,
   clipKeywords,
   clipMedia,
@@ -66,14 +66,20 @@ export function ClipCard({ clip, active, onSelect, onFilter }: ClipCardProps) {
         <div className="flex flex-wrap gap-xs">
           {clip.map && (
             <button type="button" className={tagClass} onClick={() => onFilter('map', clip.map!)}>
-              {capFirst(clip.map)}
+              {gameLabel(clip.map)}
             </button>
           )}
-          {clip.agent && (
-            <button type="button" className={tagClass} onClick={() => onFilter('agent', clip.agent!)}>
-              {capFirst(clip.agent)}
+          {/* 登場人物は出てくる順に並べる。並びに意味があるので並べ替えない */}
+          {(clip.cast ?? []).map((person) => (
+            <button
+              key={person}
+              type="button"
+              className={tagClass}
+              onClick={() => onFilter('agent', person)}
+            >
+              {person}
             </button>
-          )}
+          ))}
           {clipKeywords(clip).map((keyword) => (
             <button key={keyword} type="button" className={tagClass} onClick={() => onFilter('keyword', keyword)}>
               {clipKeywordLabel(keyword)}
