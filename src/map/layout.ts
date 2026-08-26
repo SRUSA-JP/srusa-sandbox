@@ -9,7 +9,18 @@
  * これにより「複数の所属は領域の重なりで表す」「研究室は大学の内側に入る」が
  * レイアウトの副作用として自然に成立する。
  */
-import { CANVAS, CLUSTER, groupTypeSetting, NODE, REGION, SATELLITE, UNASSIGNED, type LayoutMode } from './config';
+import {
+  CANVAS,
+  CLUSTER,
+  FALLBACK_GROUP_TYPE,
+  GROUP_RELAX,
+  groupTypeSetting,
+  NODE,
+  REGION,
+  SATELLITE,
+  UNASSIGNED,
+  type LayoutMode,
+} from './config';
 import { centroid, enclosingPolygon, pointInPolygon, polygonArea, type Point } from './geometry';
 import type { Group, Person, Relation, RelationshipData } from './schema';
 
@@ -153,6 +164,153 @@ function packRows(clusters: Cluster[]): Cluster[][] {
       width = cluster.width;
     } else {
       current.push(cluster);
+      width = next;
+    }
+  }
+  if (current.length > 0) rows.push(current);
+
+  return rows.map((row, index) => (index % 2 === 1 ? [...row].reverse() : row));
+}
+
+/**
+ * 所属を外側の所属にたたむ。
+ *
+ * 研究室は大学の中、部活は高校の中にあるので、親（parentGroupId）をたどって
+ * いちばん外側の所属の名前を返す。こうすると「M大学の人」と「Y研究室の人」が
+ * 同じ塊に入り、領域が入れ子に描かれる。
+ */
+function outermostGroupName(name: string, groups: Group[]): string {
+  const byName = new Map(groups.map((group) => [group.name, group]));
+  const byId = new Map(groups.map((group) => [group.id, group]));
+  let current = byName.get(name);
+  const seen = new Set<string>();
+
+  while (current?.parentGroupId && !seen.has(current.id)) {
+    seen.add(current.id);
+    const parent = byId.get(current.parentGroupId);
+    if (!parent) break;
+    current = parent;
+  }
+  return current?.name ?? name;
+}
+
+/**
+ * そのクラスタをどの塊に入れるか。
+ *
+ * 所属を外側にたたんだうえで、いちばん「外枠」らしいものを選ぶ。
+ * 外枠らしさは分類の描画順（groupTypeSetting の order）で決める。大学・高校が先で、
+ * 部活や「アクティブメンバー」のような後付けの札は後ろになる。
+ * 同じ順位なら人数の多い方を採る。
+ */
+function clusterAnchor(cluster: Cluster, groups: Group[]): string {
+  if (cluster.groupNames.length === 0) return '';
+  const byName = new Map(groups.map((group) => [group.name, group]));
+  /* 場所を表す所属だけを塊の代表にする。札しか持たない人はひとまとまりにする */
+  const places = cluster.groupNames.filter((name) => {
+    const group = byName.get(name);
+    return group ? groupTypeSetting(group.type).binds : false;
+  });
+  const roots = [...new Set((places.length > 0 ? places : cluster.groupNames).map((name) => outermostGroupName(name, groups)))];
+
+  return roots.reduce((best, name) => {
+    const order = (target: string) => {
+      const group = byName.get(target);
+      return group ? groupTypeSetting(group.type).order : FALLBACK_GROUP_TYPE.order;
+    };
+    if (order(name) !== order(best)) return order(name) < order(best) ? name : best;
+    return name.localeCompare(best, 'ja') < 0 ? name : best;
+  });
+}
+
+/** 塊（同じ外枠にまとまるクラスタの並び）。 */
+type Block = Cluster[];
+
+/** 塊が持つ所属の全部。塊どうしの近さを測るのに使う。 */
+function blockGroupNames(block: Block): string[] {
+  return [...new Set(block.flatMap((cluster) => cluster.groupNames))];
+}
+
+/** 塊どうしの隣に置きたい度合い。中身のクラスタをまとめて 1 つとみなす。 */
+function blockAffinity(a: Block, b: Block, relations: Relation[]): number {
+  const merged = (block: Block): Cluster => ({
+    key: '',
+    groupNames: blockGroupNames(block),
+    members: block.flatMap((cluster) => cluster.members),
+    columns: 1,
+    width: 0,
+    height: 0,
+  });
+  return affinity(merged(a), merged(b), relations);
+}
+
+/**
+ * クラスタを外枠ごとの塊にまとめ、塊の中と外をそれぞれ並べる。
+ *
+ * 塊の中は「所属の少ない順」にする。M大学だけの人が先、研究室まで持つ人が後になり、
+ * 外側の領域が内側の領域を包むように広がる。
+ */
+function buildBlocks(clusters: Cluster[], groups: Group[], relations: Relation[]): Block[] {
+  const byAnchor = new Map<string, Block>();
+  for (const cluster of clusters) {
+    const anchor = clusterAnchor(cluster, groups);
+    const block = byAnchor.get(anchor) ?? [];
+    block.push(cluster);
+    byAnchor.set(anchor, block);
+  }
+
+  const blocks = [...byAnchor.values()].map((block) =>
+    [...block].sort(
+      (a, b) =>
+        a.groupNames.length - b.groupNames.length ||
+        b.members.length - a.members.length ||
+        a.key.localeCompare(b.key),
+    ),
+  );
+  blocks.sort((a, b) => b.flatMap((c) => c.members).length - a.flatMap((c) => c.members).length);
+
+  /* 塊の並びも、近いものが隣り合うように貪欲につなぐ（クラスタの並べ方と同じ考え方） */
+  if (blocks.length <= 1) return blocks;
+  const remaining = blocks.slice(1);
+  const ordered: Block[] = [blocks[0]];
+  while (remaining.length > 0) {
+    const last = ordered[ordered.length - 1];
+    let bestIndex = 0;
+    let bestScore = -1;
+    remaining.forEach((block, index) => {
+      const score = blockAffinity(last, block, relations);
+      if (score > bestScore) {
+        bestScore = score;
+        bestIndex = index;
+      }
+    });
+    ordered.push(remaining.splice(bestIndex, 1)[0]);
+  }
+  return ordered;
+}
+
+/**
+ * 塊を行に詰める。塊は途中で折り返さない。
+ *
+ * 折り返してしまうと、同じ大学の人が上下の行に分かれて領域が図を縦断し、
+ * 関係の無い人まで囲ってしまう。
+ */
+function packBlocks(blocks: Block[]): Cluster[][] {
+  const blockWidth = (block: Block) =>
+    block.reduce((sum, cluster, index) => sum + cluster.width + (index > 0 ? CLUSTER.gap : 0), 0);
+
+  const rows: Cluster[][] = [];
+  let current: Cluster[] = [];
+  let width = 0;
+
+  for (const block of blocks) {
+    const own = blockWidth(block);
+    const next = width === 0 ? own : width + CLUSTER.gap + own;
+    if (current.length > 0 && next > CANVAS.targetWidth) {
+      rows.push(current);
+      current = [...block];
+      width = own;
+    } else {
+      current.push(...block);
       width = next;
     }
   }
@@ -857,11 +1015,99 @@ function assignGroupIds(people: PersonPlacement[], groups: Group[]): void {
   }
 }
 
+/**
+ * 所属ごとの塊を締める。
+ *
+ * 並べ替えだけでは、複数の所属を持つ人をどれか 1 か所にしか置けないので、
+ * その人の別の所属の領域が図を横切って伸びる。ここでは所属の重心へ少しずつ
+ * 引き寄せ、同時に近づきすぎた人どうしを離す。
+ *
+ * 引く力は「その人が持つ所属の数」で割る。こうすると 1 つしか所属が無い人は
+ * その塊の中心へ入り、複数持つ人はそれぞれの塊の間に落ち着く（＝領域が重なる）。
+ * 研究室のように所属者が大学の一部であるときは、内側の小さな塊が
+ * 外側の塊の中に自然に収まる。
+ */
+function relaxGroupClusters(placements: PersonPlacement[], groups: Group[]): void {
+  /* 場所を表す所属だけがまとまりを作る（アクティブメンバーのような札は効かせない） */
+  const groupNames = new Set(
+    groups.filter((group) => groupTypeSetting(group.type).binds).map((group) => group.name),
+  );
+  const belongs = new Map(
+    placements.map((placement) => [
+      placement.person.id,
+      placement.person.attributes.filter((name) => groupNames.has(name)),
+    ]),
+  );
+
+  for (let iteration = 0; iteration < GROUP_RELAX.iterations; iteration += 1) {
+    const cooling = 1 - iteration / GROUP_RELAX.iterations;
+
+    /* いまの所属ごとの重心 */
+    const sums = new Map<string, { x: number; y: number; count: number }>();
+    for (const placement of placements) {
+      for (const name of belongs.get(placement.person.id) ?? []) {
+        const sum = sums.get(name) ?? { x: 0, y: 0, count: 0 };
+        sum.x += placement.x;
+        sum.y += placement.y;
+        sum.count += 1;
+        sums.set(name, sum);
+      }
+    }
+
+    const delta = new Map(placements.map((placement) => [placement.person.id, { x: 0, y: 0 }]));
+
+    /* 所属の重心へ引き寄せる */
+    for (const placement of placements) {
+      const names = belongs.get(placement.person.id) ?? [];
+      if (names.length === 0) continue;
+      const move = delta.get(placement.person.id)!;
+      for (const name of names) {
+        const sum = sums.get(name);
+        if (!sum || sum.count === 0) continue;
+        const centerX = sum.x / sum.count;
+        const centerY = sum.y / sum.count;
+        move.x += ((centerX - placement.x) * GROUP_RELAX.attraction * cooling) / names.length;
+        move.y += ((centerY - placement.y) * GROUP_RELAX.attraction * cooling) / names.length;
+      }
+    }
+
+    /* 近づきすぎた人どうしを離す（ノードが重なると誰が誰だか読めなくなる） */
+    for (let i = 0; i < placements.length; i += 1) {
+      for (let j = i + 1; j < placements.length; j += 1) {
+        const a = placements[i];
+        const b = placements[j];
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance >= GROUP_RELAX.minDistance) continue;
+        /* 真上に重なったときは決まった向きへ逃がす（毎回同じ結果にするため） */
+        const nx = distance > 0 ? dx / distance : 1;
+        const ny = distance > 0 ? dy / distance : 0;
+        const push = (GROUP_RELAX.minDistance - distance) * GROUP_RELAX.repulsion;
+        const moveA = delta.get(a.person.id)!;
+        const moveB = delta.get(b.person.id)!;
+        moveA.x += nx * push;
+        moveA.y += ny * push;
+        moveB.x -= nx * push;
+        moveB.y -= ny * push;
+      }
+    }
+
+    for (const placement of placements) {
+      const move = delta.get(placement.person.id)!;
+      placement.x += move.x;
+      placement.y += move.y;
+    }
+  }
+}
+
 function clusteredPlacements(data: RelationshipData): PersonPlacement[] {
   /* 所属のある人はクラスタとして配置し、所属の無い人は後から相手のそばへ置く */
   const affiliated = data.people.filter((person) => person.attributes.length > 0);
-  const rows = packRows(orderClusters(buildClusters(affiliated), data.relations));
-  return placePeople(rows);
+  const clusters = orderClusters(buildClusters(affiliated), data.relations);
+  const placements = placePeople(packBlocks(buildBlocks(clusters, data.groups, data.relations)));
+  relaxGroupClusters(placements, data.groups);
+  return placements;
 }
 
 function relaxClusterHybrid(placements: PersonPlacement[], relations: Relation[]): void {

@@ -98,6 +98,28 @@ export const CLUSTER = {
   relationSaturation: 2,
 } as const;
 
+/**
+ * 所属ごとのまとまりを作り直す緩和計算。
+ *
+ * 並べ替えだけでは、複数の所属を持つ人がどれか 1 か所にしか置けず、
+ * その人の別の所属の領域が図を横切って伸びてしまう。そこで置いたあとに、
+ * 所属の重心へ少しずつ引き寄せて、所属ごとの塊を締める。
+ * 複数の所属を持つ人は、それぞれの重心に等しく引かれて塊と塊の間に落ち着く。
+ */
+export const GROUP_RELAX = {
+  /** 繰り返す回数。多いほど締まるが、動きすぎると元の並びの意図が消える。 */
+  iterations: 220,
+  /** 所属の重心へ引き寄せる強さ。 */
+  attraction: 0.12,
+  /** 近づきすぎた人どうしを離す強さ。 */
+  repulsion: 0.62,
+  /**
+   * 人と人がこれ以上近づかない距離。
+   * ノードの間隔より少し狭くして、塊の中では詰めて置けるようにする。
+   */
+  minDistance: 82,
+} as const;
+
 /** 図全体。 */
 export const CANVAS = {
   padding: 72,
@@ -160,26 +182,37 @@ export const LEGEND = {
  * - `colorSlot`: カテゴリ配色の何番目を使うか（config/colors.ts の枠を循環）
  * - `depth`: 入れ子の深さ。大きいほど内側に描き、余白を詰める
  * - `order`: 描画順の基準。小さいほど先（＝下）に描く
+ * - `binds`: 配置のときに所属者を引き寄せてまとまりを作るか
  */
 export interface GroupTypeSetting {
   label: string;
   colorSlot: number;
   depth: number;
   order: number;
+  /**
+   * その所属が「場所」かどうか。
+   *
+   * 大学・高校・塾・部活は同じ場所に居る人の集まりなので、図の上でも
+   * まとめて置く。一方「アクティブメンバー」「ネット友」のような札は、
+   * 別々の場所に居る人に横断的に付く。これを引き寄せると学校や大学の
+   * まとまりを引き裂いて、領域が図を横切ってしまうので、配置には効かせない。
+   * 領域そのものは描くので、凡例から強調して確かめることはできる。
+   */
+  binds: boolean;
 }
 
 export const GROUP_TYPE_SETTINGS: Record<GroupType, GroupTypeSetting> = {
-  university: { label: '大学', colorSlot: 0, depth: 0, order: 10 },
-  lab: { label: '研究室', colorSlot: 3, depth: 1, order: 60 },
-  school: { label: '高校', colorSlot: 1, depth: 0, order: 20 },
-  school_stage: { label: '学校段階', colorSlot: 2, depth: 0, order: 30 },
-  education: { label: '塾', colorSlot: 4, depth: 0, order: 40 },
-  company: { label: '会社', colorSlot: 5, depth: 0, order: 50 },
-  club: { label: '部活', colorSlot: 6, depth: 1, order: 70 },
-  friend_group: { label: '友人グループ', colorSlot: 7, depth: 1, order: 80 },
-  activity: { label: '活動', colorSlot: 5, depth: 1, order: 90 },
-  relationship_context: { label: '関係の文脈', colorSlot: 6, depth: 1, order: 100 },
-  unknown: { label: '不明', colorSlot: 2, depth: 0, order: 110 },
+  university: { label: '大学', colorSlot: 0, depth: 0, order: 10, binds: true },
+  lab: { label: '研究室', colorSlot: 3, depth: 1, order: 60, binds: true },
+  school: { label: '高校', colorSlot: 1, depth: 0, order: 20, binds: true },
+  school_stage: { label: '学校段階', colorSlot: 2, depth: 0, order: 30, binds: true },
+  education: { label: '塾', colorSlot: 4, depth: 0, order: 40, binds: true },
+  company: { label: '会社', colorSlot: 5, depth: 0, order: 50, binds: true },
+  club: { label: '部活', colorSlot: 6, depth: 1, order: 70, binds: true },
+  friend_group: { label: '友人グループ', colorSlot: 7, depth: 1, order: 80, binds: true },
+  activity: { label: '活動', colorSlot: 5, depth: 1, order: 90, binds: false },
+  relationship_context: { label: '関係の文脈', colorSlot: 6, depth: 1, order: 100, binds: false },
+  unknown: { label: '不明', colorSlot: 2, depth: 0, order: 110, binds: true },
 };
 
 /** 定義にない分類が来たときの既定値。データが増えても落ちないようにする。 */
@@ -188,6 +221,7 @@ export const FALLBACK_GROUP_TYPE: GroupTypeSetting = {
   colorSlot: 2,
   depth: 0,
   order: 120,
+  binds: false,
 };
 
 /** 分類ごとの設定を引く唯一の入口。設定表を直接参照しない。 */

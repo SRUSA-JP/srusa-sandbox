@@ -100,7 +100,7 @@
     { "id": "y_lab", "name": "Y研究室", "type": "lab", "parentGroupId": "m_univ" },
     { "id": "s_lab", "name": "S研究室", "type": "lab", "parentGroupId": "m_univ" },
     { "id": "m_lab", "name": "M研究室", "type": "lab", "parentGroupId": "m_univ" },
-    { "id": "tennis", "name": "テニス部", "type": "club" },
+    { "id": "tennis", "name": "テニス部", "type": "club", "parentGroupId": "k_high" },
     { "id": "shion_group", "name": "shion組", "type": "friend_group" },
     { "id": "k_company", "name": "K社", "type": "company" },
     { "id": "golf", "name": "ゴルフ", "type": "activity" },
