@@ -5,6 +5,13 @@ import type { VizTheme } from '../../theme/palette';
 
 export interface PersonNodeProps {
   placement: PersonPlacement;
+  /**
+   * 枠線の色。外側から順に 1 本ずつ。決めるのは map/display.ts。
+   *
+   * 所属の線と同じ色にしてあるので、アイコンを見ただけでどこの人か分かる。
+   * 空なら所属の無い人で、その場合だけ既定の枠線 1 本になる。
+   */
+  ringColors?: string[];
   theme: VizTheme;
   state: NodeState;
   nameMode: string;
@@ -97,12 +104,17 @@ export function PersonNode({
   theme,
   state,
   nameMode,
+  ringColors,
   onSelect,
   pointer,
   grabbed = false,
   showTooltip = true,
 }: PersonNodeProps) {
   const style = nodeStyle(theme, state);
+  /* 所属が無い人は今までどおりの 1 本。所属があればその色を外側から重ねる */
+  const rings = ringColors && ringColors.length > 0 ? ringColors : [style.ring];
+  /* 枠線の内側に顔を収める。顔が枠に食われないよう、絵は枠の分だけ小さくする */
+  const innerRadius = Math.max(1, style.radius - rings.length * style.ringWidth);
   const label = personLabel(placement.person, nameMode);
   const clipId = `avatar-clip-${placement.person.id}`;
   const interactive = Boolean(onSelect || pointer);
@@ -135,7 +147,7 @@ export function PersonNode({
       {/* Minecraft のスキンが四角なので、囲いも四角にして顔が欠けないようにする */}
       <defs>
         <clipPath id={clipId}>
-          <rect x={-style.radius} y={-style.radius} width={style.size} height={style.size} />
+          <rect x={-innerRadius} y={-innerRadius} width={innerRadius * 2} height={innerRadius * 2} />
         </clipPath>
       </defs>
       <rect
@@ -144,26 +156,33 @@ export function PersonNode({
         width={style.size}
         height={style.size}
         fill={style.fill}
-        stroke={style.ring}
-        strokeWidth={style.ringWidth}
       />
       <AvatarContentShape
         placement={placement}
         nameMode={nameMode}
-        radius={style.radius}
+        radius={innerRadius}
         color={style.glyphColor}
         clipId={clipId}
       />
-      <rect
-        x={-style.radius}
-        y={-style.radius}
-        width={style.size}
-        height={style.size}
-        fill="none"
-        stroke={style.ring}
-        strokeWidth={style.ringWidth}
-        pointerEvents="none"
-      />
+      {/* 所属の数だけ枠線を重ねる。外側が 1 つ目で、内側へ向かって並ぶ */}
+      {rings.map((color, index) => {
+        /* 線は中心をなぞるので、半分ずつ内側へ寄せると線と線が隙間なく並ぶ */
+        const inset = index * style.ringWidth + style.ringWidth / 2;
+        const half = style.radius - inset;
+        return (
+          <rect
+            key={`${color}-${index}`}
+            x={-half}
+            y={-half}
+            width={half * 2}
+            height={half * 2}
+            fill="none"
+            stroke={color}
+            strokeWidth={style.ringWidth}
+            pointerEvents="none"
+          />
+        );
+      })}
       <text
         y={style.labelOffsetY}
         textAnchor="middle"

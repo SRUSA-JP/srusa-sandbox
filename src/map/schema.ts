@@ -18,6 +18,13 @@ export interface Person {
   attributes: string[];
   nicknames: string[];
   /**
+   * SRUSA に入った時期（`YYYY-MM` / `YYYY`）。分かっている人だけが持つ。
+   *
+   * 年表の人数推移はこの値だけから作る。分からない人を「入っていない」と
+   * 数えると人数が実際より少なく出てしまうので、分かっている人数も一緒に出す。
+   */
+  joinedOn?: string;
+  /**
    * アイコン画像の URL（任意）。
    * 指定があればノードに表示し、無ければ config の代替表示にする。
    */

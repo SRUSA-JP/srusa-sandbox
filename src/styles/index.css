@@ -187,6 +187,54 @@
   shape-rendering: crispEdges;
 }
 
+/*
+ * 横に動かすつまみ（atoms/RangeSlider）。
+ *
+ * ブラウザごとに既定の見た目が違うので、自分で描く。実値は書かず、
+ * 他の操作部品と同じ `--sr-*` の変数から取る。
+ */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: var(--sr-space-lg);
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  height: var(--sr-space-xs);
+  border-radius: var(--sr-radius-sm);
+  background: var(--sr-surface-sunken);
+  border: var(--sr-border-hairline) solid var(--sr-divider);
+}
+
+input[type='range']::-moz-range-track {
+  height: var(--sr-space-xs);
+  border-radius: var(--sr-radius-sm);
+  background: var(--sr-surface-sunken);
+  border: var(--sr-border-hairline) solid var(--sr-divider);
+}
+
+/* つまみは四角。ドット絵風のときに丸だけ浮かないようにする */
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--sr-space-lg);
+  height: var(--sr-space-lg);
+  margin-top: calc((var(--sr-space-xs) - var(--sr-space-lg)) / 2);
+  border-radius: var(--sr-radius-sm);
+  border: var(--sr-border-hairline) solid var(--sr-control-border);
+  background: var(--sr-control-selected);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: var(--sr-space-lg);
+  height: var(--sr-space-lg);
+  border-radius: var(--sr-radius-sm);
+  border: var(--sr-border-hairline) solid var(--sr-control-border);
+  background: var(--sr-control-selected);
+}
+
 /* スキンの画像も、相関図の中の <image> も、ドットのまま出す */
 [data-skin='minecraft'] :is(img, image) {
   image-rendering: pixelated;

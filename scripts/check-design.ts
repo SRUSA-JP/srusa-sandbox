@@ -6,7 +6,7 @@
  * レビューで見落としやすいデザイン規約を軽く静的検査する。
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { relative, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 
 type Finding = {
   file: string;
@@ -26,6 +26,15 @@ const TARGETS = [
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.css']);
 const findings: Finding[] = [];
+
+/**
+ * 余白の目盛りの名前。styles/index.css の `--spacing-*` から読む。
+ *
+ * 名前を書き写すと、段を足したときに検査だけ古いままになる。
+ */
+const SPACING_NAMES = [
+  ...readFileSync(join(ROOT, 'src/styles/index.css'), 'utf8').matchAll(/--spacing-([a-z0-9]+):/g),
+].map((match) => match[1]);
 
 function walk(path: string): string[] {
   const fullPath = resolve(ROOT, path);
@@ -135,6 +144,36 @@ function checkNestedCards(file: string, source: string) {
   }
 }
 
+/**
+ * 幅・高さに、余白の名前を使っていないか。
+ *
+ * Tailwind v4 は `--spacing-*` の名前を `max-w-*` `min-w-*` `w-*` などにも配る。
+ * つまり `max-w-xs` は Tailwind 本来の 20rem ではなく、このリポジトリの
+ * 余白 `xs`（8px）になる。書いた側は「小さめの箱」のつもりでも、実際には
+ * 幅 8px の柱になり、中の文字が 1 文字ずつ縦に積まれる。
+ *
+ * 実際に人物の吹き出しがこれで壊れていた（28 x 381px になっていた）。
+ * 見た目に出るのに原因が名前の衝突なので、気づいてから直すまでが長い。
+ *
+ * 幅と高さは `--sr-layout-*` の変数で指定する。四角の一辺を余白の目盛りで
+ * 決める `size-*` は、目盛りを使うのが正しいので対象にしない。
+ */
+function checkSpacingNamedSizes(file: string, source: string) {
+  const risky = new RegExp(
+    String.raw`\b(max-w|min-w|max-h|min-h|w|h|basis)-(${SPACING_NAMES.join('|')})\b`,
+    'g',
+  );
+  for (const match of source.matchAll(risky)) {
+    addFinding(
+      file,
+      source,
+      match.index,
+      '幅に余白の名前',
+      `${match[0]} は余白の目盛りになります（Tailwind 本来の大きさではありません）。max-w-[var(--sr-layout-*)] へ寄せてください`,
+    );
+  }
+}
+
 for (const filePath of TARGETS.flatMap(walk)) {
   if (!SOURCE_EXTENSIONS.has(extensionOf(filePath))) continue;
   const file = relative(ROOT, filePath);
@@ -143,6 +182,7 @@ for (const filePath of TARGETS.flatMap(walk)) {
   checkArbitraryClasses(file, source);
   checkLiteralFontSize(file, source);
   checkNestedCards(file, source);
+  checkSpacingNamedSizes(file, source);
 }
 
 if (findings.length === 0) {

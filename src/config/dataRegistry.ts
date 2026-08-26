@@ -35,3 +35,14 @@ export const ZUKAN_ATTRIBUTE_LIMIT = 3;
 
 /** 図鑑カードで、所属数の上限があっても優先して見せるタグ。 */
 export const ZUKAN_PRIORITY_ATTRIBUTES = ['アクティブメンバー'];
+
+/**
+ * 活動カレンダーの 1 枠の濃さ。
+ *
+ * いちばん人が多かった日を上限、記録のある日の下限をこの値にする。
+ * 下限を 0 にすると「1 人だけ来た日」が「誰も来なかった日」と同じ見た目になる。
+ */
+export const CALENDAR_DAY = {
+  minAlpha: 0.18,
+  maxAlpha: 0.9,
+} as const;

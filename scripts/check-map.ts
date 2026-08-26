@@ -16,7 +16,11 @@
  */
 import { readFileSync } from 'node:fs';
 import { EDGE, GRID, NODE, SEPARATION } from '../src/map/config';
+import { skinnedFontSize } from '../src/config/skins';
 import { manhattanPath } from '../src/map/geometry';
+import { affiliationEdgeStyle, nodeRingColors } from '../src/map/display';
+import { activeSkin } from '../src/config/skins';
+import { buildTheme } from '../src/theme/useThemeMode';
 import { buildLayout } from '../src/map/layout';
 import { parseRelationshipData } from '../src/map/parse';
 import type { Group } from '../src/map/schema';
@@ -347,6 +351,122 @@ function checkAffiliationEdges() {
 }
 
 /* ------------------------------------------------------------------ *
+ * 名前の重なり
+ * ------------------------------------------------------------------ */
+
+/**
+ * アイコンの下に出す名前が、隣の人の名前と重なっていないか。
+ *
+ * 重なりの検査はアイコン（34px の四角）しか見ていない。名前はそれより
+ * ずっと横に長いので、間隔を詰めるとアイコンは離れたまま名前だけが重なる。
+ * 「panndasanngou」のような長い名前で先に起きる。
+ *
+ * 実際に描かせて測るのがいちばん確かだが、ここは配置の検査なので
+ * 文字の幅を見積もって当たりを取る（全角は 1、半角は約 0.55 文字ぶん）。
+ */
+function checkLabelOverlap() {
+  const fontSize = skinnedFontSize(NODE.labelFontSize);
+  const widthOf = (text: string) => {
+    let units = 0;
+    for (const char of text) units += /[\x20-\x7e]/.test(char) ? 0.55 : 1;
+    return units * fontSize;
+  };
+
+  const boxes = layout.people.map((placement) => {
+    const width = widthOf(placement.person.onlineName);
+    const isCenter = placement.person.id === data.project.defaultCenterPersonId;
+    const size = isCenter ? NODE.size * NODE.centerScale : NODE.size;
+    /* 名前はアイコンの下、中央そろえ */
+    const top = placement.y + size / 2 + NODE.labelOffsetY - fontSize;
+    return {
+      name: placement.person.onlineName,
+      left: placement.x - width / 2,
+      right: placement.x + width / 2,
+      top,
+      bottom: top + fontSize,
+    };
+  });
+
+  let worst: { a: string; b: string; overlap: number } | null = null;
+  for (let i = 0; i < boxes.length; i += 1) {
+    for (let j = i + 1; j < boxes.length; j += 1) {
+      const a = boxes[i];
+      const b = boxes[j];
+      const overlapX = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+      const overlapY = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+      if (overlapX <= 0 || overlapY <= 0) continue;
+      if (!worst || overlapX > worst.overlap) worst = { a: a.name, b: b.name, overlap: overlapX };
+    }
+  }
+
+  if (worst) {
+    fail(
+      '名前',
+      '重なり',
+      `${worst.a} と ${worst.b} の名前が ${worst.overlap.toFixed(0)}px 重なっています`,
+    );
+    return;
+  }
+
+  /* いちばん近い組の空きも出しておく。どれだけ詰められるかの目安になる */
+  let closest = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < boxes.length; i += 1) {
+    for (let j = i + 1; j < boxes.length; j += 1) {
+      const a = boxes[i];
+      const b = boxes[j];
+      if (Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) <= 0) continue;
+      closest = Math.min(closest, Math.max(a.left, b.left) - Math.min(a.right, b.right));
+    }
+  }
+  const gap = Number.isFinite(closest) ? `${closest.toFixed(0)}px` : '同じ行に並ぶ名前なし';
+  console.log(`OK  名前の重なり 0 組（同じ行でいちばん近い名前どうしの空き ${gap}）`);
+}
+
+/* ------------------------------------------------------------------ *
+ * 枠線の色
+ * ------------------------------------------------------------------ */
+
+/**
+ * 人物アイコンの枠線が、その所属の線と同じ色になっているか。
+ *
+ * 枠線を所属の線と同じ色にしてあるからこそ、線をたどらなくても
+ * アイコンだけで所属が読める。片方の色の決め方だけ変えると、
+ * 見た目は成立したまま意味だけが崩れる（気づきにくい）ので測る。
+ */
+function checkRingColors() {
+  const theme = buildTheme('light', activeSkin());
+  const state = { isCenter: false, isRelated: false, isDimmed: false };
+  const groupById = new Map(data.groups.map((group) => [group.id, group]));
+
+  let checked = 0;
+  for (const placement of layout.people) {
+    const groups = placement.groupIds
+      .map((id) => groupById.get(id))
+      .filter((group): group is Group => group !== undefined);
+    if (groups.length === 0) continue;
+
+    const rings = nodeRingColors(groups, theme, state);
+    for (const color of rings) {
+      /* その色を持つ所属が、その人の所属の中にあるか */
+      const match = groups.some(
+        (group) => affiliationEdgeStyle(group, theme, false).stroke === color,
+      );
+      if (!match) {
+        fail(
+          '枠線の色',
+          '所属の線と違う',
+          `${placement.person.onlineName} の枠線 ${color} に合う所属の線がありません`,
+        );
+        return;
+      }
+    }
+    checked += 1;
+  }
+
+  console.log(`OK  枠線の色は所属の線と同じ（${checked} 人ぶんを確認）`);
+}
+
+/* ------------------------------------------------------------------ *
  * 区画の形
  * ------------------------------------------------------------------ */
 
@@ -503,6 +623,8 @@ checkNesting();
 checkEdges();
 checkAffiliationEdges();
 checkAffiliationLength();
+checkLabelOverlap();
+checkRingColors();
 checkBlockShape();
 checkAlignment();
 checkWiring();

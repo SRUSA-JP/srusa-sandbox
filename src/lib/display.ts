@@ -34,7 +34,15 @@ import { ZUKAN_ATTRIBUTE_LIMIT, ZUKAN_PRIORITY_ATTRIBUTES } from '../config/data
 import type { PlayStreak } from './playStreak';
 import type { TimelineDay } from './timeline';
 import { roleColors } from '../config/colors';
-import { CONTRAST_MIN_LARGE, ensureContrast, type VizTheme } from '../theme/palette';
+import { CALENDAR_DAY } from '../config/dataRegistry';
+import {
+  CONTRAST_MIN_LARGE,
+  CONTRAST_MIN_TEXT,
+  ensureContrast,
+  mix,
+  readableTextOn,
+  type VizTheme,
+} from '../theme/palette';
 
 /* ------------------------------------------------------------------ *
  * 値の表示
@@ -222,6 +230,85 @@ export function playerCardContent(input: {
     overflow: hidden > 0 ? ZUKAN_TEXT.moreAttributes(hidden) : '',
     badges,
   };
+}
+
+/* ------------------------------------------------------------------ *
+ * 活動カレンダー
+ * ------------------------------------------------------------------ */
+
+/**
+ * 暦の 1 枠の色。
+ *
+ * 面の濃さでその日の人数を表す。いちばん多かった日を基準にした割合で
+ * 濃さを決めるので、データが増えて人数が変わっても見え方の意味が変わらない。
+ *
+ * 記録の無い日は沈んだ面のまま。空いた日が並んでいることが
+ * 「その週は遊んでいなかった」という読み取りになるので、色でも区別する。
+ * 出来事のあった日には印の色を返す。
+ */
+export function calendarDayColors(
+  day: TimelineDay | null,
+  busiest: number,
+  theme: VizTheme,
+): { background: string; text: string; mark?: string } {
+  const roles = roleColors(theme);
+  if (!day || day.people === 0) {
+    return { background: roles.sunken, text: roles.subtle };
+  }
+
+  /*
+   * いちばん多かった日を 1 として、下限から上限のあいだに散らす。
+   *
+   * 透かし（withAlpha）ではなく、面の色と混ぜて濃さを作る。透かしのままだと
+   * 実際に見える色が「重なった結果」になり、その上に載る文字が読めるかどうかを
+   * 測れない（測ると透かす前の濃い色に対して測ってしまう）。
+   */
+  const ratio = busiest > 0 ? day.people / busiest : 0;
+  const strength =
+    CALENDAR_DAY.minAlpha + (CALENDAR_DAY.maxAlpha - CALENDAR_DAY.minAlpha) * Math.min(1, ratio);
+  const background = mix(roles.surface, roles.accent, strength);
+
+  return {
+    background,
+    /* 薄い面にも濃い面にも載るので、その面に対して読める色を選ぶ */
+    text: readableTextOn(background, theme, CONTRAST_MIN_TEXT),
+    mark: day.marks.length > 0 ? ensureContrast(roles.danger, background, CONTRAST_MIN_LARGE) : undefined,
+  };
+}
+
+/**
+ * 年表の横軸の色。
+ *
+ * 進んだところと、これから来るところを塗り分ける。まだ来ていない印も
+ * 薄く置いて「この先にもある」ことを見せるので、その薄さもここで決める。
+ */
+export function historyAxisColors(theme: VizTheme): {
+  track: string;
+  progress: string;
+  mark: string;
+  markPending: string;
+  block: string;
+} {
+  const roles = roleColors(theme);
+  const accent = ensureContrast(roles.accent, roles.surface, CONTRAST_MIN_LARGE);
+  return {
+    track: roles.sunken,
+    progress: accent,
+    mark: ensureContrast(roles.danger, roles.surface, CONTRAST_MIN_LARGE),
+    markPending: roles.border,
+    block: accent,
+  };
+}
+
+/**
+ * 出来事の札の色（暦の外に並べるとき）。
+ *
+ * 暦の枠の中の印は「その日の面」に載るが、下に並べる一覧は
+ * ページの面に載る。同じ色を使い回すと、面が違うぶん読めなくなる。
+ */
+export function calendarMarkAccent(theme: VizTheme): string {
+  const roles = roleColors(theme);
+  return ensureContrast(roles.danger, roles.surface, CONTRAST_MIN_TEXT);
 }
 
 /* ------------------------------------------------------------------ *

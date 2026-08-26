@@ -1,5 +1,8 @@
 /**
- * 図の拡大縮小が、触る場所によらず効くかをブラウザで確かめる。
+ * ブラウザでしか分からないことを確かめる。
+ *
+ * 1. 図の拡大縮小が、触る場所によらず効くか
+ * 2. どの画面にも、細長く潰れた箱が無いか
  *
  * 相関図には人物アイコンが並んでいるので、つまむ 1 本目がアイコンの上に
  * 乗ることがよくある。アイコンは指を捕まえる（setPointerCapture）ので、
@@ -93,6 +96,65 @@ if (!chromium) {
 
 const preview = spawn('npx', ['vite', 'preview', '--port', String(PORT)], { stdio: 'ignore' });
 let failed = 0;
+
+/** 見て回る画面。routes.ts に足したらここにも足す。 */
+const ROUTES = [
+  '#/minecraft',
+  '#/minecraft/world-map',
+  '#/minecraft/calendar',
+  '#/relationships',
+  '#/zukan',
+  '#/history',
+  '#/events',
+  '#/gallery',
+  '#/players/nodoamenn',
+];
+
+/**
+ * 文字が入っているのに細長く潰れた箱が無いか。
+ *
+ * 幅の指定を間違えると（余白の名前を幅に使うなど）、箱が数 px の柱になり、
+ * 中の文字が 1 文字ずつ縦に積まれる。実際に人物の吹き出しが
+ * 28 x 381px になっていた。組み方の誤りは型でも lint でも出ないので、
+ * 実際に並べたあとの寸法で見つける。
+ *
+ * SVG は対象にしない。グラフの縦軸のように、細長いのが正しいものがある。
+ */
+async function checkNarrowBoxes(page: Page) {
+  for (const route of ROUTES) {
+    await page.goto(`${ORIGIN}/${route}`, { waitUntil: 'load', timeout: 20000 });
+    await page.waitForTimeout(1500);
+
+    const broken = await page.evaluate<Array<{ text: string; width: number; height: number }>>(() => {
+      const found: Array<{ text: string; width: number; height: number }> = [];
+      for (const element of document.querySelectorAll('body *')) {
+        /* SVG の中は見ない（縦軸のように細長いのが正しいものがある） */
+        if (element.namespaceURI && element.namespaceURI !== 'http://www.w3.org/1999/xhtml') continue;
+
+        const box = element.getBoundingClientRect();
+        if (box.width === 0 || box.height === 0) continue;
+        const text = (element.textContent ?? '').trim();
+        if (text.length <= 3) continue;
+
+        if (box.width < 70 && box.height > box.width * 3) {
+          /* 親も潰れているときは、いちばん外側だけを出す */
+          const parent = element.parentElement?.getBoundingClientRect();
+          if (parent && parent.width < 70) continue;
+          found.push({ text: text.slice(0, 24), width: Math.round(box.width), height: Math.round(box.height) });
+        }
+      }
+      return found.slice(0, 5);
+    });
+
+    if (broken.length > 0) {
+      const detail = broken.map((entry) => `${entry.width}x${entry.height}「${entry.text}」`).join(', ');
+      console.log(`NG  ${route} に細長く潰れた箱があります: ${detail}`);
+      failed += 1;
+      continue;
+    }
+    console.log(`OK  ${route} に潰れた箱なし`);
+  }
+}
 
 try {
   if (!(await waitForServer())) {
@@ -202,6 +264,8 @@ try {
       failed += 1;
     }
   }
+
+  await checkNarrowBoxes(page);
 
   await browser.close();
 } finally {

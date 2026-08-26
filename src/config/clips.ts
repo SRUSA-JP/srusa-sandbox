@@ -7,8 +7,15 @@ export interface ClipEntry {
   /** 動画の共有 URL、または画像の URL（同梱画像は `images/…` の相対パス）。 */
   sourceUrl: string;
   category: string;
+  /** ゲーム。表示名は GAME_LABELS が持つ。 */
   map?: string;
-  agent?: string;
+  /**
+   * 登場人物（出てくる順）。
+   *
+   * 並びに意味があるので配列で持つ。1 人だけの名シーンでも配列にする
+   * （人数で書き方が変わると、読む側も書く側も分岐が増える）。
+   */
+  cast?: string[];
   views?: number;
   tags: string[];
   score?: Partial<ClipScore>;
@@ -40,6 +47,25 @@ export type ClipSortKey = 'score' | 'title' | 'views';
 
 const SCORE_DEFAULTS: ClipScore = { smooth: 2, clutch: 0, tap: 3, '6kills': 0, onemag: 0 };
 
+/**
+ * ゲームの表示名。
+ *
+ * ID から機械的に作らない。PEAK や APEX のように、頭文字だけ大文字にすると
+ * 違う名前になってしまうものがある。
+ */
+const GAME_LABELS: Record<string, string> = {
+  peak: 'PEAK',
+  apex: 'APEX',
+  minecraft: 'Minecraft',
+  mahjong: '麻雀',
+  splatoon: 'Splatoon',
+  party: 'パーティゲーム',
+};
+
+export function gameLabel(value: string): string {
+  return GAME_LABELS[value] ?? capFirst(value);
+}
+
 const TAG_LABELS: Record<string, string> = {
   clutch: 'クラッチ',
   miracle: 'ミラクル',
@@ -66,17 +92,13 @@ const TOPIC_TAGS = ['highlight', 'accident', 'teamwork', 'tutorial', 'memorial']
  */
 export const CLIP_ENTRIES: ClipEntry[] = [
   {
-    /*
-     * 動画を埋め込んで出せるかの試し置き。
-     * タイトル・ゲーム・プレイヤー・タグは中身を見てから決めるものなので、
-     * ここは仮のまま置いている。決まったらこの 1 件を書き換える。
-     */
-    id: 'trial-youtube',
-    title: '（仮）YouTube 動画の表示確認',
+    id: 'peak-goal-mae',
+    title: 'ゴール目前',
     sourceUrl: 'https://youtu.be/3IXqfIS8A_Y',
-    category: 'trial',
+    category: 'clip',
+    map: 'peak',
+    cast: ['taraba01414', 'gaburichan', 'detkent', 'nodoame'],
     tags: ['highlight'],
-    note: '埋め込みの表示を確かめるために置いた動画です。タイトルとタグは仮です。',
   },
   {
     id: 'screenshot-spawn',
@@ -104,7 +126,7 @@ export const CLIP_ENTRIES: ClipEntry[] = [
     sourceUrl: '',
     category: 'sample',
     map: 'minecraft',
-    agent: 'nodoamen',
+    cast: ['nodoamen'],
     views: 0,
     tags: ['build', 'tutorial'],
     score: { smooth: 3, clutch: 0, tap: 2, '6kills': 0, onemag: 0 },
@@ -116,7 +138,7 @@ export const CLIP_ENTRIES: ClipEntry[] = [
     sourceUrl: '',
     category: 'sample',
     map: 'mahjong',
-    agent: 'natch',
+    cast: ['natch'],
     views: 0,
     tags: ['comeback', 'highlight'],
     score: { smooth: 4, clutch: 0, tap: 3, '6kills': 0, onemag: 0 },
@@ -128,7 +150,7 @@ export const CLIP_ENTRIES: ClipEntry[] = [
     sourceUrl: '',
     category: 'sample',
     map: 'apex',
-    agent: 'mitiglia',
+    cast: ['mitiglia'],
     views: 0,
     tags: ['clutch', 'teamwork'],
     score: { smooth: 2, clutch: 2, tap: 4, '6kills': 0, onemag: 0 },
@@ -140,7 +162,7 @@ export const CLIP_ENTRIES: ClipEntry[] = [
     sourceUrl: '',
     category: 'sample',
     map: 'splatoon',
-    agent: 'octbee',
+    cast: ['octbee'],
     views: 0,
     tags: ['miracle', 'accident'],
     score: { smooth: 3, clutch: 1, tap: 3, '6kills': 0, onemag: 0 },
@@ -152,7 +174,7 @@ export const CLIP_ENTRIES: ClipEntry[] = [
     sourceUrl: '',
     category: 'sample',
     map: 'party',
-    agent: 'sohei',
+    cast: ['sohei'],
     views: 0,
     tags: ['chaos', 'memorial'],
     score: { smooth: 2, clutch: 0, tap: 2, '6kills': 0, onemag: 1 },
@@ -236,6 +258,14 @@ function countBy(values: string[]) {
   }, {});
 }
 
+/** ゲームの絞り込みの選択肢。表示名だけ GAME_LABELS を通す。 */
+function gameOptions(entries: ClipEntry[]): ClipFilterOption[] {
+  const counts = countBy(entries.map((clip) => clip.map).filter(Boolean) as string[]);
+  return Object.entries(counts)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([value, count]) => ({ value, label: gameLabel(value), count }));
+}
+
 function optionsFromCounts(counts: Record<string, number>): ClipFilterOption[] {
   return Object.entries(counts)
     .sort(([a], [b]) => a.localeCompare(b))
@@ -257,12 +287,12 @@ export function clipFilterGroups(entries = CLIP_ENTRIES): ClipFilterGroup[] {
     {
       id: 'map',
       label: CLIP_TEXT.filters.map,
-      options: optionsFromCounts(countBy(entries.map((clip) => clip.map).filter(Boolean) as string[])),
+      options: gameOptions(entries),
     },
     {
       id: 'agent',
       label: CLIP_TEXT.filters.agent,
-      options: optionsFromCounts(countBy(entries.map((clip) => clip.agent).filter(Boolean) as string[])),
+      options: optionsFromCounts(countBy(entries.flatMap((clip) => clip.cast ?? []))),
     },
     { id: 'play', label: CLIP_TEXT.filters.play, options: keywordOptions(entries, SCENE_TAGS) },
     { id: 'weapon', label: CLIP_TEXT.filters.weapon, options: keywordOptions(entries, TOPIC_TAGS) },

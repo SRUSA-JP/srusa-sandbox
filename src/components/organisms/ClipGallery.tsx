@@ -40,7 +40,7 @@ export function ClipGallery({ clips, selectedClip, onSelect }: ClipGalleryProps)
   const filteredClips = useMemo(() => {
     const matched = clips.filter((clip) => {
       if (filters.map !== ALL && clip.map !== filters.map) return false;
-      if (filters.agent !== ALL && clip.agent !== filters.agent) return false;
+      if (filters.agent !== ALL && !(clip.cast ?? []).includes(filters.agent)) return false;
       if (filters.keyword !== ALL && !clipKeywords(clip).includes(filters.keyword)) return false;
       return true;
     });

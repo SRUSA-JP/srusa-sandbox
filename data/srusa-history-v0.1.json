@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "srusa-history-v1",
+  "note": "SRUSA というインカレサークルそのものの年表。Minecraft サーバーのログとは別で、こちらは人が書いて残すもの。開催した事実は分かっていても年月や参加者が分かっていないものは status を todo にして、埋まるまで画面にもそのまま出す。",
+  "entries": [
+    {
+      "id": "founding",
+      "date": "2020-04",
+      "title": "SRUSA 創設",
+      "detail": "初期メンバーは nodoame・mitiglia・alias の 3 人。",
+      "status": "confirmed",
+      "participants": ["nodoame", "mitiglia", "alias"]
+    },
+    {
+      "id": "snowboard-2021",
+      "date": "2021-03",
+      "title": "スノボ",
+      "detail": "創設の翌年 3 月ごろ。正確な日と参加者はまだ分かっていない。",
+      "status": "todo",
+      "approximate": true
+    },
+    {
+      "id": "cottage-summer",
+      "date": "",
+      "title": "コテージ",
+      "detail": "夏に行ったことは分かっているが、どの年の夏かと参加者がまだ分かっていない。",
+      "status": "todo"
+    },
+    {
+      "id": "offline-custom",
+      "date": "",
+      "title": "オフラインカスタム",
+      "detail": "2 回開催。それぞれの年月と参加者がまだ分かっていない。",
+      "status": "todo",
+      "count": 2
+    },
+    {
+      "id": "villa-nomi",
+      "date": "",
+      "title": "貸別荘呑み",
+      "detail": "2 回開催。それぞれの年月と参加者がまだ分かっていない。",
+      "status": "todo",
+      "count": 2
+    },
+    {
+      "id": "nikuzushi-nomi",
+      "date": "",
+      "title": "肉寿司呑み",
+      "detail": "1 回開催。年月と参加者がまだ分かっていない。",
+      "status": "todo",
+      "count": 1
+    },
+    {
+      "id": "apex-custom",
+      "date": "",
+      "title": "APEX カスタム",
+      "detail": "2 回開催。それぞれの年月と参加者がまだ分かっていない。",
+      "status": "todo",
+      "count": 2
+    },
+    {
+      "id": "minecraft-server",
+      "date": "",
+      "title": "Minecraft サーバーを立てた日",
+      "detail": "日別ログは 2026-08-02 から残っているが、それはログが残っている最初の日であって、サーバーを立てた日とは限らない。",
+      "status": "todo"
+    }
+  ]
+}
