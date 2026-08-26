@@ -9,13 +9,18 @@ export interface PersonProfileTooltipProps {
   onClose: () => void;
 }
 
-/** 相関図の人物を押したときに出す吹き出し。 */
+/**
+ * 相関図の人物を押したときに出す吹き出し。
+ *
+ * 幅は `--sr-layout-*` の変数で指定する。`max-w-xs` のような
+ * Tailwind の名前付きの幅は使えない（余白の名前と衝突して数 px になる）。
+ */
 export function PersonProfileTooltip({ person, label, href, onClose }: PersonProfileTooltipProps) {
   const description = MAP_TEXT.tooltip.person(label, person.attributes);
 
   return (
     <div
-      className="grid max-w-xs gap-sm rounded-md border-hairline border-divider bg-overlay px-md py-sm text-sm text-muted"
+      className="grid max-w-[var(--sr-layout-person-tooltip-max-width)] gap-sm rounded-md border-hairline border-divider bg-overlay px-md py-sm text-sm text-muted"
       role="dialog"
       aria-label={label}
     >
