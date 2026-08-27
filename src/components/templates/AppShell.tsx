@@ -26,6 +26,47 @@ const TAB = 'cursor-pointer rounded-t-md border-b-thick px-lg py-md text-md tran
 const SUB_TAB = 'cursor-pointer rounded-md px-md py-xs text-sm transition-colors';
 
 /**
+ * 下の段を、複数の画面を持つゲーム（route.group）ごとにまとめる。
+ *
+ * 同じ group が並んでいる区間を 1 つの囲いにし、group の無い画面は
+ * 今までどおり単独のタブにする。route.ts で group を持つ画面は
+ * 連続して並べてあるので、ここでは並び順をそのまま見るだけでよい。
+ */
+function groupedSiblings(siblings: Route[]): Array<{ group?: string; entries: Route[] }> {
+  const clusters: Array<{ group?: string; entries: Route[] }> = [];
+  for (const entry of siblings) {
+    const last = clusters[clusters.length - 1];
+    if (entry.group && last?.group === entry.group) {
+      last.entries.push(entry);
+    } else {
+      clusters.push({ group: entry.group, entries: [entry] });
+    }
+  }
+  return clusters;
+}
+
+/** 下の段のタブ 1 枚分のボタン。 */
+function subTabButton(entry: Route, route: Route, onNavigate: (route: Route) => void) {
+  /* タブに並ばない画面（プレイヤー紹介）は、親のタブを選択中に見せる */
+  const active = entry.id === (route.tabId ?? route.id);
+  return (
+    <button
+      key={entry.id}
+      type="button"
+      aria-current={active ? 'page' : undefined}
+      className={
+        active
+          ? `${SUB_TAB} bg-selected font-medium text-selected-ink`
+          : `${SUB_TAB} text-tab hover:bg-hover hover:text-tab-active`
+      }
+      onClick={() => onNavigate(entry)}
+    >
+      {entry.label}
+    </button>
+  );
+}
+
+/**
  * サイト全体の枠。
  *
  * どのページでも変わらないもの（サイト名・タブ・配色の切り替え・本文の幅）
@@ -78,26 +119,22 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
 
       {/* 下の段: そのまとまりの中の画面。1 つしか無いまとまりでは出さない */}
       {siblings.length > 1 && (
-        <nav className="mt-md flex flex-wrap gap-xs" aria-label={APP_TEXT.sectionNavLabel}>
-          {siblings.map((entry) => {
-            /* タブに並ばない画面（プレイヤー紹介）は、親のタブを選択中に見せる */
-            const active = entry.id === (route.tabId ?? route.id);
-            return (
-              <button
-                key={entry.id}
-                type="button"
-                aria-current={active ? 'page' : undefined}
-                className={
-                  active
-                    ? `${SUB_TAB} bg-selected font-medium text-selected-ink`
-                    : `${SUB_TAB} text-tab hover:bg-hover hover:text-tab-active`
-                }
-                onClick={() => onNavigate(entry)}
+        <nav className="mt-md flex flex-wrap items-center gap-md" aria-label={APP_TEXT.sectionNavLabel}>
+          {groupedSiblings(siblings).map((cluster) =>
+            cluster.group ? (
+              <div
+                key={`group-${cluster.group}`}
+                className="flex flex-wrap items-center gap-xs rounded-md border-hairline border-divider px-xs py-xxs"
               >
-                {entry.label}
-              </button>
-            );
-          })}
+                <span className="px-xs text-xs font-medium text-subtle">{cluster.group}</span>
+                {cluster.entries.map((entry) => subTabButton(entry, route, onNavigate))}
+              </div>
+            ) : (
+              <div key={cluster.entries[0].id} className="flex flex-wrap gap-xs">
+                {cluster.entries.map((entry) => subTabButton(entry, route, onNavigate))}
+              </div>
+            ),
+          )}
         </nav>
       )}
 

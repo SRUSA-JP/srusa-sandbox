@@ -52,6 +52,15 @@ export interface Route {
   /** 動的ページだけが持つ URL パラメータ。 */
   params?: Record<string, string>;
   /**
+   * 下の段で、複数の画面を持つゲームだとまとめて見せるための名前。
+   *
+   * Minecraft は統計・ワールドマップ・活動カレンダーの 3 画面を持つが、
+   * VALORANT・LOL・APEX はそれぞれ 1 画面だけなので、並べただけでは
+   * どれが同じゲームの画面か分からない。この名前がある画面どうしを
+   * 1 つの囲いにまとめ、無い画面は今までどおり単独のタブにする。
+   */
+  group?: string;
+  /**
    * タブに出さない画面が、どのタブの下にいるか。
    *
    * プレイヤー紹介は URL を直に開けるがタブには並べない。それでも
@@ -69,10 +78,11 @@ export const ZUKAN_PATH = '#/zukan';
 
 export const ROUTES: Route[] = [
   /* ゲーム。遊んでいるゲームをここにまとめ、下の段で切り替える */
-  { id: 'stats', section: 'games', path: '#/minecraft', label: 'Minecraft 統計', skinId: MINECRAFT_SKIN.id },
+  { id: 'stats', section: 'games', group: 'Minecraft', path: '#/minecraft', label: '統計', skinId: MINECRAFT_SKIN.id },
   {
     id: 'world-map',
     section: 'games',
+    group: 'Minecraft',
     path: '#/minecraft/world-map',
     label: 'ワールドマップ',
     skinId: MINECRAFT_SKIN.id,
@@ -80,6 +90,7 @@ export const ROUTES: Route[] = [
   {
     id: 'calendar',
     section: 'games',
+    group: 'Minecraft',
     path: '#/minecraft/calendar',
     label: '活動カレンダー',
     skinId: MINECRAFT_SKIN.id,
