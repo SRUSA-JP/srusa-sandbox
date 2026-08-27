@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, preview]
   pull_request:
   workflow_dispatch:
 
@@ -22,3 +22,28 @@ jobs:
       # build が型検査・ESLint・UI初期レンダリング・配色/デザイン検査を順に実行する
       - name: 型検査・lint・UI/デザイン検査とビルド
         run: npm run build
+
+  deploy-preview:
+    # preview ブランチへの push のときだけ、Netlify の固定プレビューへデプロイする。
+    # サンドボックス環境からは Netlify への通信がブロックされているため、
+    # デプロイは実ネットワークを持つ GitHub Actions 側で行う。
+    if: github.event_name == 'push' && github.ref == 'refs/heads/preview'
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Netlify プレビューへデプロイ
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: npx netlify-cli deploy --dir=dist --alias preview
