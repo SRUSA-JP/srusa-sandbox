@@ -104,6 +104,33 @@ function shortDate(value: string): string {
   return match ? `${match[1]}/${match[2]}` : value;
 }
 
+/**
+ * from から to までの日数。
+ *
+ * バックアップの間隔は毎日ではない（実際に 08-17 → 08-22 のように 5 日分が
+ * まとめて 1 行になっている）。その行を「1 日ぶん」のつもりで並べると、
+ * 複数日の合計が単日の隣に並んで、伸び方が正しく読めなくなる。
+ * 何日ぶんかを持っておき、ラベルに出す側で断れるようにする。
+ */
+function spanDays(from: string, to: string): number {
+  const start = new Date(from.slice(0, 10)).getTime();
+  const end = new Date(to.slice(0, 10)).getTime();
+  const days = Math.round((end - start) / (24 * 60 * 60 * 1000));
+  return Math.max(1, days);
+}
+
+/**
+ * 横軸に出す期間の見出し。
+ *
+ * 1 日ぶんならそのまま日付の範囲を出す。複数日ぶんの合計になっている
+ * ときは「（n日分）」を付けて、単日の点と同じ意味では読めないことを示す。
+ */
+function periodCategoryLabel(from: string, to: string): string {
+  const days = spanDays(from, to);
+  const range = `${shortDate(from)}-${shortDate(to)}`;
+  return days > 1 ? `${range}（${days}日分）` : range;
+}
+
 export function loadPlayerDailyDocument(): PlayerDailyDocument {
   return currentPlayerDailySummaryJson as PlayerDailyDocument;
 }
@@ -140,7 +167,7 @@ export function playerDailyTimeline(
     series: players.map((player) => ({ key: player, label: player })),
     rows: periods.map((period) => {
       const row: Record<string, string | number> = {
-        [PLAYER_DAILY_CATEGORY_KEY]: `${shortDate(period.from)}-${shortDate(period.to)}`,
+        [PLAYER_DAILY_CATEGORY_KEY]: periodCategoryLabel(period.from, period.to),
       };
       for (const entry of doc.rows.filter((delta) => delta.to === period.to && selected.has(delta.player))) {
         row[entry.player] = entry[metric];
