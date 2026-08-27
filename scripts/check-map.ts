@@ -17,6 +17,7 @@
 import { readFileSync } from 'node:fs';
 import { EDGE, GRID, NODE, SEPARATION } from '../src/map/config';
 import { skinnedFontSize } from '../src/config/skins';
+import { groupTypeSetting } from '../src/map/config';
 import { manhattanPath } from '../src/map/geometry';
 import { affiliationEdgeStyle, nodeRingColors } from '../src/map/display';
 import { activeSkin } from '../src/config/skins';
@@ -55,6 +56,15 @@ const MIN_ALIGNED_RATIO = 0.8;
 
 /** 子の囲いが親からはみ出してよい量（座標を丸めるぶん）。 */
 const NESTING_TOLERANCE = 1;
+
+/**
+ * 同じ所属の人が、図のどこまで散らばってよいか（対角線に対する割合）。
+ *
+ * いまは S塾 の 45% がいちばん広い。所属が重なっている人はどちらか 1 か所に
+ * しか置けないので 0 にはできない。持ち場の決め方を「所属者の多いほう」から
+ * 「少ないほう」に変えると 78% まで広がるので、その手前に置く。
+ */
+const MAX_GROUP_SPREAD = 0.55;
 
 /** 区画の縦横の比の上限。これを超えると帯に見える。 */
 const MAX_BLOCK_RATIO = 4;
@@ -281,8 +291,12 @@ function checkChannels() {
  * 所属を持つ人が、全員どこかに繋がっているか。
  *
  * 相関図の目的は「誰と誰が繋がっているか」を見せることなので、
- * 所属があるのに線が 1 本も出ていない人がいると、その人だけ図から浮く。
- * 明示的な関係が書かれていない人（nodoame など）を拾うのがこの検査の役目。
+ * 繋がれるはずなのに線が 1 本も出ていない人がいると、その人だけ図から浮く。
+ *
+ * 「繋がれるはず」は、名前のある場所（M大学・K高校・S塾・K社）に
+ * 所属している人のこと。名前の無い段階（小学校・高校）や状態の札
+ * （アクティブメンバー）しか持たない人は、そもそも線を引く根拠が無いので
+ * 対象にしない。無い繋がりを描くよりは、線が無いままのほうがよい。
  */
 function checkAffiliationEdges() {
   /* 所属者が 1 人だけのグループは、どう繋いでも相手がいない。繋げる対象から外す */
@@ -292,8 +306,16 @@ function checkAffiliationEdges() {
       data.people.filter((person) => person.attributes.includes(group.name)).length,
     ]),
   );
+  /* 線を引く根拠になるのは、所属者が 2 人以上いて、かつ「知り合い」を意味する所属だけ */
+  const connecting = new Set(
+    data.groups
+      .filter((group) => groupTypeSetting(group.type).connects)
+      .map((group) => group.name),
+  );
   const groupNames = new Set(
-    data.groups.map((group) => group.name).filter((name) => (memberCount.get(name) ?? 0) >= 2),
+    data.groups
+      .map((group) => group.name)
+      .filter((name) => (memberCount.get(name) ?? 0) >= 2 && connecting.has(name)),
   );
   const connected = new Set<string>();
   for (const edge of layout.affiliationEdges) {
@@ -334,10 +356,9 @@ function checkAffiliationEdges() {
    * 誰とも所属を共有していない人。データ側の穴なので、ここでは落とさずに数だけ出す。
    * 所属を足せば自動で線が繋がるので、増えていないかを見るための目印。
    */
+  /* 札しか持っていない人。データの穴ではないので落とさず、数だけ出す */
   const alone = data.people.filter(
-    (person) =>
-      !connected.has(person.id) &&
-      person.attributes.some((name) => memberCount.has(name)),
+    (person) => !connected.has(person.id) && person.attributes.some((name) => memberCount.has(name)),
   );
 
   console.log(
@@ -345,9 +366,66 @@ function checkAffiliationEdges() {
   );
   if (alone.length > 0) {
     console.log(
-      `    参考: 所属を共有する相手がいない人 ${alone.length} 人（${alone.map((person) => person.onlineName).join(', ')}）`,
+      `    参考: 線を引く根拠のある所属を持たない人 ${alone.length} 人（${alone.map((person) => person.onlineName).join(', ')}）`,
     );
   }
+}
+
+/* ------------------------------------------------------------------ *
+ * 所属のまとまり
+ * ------------------------------------------------------------------ */
+
+/**
+ * 同じ所属の人が、図の上でも近くに集まっているか。
+ *
+ * 見る人は「同じ所属＝近く」で読むので、離れていると所属が読み取れない。
+ *
+ * 見るのは「知り合い」を意味する所属だけ（名前のある場所）。
+ * 「アクティブメンバー」「小学校」のような札は、別々の場所にいる人へ
+ * 横断的に付くものなので、図の上で近くに集まるほうがおかしい。
+ *
+ * 1 人はどこか 1 か所にしか置けないので、所属が重なっている人がいると
+ * どちらかの所属は必ず広がる。完全には潰せないので上限で押さえる。
+ */
+function checkGroupCohesion() {
+  const rows: Array<{ name: string; members: number; spread: number }> = [];
+
+  for (const group of data.groups) {
+    if (!groupTypeSetting(group.type).connects) continue;
+    const members = data.people
+      .filter((person) => person.attributes.includes(group.name))
+      .map((person) => layout.byId.get(person.id))
+      .filter((place): place is NonNullable<typeof place> => Boolean(place));
+    if (members.length < 2) continue;
+
+    /* いちばん遠い 2 人の距離。1 人でも離れていると所属が読めなくなる */
+    let farthest = 0;
+    for (let i = 0; i < members.length; i += 1) {
+      for (let j = i + 1; j < members.length; j += 1) {
+        farthest = Math.max(
+          farthest,
+          Math.hypot(members[i].x - members[j].x, members[i].y - members[j].y),
+        );
+      }
+    }
+    rows.push({ name: group.name, members: members.length, spread: farthest / diagonal });
+  }
+
+  if (rows.length === 0) return;
+  rows.sort((a, b) => b.spread - a.spread);
+  const worst = rows[0];
+
+  if (worst.spread > MAX_GROUP_SPREAD) {
+    fail(
+      '所属のまとまり',
+      '散らばり',
+      `${worst.name} の ${worst.members} 人が図の ${(worst.spread * 100).toFixed(0)}% に散らばっています（上限 ${(MAX_GROUP_SPREAD * 100).toFixed(0)}%）`,
+    );
+    return;
+  }
+  console.log(
+    `OK  所属のまとまり（いちばん散らばっているのは ${worst.name} の ${(worst.spread * 100).toFixed(0)}% / 上限 ${(MAX_GROUP_SPREAD * 100).toFixed(0)}%）`,
+  );
 }
 
 /* ------------------------------------------------------------------ *
@@ -476,6 +554,10 @@ function checkRingColors() {
  * 同じグループの人は 1 列や 2×4 のような整った長方形に並べたい。
  * 並べ方の点数の付け方をひとつ間違えると（欠けた升目を重く見すぎるなど）、
  * 11 人が 1×11 の帯になって図が縦に伸びる。見た目には気づきにくいので測る。
+ *
+ * 見るのは、そのグループを持ち場にしている人（＝実際に区画を作っている人）だけ。
+ * 持ち場が他所にある所属者まで含めると、散らばった位置の外接矩形を
+ * 「区画の形」として測ってしまい、区画ではないものを細長いと言ってしまう。
  */
 function checkBlockShape() {
   const worst: Array<{ name: string; ratio: number; columns: number; rows: number }> = [];
@@ -483,11 +565,12 @@ function checkBlockShape() {
   for (const region of layout.regions) {
     /* 子の区画を持つグループは、子の形に引っぱられるので対象外 */
     if (data.groups.some((group) => group.parentGroupId === region.group.id)) continue;
-    if (region.memberIds.length < MIN_BLOCK_MEMBERS) continue;
-
+    /* その区画に住んでいる人だけを見る */
     const points = region.memberIds
       .map((id) => layout.byId.get(id))
-      .filter((place): place is NonNullable<typeof place> => Boolean(place));
+      .filter((place): place is NonNullable<typeof place> => Boolean(place))
+      .filter((place) => place.homeGroupId === region.group.id);
+    if (points.length < MIN_BLOCK_MEMBERS) continue;
     const columns = new Set(points.map((place) => place.x)).size;
     const rows = new Set(points.map((place) => place.y)).size;
     if (columns === 0 || rows === 0) continue;
@@ -623,6 +706,7 @@ checkNesting();
 checkEdges();
 checkAffiliationEdges();
 checkAffiliationLength();
+checkGroupCohesion();
 checkLabelOverlap();
 checkRingColors();
 checkBlockShape();

@@ -206,6 +206,14 @@ export const FLOORPLAN = {
   /** 区画の中で人を入れ替える、繰り返しの上限。縮まなくなればそこで止まる。 */
   slotPasses: 8,
   /**
+   * 同じ所属の人どうしを引き寄せる強さ。
+   *
+   * 所属の線は親から放射状に出るだけなので、線だけでは「同じ所属だが
+   * 親ではない人」どうしが離れたままになる。所属のまとまりを保つために、
+   * 同じ所属の組すべてを弱く引き寄せる。
+   */
+  groupCohesion: 3,
+  /**
    * 折り返す幅を探すときの、いちばん狭い値（升目の数）。
    *
    * 幅は決め打ちにしない。決め打ちだと人が 1 人増えただけで並びが別の形に
@@ -385,6 +393,19 @@ export interface GroupTypeSetting {
    * 領域そのものは描くので、凡例から強調して確かめることはできる。
    */
   binds: boolean;
+  /**
+   * その所属が「知り合い」を意味するかどうか。
+   *
+   * 名前のある場所（M大学・K高校・S塾・K社）なら、同じ所属の人は
+   * 実際に顔を合わせている。そこから線を引いてよい。
+   *
+   * 一方「小学校」「高校」のように名前の無い段階は、同じ札が付いていても
+   * 同じ学校とは限らない。「アクティブメンバー」のような状態の札や、
+   * 所属が分からない人を集めた「不明」も同じで、札が同じだけでは
+   * 知り合いにならない。ここから線を引くと、実際には無い繋がりを
+   * 描いてしまう（kreis が rik 以外とも繋がって見えていた）。
+   */
+  connects: boolean;
 }
 
 /**
@@ -441,17 +462,19 @@ export function groupBiome(group: { id: string; type: GroupType }): BiomeId {
 }
 
 export const GROUP_TYPE_SETTINGS: Record<GroupType, GroupTypeSetting> = {
-  university: { label: '大学', colorSlot: 0, depth: 0, order: 10, binds: true },
-  lab: { label: '研究室', colorSlot: 3, depth: 1, order: 60, binds: true },
-  school: { label: '高校', colorSlot: 1, depth: 0, order: 20, binds: true },
-  school_stage: { label: '学校段階', colorSlot: 2, depth: 0, order: 30, binds: true },
-  education: { label: '塾', colorSlot: 4, depth: 0, order: 40, binds: true },
-  company: { label: '会社', colorSlot: 5, depth: 0, order: 50, binds: true },
-  club: { label: '部活', colorSlot: 6, depth: 1, order: 70, binds: true },
-  friend_group: { label: '友人グループ', colorSlot: 7, depth: 1, order: 80, binds: true },
-  activity: { label: '活動', colorSlot: 5, depth: 1, order: 90, binds: false },
-  relationship_context: { label: '関係の文脈', colorSlot: 6, depth: 1, order: 100, binds: false },
-  unknown: { label: '不明', colorSlot: 2, depth: 0, order: 110, binds: true },
+  university: { label: '大学', colorSlot: 0, depth: 0, order: 10, binds: true, connects: true },
+  lab: { label: '研究室', colorSlot: 3, depth: 1, order: 60, binds: true, connects: true },
+  school: { label: '高校', colorSlot: 1, depth: 0, order: 20, binds: true, connects: true },
+  /* 「小学校」「高校」のように名前の無い段階。同じ段階でも同じ学校とは限らない */
+  school_stage: { label: '学校段階', colorSlot: 2, depth: 0, order: 30, binds: true, connects: false },
+  education: { label: '塾', colorSlot: 4, depth: 0, order: 40, binds: true, connects: true },
+  company: { label: '会社', colorSlot: 5, depth: 0, order: 50, binds: true, connects: true },
+  club: { label: '部活', colorSlot: 6, depth: 1, order: 70, binds: true, connects: true },
+  friend_group: { label: '友人グループ', colorSlot: 7, depth: 1, order: 80, binds: true, connects: true },
+  activity: { label: '活動', colorSlot: 5, depth: 1, order: 90, binds: false, connects: false },
+  relationship_context: { label: '関係の文脈', colorSlot: 6, depth: 1, order: 100, binds: false, connects: false },
+  /* 所属が分からない人の置き場。分からない者同士が知り合いということはない */
+  unknown: { label: '不明', colorSlot: 2, depth: 0, order: 110, binds: true, connects: false },
 };
 
 /** 定義にない分類が来たときの既定値。データが増えても落ちないようにする。 */
@@ -460,6 +483,8 @@ export const FALLBACK_GROUP_TYPE: GroupTypeSetting = {
   colorSlot: 2,
   depth: 0,
   order: 120,
+  /* 知らない分類は、線を引かない側に倒す。無い繋がりを描くほうが害が大きい */
+  connects: false,
   binds: false,
 };
 
