@@ -1207,6 +1207,15 @@ export function affiliationHubs(data: RelationshipData): AffiliationHub[] {
 
   const hubs: AffiliationHub[] = [];
   for (const group of data.groups) {
+    /*
+     * 「知り合い」を意味しない所属からは線を引かない。
+     *
+     * 名前の無い段階（小学校・高校）や状態の札（アクティブメンバー）は、
+     * 同じ札が付いていても顔を合わせているとは限らない。そこから線を引くと、
+     * 実際には無い繋がりが図に出てしまう。
+     */
+    if (!groupTypeSetting(group.type).connects) continue;
+
     const members = data.people.filter((person) => person.attributes.includes(group.name));
     if (members.length < 2) continue;
 
@@ -1611,7 +1620,7 @@ function emitBox(box: FloorBox, originColumn: number, originRow: number, into: P
  * 所属を持ち場にして、そこの区画に入れる。他の所属との繋がりは、
  * 所属の線（グループの色）が引き受けるので、区画が離れていても読める。
  */
-function homeGroupOf(person: Person, groups: Group[]): Group | null {
+function homeGroupOf(person: Person, groups: Group[], memberCount: Map<string, number>): Group | null {
   const byName = new Map(groups.map((group) => [group.name, group]));
   const byId = new Map(groups.map((group) => [group.id, group]));
 
@@ -1634,9 +1643,23 @@ function homeGroupOf(person: Person, groups: Group[]): Group | null {
   if (candidates.length === 0) return null;
 
   return candidates.reduce((best, group) => {
+    /* 内側の所属を優先する（研究室 ⊃ 大学 なら研究室に住む） */
     const a = depthOf(group);
     const b = depthOf(best);
     if (a !== b) return a > b ? group : best;
+
+    /*
+     * 同じ深さなら、所属者の少ないほうに住む。
+     *
+     * 分類の順で決めると、大きい所属がいつも勝って小さい所属が空になる。
+     * 実際 S塾 の 10 人は全員 K高校 か M大学 に住み、S塾 には誰も残らず、
+     * 囲いも描かれないまま 10 人が図の 6 割に散らばっていた。
+     * 少ないほうに住まわせると、どの所属にも人が残ってまとまりができる。
+     */
+    const sizeA = memberCount.get(group.name) ?? 0;
+    const sizeB = memberCount.get(best.name) ?? 0;
+    if (sizeA !== sizeB) return sizeA > sizeB ? group : best;
+
     const orderA = groupTypeSetting(group.type).order;
     const orderB = groupTypeSetting(best.type).order;
     if (orderA !== orderB) return orderA < orderB ? group : best;
@@ -1653,7 +1676,16 @@ function homeGroupOf(person: Person, groups: Group[]): Group | null {
  */
 function floorplanPlacements(data: RelationshipData): PersonPlacement[] {
   const hubs = affiliationHubs(data);
-  const home = new Map(data.people.map((person) => [person.id, homeGroupOf(person, data.groups)]));
+  /* 所属者の数。持ち場を決めるときに「少ないほう」を選ぶのに使う */
+  const memberCount = new Map(
+    data.groups.map((group) => [
+      group.name,
+      data.people.filter((person) => person.attributes.includes(group.name)).length,
+    ]),
+  );
+  const home = new Map(
+    data.people.map((person) => [person.id, homeGroupOf(person, data.groups, memberCount)]),
+  );
 
   const boxes = new Map<string, FloorBox>();
   for (const group of data.groups) {
@@ -1913,7 +1945,14 @@ function refineSlots(
 ): void {
   const byId = new Map(placements.map((placement) => [placement.person.id, placement]));
 
-  /** 誰と誰が線で繋がっているか。関係線は重く見る（区画の並べ替えと同じ扱い）。 */
+  /**
+   * 誰と誰を近くに置きたいか。
+   *
+   * 線で繋がっている相手（関係線・所属の線）に加えて、同じ所属の人どうしも
+   * 引き寄せる。所属の線は親から放射状に出るだけなので、線だけを見ていると
+   * 「同じ所属だが親ではない人」どうしが離れたままになる
+   * （S塾 の 10 人が図の 63% に散らばっていた）。
+   */
   const neighbours = new Map<string, Array<{ id: string; weight: number }>>();
   const link = (a: string, b: string, weight: number) => {
     if (!byId.has(a) || !byId.has(b)) return;
@@ -1925,6 +1964,16 @@ function refineSlots(
   }
   for (const hub of hubs) {
     for (const memberId of hub.memberIds) link(hub.hubId, memberId, 1);
+  }
+
+  /* 同じ所属どうしを引き寄せる。人数の多い所属ほど 1 組あたりは軽くして、
+     大きな所属が全部を引きずらないようにする */
+  for (const { memberIds, hubId } of hubs) {
+    const members = [hubId, ...memberIds];
+    const weight = FLOORPLAN.groupCohesion / Math.max(1, members.length - 1);
+    for (let i = 0; i < members.length; i += 1) {
+      for (let j = i + 1; j < members.length; j += 1) link(members[i], members[j], weight);
+    }
   }
 
   /** その人から出ている線の長さの合計。 */

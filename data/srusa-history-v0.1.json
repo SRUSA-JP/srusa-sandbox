@@ -6,9 +6,13 @@
       "id": "founding",
       "date": "2020-04",
       "title": "SRUSA 創設",
-      "detail": "初期メンバーは nodoame・mitiglia・alias の 3 人。",
+      "detail": "初期メンバーは nodoame・mitiglia・alias の 3 人。コロナ禍で直接集まれないなか、ゲームで集まっていた理系の大学生の集まりとして始まった。",
       "status": "confirmed",
-      "participants": ["nodoame", "mitiglia", "alias"]
+      "participants": [
+        "nodoame",
+        "mitiglia",
+        "alias"
+      ]
     },
     {
       "id": "snowboard-2021",
@@ -62,6 +66,13 @@
       "date": "",
       "title": "Minecraft サーバーを立てた日",
       "detail": "日別ログは 2026-08-02 から残っているが、それはログが残っている最初の日であって、サーバーを立てた日とは限らない。",
+      "status": "todo"
+    },
+    {
+      "id": "name-origin",
+      "date": "",
+      "title": "SRUSA という名前の由来",
+      "detail": "「コロナ禍で集まれないけれど、ゲームで集まる理系の大学生」という意味の略称、というところまでは分かっている。どの語の頭文字なのかは未確定。",
       "status": "todo"
     }
   ]
