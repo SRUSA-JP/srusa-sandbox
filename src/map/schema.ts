@@ -38,6 +38,14 @@ export interface Group {
   type: GroupType;
   /** 上位グループ（研究室 → 大学など）。 */
   parentGroupId?: string;
+  /**
+   * その所属が「知り合い」を意味するか。分類ごとの既定を上書きする。
+   *
+   * 「小学校」「中学校」のように名前の無い段階は、同じ札でも同じ学校とは
+   * 限らないので、既定では線を引かない。ただし実際に同じ園・同じ学校だと
+   * 分かっているものは、ここで true にして線を引く（幼稚園がそれにあたる）。
+   */
+  connects?: boolean;
 }
 
 export interface Relation {

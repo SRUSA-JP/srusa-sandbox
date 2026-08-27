@@ -55,6 +55,7 @@ function parseGroup(raw: unknown, index: number): Group {
     name: requireString(raw.name, `${field}.name`),
     type: requireString(raw.type, `${field}.type`),
     parentGroupId: raw.parentGroupId === undefined ? undefined : requireString(raw.parentGroupId, `${field}.parentGroupId`),
+    connects: typeof raw.connects === 'boolean' ? raw.connects : undefined,
   };
 }
 

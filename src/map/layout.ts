@@ -17,6 +17,7 @@ import {
   FLOORPLAN,
   GRID,
   GROUP_RELAX,
+  groupConnects,
   groupTypeSetting,
   NODE,
   REGION,
@@ -1214,7 +1215,7 @@ export function affiliationHubs(data: RelationshipData): AffiliationHub[] {
      * 同じ札が付いていても顔を合わせているとは限らない。そこから線を引くと、
      * 実際には無い繋がりが図に出てしまう。
      */
-    if (!groupTypeSetting(group.type).connects) continue;
+    if (!groupConnects(group)) continue;
 
     const members = data.people.filter((person) => person.attributes.includes(group.name));
     if (members.length < 2) continue;
