@@ -258,7 +258,7 @@ export const STATS_TEXT = {
     },
     daily: {
       title: 'PLAYER DAILY LOG',
-      note: 'バックアップ間の差分から、プレイヤーごとの伸び方を日付別に見ます。',
+      note: 'バックアップ間の差分から、プレイヤーごとの伸び方を日付別に見ます。バックアップは毎日は取っていないので、間が空いた区間はその日数ぶんの合計です（横軸に「n日分」と出ます）。',
       player: 'プレイヤー',
       metric: '指標',
       lastActive: '直近活動',
@@ -621,16 +621,13 @@ export const STREAK_TEXT = {
   totalDays: '遊んだ日数',
   lastPlayed: '最後にログイン',
   days: (count: number) => `${count} 日`,
-  /** 帯の見出し。何日ぶんを並べているか。 */
-  recent: (count: number) => `直近 ${count} 日`,
-  /** 連なりが途切れているとき。 */
-  broken: '途切れています',
-  /** 続いているとき。 */
-  active: '継続中',
   /** 一度もログインの記録が無い人。 */
   empty: 'ログインの記録がまだありません。',
   /** 帯の 1 マスの読み上げ。 */
   markAlt: (date: string, played: boolean) => `${date} ${played ? 'ログインあり' : 'ログインなし'}`,
+  /** カレンダーの見出し。 */
+  calendarTitle: 'ログイン日カレンダー',
+  calendarNote: '来た日を暦で表しています。濃い升目がログインした日です。',
 } as const;
 
 /**
@@ -853,4 +850,14 @@ export const HISTORY_TEXT = {
 
   /** 日付が入っていない項目の表示。 */
   undated: '時期が不明',
+} as const;
+
+/**
+ * まだ中身の無いゲームのページ（VALORANT・LOL・APEX）の文言。
+ *
+ * 「準備中」という事実だけを言う。それらしい統計や説明をでっち上げない。
+ */
+export const GAME_PLACEHOLDER_TEXT = {
+  lead: (game: string) => `${game} のページはまだありません。`,
+  note: 'ここにはまだ中身がありません。データが揃ったら、Minecraft の統計や活動カレンダーと同じ形で追加します。',
 } as const;

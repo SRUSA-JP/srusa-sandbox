@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   AppLayout,
   Note,
+  PlayerCalendarPanel,
   PlayerDailyPanel,
   PlayerDirectory,
   PlayerFeaturedUsePanel,
@@ -9,7 +10,6 @@ import {
   PlayerRankingPanel,
   PlayerRelationshipPanel,
   PlayerStatTiles,
-  PlayerStreakPanel,
 } from '../components';
 import { CONTROL, CONTROL_HOVER, CONTROL_ROW } from '../components/classes';
 import { APP_TEXT, ZUKAN_TEXT } from '../config/messages';
@@ -17,6 +17,7 @@ import { allPlayerProfiles, playerProfile } from '../data/playerProfiles';
 import { listDatasets, loadDataset } from '../data/datasets';
 import { playLog } from '../data/playLog';
 import { playStreakOf, playStreakRanking } from '../lib/playStreak';
+import { playerDayEntries } from '../lib/playerCalendar';
 import { PLAY_STREAK_WINDOW_DAYS } from '../config/dataRegistry';
 import type { StatsDocument } from '../data/schema';
 import type { VizTheme } from '../theme/palette';
@@ -53,6 +54,10 @@ export function PlayerPage({ theme, route }: PlayerPageProps) {
   /* 連続プレイ日数はログ由来なので、統計データの読み込みを待たずに出せる */
   const streak = useMemo(
     () => (profile ? playStreakOf(playLog(), profile.name, PLAY_STREAK_WINDOW_DAYS) : null),
+    [profile],
+  );
+  const calendarEntries = useMemo(
+    () => (profile ? playerDayEntries(playLog(), profile.name) : []),
     [profile],
   );
   /* 見つからなかったときは図鑑をそのまま出すので、そちら用の一覧も用意しておく */
@@ -94,7 +99,7 @@ export function PlayerPage({ theme, route }: PlayerPageProps) {
       }
     >
       <PlayerProfileHero profile={profile} theme={theme} />
-      {streak && <PlayerStreakPanel streak={streak} theme={theme} />}
+      {streak && <PlayerCalendarPanel streak={streak} entries={calendarEntries} theme={theme} />}
       {player ? (
         <>
           <PlayerStatTiles player={player} theme={theme} generatedOn={statsGeneratedOn} />

@@ -29,7 +29,7 @@ import {
 import type { NumericPlayerRowKey, RateBasis } from './selectors';
 import { formatDecimal, formatInt } from './format';
 import { PLAYSTYLE_IDS, type PlaystyleScore } from './statsExperience';
-import { STREAK_TEXT, ZUKAN_TEXT } from '../config/messages';
+import { ZUKAN_TEXT } from '../config/messages';
 import { ZUKAN_ATTRIBUTE_LIMIT, ZUKAN_PRIORITY_ATTRIBUTES } from '../config/dataRegistry';
 import type { PlayStreak } from './playStreak';
 import type { TimelineDay } from './timeline';
@@ -168,33 +168,6 @@ export function playstyleAxisOrder(scores: PlaystyleScore[]): PlaystyleScore[] {
  * 連続プレイ日数
  * ------------------------------------------------------------------ */
 
-/**
- * 連続プレイ日数の見せ方。
- *
- * 数え方は lib/playStreak.ts、色は config/colors.ts が持つ。ここは
- * 「どの数字にどの見出しを付け、続いているかをどう言うか」だけを決める。
- */
-export function playStreakSummary(streak: PlayStreak): {
-  tiles: Array<{ label: string; value: string }>;
-  state: string;
-  hasRecord: boolean;
-} {
-  return {
-    tiles: [
-      /* 途切れている人の連なりを「現在」と呼ぶと、いまも続いていると読めてしまう */
-      {
-        label: streak.active ? STREAK_TEXT.current : STREAK_TEXT.lastRun,
-        value: STREAK_TEXT.days(streak.current),
-      },
-      { label: STREAK_TEXT.longest, value: STREAK_TEXT.days(streak.longest) },
-      { label: STREAK_TEXT.totalDays, value: STREAK_TEXT.days(streak.totalDays) },
-      { label: STREAK_TEXT.lastPlayed, value: streak.lastPlayed },
-    ],
-    state: streak.active ? STREAK_TEXT.active : STREAK_TEXT.broken,
-    hasRecord: streak.totalDays > 0,
-  };
-}
-
 /* ------------------------------------------------------------------ *
  * 図鑑
  * ------------------------------------------------------------------ */
@@ -307,6 +280,22 @@ export function historyAxisColors(theme: VizTheme): {
 export function calendarMarkAccent(theme: VizTheme): string {
   const roles = roleColors(theme);
   return ensureContrast(roles.danger, roles.surface, CONTRAST_MIN_TEXT);
+}
+
+/**
+ * その人の暦の 1 枠の色。
+ *
+ * 活動カレンダー（人数で濃さを変える）とは違い、ここは「来たか来ていないか」の
+ * 2 択なので、濃さの段は作らない。強調色 1 色と、沈んだ面の 2 色だけで表す。
+ */
+export function playerCalendarDayColor(
+  played: boolean,
+  theme: VizTheme,
+): { background: string; text: string } {
+  const roles = roleColors(theme);
+  if (!played) return { background: roles.sunken, text: roles.subtle };
+  const background = ensureContrast(roles.accent, roles.surface, CONTRAST_MIN_LARGE);
+  return { background, text: readableTextOn(background, theme, CONTRAST_MIN_TEXT) };
 }
 
 /* ------------------------------------------------------------------ *
