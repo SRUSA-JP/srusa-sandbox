@@ -10,6 +10,9 @@ export interface ActivityCalendarProps {
   /** 濃さを決めるための、いちばん人が多かった日の人数。 */
   busiest: number;
   theme: VizTheme;
+  /** いま開いている日。 */
+  selected: string;
+  onSelect: (date: string) => void;
 }
 
 /**
@@ -20,7 +23,13 @@ export interface ActivityCalendarProps {
  *
  * 何色にするかは lib/display.ts が決め、ここは並べるだけ。
  */
-export function ActivityCalendar({ months, busiest, theme }: ActivityCalendarProps) {
+export function ActivityCalendar({
+  months,
+  busiest,
+  theme,
+  selected,
+  onSelect,
+}: ActivityCalendarProps) {
   return (
     <div className="flex flex-col gap-xxl">
       {months.map((month) => (
@@ -40,8 +49,9 @@ export function ActivityCalendar({ months, busiest, theme }: ActivityCalendarPro
                   key={cell.date || `blank-${index}`}
                   cell={cell}
                   background={colors.background}
-                  markColor={colors.mark}
                   textColor={colors.text}
+                  selected={cell.date !== '' && cell.date === selected}
+                  onSelect={onSelect}
                 />
               );
             })}

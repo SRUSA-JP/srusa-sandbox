@@ -244,13 +244,12 @@ export function playerCardContent(input: {
  *
  * 記録の無い日は沈んだ面のまま。空いた日が並んでいることが
  * 「その週は遊んでいなかった」という読み取りになるので、色でも区別する。
- * 出来事のあった日には印の色を返す。
  */
 export function calendarDayColors(
   day: TimelineDay | null,
   busiest: number,
   theme: VizTheme,
-): { background: string; text: string; mark?: string } {
+): { background: string; text: string } {
   const roles = roleColors(theme);
   if (!day || day.people === 0) {
     return { background: roles.sunken, text: roles.subtle };
@@ -272,7 +271,6 @@ export function calendarDayColors(
     background,
     /* 薄い面にも濃い面にも載るので、その面に対して読める色を選ぶ */
     text: readableTextOn(background, theme, CONTRAST_MIN_TEXT),
-    mark: day.marks.length > 0 ? ensureContrast(roles.danger, background, CONTRAST_MIN_LARGE) : undefined,
   };
 }
 

@@ -7,6 +7,7 @@ export * from './KpiTile';
 export * from './PersonNode';
 export * from './PersonProfileTooltip';
 export * from './PasswordField';
+export * from './PlayerChip';
 export * from './PlayerIconPlaceholder';
 export * from './RankingPreviewCard';
 export * from './RelationEdge';

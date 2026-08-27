@@ -33,6 +33,7 @@ export * from './WorldMapLog';
 export * from './WorldMapViewer';
 export * from './PlayerStreakPanel';
 export * from './ActivityCalendar';
+export * from './CalendarDayPanel';
 export * from './TuningPanel';
 export * from './HistoryTimeline';
 export * from './HistoryAxisScrubber';
