@@ -7,3 +7,4 @@ export * from './WorldMapPage';
 export * from './ZukanPage';
 export * from './CalendarPage';
 export * from './HistoryPage';
+export * from './GamePlaceholderPage';

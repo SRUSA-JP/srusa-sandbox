@@ -14,6 +14,7 @@ import type { ReactElement } from 'react';
 import {
   ClipsPage,
   EventRankingsPage,
+  GamePlaceholderPage,
   MapPage,
   PlayerPage,
   StatsPage,
@@ -35,6 +36,9 @@ const PAGES: Record<RouteId, PageRenderer> = {
   relationships: ({ route }) => <MapPage theme={themeFor(route)} />,
   zukan: ({ route }) => <ZukanPage theme={themeFor(route)} />,
   calendar: ({ route }) => <CalendarPage theme={themeFor(route)} />,
+  valorant: ({ route }) => <GamePlaceholderPage route={route} />,
+  lol: ({ route }) => <GamePlaceholderPage route={route} />,
+  apex: ({ route }) => <GamePlaceholderPage route={route} />,
   history: ({ route }) => <HistoryPage theme={themeFor(route)} />,
   events: ({ route }) => <EventRankingsPage theme={themeFor(route)} />,
   clips: () => <ClipsPage />,

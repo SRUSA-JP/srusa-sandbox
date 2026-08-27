@@ -13,6 +13,9 @@ export type RouteId =
   | 'relationships'
   | 'zukan'
   | 'calendar'
+  | 'valorant'
+  | 'lol'
+  | 'apex'
   | 'history'
   | 'events'
   | 'clips'
@@ -21,12 +24,12 @@ export type RouteId =
 /**
  * まとまり（上のタブ）の一覧。
  *
- * Minecraft の統計・ワールドマップ・活動カレンダーは同じゲームの話なので、
- * 上のタブでは 1 つにまとめ、中の切り替えは下の段に出す。
- * 上のタブが 8 枚あると、どれが同じ話題なのか分からなくなるため。
+ * Minecraft・VALORANT・LOL・APEX は「遊んでいるゲーム」という同じ話題なので、
+ * 上のタブでは「ゲーム」1 つにまとめ、どのゲームかは下の段で切り替える。
+ * 上のタブが何枚もあると、どれが同じ話題なのか分からなくなるため。
  */
 export const SECTIONS = [
-  { id: 'minecraft', label: 'マインクラフト' },
+  { id: 'games', label: 'ゲーム' },
   { id: 'relationships', label: '相関図' },
   { id: 'members', label: 'メンバー' },
   { id: 'history', label: '年表' },
@@ -65,22 +68,29 @@ export interface Route {
 export const ZUKAN_PATH = '#/zukan';
 
 export const ROUTES: Route[] = [
-  /* マインクラフト。この 3 つは同じゲームの話なので、下の段で切り替える */
-  { id: 'stats', section: 'minecraft', path: '#/minecraft', label: '統計', skinId: MINECRAFT_SKIN.id },
+  /* ゲーム。遊んでいるゲームをここにまとめ、下の段で切り替える */
+  { id: 'stats', section: 'games', path: '#/minecraft', label: 'Minecraft 統計', skinId: MINECRAFT_SKIN.id },
   {
     id: 'world-map',
-    section: 'minecraft',
+    section: 'games',
     path: '#/minecraft/world-map',
     label: 'ワールドマップ',
     skinId: MINECRAFT_SKIN.id,
   },
   {
     id: 'calendar',
-    section: 'minecraft',
+    section: 'games',
     path: '#/minecraft/calendar',
     label: '活動カレンダー',
     skinId: MINECRAFT_SKIN.id,
   },
+  /*
+   * ここから先はまだ中身が無いプレースホルダー。Minecraft 以外にも遊んでいる
+   * ゲームがあるので、タブの場所だけ先に用意しておく。
+   */
+  { id: 'valorant', section: 'games', path: '#/valorant', label: 'VALORANT', skinId: MINECRAFT_SKIN.id },
+  { id: 'lol', section: 'games', path: '#/lol', label: 'LOL', skinId: MINECRAFT_SKIN.id },
+  { id: 'apex', section: 'games', path: '#/apex', label: 'APEX', skinId: MINECRAFT_SKIN.id },
   /* 相関図も Minecraft のページと同じドット絵風にする（サイト全体の雰囲気を揃えるため） */
   {
     id: 'relationships',
