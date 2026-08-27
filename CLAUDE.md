@@ -42,6 +42,7 @@ npm run check:design    # UI層の色・寸法直書きやカード入れ子な�
 npm run check:layout    # 図の文字が枠からはみ出さない・小さすぎないかの検査
 npm run check:map       # 相関図の重なり・入れ子・関係線の長さ・囲いの広がりの検査
 npm run build:world-map # BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（BlueMap の出力が要る）
+npm run build:icons     # assets/app-icon.png から配るアイコン一式を作り直す
 npm run update:data     # AWS SSO 確認 → ../aws_minecraft の抽出 → sync:data
 npm run sync:data       # ../aws_minecraft と BlueMap の出力からデータを取り込む
 npm run refresh:data    # update:data の分かりやすい別名。最新化するときの入口
@@ -147,7 +148,8 @@ data/                     # ビルド時に取り込む JSON（アプリの入�
   world-map.json          # ワールドマップの範囲と縮尺（build:world-map が作る）
 public/images/            # BlueMap の 3D 表示のスクリーンショット
 public/world-map/         # 貼り合わせた 2D のワールドマップ（build:world-map が作る）
-public/icons/             # アプリのアイコン（タブ・ホーム画面）
+public/icons/             # 配るアプリのアイコン（build:icons が作る。手で編集しない）
+assets/                   # アイコンの元絵。public/ に置くと利用者にも配られるので分けてある
 netlify.toml              # 公開設定（https://srusa-sandbox.netlify.app/）
 scripts/sync-data.mjs     # ../aws_minecraft と BlueMap の出力からのデータ取り込み
 scripts/check-contrast.ts # 配色の検査
