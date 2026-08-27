@@ -45,6 +45,7 @@ export function PlayerDailyPanel({ profile, theme }: PlayerDailyPanelProps) {
       title="日別ログ"
       note={joinNotes(
         `バックアップ間の差分から、このプレイヤーだけの伸び方を表示します。更新 ${doc.generated_on}`,
+        'バックアップは毎日は取っていないので、間が空いた区間はその日数ぶんの合計です（横軸に「n日分」と出ます）。',
         last ? ` 直近活動: ${periodLabel(last.from, last.to)}` : undefined,
       )}
       actions={<Picker label="指標" value={metric} options={PLAYER_DAILY_METRICS} onChange={setMetric} />}

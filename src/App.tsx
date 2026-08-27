@@ -5,6 +5,7 @@ import { useScrollRestoration } from './hooks/useScrollRestoration';
 import {
   ClipsPage,
   EventRankingsPage,
+  GamePlaceholderPage,
   MapPage,
   PlayerPage,
   StatsPage,
@@ -25,6 +26,9 @@ const PAGES: Record<RouteId, (props: { theme: VizTheme; route: Route }) => React
   relationships: MapPage,
   zukan: ZukanPage,
   calendar: CalendarPage,
+  valorant: GamePlaceholderPage,
+  lol: GamePlaceholderPage,
+  apex: GamePlaceholderPage,
   history: HistoryPage,
   events: EventRankingsPage,
   clips: ClipsPage,

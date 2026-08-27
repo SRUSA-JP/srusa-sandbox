@@ -1,5 +1,13 @@
-import { useMemo } from 'react';
-import { ActivityCalendar, AppLayout, ChartCard, KpiGrid, KpiTile, Note } from '../components';
+import { useMemo, useState } from 'react';
+import {
+  ActivityCalendar,
+  AppLayout,
+  CalendarDayPanel,
+  ChartCard,
+  KpiGrid,
+  KpiTile,
+  Note,
+} from '../components';
 import { CalendarMarkTag } from '../components/molecules';
 import { CALENDAR_TEXT } from '../config/messages';
 import { playLog } from '../data/playLog';
@@ -28,6 +36,12 @@ export function CalendarPage({ theme }: CalendarPageProps) {
     [timeline],
   );
   const kpi = CALENDAR_TEXT.kpi;
+  /* 押された日。押すまでは何も開かない */
+  const [selected, setSelected] = useState('');
+  const selectedDay = useMemo(
+    () => playLog().days.find((day) => day.date === selected) ?? null,
+    [selected],
+  );
   /* 一覧はページの面に載るので、暦の枠の中とは別の濃さが要る */
   const markAccent = calendarMarkAccent(theme);
 
@@ -52,7 +66,25 @@ export function CalendarPage({ theme }: CalendarPageProps) {
       </KpiGrid>
 
       <ChartCard title={CALENDAR_TEXT.daysTitle} note={CALENDAR_TEXT.disclaimer}>
-        <ActivityCalendar months={months} busiest={busiest} theme={theme} />
+        <div className="flex flex-col gap-xxl">
+          <ActivityCalendar
+            months={months}
+            busiest={busiest}
+            theme={theme}
+            selected={selected}
+            onSelect={setSelected}
+          />
+          {selected ? (
+            <CalendarDayPanel
+              date={selected}
+              day={selectedDay}
+              theme={theme}
+              onClose={() => setSelected('')}
+            />
+          ) : (
+            <p className="text-sm text-muted">{CALENDAR_TEXT.players.hint}</p>
+          )}
+        </div>
       </ChartCard>
 
       <ChartCard title={CALENDAR_TEXT.marksTitle}>

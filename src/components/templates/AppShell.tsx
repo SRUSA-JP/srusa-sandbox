@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { APP_TEXT } from '../../config/messages';
-import { ROUTES, type Route } from '../../routes';
+import { SECTIONS, routesInSection, type Route } from '../../routes';
 import type { ThemeMode } from '../../theme/palette';
 import { IconButton } from '../atoms';
 
@@ -14,8 +14,16 @@ export interface AppShellProps {
   children: ReactNode;
 }
 
-/** タブ 1 枚。選択中は下線と面で示す（色だけに頼らない）。 */
+/** 上の段のタブ 1 枚。選択中は下線と面で示す（色だけに頼らない）。 */
 const TAB = 'cursor-pointer rounded-t-md border-b-thick px-lg py-md text-md transition-colors';
+
+/**
+ * 下の段のタブ 1 枚。
+ *
+ * 上の段より小さく、下線ではなく面で選択中を示す。同じ形にすると
+ * どちらが上位のまとまりなのか分からなくなる。
+ */
+const SUB_TAB = 'cursor-pointer rounded-md px-md py-xs text-sm transition-colors';
 
 /**
  * サイト全体の枠。
@@ -25,6 +33,7 @@ const TAB = 'cursor-pointer rounded-t-md border-b-thick px-lg py-md text-md tran
  */
 export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: AppShellProps) {
   const dark = mode === 'dark';
+  const siblings = routesInSection(route.section);
   return (
     <div className="mx-auto max-w-[var(--sr-layout-max-width)] px-lg pt-lg pb-page sm:px-xxl sm:pt-xxl md:px-xxxl">
       <header className="flex flex-wrap items-start justify-between gap-lg">
@@ -40,16 +49,18 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
         />
       </header>
 
+      {/* 上の段: まとまり。押すとそのまとまりの最初の画面へ行く */}
       <nav
-        className="mt-lg mb-xxl flex flex-wrap gap-xs border-b-hairline border-divider sm:mt-xl sm:mb-section"
+        className="mt-lg flex flex-wrap gap-xs border-b-hairline border-divider sm:mt-xl"
         aria-label={APP_TEXT.navLabel}
       >
-        {/* タブに並ばない画面（プレイヤー紹介）は、親のタブを選択中に見せる */}
-        {ROUTES.map((entry) => {
-          const active = entry.id === (route.tabId ?? route.id);
+        {SECTIONS.map((section) => {
+          const active = section.id === route.section;
+          const first = routesInSection(section.id)[0];
+          if (!first) return null;
           return (
             <button
-              key={entry.id}
+              key={section.id}
               type="button"
               aria-current={active ? 'page' : undefined}
               className={
@@ -57,13 +68,40 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
                   ? `${TAB} border-tab-marker bg-tab-active-bg font-medium text-tab-active`
                   : `${TAB} border-transparent text-tab hover:bg-hover hover:text-tab-active`
               }
-              onClick={() => onNavigate(entry)}
+              onClick={() => onNavigate(first)}
             >
-              {entry.label}
+              {section.label}
             </button>
           );
         })}
       </nav>
+
+      {/* 下の段: そのまとまりの中の画面。1 つしか無いまとまりでは出さない */}
+      {siblings.length > 1 && (
+        <nav className="mt-md flex flex-wrap gap-xs" aria-label={APP_TEXT.sectionNavLabel}>
+          {siblings.map((entry) => {
+            /* タブに並ばない画面（プレイヤー紹介）は、親のタブを選択中に見せる */
+            const active = entry.id === (route.tabId ?? route.id);
+            return (
+              <button
+                key={entry.id}
+                type="button"
+                aria-current={active ? 'page' : undefined}
+                className={
+                  active
+                    ? `${SUB_TAB} bg-selected font-medium text-selected-ink`
+                    : `${SUB_TAB} text-tab hover:bg-hover hover:text-tab-active`
+                }
+                onClick={() => onNavigate(entry)}
+              >
+                {entry.label}
+              </button>
+            );
+          })}
+        </nav>
+      )}
+
+      <div className="mb-xxl sm:mb-section" />
 
       {children}
     </div>

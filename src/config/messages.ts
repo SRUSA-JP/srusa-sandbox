@@ -18,15 +18,17 @@ export const APP_TEXT = {
   shortName: 'SRUSA',
   /** サイト名の下に出す説明。 */
   siteNote:
-    'SRUSA の試験用コンテンツを公開している場所です。Minecraft サーバーの統計、ワールドマップ、相関図、SRUSA 図鑑、ギャラリーがあります。',
+    'SRUSA の試験用コンテンツを公開している場所です。Minecraft サーバーの統計・ワールドマップ・活動カレンダー、相関図、メンバー、年表、ギャラリーがあります。',
   /**
    * 検索結果やホーム画面に出る説明。
    * 画面に出る siteNote と役割が違う（こちらは中身を見ずに読まれる）ので別に持つ。
    */
   siteDescription:
-    'SRUSA の試験用コンテンツを公開しているサイトです。Minecraft サーバーの統計、ワールドマップ、相関図、SRUSA 図鑑、ギャラリーを置いています。掲載内容と公開範囲は検討中です。',
+    'SRUSA の試験用コンテンツを公開しているサイトです。Minecraft サーバーの統計・ワールドマップ・活動カレンダー、相関図、メンバー、年表、ギャラリーを置いています。掲載内容と公開範囲は検討中です。',
   /** タブ全体の読み上げ名。 */
   navLabel: 'ページ',
+  /** 下の段（まとまりの中の切り替え）の読み上げ。 */
+  sectionNavLabel: 'このまとまりの中の画面',
   /** ページ全体にかかる注意書きの見出し。本文の下に出す。 */
   disclaimer: 'このページについて',
   /**
@@ -256,7 +258,7 @@ export const STATS_TEXT = {
     },
     daily: {
       title: 'PLAYER DAILY LOG',
-      note: 'バックアップ間の差分から、プレイヤーごとの伸び方を日付別に見ます。',
+      note: 'バックアップ間の差分から、プレイヤーごとの伸び方を日付別に見ます。バックアップは毎日は取っていないので、間が空いた区間はその日数ぶんの合計です（横軸に「n日分」と出ます）。',
       player: 'プレイヤー',
       metric: '指標',
       lastActive: '直近活動',
@@ -619,26 +621,23 @@ export const STREAK_TEXT = {
   totalDays: '遊んだ日数',
   lastPlayed: '最後にログイン',
   days: (count: number) => `${count} 日`,
-  /** 帯の見出し。何日ぶんを並べているか。 */
-  recent: (count: number) => `直近 ${count} 日`,
-  /** 連なりが途切れているとき。 */
-  broken: '途切れています',
-  /** 続いているとき。 */
-  active: '継続中',
   /** 一度もログインの記録が無い人。 */
   empty: 'ログインの記録がまだありません。',
   /** 帯の 1 マスの読み上げ。 */
   markAlt: (date: string, played: boolean) => `${date} ${played ? 'ログインあり' : 'ログインなし'}`,
+  /** カレンダーの見出し。 */
+  calendarTitle: 'ログイン日カレンダー',
+  calendarNote: '来た日を暦で表しています。濃い升目がログインした日です。',
 } as const;
 
 /**
- * SRUSA 図鑑。人をまとめて並べ、ひとりずつの紹介ページへ渡す入口。
+ * メンバー。人をまとめて並べ、ひとりずつの紹介ページへ渡す入口。
  *
  * 名前は相関図のデータにある表記のまま出す。頭文字だけの人はそのまま頭文字で出し、
  * ここで本名に近づける言い換えをしないこと（相関図の匿名化を弱めないため）。
  */
 export const ZUKAN_TEXT = {
-  title: 'SRUSA 図鑑',
+  title: 'メンバー',
   note: '相関図と Minecraft のデータにいる人をまとめた名簿です。',
   lead: '名前を選ぶと、その人の紹介ページへ移ります。所属や、Minecraft に参加しているかで絞り込めます。',
   /** 絞り込みのプルダウン。 */
@@ -678,12 +677,12 @@ export const ZUKAN_TEXT = {
   moreAttributes: (count: number) => `ほか ${count}`,
   /** カード全体の読み上げ。 */
   open: (name: string) => `${name} の紹介ページを開く`,
-  /** 他のページから図鑑へ飛ぶボタン。 */
-  link: '図鑑を見る',
-  /** 紹介ページから図鑑へ戻るボタン。 */
-  back: '図鑑へ戻る',
+  /** 他のページからメンバーへ飛ぶボタン。 */
+  link: 'メンバーを見る',
+  /** 紹介ページからメンバーへ戻るボタン。 */
+  back: 'メンバーへ戻る',
   /** 知らない名前で紹介ページを開いたとき。 */
-  notFound: 'その名前の人は見つかりませんでした。下の図鑑から選び直せます。',
+  notFound: 'その名前の人は見つかりませんでした。下の一覧から選び直せます。',
 } as const;
 
 /** 表（DataTable）。統計ビューアと相関図で共用する。 */
@@ -706,7 +705,7 @@ export const TABLE_TEXT = {
  */
 export const CALENDAR_TEXT = {
   title: '活動カレンダー',
-  lead: 'サーバーのログに残っている日を暦に並べています。色が濃い日ほど多くの人が入っていて、印の付いた日には初参加や記録の更新があります。',
+  lead: 'サーバーのログに残っている日を暦に並べています。色が濃い日ほど多くの人が入っていて、日を押すとその日いた人が出ます。',
   note: (from: string, to: string) => `${from} 〜 ${to} の記録から作っています。`,
 
   /** 記録の限界。ここは推測で埋めない。 */
@@ -743,6 +742,31 @@ export const CALENDAR_TEXT = {
       `${date}: ${formatInt(people)} 人 / 入室 ${formatInt(joins)} / 死亡 ${formatInt(deaths)}`,
     /** 誰も入らなかった日。 */
     empty: (date: string) => `${date}: 記録なし`,
+  },
+
+  /** 日を押したときに出す、その日いた人の一覧。 */
+  players: {
+    title: (date: string) => `${date} にいた人`,
+    /** 押す前の案内。 */
+    hint: '日を押すと、その日サーバーにいた人が出ます。',
+    /** 記録の無い日を押したとき。 */
+    empty: (date: string) => `${date} は誰も入っていません。`,
+    close: '閉じる',
+    /**
+     * 最初と最後のあいだの幅。
+     *
+     * ログにあるのは「最初に見た時刻」と「最後に見た時刻」だけなので、
+     * この差は途中で抜けていた時間も含む。プレイ時間とは呼ばない。
+     */
+    span: (minutes: number) =>
+      minutes >= 60 ? `${Math.floor(minutes / 60)} 時間 ${minutes % 60} 分` : `${minutes} 分`,
+    spanLabel: '最初と最後のあいだ',
+    spanUnknown: '時刻が読めません',
+    range: (from: string, to: string) => `${from} 〜 ${to}`,
+    joins: (count: number) => `入室 ${formatInt(count)}`,
+    deaths: (count: number) => `死亡 ${formatInt(count)}`,
+    /** 幅の意味の断り。 */
+    note: 'ログにあるのは最初と最後に見かけた時刻だけなので、この幅には途中で抜けていた時間も入ります。',
   },
 
   /** その日の出来事。数と名前は呼び出し側が渡す。 */
@@ -826,4 +850,14 @@ export const HISTORY_TEXT = {
 
   /** 日付が入っていない項目の表示。 */
   undated: '時期が不明',
+} as const;
+
+/**
+ * まだ中身の無いゲームのページ（VALORANT・LOL・APEX）の文言。
+ *
+ * 「準備中」という事実だけを言う。それらしい統計や説明をでっち上げない。
+ */
+export const GAME_PLACEHOLDER_TEXT = {
+  lead: (game: string) => `${game} のページはまだありません。`,
+  note: 'ここにはまだ中身がありません。データが揃ったら、Minecraft の統計や活動カレンダーと同じ形で追加します。',
 } as const;

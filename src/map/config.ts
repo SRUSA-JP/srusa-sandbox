@@ -456,6 +456,17 @@ export const GROUP_TYPE_BIOMES: Record<GroupType, BiomeId> = {
   unknown: 'stony_shore',
 };
 
+/**
+ * その所属から線を引くか。
+ *
+ * 既定は分類ごとの `connects`。グループ側に `connects` があればそちらが勝つ。
+ * 「小学校」は名前が無いので既定では引かないが、実際に同じ園だと分かっている
+ * 幼稚園のようなものは、データ側で引く指定にできる。
+ */
+export function groupConnects(group: { type: GroupType; connects?: boolean }): boolean {
+  return group.connects ?? groupTypeSetting(group.type).connects;
+}
+
 /** そのグループの囲いに使うバイオーム。 */
 export function groupBiome(group: { id: string; type: GroupType }): BiomeId {
   return GROUP_BIOMES[group.id] ?? GROUP_TYPE_BIOMES[group.type] ?? 'stony_shore';

@@ -17,7 +17,7 @@
 import { readFileSync } from 'node:fs';
 import { EDGE, GRID, NODE, SEPARATION } from '../src/map/config';
 import { skinnedFontSize } from '../src/config/skins';
-import { groupTypeSetting } from '../src/map/config';
+import { groupConnects } from '../src/map/config';
 import { manhattanPath } from '../src/map/geometry';
 import { affiliationEdgeStyle, nodeRingColors } from '../src/map/display';
 import { activeSkin } from '../src/config/skins';
@@ -309,7 +309,7 @@ function checkAffiliationEdges() {
   /* 線を引く根拠になるのは、所属者が 2 人以上いて、かつ「知り合い」を意味する所属だけ */
   const connecting = new Set(
     data.groups
-      .filter((group) => groupTypeSetting(group.type).connects)
+      .filter((group) => groupConnects(group))
       .map((group) => group.name),
   );
   const groupNames = new Set(
@@ -391,7 +391,7 @@ function checkGroupCohesion() {
   const rows: Array<{ name: string; members: number; spread: number }> = [];
 
   for (const group of data.groups) {
-    if (!groupTypeSetting(group.type).connects) continue;
+    if (!groupConnects(group)) continue;
     const members = data.people
       .filter((person) => person.attributes.includes(group.name))
       .map((person) => layout.byId.get(person.id))

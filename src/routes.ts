@@ -13,13 +13,36 @@ export type RouteId =
   | 'relationships'
   | 'zukan'
   | 'calendar'
+  | 'valorant'
+  | 'lol'
+  | 'apex'
   | 'history'
   | 'events'
   | 'clips'
   | 'player';
 
+/**
+ * まとまり（上のタブ）の一覧。
+ *
+ * Minecraft・VALORANT・LOL・APEX は「遊んでいるゲーム」という同じ話題なので、
+ * 上のタブでは「ゲーム」1 つにまとめ、どのゲームかは下の段で切り替える。
+ * 上のタブが何枚もあると、どれが同じ話題なのか分からなくなるため。
+ */
+export const SECTIONS = [
+  { id: 'games', label: 'ゲーム' },
+  { id: 'relationships', label: '相関図' },
+  { id: 'members', label: 'メンバー' },
+  { id: 'history', label: '年表' },
+  { id: 'events', label: 'イベント' },
+  { id: 'clips', label: 'ギャラリー' },
+] as const;
+
+export type SectionId = (typeof SECTIONS)[number]['id'];
+
 export interface Route {
   id: RouteId;
+  /** どのまとまりに属するか。上のタブはこれで選ばれる。 */
+  section: SectionId;
   /** URL のハッシュ。ブックマークと再読み込みができるようにする。 */
   path: string;
   /** タブに出す名前。 */
@@ -45,27 +68,47 @@ export interface Route {
 export const ZUKAN_PATH = '#/zukan';
 
 export const ROUTES: Route[] = [
-  { id: 'stats', path: '#/minecraft', label: 'Minecraft 統計', skinId: MINECRAFT_SKIN.id },
+  /* ゲーム。遊んでいるゲームをここにまとめ、下の段で切り替える */
+  { id: 'stats', section: 'games', path: '#/minecraft', label: 'Minecraft 統計', skinId: MINECRAFT_SKIN.id },
   {
     id: 'world-map',
+    section: 'games',
     path: '#/minecraft/world-map',
     label: 'ワールドマップ',
     skinId: MINECRAFT_SKIN.id,
   },
-  /* 活動カレンダーはサーバーのログから作るので、Minecraft のまとまりに置く */
   {
     id: 'calendar',
+    section: 'games',
     path: '#/minecraft/calendar',
     label: '活動カレンダー',
     skinId: MINECRAFT_SKIN.id,
   },
+  /*
+   * ここから先はまだ中身が無いプレースホルダー。Minecraft 以外にも遊んでいる
+   * ゲームがあるので、タブの場所だけ先に用意しておく。
+   */
+  { id: 'valorant', section: 'games', path: '#/valorant', label: 'VALORANT', skinId: MINECRAFT_SKIN.id },
+  { id: 'lol', section: 'games', path: '#/lol', label: 'LOL', skinId: MINECRAFT_SKIN.id },
+  { id: 'apex', section: 'games', path: '#/apex', label: 'APEX', skinId: MINECRAFT_SKIN.id },
   /* 相関図も Minecraft のページと同じドット絵風にする（サイト全体の雰囲気を揃えるため） */
-  { id: 'relationships', path: '#/relationships', label: '相関図', skinId: MINECRAFT_SKIN.id },
-  { id: 'zukan', path: ZUKAN_PATH, label: 'SRUSA 図鑑', skinId: MINECRAFT_SKIN.id },
-  { id: 'history', path: '#/history', label: '年表', skinId: MINECRAFT_SKIN.id },
-  { id: 'events', path: '#/events', label: 'イベント', skinId: MINECRAFT_SKIN.id },
-  { id: 'clips', path: '#/gallery', label: 'ギャラリー', skinId: MINECRAFT_SKIN.id },
+  {
+    id: 'relationships',
+    section: 'relationships',
+    path: '#/relationships',
+    label: '相関図',
+    skinId: MINECRAFT_SKIN.id,
+  },
+  { id: 'zukan', section: 'members', path: ZUKAN_PATH, label: 'メンバー', skinId: MINECRAFT_SKIN.id },
+  { id: 'history', section: 'history', path: '#/history', label: '年表', skinId: MINECRAFT_SKIN.id },
+  { id: 'events', section: 'events', path: '#/events', label: 'イベント', skinId: MINECRAFT_SKIN.id },
+  { id: 'clips', section: 'clips', path: '#/gallery', label: 'ギャラリー', skinId: MINECRAFT_SKIN.id },
 ];
+
+/** そのまとまりに入っている画面。下の段に並べる。 */
+export function routesInSection(section: SectionId): Route[] {
+  return ROUTES.filter((route) => route.section === section);
+}
 
 /** ハッシュが無い・知らないときに出す画面。 */
 export const DEFAULT_ROUTE = ROUTES[0];
@@ -82,6 +125,7 @@ export function routeFromHash(hash: string): Route {
   if (player) {
     return {
       id: 'player',
+      section: 'members',
       path: normalized,
       label: 'プレイヤー紹介',
       skinId: MINECRAFT_SKIN.id,

@@ -6,7 +6,7 @@
     "nameMode": "online"
   },
   "people": [
-    { "id": "nodoame", "onlineName": "nodoame", "joinedOn": "2020-04", "attributes": ["M大学", "Y研究室", "K高校", "S塾", "K社", "アクティブメンバー"], "nicknames": [] },
+    { "id": "nodoame", "onlineName": "nodoame", "joinedOn": "2020-04", "attributes": ["幼稚園", "小学校", "M大学", "Y研究室", "K高校", "テニス部", "S塾", "K社", "アクティブメンバー"], "nicknames": [] },
     { "id": "octbee", "onlineName": "octbee", "attributes": ["幼稚園", "小学校", "中学校", "S塾"], "nicknames": [] },
     { "id": "n", "onlineName": "N", "attributes": ["幼稚園", "小学校", "中学校", "S塾"], "nicknames": [] },
     { "id": "mitiglia", "onlineName": "mitiglia", "joinedOn": "2020-04", "attributes": ["K高校", "S塾", "アクティブメンバー"], "nicknames": [] },
@@ -87,7 +87,7 @@
     { "id": "creata", "onlineName": "creata", "attributes": ["shion組"], "nicknames": [] }
   ],
   "groups": [
-    { "id": "kindergarten", "name": "幼稚園", "type": "school_stage" },
+    { "id": "kindergarten", "name": "幼稚園", "type": "school_stage", "connects": true },
     { "id": "elementary", "name": "小学校", "type": "school_stage" },
     { "id": "junior_high", "name": "中学校", "type": "school_stage" },
     { "id": "k_high", "name": "K高校", "type": "school" },
@@ -118,6 +118,7 @@
     { "source": "gotti", "target": "yotsugi", "type": "friend" },
     { "source": "j-line", "target": "hutaba", "type": "friend" },
     { "source": "mark", "target": "yumili", "type": "friend", "context": "小学校" },
+    { "source": "nodoame", "target": "mark", "type": "friend" },
     { "source": "shion", "target": "pitan", "type": "friend" },
     { "source": "gomakusa", "target": "tera", "type": "friend", "uncertain": true },
     { "source": "gomakusa", "target": "yosshi", "type": "friend" },
