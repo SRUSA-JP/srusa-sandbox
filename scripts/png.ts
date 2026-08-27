@@ -50,6 +50,8 @@ export function decodePng(file: Buffer): Rgba {
 
   let width = 0;
   let height = 0;
+  /* 1 画素あたりのバイト数。RGBA なら 4、RGB なら 3 */
+  let sourceBytes = BYTES_PER_PIXEL;
   const idat: Buffer[] = [];
 
   for (let pos = 8; pos < file.length; ) {
@@ -60,9 +62,11 @@ export function decodePng(file: Buffer): Rgba {
       width = body.readUInt32BE(0);
       height = body.readUInt32BE(4);
       const [depth, colorType, , , interlace] = body.subarray(8, 13);
-      if (depth !== 8 || colorType !== 6 || interlace !== 0) {
+      /* 6 は RGBA、2 は RGB（透過なし）。書き出しは常に RGBA なので、読むときに揃える */
+      if (depth !== 8 || (colorType !== 6 && colorType !== 2) || interlace !== 0) {
         throw new Error(`未対応の PNG（depth=${depth} colorType=${colorType} interlace=${interlace}）`);
       }
+      sourceBytes = colorType === 6 ? 4 : 3;
     } else if (type === 'IDAT') {
       idat.push(body);
     } else if (type === 'IEND') {
@@ -71,7 +75,7 @@ export function decodePng(file: Buffer): Rgba {
     pos += 12 + length;
   }
 
-  const stride = width * BYTES_PER_PIXEL;
+  const stride = width * sourceBytes;
   const raw = inflateSync(Buffer.concat(idat));
   const out = Buffer.alloc(height * stride);
 
@@ -83,9 +87,9 @@ export function decodePng(file: Buffer): Rgba {
     const cur = out.subarray(y * stride, (y + 1) * stride);
     const up = y > 0 ? out.subarray((y - 1) * stride, y * stride) : null;
     for (let i = 0; i < stride; i++) {
-      const a = i >= BYTES_PER_PIXEL ? cur[i - BYTES_PER_PIXEL] : 0;
+      const a = i >= sourceBytes ? cur[i - sourceBytes] : 0;
       const b = up ? up[i] : 0;
-      const c = up && i >= BYTES_PER_PIXEL ? up[i - BYTES_PER_PIXEL] : 0;
+      const c = up && i >= sourceBytes ? up[i - sourceBytes] : 0;
       const x = line[i];
       let value: number;
       switch (filter) {
@@ -100,7 +104,15 @@ export function decodePng(file: Buffer): Rgba {
     }
   }
 
-  return { width, height, data: out };
+  if (sourceBytes === BYTES_PER_PIXEL) return { width, height, data: out };
+
+  /* RGB で来たものは、不透明の RGBA に広げてから返す */
+  const rgba = Buffer.alloc(width * height * BYTES_PER_PIXEL);
+  for (let index = 0; index < width * height; index += 1) {
+    out.copy(rgba, index * BYTES_PER_PIXEL, index * sourceBytes, index * sourceBytes + 3);
+    rgba[index * BYTES_PER_PIXEL + 3] = 0xff;
+  }
+  return { width, height, data: rgba };
 }
 
 function paeth(a: number, b: number, c: number): number {

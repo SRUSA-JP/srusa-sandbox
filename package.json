@@ -30,7 +30,8 @@
     "build:play-days": "node scripts/build-play-days.mjs",
     "build:chunk-world-map": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/build-chunk-world-map.ts --outfile=node_modules/.cache/build-chunk-world-map.mjs && node node_modules/.cache/build-chunk-world-map.mjs",
     "build:world-map": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/build-world-map.ts --outfile=node_modules/.cache/build-world-map.mjs && node node_modules/.cache/build-world-map.mjs",
-    "check:viewport": "esbuild --bundle --format=esm --platform=node --log-level=error --packages=external scripts/check-viewport.ts --outfile=node_modules/.cache/check-viewport.mjs && node node_modules/.cache/check-viewport.mjs"
+    "check:viewport": "esbuild --bundle --format=esm --platform=node --log-level=error --packages=external scripts/check-viewport.ts --outfile=node_modules/.cache/check-viewport.mjs && node node_modules/.cache/check-viewport.mjs",
+    "build:icons": "esbuild --bundle --format=esm --platform=node --log-level=error scripts/build-app-icons.ts --outfile=node_modules/.cache/build-app-icons.mjs && node node_modules/.cache/build-app-icons.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",
