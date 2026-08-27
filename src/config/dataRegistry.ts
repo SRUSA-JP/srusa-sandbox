@@ -46,3 +46,11 @@ export const CALENDAR_DAY = {
   minAlpha: 0.18,
   maxAlpha: 0.9,
 } as const;
+
+/**
+ * 活動カレンダーの 1 枠に並べる顔アイコンの上限。
+ *
+ * 枠は狭いので、人数が多い日でも枠を伸ばさずに済むよう、
+ * ここを超えたぶんは「ほか n 人」にまとめる。
+ */
+export const CALENDAR_DAY_AVATAR_LIMIT = 3;

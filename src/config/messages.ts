@@ -705,7 +705,7 @@ export const TABLE_TEXT = {
  */
 export const CALENDAR_TEXT = {
   title: '活動カレンダー',
-  lead: 'サーバーのログに残っている日を暦に並べています。色が濃い日ほど多くの人が入っていて、日を押すとその日いた人が出ます。',
+  lead: 'サーバーのログに残っている日を暦に並べています。色が濃い日ほど多くの人が入っていて、枠の中の顔はその日いた人です。日を押すと詳しく出ます。',
   note: (from: string, to: string) => `${from} 〜 ${to} の記録から作っています。`,
 
   /** 記録の限界。ここは推測で埋めない。 */
@@ -738,10 +738,14 @@ export const CALENDAR_TEXT = {
     deaths: (count: number) => `死亡 ${formatInt(count)}`,
     firstSeen: (time: string) => `最初の入室 ${time}`,
     /** 暦の枠を指したときに出す説明。 */
-    tooltip: (date: string, people: number, joins: number, deaths: number) =>
-      `${date}: ${formatInt(people)} 人 / 入室 ${formatInt(joins)} / 死亡 ${formatInt(deaths)}`,
+    tooltip: (date: string, people: number, joins: number, deaths: number, names: string[]) =>
+      `${date}: ${formatInt(people)} 人 / 入室 ${formatInt(joins)} / 死亡 ${formatInt(deaths)}${
+        names.length > 0 ? ` （${names.join('・')}）` : ''
+      }`,
     /** 誰も入らなかった日。 */
     empty: (date: string) => `${date}: 記録なし`,
+    /** 枠に収まらなかった人数。 */
+    more: (count: number) => `ほか ${formatInt(count)} 人`,
   },
 
   /** 日を押したときに出す、その日いた人の一覧。 */

@@ -10,6 +10,7 @@
  * 「記録が残っているいちばん古い日」から始まる。
  */
 import type { PlayLog, PlayLogDay } from '../data/playLog';
+import { dayPlayers } from './dayPlayers';
 
 /** 年表に出す、その日の出来事の種類。 */
 export type TimelineMarkKind =
@@ -38,6 +39,8 @@ export interface TimelineDay {
   deaths: number;
   /** その日いちばん早い時刻（日本時間）。誰も居ない日は空。 */
   firstSeen: string;
+  /** その日いた人。長くいた順（dayPlayers と同じ並び）。 */
+  players: string[];
   marks: TimelineMark[];
 }
 
@@ -94,6 +97,7 @@ export function buildTimeline(log: PlayLog): Timeline {
       joins: day.joins,
       deaths: day.deaths,
       firstSeen: earliestTime(day),
+      players: dayPlayers(day).map((player) => player.name),
       marks,
     };
   });

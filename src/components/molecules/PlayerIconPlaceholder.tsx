@@ -9,8 +9,8 @@ export interface PlayerIconPlaceholderProps {
   accent: string;
   /** 読み上げ用の説明。 */
   alt: string;
-  /** 表示サイズ。 */
-  size?: 'normal' | 'large';
+  /** 表示サイズ。tiny は活動カレンダーの枠のような、ごく小さい並びで使う。 */
+  size?: 'normal' | 'large' | 'tiny';
 }
 
 /** プレイヤー名から固定生成する Minecraft 風の仮アイコン。 */
@@ -20,11 +20,15 @@ export function PlayerIconPlaceholder({ name, accent, alt, size = 'normal' }: Pl
   const sizeClass =
     size === 'large'
       ? 'size-[calc(var(--sr-space-section)+var(--sr-space-xxl))]'
-      : 'size-[var(--sr-space-section)]';
+      : size === 'tiny'
+        ? 'size-[var(--sr-layout-swatch-size)]'
+        : 'size-[var(--sr-space-section)]';
+  /* 極小サイズでは太い枠が絵を食ってしまうので、枠は細いほうに落とす */
+  const borderClass = size === 'tiny' ? 'border-hairline' : 'border-thick';
 
   return (
     <div
-      className={`grid ${sizeClass} place-items-center overflow-hidden border-thick font-bold text-heading`}
+      className={`grid ${sizeClass} place-items-center overflow-hidden ${borderClass} font-bold text-heading`}
       style={{ borderColor: accent, backgroundColor: withAlpha(accent, 0.16) }}
       role="img"
       aria-label={alt}

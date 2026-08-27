@@ -111,7 +111,7 @@ for (const { label, theme } of cases) {
    * 両端と真ん中を見る。ここを外すと、混み合った日だけ数字が読めなくなる。
    */
   for (const [label, people] of [['薄い日', 1], ['中くらいの日', 6], ['濃い日', 11]] as const) {
-    const day = { date: '', people, joins: 0, deaths: 0, firstSeen: '', marks: [] };
+    const day = { date: '', people, joins: 0, deaths: 0, firstSeen: '', players: [], marks: [] };
     const cell = calendarDayColors(day, 11, theme);
     check(`活動カレンダー ${label}の数字 / 枠`, cell.text, cell.background, CONTRAST_MIN_TEXT);
   }

@@ -1,5 +1,5 @@
 import { CALENDAR_TEXT } from '../../config/messages';
-import { calendarDayColors } from '../../lib/display';
+import { calendarDayColors, calendarMarkAccent } from '../../lib/display';
 import type { CalendarMonth } from '../../lib/calendar';
 import type { TimelineDay } from '../../lib/timeline';
 import type { VizTheme } from '../../theme/palette';
@@ -30,6 +30,9 @@ export function ActivityCalendar({
   selected,
   onSelect,
 }: ActivityCalendarProps) {
+  /* 出来事の札（下の一覧）と同じ色で揃え、暦の中と外で顔の色が変わらないようにする */
+  const avatarAccent = calendarMarkAccent(theme);
+
   return (
     <div className="flex flex-col gap-xxl">
       {months.map((month) => (
@@ -50,6 +53,7 @@ export function ActivityCalendar({
                   cell={cell}
                   background={colors.background}
                   textColor={colors.text}
+                  avatarAccent={avatarAccent}
                   selected={cell.date !== '' && cell.date === selected}
                   onSelect={onSelect}
                 />
