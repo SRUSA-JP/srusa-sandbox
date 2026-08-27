@@ -6,7 +6,7 @@
     "nameMode": "online"
   },
   "people": [
-    { "id": "nodoame", "onlineName": "nodoame", "joinedOn": "2020-04", "attributes": ["M大学", "Y研究室", "K高校", "S塾", "アクティブメンバー"], "nicknames": [] },
+    { "id": "nodoame", "onlineName": "nodoame", "joinedOn": "2020-04", "attributes": ["M大学", "Y研究室", "K高校", "S塾", "K社", "アクティブメンバー"], "nicknames": [] },
     { "id": "octbee", "onlineName": "octbee", "attributes": ["幼稚園", "小学校", "中学校", "S塾"], "nicknames": [] },
     { "id": "n", "onlineName": "N", "attributes": ["幼稚園", "小学校", "中学校", "S塾"], "nicknames": [] },
     { "id": "mitiglia", "onlineName": "mitiglia", "joinedOn": "2020-04", "attributes": ["K高校", "S塾", "アクティブメンバー"], "nicknames": [] },
@@ -23,7 +23,7 @@
     { "id": "j-line", "onlineName": "j-line", "attributes": ["M大学"], "nicknames": [] },
     { "id": "gomakusa", "onlineName": "gomakusa", "attributes": ["M大学", "S研究室", "アクティブメンバー"], "nicknames": [] },
     { "id": "shintani", "onlineName": "shintani", "attributes": ["M大学"], "nicknames": [] },
-    { "id": "gaburichan", "onlineName": "gaburichan", "attributes": ["M大学", "アクティブメンバー"], "nicknames": [] },
+    { "id": "gaburichan", "onlineName": "gaburichan", "attributes": ["M大学", "K社", "アクティブメンバー"], "nicknames": [] },
     { "id": "taraba01414", "onlineName": "taraba01414", "attributes": ["M大学"], "nicknames": [] },
     { "id": "ekisyo", "onlineName": "ekisyo", "attributes": ["M大学"], "nicknames": [] },
     { "id": "kreis", "onlineName": "kreis", "attributes": ["高校", "アクティブメンバー"], "nicknames": [] },
