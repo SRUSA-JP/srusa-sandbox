@@ -7,7 +7,7 @@ import type { PageContent } from './schema';
 
 export const RELATIONSHIPS_CONTENT: PageContent = {
   title: '相関図',
-  lead: 'SRUSA 図鑑に載せる人たちのつながりと、所属（学校・研究室・部活・友人グループなど）を 1 枚にまとめた図です。',
+  lead: 'メンバーに載せる人たちのつながりと、所属（学校・研究室・部活・友人グループなど）を 1 枚にまとめた図です。',
   disclaimer: '試験的なコンテンツです。掲載の可否と公開範囲はまだ決まっていません。',
   sections: [
     {
