@@ -2,7 +2,13 @@ import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { APP_TEXT } from './src/config/messages';
-import { APP_ICON, INITIAL_THEME_COLOR, MANIFEST_FILE, webManifest } from './src/config/pwa';
+import {
+  APP_ICON_TYPE,
+  appIcon,
+  INITIAL_THEME_COLOR,
+  MANIFEST_FILE,
+  webManifest,
+} from './src/config/pwa';
 
 /**
  * ページの見出しまわり（タイトル・説明・アイコン・マニフェスト）を組み立てる。
@@ -66,12 +72,21 @@ function siteMetadata(): Plugin {
         },
         {
           tag: 'link',
-          attrs: { rel: 'icon', type: APP_ICON.type, href: `./${APP_ICON.path}` },
+          attrs: {
+            rel: 'icon',
+            type: APP_ICON_TYPE,
+            sizes: `${appIcon('favicon').size}x${appIcon('favicon').size}`,
+            href: `./${appIcon('favicon').path}`,
+          },
           injectTo: 'head' as const,
         },
         {
           tag: 'link',
-          attrs: { rel: 'apple-touch-icon', href: `./${APP_ICON.path}` },
+          attrs: {
+            rel: 'apple-touch-icon',
+            sizes: `${appIcon('apple').size}x${appIcon('apple').size}`,
+            href: `./${appIcon('apple').path}`,
+          },
           injectTo: 'head' as const,
         },
         {
