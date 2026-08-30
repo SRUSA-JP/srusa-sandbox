@@ -22,6 +22,7 @@ import {
   ProsePanel,
   RankBarChart,
   SeriesBarChart,
+  ServiceCostPanel,
   TechnicalDetails,
   TrendLineChart,
 } from '../components';
@@ -126,6 +127,11 @@ export function StatsPage({ theme }: StatsPageProps) {
   const [trendBasis, setTrendBasis] = useState<RateBasis>(STATS_DEFAULTS.trendBasis);
   const [trendScope, setTrendScope] = useState<TrendScope>(STATS_DEFAULTS.trendScope);
   const [trendMode, setTrendMode] = useState<TrendMode>(STATS_DEFAULTS.trendMode);
+  const [serviceCostOptions, setServiceCostOptions] = useState({
+    totalCost: 3000,
+    basePercent: 20,
+    slope: 1,
+  });
   /** 日付ごとの推移に使う全スナップショット。 */
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
 
@@ -422,6 +428,14 @@ export function StatsPage({ theme }: StatsPageProps) {
               snapshots={snapshots}
               players={playerNames}
               theme={theme}
+            />
+
+            <ServiceCostPanel
+              rows={rows}
+              options={serviceCostOptions}
+              onOptionsChange={setServiceCostOptions}
+              theme={theme}
+              note={` 更新 ${statsDataDate}`}
             />
 
             <FeaturedItemUseColumns theme={theme} />
