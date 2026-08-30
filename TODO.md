@@ -7,6 +7,75 @@
 
 ### DONE
 
+#### 2026-08-31
+
+- 原文: `スマホでの３ｄマップ表示の縦幅を適切に` / `ワールドマップで３ｄがあるのは３ｄをデフォルトで．`
+  - ワールドマップページの初期表示を `スポーン3D` に変更した
+  - スマートフォンでは BlueMap iframe の高さを `min(560px,65vh)` にし、デスクトップでは従来の `min(760px,75vh)` を使うようにした
+  - 確認: `npm run typecheck`、`npm run lint`、`npm run check:design`、`npm run build` が通ることを確認
+
+- 原文: `サーバー維持費の請求を四捨五入で丸めたり，固定値でカスタムも出来るように` / `固定値っていうかカスタム値だな` / `値の入力は一時的に何も入らないのを許容するように．`
+  - 維持費パネルに丸め単位を追加し、配分額を指定した円単位で四捨五入できるようにした
+  - プレイヤー別のカスタム額を指定できるようにし、カスタム額を総額から引いた残りを未指定プレイヤーへ配分するようにした
+  - カスタム額の合計が総額を超えた場合は、カスタム対象者の中で総額に収まるよう按分し、警告を出すようにした
+  - 数値入力は入力中の空欄を許容し、空欄の間は親の値を `NaN` や `0` に変えないようにした
+  - 確認: `npm run typecheck`、`npm run lint`、`npm run check:design`、`npm run build` が通ることを確認
+
+#### 2026-08-30
+
+- 原文: `gitignoreに適切に`
+  - [`.gitignore`](.gitignore) に、データ取得時に誤って置きやすい `data/*.tar.gz` / `data/*.zip` と、公開に不要な BlueMap sourcemap `public/bluemap-spawn/assets/*.map` を追加した
+  - 3D 表示に必要な `public/bluemap-spawn/` 本体やタイルは追跡対象のままにした
+  - 確認: `git status --ignored --short` で BlueMap sourcemap が ignored になることを確認
+
+- 原文: `プレイ時間でマイクラ鯖の維持費の傾斜をつけたいカスタムも・．DESIGN.ｍｄにも気を付けて`
+  - Minecraft 統計ページに「サーバー維持費の傾斜」パネルを追加した
+  - 総額、基本割%、傾斜係数を画面上で変更でき、プレイ時間がある対象者へ基本割 + `プレイ時間^傾斜` の従量分で配分する
+  - 負担額ランキングを横棒グラフで表示し、表ビューではプレイ時間、割合、基本割、従量分、負担額、円/h を CSV 出力できるようにした
+  - 計算は [src/lib/serviceCost.ts](src/lib/serviceCost.ts) に分離し、端数配分後も合計が入力総額に一致するようにした
+  - [DESIGN.md](DESIGN.md) に、維持費試算パネルの見せ方と使う部品の方針を追記した
+  - 確認: `npm run typecheck`、`npm run lint`、`npm run check:design`、`npm run build` が通ることを確認
+
+- 原文: `2026/08/30のデータに更新したい`
+  - AWS SSO 承認後、ライブサーバーから `mc-player-data-20260830.tar.gz` と `mc-logs-20260830.tar.gz` を取得した
+  - `../aws_minecraft` 側で `player-data-by-date-20260830.*` と `mc-log-daily-summary-20260830.*` を生成し、srusa-sandbox に同期した
+  - `data/minecraft-stats-20260830.json`、`data/player-daily-summary-20260830.*`、`data/player-featured-used-items-20260830.json`、`data/play-days-20260830.json` を生成した
+  - `data/data-registry.json` と `src/data/current.ts` の参照先を `20260830` に更新した
+  - サーバー側の一時ファイルを削除し、取得のために起動した EC2 は停止済み
+  - 確認: `npm run build` が通ることを確認
+
+- 原文: `カレンダーとかも含めて網羅的に更新するコマンドとそのノウハウも`
+  - `npm run refresh:live` を追加し、ライブサーバーから統計・日別・活動カレンダー用データを取得して同期する一発コマンドにした
+  - `scripts/build-minecraft-stats.mjs` を追加し、`player-data-by-date-YYYYMMDD.json` の最新スナップショットから公開用の `minecraft-stats-YYYYMMDD.json` を生成するようにした
+  - `scripts/sync-data.mjs` の派生生成に `build:minecraft-stats` を組み込み、`daily` 更新時に統計ページ用 JSON も同じ日付へ揃うようにした
+  - [docs/data-update-runbook.md](docs/data-update-runbook.md) にライブ更新の流れ、取得対象、3D データを取らないこと、SSM ポートフォワード、ログ展開、sha256 照合の注意を追記した
+  - [srusa-data-refresh skill](.codex/skills/srusa-data-refresh/SKILL.md) を追加し、次回以降のデータ更新手順を Codex が拾えるようにした
+  - 確認: `npm run refresh:live -- --help` と skill の validation が通ることを確認
+
+- 原文: `バックアップはむやみに３ｄで取らなくてよいからね`
+  - 定例バックアップやライブ更新用アーカイブには BlueMap の 3D タイルやワールド全体のレンダリング結果を含めない方針を明記した
+  - [docs/data-update-runbook.md](docs/data-update-runbook.md) と [srusa-data-refresh skill](.codex/skills/srusa-data-refresh/SKILL.md) に、必要な公開ビューから逆算した最小限の元データだけを固めることを追記した
+  - 確認: Markdown の文面確認のみ
+
+- 原文: `3dログは要らないからね．` / `あとは３ｄデータが一個だけ？あると思うからリスポーン地点の１６ｘ１６チャンクを３ｄで表示できるように新たな，マップの表示の種類として表示する感じで`
+  - ライブ更新コマンドは 3D データを取得しない方針にした
+  - 既存の BlueMap `overworld_spawn` 出力だけを `public/bluemap-spawn/` にコピーし、フルワールド 3D ではなくスポーン周辺 3D として公開するようにした
+  - ワールドマップページに `2D` / `スポーン3D` の表示切り替えを追加し、`スポーン3D` では BlueMap ビューアを iframe で表示する
+  - 3D iframe の高さは `src/theme/tokens.ts` のレイアウトトークンで管理する
+  - 確認: ローカル dev server で BlueMap の主要ファイルが 200 で返ることを確認
+
+- 原文: `あとは，ゲームの表示で包含関係で順に表示するように例えばマイクラとかＡＰＥＸのゲームの下にマイクラのゲームをクリックしたときにマップとかカレンダーとかが表示されるように．今はコンテンツ→あるゲームのコンテンツ→ゲームタイトルで最後二つが逆になってるから．`
+  - `src/routes.ts` に `gameId` / `gameLabel` を追加し、ゲームセクションの親ゲームと中の画面を分けた
+  - `AppShell` のゲームナビを「ゲーム一覧（Minecraft / VALORANT / LOL / APEX）→ 選んだゲーム内の画面（統計 / ワールドマップ / 活動カレンダー）」の順に変更した
+  - VALORANT / LOL / APEX はゲーム名を親タブに出し、中の画面は `概要` として扱うようにした
+  - 確認: `npm run build` が通ることを確認
+
+- 原文: `このデータの取得方法ってマニュアル化されてなかったらしてほしい`
+  - 既存の [docs/data-update-runbook.md](docs/data-update-runbook.md) に、取得元の作り方を追記した
+  - AWS 由来データは `../aws_minecraft/data/`、ワールドマップは `../srusa-portal/bluemap/web/` を元にし、このリポジトリには公開用 JSON / PNG だけを同期することを明記した
+  - BlueMap のレンダリング → `npm run refresh:data:local -- map --dry-run` → `npm run refresh:data:local -- map` → `npm run check:world-map` の手順を追加した
+  - 確認: Markdown の文面確認のみ
+
 #### 2026-08-25
 
 - 原文: `コントラスト比とかデザインもチェックできるようんい`
