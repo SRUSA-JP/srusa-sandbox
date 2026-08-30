@@ -62,7 +62,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
     () => latestWorldMapDate(maps, document?.generated_on),
     [document?.generated_on, maps],
   );
-  const [viewMode, setViewMode] = useState<WorldMapViewMode>('2d');
+  const [viewMode, setViewMode] = useState<WorldMapViewMode>('spawn-3d');
   const [selectedDimension, setSelectedDimension] = useState<DimensionSelection>(ALL_DIMENSIONS);
   const [selectedMapIds, setSelectedMapIds] = useState<Record<string, string>>({});
   /*

@@ -11,7 +11,7 @@ export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
       <iframe
         title={WORLD_MAP_TEXT.threeD.title}
         src={src}
-        className="block h-[var(--sr-layout-world-map-3d-height)] min-h-[var(--sr-layout-world-map-3d-min-height)] w-full"
+        className="block h-[var(--sr-layout-world-map-3d-compact-height)] min-h-[var(--sr-layout-world-map-3d-min-height)] w-full sm:h-[var(--sr-layout-world-map-3d-height)]"
         loading="lazy"
         allow="fullscreen"
       />

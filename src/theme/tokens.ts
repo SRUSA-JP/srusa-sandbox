@@ -173,8 +173,10 @@ export const LAYOUT = {
   tooltipMinWidth: 180,
   /** BlueMap の 3D ビューアを埋め込む高さ。 */
   worldMap3dHeight: 'min(760px,75vh)',
+  /** 狭い画面での BlueMap の 3D ビューア高さ。 */
+  worldMap3dCompactHeight: 'min(560px,65vh)',
   /** BlueMap の 3D ビューアを埋め込む最小高さ。 */
-  worldMap3dMinHeight: 420,
+  worldMap3dMinHeight: 360,
   /**
    * 人物の吹き出しの最大幅。
    *
