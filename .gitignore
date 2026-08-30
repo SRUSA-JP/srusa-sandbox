@@ -6,6 +6,13 @@ dist/
 *.log
 npm-debug.log*
 
+# データ取得時のローカルアーカイブ
+data/*.tar.gz
+data/*.zip
+
+# BlueMap の公開に不要なデバッグ用ファイル
+public/bluemap-spawn/**/*.map
+
 # ローカル設定と秘密情報
 .env
 .env.*
