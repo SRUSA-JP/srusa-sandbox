@@ -7,7 +7,7 @@
  *
  * 値を含む文は関数にして、数値の整形は lib/format.ts に任せる。
  */
-import { formatInt, formatMegabytes } from '../lib/format';
+import { formatDecimal, formatInt, formatMegabytes } from '../lib/format';
 import { OTHER_ENTRY } from './labels';
 
 /** 画面の外枠（サイト名・タブ・配色の切り替え）。 */
@@ -29,6 +29,10 @@ export const APP_TEXT = {
   navLabel: 'ページ',
   /** 下の段（まとまりの中の切り替え）の読み上げ。 */
   sectionNavLabel: 'このまとまりの中の画面',
+  /** ゲーム一覧の読み上げ。 */
+  gameNavLabel: 'ゲーム',
+  /** ゲーム内コンテンツ一覧の読み上げ。 */
+  gameContentNavLabel: 'ゲーム内の画面',
   /** ページ全体にかかる注意書きの見出し。本文の下に出す。 */
   disclaimer: 'このページについて',
   /**
@@ -372,6 +376,32 @@ export const STATS_TEXT = {
       rateValue: (rate: string) => `1 DI = ${rate} EM`,
       rateNote: '選択中の算出元から見た簡易レート',
     },
+    serviceCost: {
+      title: 'サーバー維持費の傾斜',
+      note:
+        'プレイ時間が 0 時間より大きい人を対象に、基本割とプレイ時間に応じた従量分で維持費を分けます。',
+      totalCost: '総額',
+      totalCostLabel: '維持費の総額',
+      basePercent: '基本割%',
+      basePercentLabel: '均等に分ける割合',
+      slope: '傾斜',
+      slopeLabel: 'プレイ時間への傾斜係数',
+      participants: '対象人数',
+      totalHours: '対象プレイ時間',
+      baseCost: '基本割',
+      usageCost: '従量分',
+      averageCost: '平均',
+      yen: ' 円',
+      yenPerHour: ' 円/h',
+      shareColumn: '割合',
+      baseColumn: '基本割',
+      usageColumn: '従量分',
+      costColumn: '負担額',
+      yenPerHourColumn: '円/h',
+      noPlayers: 'プレイ時間がある対象者がいません。',
+      basis: (basePercent: number, slope: number) =>
+        `基本割 ${formatInt(basePercent)}% / 従量分は プレイ時間^${formatDecimal(slope)} で配分。`,
+    },
   },
 
   /** 換算後の分母の説明。グラフの注記に使う。 */
@@ -399,6 +429,7 @@ export const STATS_TEXT = {
     series: (series: string, basis: string) => `series-${series}-${basis}.csv`,
     trend: (metric: string, basis: string) => `trend-${metric}-${basis}.csv`,
     economyRanking: (mode: string) => `economy-ranking-${mode}.csv`,
+    serviceCost: 'minecraft-service-cost.csv',
     scatter: (x: string, y: string, basis: string) => `scatter-${x}-${y}-${basis}.csv`,
   },
 } as const;
@@ -420,6 +451,8 @@ export const WORLD_MAP_TEXT = {
 
   picker: {
     view: '表示',
+    view2d: '2D',
+    view3d: 'スポーン3D',
     dimension: 'ディメンション',
     allDimensions: 'すべて',
     map: '日付',
@@ -483,6 +516,11 @@ export const WORLD_MAP_TEXT = {
     tag: 'スクリーンショット',
     /** 何を写したものかの説明。 */
     note: '下の 2 枚は操作できません。BlueMap の 3D 表示を撮った画像です。',
+  },
+
+  threeD: {
+    title: 'スポーン周辺 3D',
+    note: 'スポーン地点の周辺だけを BlueMap の 3D ビューアで表示します。',
   },
 } as const;
 

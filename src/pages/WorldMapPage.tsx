@@ -7,6 +7,7 @@ import {
   Picker,
   ProsePanel,
   TechnicalDetails,
+  WorldMap3dViewer,
   WorldMapGallery,
   WorldMapLog,
 } from '../components';
@@ -32,7 +33,13 @@ const EMPTY_MAPS: WorldMap[] = [];
 const ALL_DIMENSIONS = '*';
 
 type TooltipMode = 'on' | 'off';
+type WorldMapViewMode = '2d' | 'spawn-3d';
 type DimensionSelection = typeof ALL_DIMENSIONS | string;
+
+const VIEW_OPTIONS: Array<{ value: WorldMapViewMode; label: string }> = [
+  { value: '2d', label: WORLD_MAP_TEXT.picker.view2d },
+  { value: 'spawn-3d', label: WORLD_MAP_TEXT.picker.view3d },
+];
 
 const TOOLTIP_OPTIONS: Array<{ value: TooltipMode; label: string }> = [
   { value: 'on', label: MAP_TEXT.picker.tooltipOn },
@@ -55,6 +62,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
     () => latestWorldMapDate(maps, document?.generated_on),
     [document?.generated_on, maps],
   );
+  const [viewMode, setViewMode] = useState<WorldMapViewMode>('2d');
   const [selectedDimension, setSelectedDimension] = useState<DimensionSelection>(ALL_DIMENSIONS);
   const [selectedMapIds, setSelectedMapIds] = useState<Record<string, string>>({});
   /*
@@ -121,11 +129,17 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
       }
     >
       <ChartCard
-        title={WORLD_MAP_TEXT.card.title}
-        note={WORLD_MAP_TEXT.card.note}
+        title={viewMode === '2d' ? WORLD_MAP_TEXT.card.title : WORLD_MAP_TEXT.threeD.title}
+        note={viewMode === '2d' ? WORLD_MAP_TEXT.card.note : WORLD_MAP_TEXT.threeD.note}
         actions={
           <>
-            {dimensionOptions.length > 1 && (
+            <Picker
+              label={WORLD_MAP_TEXT.picker.view}
+              value={viewMode}
+              options={VIEW_OPTIONS}
+              onChange={setViewMode}
+            />
+            {viewMode === '2d' && dimensionOptions.length > 1 && (
               <Picker
                 label={WORLD_MAP_TEXT.picker.dimension}
                 value={selectedDimension}
@@ -133,35 +147,43 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
                 onChange={setSelectedDimension}
               />
             )}
-            <Picker
-              label={WORLD_MAP_TEXT.picker.tooltips}
-              value={tooltipMode}
-              options={TOOLTIP_OPTIONS}
-              onChange={setTooltipMode}
-            />
+            {viewMode === '2d' && (
+              <Picker
+                label={WORLD_MAP_TEXT.picker.tooltips}
+                value={tooltipMode}
+                options={TOOLTIP_OPTIONS}
+                onChange={setTooltipMode}
+              />
+            )}
           </>
         }
       >
-        {document?.issues && document.issues.length > 0 && (
-          <div className="mb-md">
-            <NoticePanel title={APP_TEXT.disclaimer}>{WORLD_MAP_TEXT.partialData(document.issues.length)}</NoticePanel>
-          </div>
-        )}
-        {selectedMaps.length > 0 ? (
-          <WorldMapGallery
-            maps={dimensionMaps}
-            selectedMaps={selectedMaps}
-            selectedMapIds={selectedMapIds}
-            fallbackDate={document?.generated_on}
-            latestDate={latestDate}
-            showTooltips={tooltipMode === 'on'}
-            theme={theme}
-            onSelectMap={(dimension, mapId) => {
-              setSelectedMapIds((previous) => ({ ...previous, [dimension]: mapId }));
-            }}
-          />
+        {viewMode === '2d' ? (
+          <>
+            {document?.issues && document.issues.length > 0 && (
+              <div className="mb-md">
+                <NoticePanel title={APP_TEXT.disclaimer}>{WORLD_MAP_TEXT.partialData(document.issues.length)}</NoticePanel>
+              </div>
+            )}
+            {selectedMaps.length > 0 ? (
+              <WorldMapGallery
+                maps={dimensionMaps}
+                selectedMaps={selectedMaps}
+                selectedMapIds={selectedMapIds}
+                fallbackDate={document?.generated_on}
+                latestDate={latestDate}
+                showTooltips={tooltipMode === 'on'}
+                theme={theme}
+                onSelectMap={(dimension, mapId) => {
+                  setSelectedMapIds((previous) => ({ ...previous, [dimension]: mapId }));
+                }}
+              />
+            ) : (
+              <Note tone="error">{WORLD_MAP_TEXT.noData}</Note>
+            )}
+          </>
         ) : (
-          <Note tone="error">{WORLD_MAP_TEXT.noData}</Note>
+          <WorldMap3dViewer src={`${import.meta.env.BASE_URL}bluemap-spawn/index.html#overworld_spawn:0:80:0:700:0:0.85:0:0:perspective`} />
         )}
       </ChartCard>
 

@@ -49,6 +49,10 @@ export interface Route {
   label: string;
   /** この画面で使う見た目のプリセット（config/skins.ts）。 */
   skinId: string;
+  /** ゲーム配下の画面だけが持つ、親ゲームの ID。 */
+  gameId?: string;
+  /** ゲーム配下の画面だけが持つ、親ゲームの表示名。 */
+  gameLabel?: string;
   /** 動的ページだけが持つ URL パラメータ。 */
   params?: Record<string, string>;
   /**
@@ -78,11 +82,22 @@ export const ZUKAN_PATH = '#/zukan';
 
 export const ROUTES: Route[] = [
   /* ゲーム。遊んでいるゲームをここにまとめ、下の段で切り替える */
-  { id: 'stats', section: 'games', group: 'Minecraft', path: '#/minecraft', label: '統計', skinId: MINECRAFT_SKIN.id },
+  {
+    id: 'stats',
+    section: 'games',
+    group: 'Minecraft',
+    gameId: 'minecraft',
+    gameLabel: 'Minecraft',
+    path: '#/minecraft',
+    label: '統計',
+    skinId: MINECRAFT_SKIN.id,
+  },
   {
     id: 'world-map',
     section: 'games',
     group: 'Minecraft',
+    gameId: 'minecraft',
+    gameLabel: 'Minecraft',
     path: '#/minecraft/world-map',
     label: 'ワールドマップ',
     skinId: MINECRAFT_SKIN.id,
@@ -91,6 +106,8 @@ export const ROUTES: Route[] = [
     id: 'calendar',
     section: 'games',
     group: 'Minecraft',
+    gameId: 'minecraft',
+    gameLabel: 'Minecraft',
     path: '#/minecraft/calendar',
     label: '活動カレンダー',
     skinId: MINECRAFT_SKIN.id,
@@ -99,9 +116,33 @@ export const ROUTES: Route[] = [
    * ここから先はまだ中身が無いプレースホルダー。Minecraft 以外にも遊んでいる
    * ゲームがあるので、タブの場所だけ先に用意しておく。
    */
-  { id: 'valorant', section: 'games', path: '#/valorant', label: 'VALORANT', skinId: MINECRAFT_SKIN.id },
-  { id: 'lol', section: 'games', path: '#/lol', label: 'LOL', skinId: MINECRAFT_SKIN.id },
-  { id: 'apex', section: 'games', path: '#/apex', label: 'APEX', skinId: MINECRAFT_SKIN.id },
+  {
+    id: 'valorant',
+    section: 'games',
+    gameId: 'valorant',
+    gameLabel: 'VALORANT',
+    path: '#/valorant',
+    label: '概要',
+    skinId: MINECRAFT_SKIN.id,
+  },
+  {
+    id: 'lol',
+    section: 'games',
+    gameId: 'lol',
+    gameLabel: 'LOL',
+    path: '#/lol',
+    label: '概要',
+    skinId: MINECRAFT_SKIN.id,
+  },
+  {
+    id: 'apex',
+    section: 'games',
+    gameId: 'apex',
+    gameLabel: 'APEX',
+    path: '#/apex',
+    label: '概要',
+    skinId: MINECRAFT_SKIN.id,
+  },
   /* 相関図も Minecraft のページと同じドット絵風にする（サイト全体の雰囲気を揃えるため） */
   {
     id: 'relationships',

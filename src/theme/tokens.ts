@@ -171,6 +171,10 @@ export const LAYOUT = {
   viewportCompactHeight: 420,
   /** 図に重ねる吹き出しの最小幅。座標が桁変わりしても幅が跳ねないようにする。 */
   tooltipMinWidth: 180,
+  /** BlueMap の 3D ビューアを埋め込む高さ。 */
+  worldMap3dHeight: 'min(760px,75vh)',
+  /** BlueMap の 3D ビューアを埋め込む最小高さ。 */
+  worldMap3dMinHeight: 420,
   /**
    * 人物の吹き出しの最大幅。
    *

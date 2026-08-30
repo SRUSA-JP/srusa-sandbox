@@ -13,8 +13,9 @@ export interface GamePlaceholderPageProps {
  * 無いものを埋めた画面を作らず、「まだ無い」とだけ言う。
  */
 export function GamePlaceholderPage({ route }: GamePlaceholderPageProps) {
+  const title = route.gameLabel ?? route.label;
   return (
-    <AppLayout title={route.label} lead={GAME_PLACEHOLDER_TEXT.lead(route.label)}>
+    <AppLayout title={title} lead={GAME_PLACEHOLDER_TEXT.lead(title)}>
       <Note>{GAME_PLACEHOLDER_TEXT.note}</Note>
     </AppLayout>
   );

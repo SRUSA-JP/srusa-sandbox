@@ -1,31 +1,31 @@
 {
-  "generated_on": "2026-08-25",
-  "source": "BlueMap lowres LOD1 / End MCA overview",
+  "generated_on": "2026-08-30",
+  "source": "BlueMap lowres LOD1",
   "maps": [
     {
       "id": "end",
       "dimension": "end",
       "label": "End",
-      "updated_on": "2026-08-25",
+      "updated_on": "2026-08-30",
       "image": "world-map/end.png",
       "bounds": {
-        "minX": -17408,
-        "minZ": -1536,
-        "maxX": 2048,
-        "maxZ": 4608
+        "minX": -4500,
+        "minZ": -990,
+        "maxX": 1410,
+        "maxZ": 4386
       },
       "pixels": {
-        "width": 4864,
-        "height": 1536
+        "width": 5910,
+        "height": 5376
       },
-      "blocksPerPixel": 4,
-      "bytes": 204224
+      "blocksPerPixel": 1,
+      "bytes": 498860
     },
     {
       "id": "nether",
       "dimension": "nether",
       "label": "Nether",
-      "updated_on": "2026-08-25",
+      "updated_on": "2026-08-30",
       "image": "world-map/nether.png",
       "bounds": {
         "minX": -512,
@@ -44,7 +44,7 @@
       "id": "overworld",
       "dimension": "overworld",
       "label": "Overworld",
-      "updated_on": "2026-08-25",
+      "updated_on": "2026-08-30",
       "image": "world-map/overworld.png",
       "bounds": {
         "minX": -1024,
@@ -101,7 +101,7 @@
       "id": "twilightforest",
       "dimension": "twilightforest",
       "label": "Twilight Forest",
-      "updated_on": "2026-08-25",
+      "updated_on": "2026-08-30",
       "image": "world-map/twilightforest.png",
       "bounds": {
         "minX": -2206,

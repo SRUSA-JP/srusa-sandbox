@@ -25,21 +25,16 @@ const TAB = 'cursor-pointer rounded-t-md border-b-thick px-lg py-md text-md tran
  */
 const SUB_TAB = 'cursor-pointer rounded-md px-md py-xs text-sm transition-colors';
 
-/**
- * 下の段を、複数の画面を持つゲーム（route.group）ごとにまとめる。
- *
- * 同じ group が並んでいる区間を 1 つの囲いにし、group の無い画面は
- * 今までどおり単独のタブにする。route.ts で group を持つ画面は
- * 連続して並べてあるので、ここでは並び順をそのまま見るだけでよい。
- */
-function groupedSiblings(siblings: Route[]): Array<{ group?: string; entries: Route[] }> {
-  const clusters: Array<{ group?: string; entries: Route[] }> = [];
+function gameClusters(siblings: Route[]): Array<{ id: string; label: string; entries: Route[] }> {
+  const clusters: Array<{ id: string; label: string; entries: Route[] }> = [];
   for (const entry of siblings) {
+    const id = entry.gameId ?? entry.id;
+    const label = entry.gameLabel ?? entry.group ?? entry.label;
     const last = clusters[clusters.length - 1];
-    if (entry.group && last?.group === entry.group) {
+    if (last?.id === id) {
       last.entries.push(entry);
     } else {
-      clusters.push({ group: entry.group, entries: [entry] });
+      clusters.push({ id, label, entries: [entry] });
     }
   }
   return clusters;
@@ -75,6 +70,9 @@ function subTabButton(entry: Route, route: Route, onNavigate: (route: Route) => 
 export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: AppShellProps) {
   const dark = mode === 'dark';
   const siblings = routesInSection(route.section);
+  const games = route.section === 'games' ? gameClusters(siblings) : [];
+  const activeGameId = route.gameId ?? route.id;
+  const activeGame = games.find((game) => game.id === activeGameId);
   return (
     <div className="mx-auto max-w-[var(--sr-layout-max-width)] px-lg pt-lg pb-page sm:px-xxl sm:pt-xxl md:px-xxxl">
       <header className="flex flex-wrap items-start justify-between gap-lg">
@@ -117,24 +115,39 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
         })}
       </nav>
 
-      {/* 下の段: そのまとまりの中の画面。1 つしか無いまとまりでは出さない */}
-      {siblings.length > 1 && (
-        <nav className="mt-md flex flex-wrap items-center gap-md" aria-label={APP_TEXT.sectionNavLabel}>
-          {groupedSiblings(siblings).map((cluster) =>
-            cluster.group ? (
-              <div
-                key={`group-${cluster.group}`}
-                className="flex flex-wrap items-center gap-xs rounded-md border-hairline border-divider px-xs py-xxs"
+      {games.length > 1 && (
+        <nav className="mt-md flex flex-wrap items-center gap-xs" aria-label={APP_TEXT.gameNavLabel}>
+          {games.map((game) => {
+            const active = game.id === activeGameId;
+            return (
+              <button
+                key={game.id}
+                type="button"
+                aria-current={active ? 'page' : undefined}
+                className={
+                  active
+                    ? `${SUB_TAB} bg-selected font-medium text-selected-ink`
+                    : `${SUB_TAB} text-tab hover:bg-hover hover:text-tab-active`
+                }
+                onClick={() => onNavigate(game.entries[0])}
               >
-                <span className="px-xs text-xs font-medium text-subtle">{cluster.group}</span>
-                {cluster.entries.map((entry) => subTabButton(entry, route, onNavigate))}
-              </div>
-            ) : (
-              <div key={cluster.entries[0].id} className="flex flex-wrap gap-xs">
-                {cluster.entries.map((entry) => subTabButton(entry, route, onNavigate))}
-              </div>
-            ),
-          )}
+                {game.label}
+              </button>
+            );
+          })}
+        </nav>
+      )}
+
+      {/* 下の段: そのまとまりの中の画面。1 つしか無いまとまりでは出さない */}
+      {route.section !== 'games' && siblings.length > 1 && (
+        <nav className="mt-md flex flex-wrap items-center gap-md" aria-label={APP_TEXT.sectionNavLabel}>
+          {siblings.map((entry) => subTabButton(entry, route, onNavigate))}
+        </nav>
+      )}
+
+      {activeGame && activeGame.entries.length > 1 && (
+        <nav className="mt-sm flex flex-wrap items-center gap-xs" aria-label={APP_TEXT.gameContentNavLabel}>
+          {activeGame.entries.map((entry) => subTabButton(entry, route, onNavigate))}
         </nav>
       )}
 
