@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { PLAYER_COLUMN, STATS_TEXT } from '../../config';
 import { useChartMetrics } from '../../hooks/useChartMetrics';
 import { barChartHeight, joinNotes } from '../../lib/display';
@@ -10,7 +11,7 @@ import {
 import type { PlayerRow } from '../../lib/selectors';
 import type { Row } from '../../lib/export';
 import type { VizTheme } from '../../theme/palette';
-import { Note, NumberField } from '../atoms';
+import { Button, Note, NumberField, Picker } from '../atoms';
 import { KpiTile } from '../molecules';
 import { ChartCard } from './ChartCard';
 import { KpiGrid } from './KpiGrid';
@@ -26,13 +27,20 @@ export interface ServiceCostPanelProps {
 
 /** プレイ時間に応じた Minecraft サーバー維持費の試算。 */
 export function ServiceCostPanel({ rows, options, onOptionsChange, theme, note }: ServiceCostPanelProps) {
+  const [customPlayer, setCustomPlayer] = useState('');
   const chart = useChartMetrics();
   const summary = serviceCostSummary(rows, options);
   const chartRows = serviceCostChartRows(summary.rows);
+  const customPlayerOptions = summary.rows.map((row) => ({ value: row.name, label: row.name }));
+  const effectiveCustomPlayer = customPlayerOptions.some((option) => option.value === customPlayer)
+    ? customPlayer
+    : customPlayerOptions[0]?.value ?? '';
+  const customCost = options.customCosts[effectiveCustomPlayer] ?? 0;
   const tableRows = summary.rows.map<Row>((row) => ({
     player: row.name,
     playtime_hours: row.playtime_hours,
     share_percent: row.share_percent,
+    custom_cost_yen: row.custom_cost_yen,
     base_cost_yen: row.base_cost_yen,
     usage_cost_yen: row.usage_cost_yen,
     cost_yen: row.cost_yen,
@@ -44,7 +52,7 @@ export function ServiceCostPanel({ rows, options, onOptionsChange, theme, note }
       title={STATS_TEXT.card.serviceCost.title}
       note={joinNotes(
         STATS_TEXT.card.serviceCost.note,
-        STATS_TEXT.card.serviceCost.basis(options.basePercent, options.slope),
+        STATS_TEXT.card.serviceCost.basis(options.basePercent, options.slope, options.roundingUnit),
         note,
       )}
       actions={
@@ -67,6 +75,43 @@ export function ServiceCostPanel({ rows, options, onOptionsChange, theme, note }
             value={options.slope}
             onChange={(slope) => onOptionsChange({ ...options, slope })}
           />
+          <NumberField
+            label={STATS_TEXT.card.serviceCost.roundingUnit}
+            ariaLabel={STATS_TEXT.card.serviceCost.roundingUnitLabel}
+            value={options.roundingUnit}
+            onChange={(roundingUnit) => onOptionsChange({ ...options, roundingUnit })}
+          />
+          {effectiveCustomPlayer && (
+            <>
+              <Picker
+                label={STATS_TEXT.card.serviceCost.customPlayer}
+                value={effectiveCustomPlayer}
+                options={customPlayerOptions}
+                onChange={setCustomPlayer}
+              />
+              <NumberField
+                label={STATS_TEXT.card.serviceCost.customCost}
+                ariaLabel={STATS_TEXT.card.serviceCost.customCostLabel(effectiveCustomPlayer)}
+                value={customCost}
+                onChange={(value) =>
+                  onOptionsChange({
+                    ...options,
+                    customCosts: { ...options.customCosts, [effectiveCustomPlayer]: value },
+                  })
+                }
+              />
+              <Button
+                label={STATS_TEXT.card.serviceCost.clearCustom}
+                icon="reset"
+                disabled={!options.customCosts[effectiveCustomPlayer]}
+                onClick={() => {
+                  const customCosts = { ...options.customCosts };
+                  delete customCosts[effectiveCustomPlayer];
+                  onOptionsChange({ ...options, customCosts });
+                }}
+              />
+            </>
+          )}
         </>
       }
       tableRows={tableRows}
@@ -74,6 +119,7 @@ export function ServiceCostPanel({ rows, options, onOptionsChange, theme, note }
         PLAYER_COLUMN,
         { key: 'playtime_hours', label: STATS_TEXT.kpi.playtime },
         { key: 'share_percent', label: STATS_TEXT.card.serviceCost.shareColumn },
+        { key: 'custom_cost_yen', label: STATS_TEXT.card.serviceCost.customColumn },
         { key: 'base_cost_yen', label: STATS_TEXT.card.serviceCost.baseColumn },
         { key: 'usage_cost_yen', label: STATS_TEXT.card.serviceCost.usageColumn },
         { key: 'cost_yen', label: STATS_TEXT.card.serviceCost.costColumn },
@@ -92,9 +138,9 @@ export function ServiceCostPanel({ rows, options, onOptionsChange, theme, note }
             />
             <KpiTile
               compact
-              label={STATS_TEXT.card.serviceCost.baseCost}
-              value={`${formatInt(summary.baseCost)}${STATS_TEXT.card.serviceCost.yen}`}
-              sub={`${formatInt(options.basePercent)}%`}
+              label={STATS_TEXT.card.serviceCost.customTotal}
+              value={`${formatInt(summary.customCost)}${STATS_TEXT.card.serviceCost.yen}`}
+              sub={STATS_TEXT.card.serviceCost.customCost}
             />
             <KpiTile
               compact
@@ -104,11 +150,12 @@ export function ServiceCostPanel({ rows, options, onOptionsChange, theme, note }
             />
             <KpiTile
               compact
-              label={STATS_TEXT.card.serviceCost.averageCost}
-              value={`${formatInt(summary.averageCost)}${STATS_TEXT.card.serviceCost.yen}`}
-              sub={STATS_TEXT.card.serviceCost.costColumn}
+              label={STATS_TEXT.card.serviceCost.baseCost}
+              value={`${formatInt(summary.baseCost)}${STATS_TEXT.card.serviceCost.yen}`}
+              sub={`${formatInt(options.basePercent)}%`}
             />
           </KpiGrid>
+          {summary.customLimited && <Note tone="error">{STATS_TEXT.card.serviceCost.customLimited}</Note>}
           <RankBarChart
             data={chartRows}
             theme={theme}

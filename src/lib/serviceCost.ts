@@ -4,12 +4,15 @@ export interface ServiceCostOptions {
   totalCost: number;
   basePercent: number;
   slope: number;
+  roundingUnit: number;
+  customCosts: Record<string, number>;
 }
 
 export interface ServiceCostRow {
   name: string;
   playtime_hours: number;
   share_percent: number;
+  custom_cost_yen: number;
   base_cost_yen: number;
   usage_cost_yen: number;
   cost_yen: number;
@@ -18,6 +21,8 @@ export interface ServiceCostRow {
 
 export interface ServiceCostSummary {
   totalCost: number;
+  customCost: number;
+  customLimited: boolean;
   baseCost: number;
   usageCost: number;
   players: number;
@@ -35,25 +40,36 @@ function roundedYen(value: number): number {
   return Math.max(0, Math.round(Number.isFinite(value) ? value : 0));
 }
 
-function allocateYen(total: number, weights: number[]): number[] {
+function roundedToUnit(value: number, unit: number): number {
+  return Math.max(0, Math.round(value / unit) * unit);
+}
+
+function allocateYen(total: number, weights: number[], roundingUnit: number): number[] {
   if (weights.length === 0 || total <= 0) return weights.map(() => 0);
+  const unit = Math.max(1, Math.round(roundingUnit));
   const weightTotal = weights.reduce((sum, weight) => sum + Math.max(0, weight), 0);
   const safeWeights = weightTotal > 0 ? weights.map((weight) => Math.max(0, weight)) : weights.map(() => 1);
   const safeTotal = weightTotal > 0 ? weightTotal : weights.length;
   const exact = safeWeights.map((weight) => (total * weight) / safeTotal);
-  const floors = exact.map(Math.floor);
-  let rest = total - floors.reduce((sum, value) => sum + value, 0);
+  const rounded = exact.map((value) => roundedToUnit(value, unit));
+  let rest = total - rounded.reduce((sum, value) => sum + value, 0);
   const order = exact
-    .map((value, index) => ({ index, fraction: value - Math.floor(value) }))
-    .sort((a, b) => b.fraction - a.fraction);
+    .map((value, index) => ({ index, gap: Math.abs(value - rounded[index]) }))
+    .sort((a, b) => b.gap - a.gap);
+  let cursor = 0;
 
-  for (const item of order) {
-    if (rest <= 0) break;
-    floors[item.index] += 1;
-    rest -= 1;
+  while (rest !== 0 && order.length > 0) {
+    const item = order[cursor % order.length];
+    const amount = Math.min(unit, Math.abs(rest));
+    const delta = rest > 0 ? amount : -amount;
+    if (delta > 0 || rounded[item.index] >= amount) {
+      rounded[item.index] += delta;
+      rest -= delta;
+    }
+    cursor += 1;
   }
 
-  return floors;
+  return rounded;
 }
 
 export function serviceCostSummary(rows: PlayerRow[], options: ServiceCostOptions): ServiceCostSummary {
@@ -61,24 +77,40 @@ export function serviceCostSummary(rows: PlayerRow[], options: ServiceCostOption
   const totalCost = roundedYen(options.totalCost);
   const basePercent = clamp(options.basePercent, 0, 100);
   const slope = clamp(options.slope, 0, 4);
-  const baseCost = roundedYen((totalCost * basePercent) / 100);
-  const usageCost = totalCost - baseCost;
+  const roundingUnit = Math.max(1, Math.round(options.roundingUnit));
+  const requestedCustomCosts = players.map((row) => roundedYen(options.customCosts[row.name] ?? 0));
+  const requestedCustomTotal = requestedCustomCosts.reduce((sum, cost) => sum + cost, 0);
+  const customLimited = requestedCustomTotal > totalCost;
+  const effectiveCustomCosts = customLimited
+    ? allocateYen(totalCost, requestedCustomCosts, roundingUnit)
+    : requestedCustomCosts;
+  const customCosts = Object.fromEntries(players.map((row, index) => [row.name, effectiveCustomCosts[index] ?? 0]));
+  const customCost = effectiveCustomCosts.reduce((sum, cost) => sum + cost, 0);
+  const sharedPlayers = players.filter((row) => !customCosts[row.name]);
+  const sharedCost = totalCost - customCost;
+  const baseCost = roundedYen((sharedCost * basePercent) / 100);
+  const usageCost = sharedCost - baseCost;
   const totalHours = players.reduce((sum, row) => sum + row.playtime_hours, 0);
-  const baseAllocations = allocateYen(baseCost, players.map(() => 1));
+  const baseAllocations = allocateYen(baseCost, sharedPlayers.map(() => 1), roundingUnit);
   const usageAllocations = allocateYen(
     usageCost,
-    players.map((row) => Math.pow(row.playtime_hours, slope)),
+    sharedPlayers.map((row) => Math.pow(row.playtime_hours, slope)),
+    roundingUnit,
   );
+  const sharedIndexByName = new Map(sharedPlayers.map((row, index) => [row.name, index]));
 
   const costRows = players
-    .map((row, index) => {
-      const base = baseAllocations[index] ?? 0;
-      const usage = usageAllocations[index] ?? 0;
-      const cost = base + usage;
+    .map((row) => {
+      const custom = customCosts[row.name] ?? 0;
+      const index = sharedIndexByName.get(row.name);
+      const base = index === undefined ? 0 : baseAllocations[index] ?? 0;
+      const usage = index === undefined ? 0 : usageAllocations[index] ?? 0;
+      const cost = custom || base + usage;
       return {
         name: row.name,
         playtime_hours: row.playtime_hours,
         share_percent: totalCost > 0 ? (cost / totalCost) * 100 : 0,
+        custom_cost_yen: custom,
         base_cost_yen: base,
         usage_cost_yen: usage,
         cost_yen: cost,
@@ -89,6 +121,8 @@ export function serviceCostSummary(rows: PlayerRow[], options: ServiceCostOption
 
   return {
     totalCost,
+    customCost,
+    customLimited,
     baseCost,
     usageCost,
     players: players.length,
