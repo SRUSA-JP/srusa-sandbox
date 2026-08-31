@@ -163,7 +163,7 @@ try {
   expectIncludes('AppShell mobile nav', navHtml, 'sr-only">ゲーム</span>');
   expectIncludes('AppShell mobile nav', navHtml, 'aria-current="page"');
   expectIncludes('AppShell mobile nav', navHtml, 'bg-tab-marker');
-  expectIncludes('AppShell mobile nav', navHtml, 'shape-rendering="crispEdges"');
+  expectIncludes('AppShell mobile nav', navHtml, 'grid-cols-5 grid-rows-5');
   expectExcludes('AppShell mobile nav', navHtml, 'bg-selected');
   expectExcludes('AppShell mobile nav', navHtml, APP_TEXT.gameContentNavLabel);
   expectIncludes('AppShell mobile context nav', html, `aria-label="${APP_TEXT.gameContentNavLabel}"`);
