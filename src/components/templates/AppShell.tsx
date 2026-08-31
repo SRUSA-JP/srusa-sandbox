@@ -15,7 +15,7 @@ export interface AppShellProps {
 }
 
 /** 上の段のタブ 1 枚。選択中は下線と面で示す（色だけに頼らない）。 */
-const TAB = 'cursor-pointer rounded-t-md border-b-thick px-lg py-md text-md transition-colors';
+const TAB = 'shrink-0 cursor-pointer whitespace-nowrap rounded-md border-b-thick px-md py-xs text-sm transition-colors';
 
 /**
  * 下の段のタブ 1 枚。
@@ -23,7 +23,7 @@ const TAB = 'cursor-pointer rounded-t-md border-b-thick px-lg py-md text-md tran
  * 上の段より小さく、下線ではなく面で選択中を示す。同じ形にすると
  * どちらが上位のまとまりなのか分からなくなる。
  */
-const SUB_TAB = 'cursor-pointer rounded-md px-md py-xs text-sm transition-colors';
+const SUB_TAB = 'shrink-0 cursor-pointer whitespace-nowrap rounded-md px-md py-xs text-sm transition-colors';
 
 function gameClusters(siblings: Route[]): Array<{ id: string; label: string; entries: Route[] }> {
   const clusters: Array<{ id: string; label: string; entries: Route[] }> = [];
@@ -75,53 +75,55 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
   const activeGameId = route.gameId ?? route.id;
   const activeGame = games.find((game) => game.id === activeGameId);
   return (
-    <div className="mx-auto max-w-[var(--sr-layout-max-width)] px-lg pt-md pb-page sm:px-xxl sm:pt-lg md:px-xxxl">
-      <header className="flex flex-wrap items-center justify-between gap-md">
-        <a href="#/" className="flex min-w-0 items-center gap-sm hover:bg-hover" aria-label={APP_TEXT.homeLink}>
-          <img
-            src={logoSrc}
-            alt={APP_TEXT.logoAlt}
-            className="h-[var(--sr-layout-logo-size)] w-[var(--sr-layout-logo-size)] shrink-0 rounded-sm border-hairline border-divider bg-sunken"
-          />
-          <span className="min-w-0 text-lg font-medium tracking-tight text-heading">{APP_TEXT.siteName}</span>
-        </a>
-        {/* 絵は「押すと何になるか」を出す。説明も同じ言い方で揃える */}
-        <IconButton
-          icon={dark ? 'light' : 'dark'}
-          label={dark ? APP_TEXT.theme.toLight : APP_TEXT.theme.toDark}
-          onClick={onToggleTheme}
-        />
+    <div className="mx-auto max-w-[var(--sr-layout-max-width)] px-lg pb-page sm:px-xxl md:px-xxxl">
+      <header className="sticky top-0 z-40 -mx-lg border-b-hairline border-divider bg-page px-lg py-xs sm:-mx-xxl sm:px-xxl md:-mx-xxxl md:px-xxxl">
+        <div className="mx-auto flex max-w-[var(--sr-layout-max-width)] items-center gap-md overflow-x-auto">
+          <a href="#/" className="flex shrink-0 items-center gap-sm hover:bg-hover" aria-label={APP_TEXT.homeLink}>
+            <img
+              src={logoSrc}
+              alt={APP_TEXT.logoAlt}
+              className="h-[var(--sr-layout-logo-size)] w-[var(--sr-layout-logo-size)] shrink-0 rounded-sm border-hairline border-divider bg-sunken"
+            />
+            <span className="text-lg font-medium tracking-tight text-heading">{APP_TEXT.siteName}</span>
+          </a>
+
+          {/* 上の段: まとまり。押すとそのまとまりの最初の画面へ行く */}
+          <nav className="flex shrink-0 items-center gap-xs" aria-label={APP_TEXT.navLabel}>
+            {SECTIONS.map((section) => {
+              const active = section.id === route.section;
+              const first = routesInSection(section.id)[0];
+              if (!first) return null;
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  aria-current={active ? 'page' : undefined}
+                  className={
+                    active
+                      ? `${TAB} border-tab-marker bg-tab-active-bg font-medium text-tab-active`
+                      : `${TAB} border-transparent text-tab hover:bg-hover hover:text-tab-active`
+                  }
+                  onClick={() => onNavigate(first)}
+                >
+                  {section.label}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* 絵は「押すと何になるか」を出す。説明も同じ言い方で揃える */}
+          <div className="ml-auto shrink-0">
+            <IconButton
+              icon={dark ? 'light' : 'dark'}
+              label={dark ? APP_TEXT.theme.toLight : APP_TEXT.theme.toDark}
+              onClick={onToggleTheme}
+            />
+          </div>
+        </div>
       </header>
 
-      {/* 上の段: まとまり。押すとそのまとまりの最初の画面へ行く */}
-      <nav
-        className="mt-md flex flex-wrap gap-xs border-b-hairline border-divider"
-        aria-label={APP_TEXT.navLabel}
-      >
-        {SECTIONS.map((section) => {
-          const active = section.id === route.section;
-          const first = routesInSection(section.id)[0];
-          if (!first) return null;
-          return (
-            <button
-              key={section.id}
-              type="button"
-              aria-current={active ? 'page' : undefined}
-              className={
-                active
-                  ? `${TAB} border-tab-marker bg-tab-active-bg font-medium text-tab-active`
-                  : `${TAB} border-transparent text-tab hover:bg-hover hover:text-tab-active`
-              }
-              onClick={() => onNavigate(first)}
-            >
-              {section.label}
-            </button>
-          );
-        })}
-      </nav>
-
       {games.length > 1 && (
-        <nav className="mt-md flex flex-wrap items-center gap-xs" aria-label={APP_TEXT.gameNavLabel}>
+        <nav className="mt-md flex items-center gap-xs overflow-x-auto" aria-label={APP_TEXT.gameNavLabel}>
           {games.map((game) => {
             const active = game.id === activeGameId;
             return (
@@ -145,13 +147,13 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
 
       {/* 下の段: そのまとまりの中の画面。1 つしか無いまとまりでは出さない */}
       {route.section !== 'games' && siblings.length > 1 && (
-        <nav className="mt-md flex flex-wrap items-center gap-md" aria-label={APP_TEXT.sectionNavLabel}>
+        <nav className="mt-md flex items-center gap-md overflow-x-auto" aria-label={APP_TEXT.sectionNavLabel}>
           {siblings.map((entry) => subTabButton(entry, route, onNavigate))}
         </nav>
       )}
 
       {activeGame && activeGame.entries.length > 1 && (
-        <nav className="mt-sm flex flex-wrap items-center gap-xs" aria-label={APP_TEXT.gameContentNavLabel}>
+        <nav className="mt-sm flex items-center gap-xs overflow-x-auto" aria-label={APP_TEXT.gameContentNavLabel}>
           {activeGame.entries.map((entry) => subTabButton(entry, route, onNavigate))}
         </nav>
       )}
