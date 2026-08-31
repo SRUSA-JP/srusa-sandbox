@@ -81,19 +81,26 @@ function mobileNavButton(item: MobileNavItem, route: Route, onNavigate: (route: 
   const active = item.activeSections.includes(route.section);
   const target = routesInSection(item.targetSection)[0];
   if (!target) return null;
+  const buttonClass = active
+    ? 'flex min-h-[var(--sr-layout-mobile-nav-height)] min-w-0 flex-col items-center justify-start px-xs py-xxs text-tab-active'
+    : 'flex min-h-[var(--sr-layout-mobile-nav-height)] min-w-0 flex-col items-center justify-start px-xs py-xxs text-tab hover:text-tab-active';
   return (
     <button
       key={item.label}
       type="button"
       aria-current={active ? 'page' : undefined}
-      className={
-        active
-          ? 'grid min-h-[var(--sr-layout-mobile-nav-height)] min-w-0 place-items-center rounded-md bg-selected px-xs py-xxs text-selected-ink'
-          : 'grid min-h-[var(--sr-layout-mobile-nav-height)] min-w-0 place-items-center rounded-md px-xs py-xxs text-tab hover:bg-hover hover:text-tab-active'
-      }
+      className={buttonClass}
       onClick={() => onNavigate(target)}
     >
-      <Icon name={item.icon} size={LAYOUT.mobileNavIconSize} />
+      <span
+        aria-hidden
+        className={`h-[var(--sr-border-thick)] w-[var(--sr-space-xl)] ${
+          active ? 'bg-tab-marker' : 'bg-transparent'
+        }`}
+      />
+      <span className="grid flex-1 place-items-center">
+        <Icon name={item.icon} size={LAYOUT.mobileNavIconSize} />
+      </span>
       <span className="sr-only">{item.label}</span>
     </button>
   );
@@ -201,7 +208,7 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
       {children}
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-50 border-t-hairline border-divider bg-page px-xs pb-mobile-nav-safe pt-xs sm:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 border-t-hairline border-divider bg-page px-xs pb-mobile-nav-safe sm:hidden"
         aria-label={APP_TEXT.mobileNavLabel}
       >
         <div className="mx-auto grid max-w-[var(--sr-layout-max-width)] grid-cols-5 gap-xxs">

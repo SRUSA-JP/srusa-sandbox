@@ -84,6 +84,17 @@ function expectIncludes(label: string, html: string, text: string) {
   if (!html.includes(text)) throw new Error(`${label} に ${text} が見つかりません`);
 }
 
+function expectExcludes(label: string, html: string, text: string) {
+  if (html.includes(text)) throw new Error(`${label} に不要な ${text} が含まれています`);
+}
+
+function htmlFrom(html: string, marker: string): string {
+  const start = html.indexOf(marker);
+  if (start < 0) throw new Error(`${marker} が見つかりません`);
+  const end = html.indexOf('</nav>', start);
+  return end < 0 ? html.slice(start) : html.slice(start, end);
+}
+
 let failed = false;
 
 for (const route of ROUTES_TO_CHECK) {
@@ -118,9 +129,11 @@ try {
       </AppShell>,
     ),
   );
-  expectIncludes('AppShell mobile nav', html, `aria-label="${APP_TEXT.mobileNavLabel}"`);
-  expectIncludes('AppShell mobile nav', html, 'sr-only">ゲーム</span>');
-  expectIncludes('AppShell mobile nav', html, 'aria-current="page"');
+  const navHtml = htmlFrom(html, `aria-label="${APP_TEXT.mobileNavLabel}"`);
+  expectIncludes('AppShell mobile nav', navHtml, 'sr-only">ゲーム</span>');
+  expectIncludes('AppShell mobile nav', navHtml, 'aria-current="page"');
+  expectIncludes('AppShell mobile nav', navHtml, 'bg-tab-marker');
+  expectExcludes('AppShell mobile nav', navHtml, 'bg-selected');
   console.log(`OK  AppShell mobile nav (${html.length} chars)`);
 } catch (error) {
   failed = true;
