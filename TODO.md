@@ -9,6 +9,13 @@
 
 #### 2026-08-31
 
+- 原文: `PCでもブルーマップの縦幅小さすぎるわ`
+  - PC 向けの BlueMap iframe 高さを `min(1180px,92dvh)` に広げ、通常表示でも画面高の大半を使うようにした
+  - BlueMap iframe の最小高さを `760px` に広げ、全画面時の高さを `calc(100dvh - 40px)` にした
+  - BlueMap 内部 CSS 補正の名前をスマホ限定からビューア全体の補正へ整理した
+  - [DESIGN.md](DESIGN.md) に、3D ビューアは PC でもスマートフォンでも通常表示から画面高の大半を使う方針を追記した
+  - 確認: `npm run typecheck`、`npm run lint`、`npm run check:design` が通ることを確認
+
 - 原文: `３ｄマップ表示は多分ブルーマップ側の表示設定で縦幅が狭いからそこを調整できないか試してみて，スマホで`
   - BlueMap 生成物の CSS を確認し、スマホ時に `#app { font-size: 1.5rem }` と `#ff-mobile-controls { font-size: 15vh }` が効いて操作UIが縦幅を圧迫しやすいことを確認した
   - `WorldMap3dViewer` で iframe 読み込み後に同一オリジンの BlueMap へスマホ用 CSS を注入し、`100dvh` 基準の高さ、上部バー、モバイル操作ボタン、ズームボタンのサイズを補正するようにした

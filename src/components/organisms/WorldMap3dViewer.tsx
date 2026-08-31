@@ -6,8 +6,8 @@ export interface WorldMap3dViewerProps {
   src: string;
 }
 
-const BLUEMAP_MOBILE_STYLE_ID = 'srusa-bluemap-mobile-style';
-const BLUEMAP_MOBILE_STYLE = `
+const BLUEMAP_VIEWER_STYLE_ID = 'srusa-bluemap-viewer-style';
+const BLUEMAP_VIEWER_STYLE = `
 html,
 body,
 #map-container,
@@ -50,14 +50,14 @@ body {
 }
 `;
 
-function applyBlueMapMobileStyle(frame: HTMLIFrameElement) {
+function applyBlueMapViewerStyle(frame: HTMLIFrameElement) {
   try {
     const document = frame.contentDocument;
-    if (!document || document.getElementById(BLUEMAP_MOBILE_STYLE_ID)) return;
+    if (!document || document.getElementById(BLUEMAP_VIEWER_STYLE_ID)) return;
 
     const style = document.createElement('style');
-    style.id = BLUEMAP_MOBILE_STYLE_ID;
-    style.textContent = BLUEMAP_MOBILE_STYLE;
+    style.id = BLUEMAP_VIEWER_STYLE_ID;
+    style.textContent = BLUEMAP_VIEWER_STYLE;
     document.head.appendChild(style);
   } catch (cause) {
     void cause;
@@ -142,7 +142,7 @@ export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
         }`}
         loading="lazy"
         allow="fullscreen"
-        onLoad={(event) => applyBlueMapMobileStyle(event.currentTarget)}
+        onLoad={(event) => applyBlueMapViewerStyle(event.currentTarget)}
       />
     </div>
   );
