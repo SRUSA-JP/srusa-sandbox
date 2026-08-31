@@ -128,6 +128,11 @@ try {
   expectIncludes('BoardScore active members', html, 'アクティブ');
   expectIncludes('BoardScore active members', html, 'role="img"');
   expectIncludes('BoardScore active members', html, 'nodoamenn');
+  expectIncludes('BoardScore active members', html, 'ボードゲーム得点記録表');
+  expectIncludes('BoardScore active members', html, 'scope="col"');
+  expectIncludes('BoardScore active members', html, 'scope="row"');
+  expectIncludes('BoardScore active members', html, '未入力');
+  expectIncludes('BoardScore active members', html, '合計');
   console.log(`OK  BoardScore active members (${html.length} chars)`);
 } catch (error) {
   failed = true;

@@ -224,6 +224,18 @@ function scoreValue(doc: BoardScoreDocument, roundId: string, participantId: str
   return doc.scores.find((score) => score.roundId === roundId && score.participantId === participantId)?.score;
 }
 
+function participantTotal(doc: BoardScoreDocument, participantId: string): number {
+  return doc.scores
+    .filter((score) => score.participantId === participantId)
+    .reduce((sum, score) => sum + score.score, 0);
+}
+
+function roundTotal(doc: BoardScoreDocument, roundId: string): number {
+  return doc.scores
+    .filter((score) => score.roundId === roundId)
+    .reduce((sum, score) => sum + score.score, 0);
+}
+
 function sourceLabel(participant: BoardParticipant): string {
   if (participant.source === 'active-member') return 'アクティブ';
   if (participant.source === 'imported') return '読込';
@@ -264,6 +276,11 @@ export function BoardScorePage({ theme }: BoardScorePageProps) {
     rounds: doc.rounds.length,
     source: sourceLabel(participant),
   }));
+  const rankByParticipant = new Map(ranked.map((participant) => [participant.id, participant.rank]));
+  const totalCells = doc.participants.length * doc.rounds.length;
+  const filledCells = doc.scores.length;
+  const blankCells = Math.max(0, totalCells - filledCells);
+  const leader = ranked[0];
 
   const addPlayer = () => {
     const participant = {
@@ -398,26 +415,135 @@ export function BoardScorePage({ theme }: BoardScorePageProps) {
         </div>
       </section>
 
-      <ChartCard title={`${doc.title || '無題'} の合計`} note={`記録済み ${formatInt(doc.rounds.length)} 回`}>
-        {ranked.length > 0 ? (
-          <div className="grid gap-sm">
-            {ranked.map((player) => (
-              <div key={player.id} className="grid grid-cols-[3em_auto_minmax(0,1fr)_auto] items-center gap-md">
-                <span className="font-mono text-md tabular-nums text-muted">#{player.rank}</span>
-                <PlayerIconPlaceholder
-                  name={displayName(player)}
-                  accent={theme.categorical[ranked.indexOf(player) % theme.categorical.length] ?? theme.accent}
-                  alt={`${displayName(player)} のアイコン`}
-                />
-                <span className="truncate font-medium text-heading">{displayName(player)}</span>
-                <span className="font-mono text-lg tabular-nums text-heading">{formatInt(player.total)}</span>
-              </div>
-            ))}
+      <section className={SECTION}>
+        <div className="mb-md grid gap-md lg:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="min-w-0">
+            <h2 className="text-lg text-heading">記録シート</h2>
+            <p className="mt-xxs text-sm text-muted">
+              行は回や得点カテゴリ、列は参加者です。空欄は未入力として扱い、合計には含めません。
+            </p>
+          </div>
+          <div className="grid gap-xs text-sm text-muted sm:grid-cols-3 lg:min-w-[calc(var(--sr-layout-sidebar-width)+var(--sr-space-xxl))]">
+            <div className="border-l-thick border-divider pl-sm">
+              <span className="block text-xs">入力済み</span>
+              <span className="font-mono text-lg tabular-nums text-heading">{formatInt(filledCells)}</span>
+            </div>
+            <div className="border-l-thick border-divider pl-sm">
+              <span className="block text-xs">未入力</span>
+              <span className="font-mono text-lg tabular-nums text-heading">{formatInt(blankCells)}</span>
+            </div>
+            <div className="border-l-thick border-divider pl-sm">
+              <span className="block text-xs">先頭</span>
+              <span className="truncate text-lg text-heading">{leader ? displayName(leader) : '-'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-md flex flex-wrap items-end gap-md">
+          <label className="flex min-w-[var(--sr-layout-inline-form-min-width)] flex-1 flex-col gap-xs text-md text-muted">
+            行の名前
+            <input className={FIELD_INPUT_FULL} value={newRoundLabel} onChange={(event) => setNewRoundLabel(event.currentTarget.value)} />
+          </label>
+          <Button label="行を追加" onClick={addRound} disabled={doc.participants.length === 0} />
+        </div>
+
+        {doc.rounds.length > 0 ? (
+          <div className="overflow-auto overscroll-contain border-hairline border-divider">
+            <table className={`${TABLE} min-w-[var(--sr-layout-map-min-width)]`}>
+              <caption className="sr-only">{`${doc.title || '無題'} のボードゲーム得点記録表`}</caption>
+              <thead>
+                <tr>
+                  <th className={`${TABLE_CELL} ${TABLE_HEAD_CELL} sticky left-0 top-0 z-20 bg-table-head text-left`} scope="col">
+                    項目
+                  </th>
+                  {doc.participants.map((player, index) => (
+                    <th key={player.id} className={`${TABLE_CELL} ${TABLE_HEAD_CELL} sticky top-0 text-right`} scope="col">
+                      <span className="inline-flex items-center justify-end gap-xs">
+                        <PlayerIconPlaceholder
+                          name={displayName(player)}
+                          accent={theme.categorical[index % theme.categorical.length] ?? theme.accent}
+                          alt=""
+                          size="tiny"
+                        />
+                        <span>{displayName(player)}</span>
+                        <span className="font-mono text-xs tabular-nums text-subtle">#{rankByParticipant.get(player.id) ?? '-'}</span>
+                      </span>
+                    </th>
+                  ))}
+                  <th className={`${TABLE_CELL} ${TABLE_HEAD_CELL} sticky top-0 text-right`} scope="col">
+                    行合計
+                  </th>
+                  <th className={`${TABLE_CELL} ${TABLE_HEAD_CELL} sticky top-0 text-right`} scope="col">
+                    操作
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {doc.rounds.map((round) => (
+                  <tr key={round.id} className="hover:bg-table-row-hover">
+                    <th className={`${TABLE_CELL} sticky left-0 bg-page text-left`} scope="row">
+                      <input
+                        className={FIELD_INPUT_FULL}
+                        value={round.label}
+                        onChange={(event) =>
+                          setDoc((current) =>
+                            withUpdatedAt({
+                              ...current,
+                              rounds: current.rounds.map((entry) =>
+                                entry.id === round.id ? { ...entry, label: event.currentTarget.value } : entry,
+                              ),
+                            }),
+                          )
+                        }
+                      />
+                    </th>
+                    {doc.participants.map((player) => (
+                      <td key={player.id} className={`${TABLE_CELL} text-right`}>
+                        <label className={FIELD}>
+                          <span className="sr-only">{`${round.label} ${displayName(player)} の得点`}</span>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            className={FIELD_INPUT}
+                            value={scoreValue(doc, round.id, player.id) ?? ''}
+                            onChange={(event) => updateScore(round.id, player.id, event.currentTarget.value)}
+                          />
+                        </label>
+                      </td>
+                    ))}
+                    <td className={`${TABLE_CELL} text-right font-mono tabular-nums text-heading`}>
+                      {formatInt(roundTotal(doc, round.id))}
+                    </td>
+                    <td className={`${TABLE_CELL} text-right`}>
+                      <button type="button" className={`${FIELD_INPUT} ${CONTROL_HOVER}`} onClick={() => removeRound(round.id)}>
+                        削除
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th className={`${TABLE_CELL} sticky left-0 bg-table-head text-left text-muted`} scope="row">
+                    合計
+                  </th>
+                  {doc.participants.map((player) => (
+                    <td key={player.id} className={`${TABLE_CELL} bg-table-head text-right font-mono tabular-nums text-heading`}>
+                      {formatInt(participantTotal(doc, player.id))}
+                    </td>
+                  ))}
+                  <td className={`${TABLE_CELL} bg-table-head text-right font-mono tabular-nums text-heading`}>
+                    {formatInt(doc.scores.reduce((sum, score) => sum + score.score, 0))}
+                  </td>
+                  <td className={`${TABLE_CELL} bg-table-head`} />
+                </tr>
+              </tfoot>
+            </table>
           </div>
         ) : (
-          <Note>プレイヤーを追加すると集計が始まります。</Note>
+          <Note>行を追加すると得点入力欄が出ます。</Note>
         )}
-      </ChartCard>
+      </section>
 
       <section className={SECTION}>
         <h2 className="mb-md text-lg text-heading">プレイヤー</h2>
@@ -460,81 +586,6 @@ export function BoardScorePage({ theme }: BoardScorePageProps) {
             </div>
           ))}
         </div>
-      </section>
-
-      <section className={SECTION}>
-        <h2 className="mb-md text-lg text-heading">得点ログ</h2>
-        <div className="mb-md flex flex-wrap items-end gap-md">
-          <label className="flex min-w-[var(--sr-layout-inline-form-min-width)] flex-1 flex-col gap-xs text-md text-muted">
-            回の名前
-            <input className={FIELD_INPUT_FULL} value={newRoundLabel} onChange={(event) => setNewRoundLabel(event.currentTarget.value)} />
-          </label>
-          <Button label="回を追加" onClick={addRound} disabled={doc.participants.length === 0} />
-        </div>
-
-        {doc.rounds.length > 0 ? (
-          <div className="overflow-auto overscroll-contain">
-            <table className={`${TABLE} min-w-[var(--sr-layout-map-min-width)]`}>
-              <thead>
-                <tr>
-                  <th className={`${TABLE_CELL} ${TABLE_HEAD_CELL} sticky left-0 top-0 z-20 bg-table-head text-left`}>回</th>
-                  {doc.participants.map((player) => (
-                    <th key={player.id} className={`${TABLE_CELL} ${TABLE_HEAD_CELL} sticky top-0 text-right`}>
-                      <span className="inline-flex items-center justify-end gap-xs">
-                        <PlayerIconPlaceholder name={displayName(player)} accent={theme.accent} alt="" size="tiny" />
-                        <span>{displayName(player)}</span>
-                      </span>
-                    </th>
-                  ))}
-                  <th className={`${TABLE_CELL} ${TABLE_HEAD_CELL} sticky top-0 text-right`}>操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                {doc.rounds.map((round) => (
-                  <tr key={round.id} className="hover:bg-table-row-hover">
-                    <td className={`${TABLE_CELL} sticky left-0 bg-page`}>
-                      <input
-                        className={FIELD_INPUT_FULL}
-                        value={round.label}
-                        onChange={(event) =>
-                          setDoc((current) =>
-                            withUpdatedAt({
-                              ...current,
-                              rounds: current.rounds.map((entry) =>
-                                entry.id === round.id ? { ...entry, label: event.currentTarget.value } : entry,
-                              ),
-                            }),
-                          )
-                        }
-                      />
-                    </td>
-                    {doc.participants.map((player) => (
-                      <td key={player.id} className={`${TABLE_CELL} text-right`}>
-                        <label className={FIELD}>
-                          <span className="sr-only">{`${round.label} ${displayName(player)} の得点`}</span>
-                          <input
-                            type="number"
-                            inputMode="decimal"
-                            className={FIELD_INPUT}
-                            value={scoreValue(doc, round.id, player.id) ?? ''}
-                            onChange={(event) => updateScore(round.id, player.id, event.currentTarget.value)}
-                          />
-                        </label>
-                      </td>
-                    ))}
-                    <td className={`${TABLE_CELL} text-right`}>
-                      <button type="button" className={`${FIELD_INPUT} ${CONTROL_HOVER}`} onClick={() => removeRound(round.id)}>
-                        削除
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <Note>回を追加すると得点入力欄が出ます。</Note>
-        )}
       </section>
 
       <ChartCard title="順位表" note="CSV は確認用、JSON は再開用です。">
