@@ -459,9 +459,7 @@ export const WORLD_MAP_TEXT = {
   },
 
   picker: {
-    view: '表示',
-    view2d: '2D',
-    view3d: 'スポーン3D',
+    mapSettings: '2D マップ設定',
     dimension: 'ディメンション',
     allDimensions: 'すべて',
     snapshot: '履歴',
@@ -517,17 +515,6 @@ export const WORLD_MAP_TEXT = {
     overworld: (x: number, z: number) => `通常世界 X ${formatInt(x)} / Z ${formatInt(z)}`,
   },
 
-  /**
-   * 3D の見た目を写真で見せる節。
-   * 地図そのものと取り違えられないよう、必ずスクリーンショットだと明記する。
-   */
-  screenshot: {
-    /** 各画像に付ける札。 */
-    tag: 'スクリーンショット',
-    /** 何を写したものかの説明。 */
-    note: '下の 2 枚は操作できません。BlueMap の 3D 表示を撮った画像です。',
-  },
-
   threeD: {
     title: 'スポーン周辺 3D',
     note: 'スポーン地点の周辺だけを BlueMap の 3D ビューアで表示します。',
@@ -572,6 +559,7 @@ export const MAP_TEXT = {
     groupOption: (name: string, type: string, members: number) =>
       `${name}（${type}・${formatInt(members)}人）`,
     edges: '関係線',
+    displaySettings: '表示設定',
   },
 
   /** 掴んで動かした配置を元に戻すボタン。 */

@@ -222,6 +222,11 @@ UI層に色コード、`rgb()`、`text-white` / `bg-black` のような標準色
   使う面・線・札は既存の `bg-surface`、`border-hairline`、`TAG` に揃え、ページ全体や節全体を
   さらにカードで囲まない。写真は更新内容そのものを示す既存画像だけを使い、雰囲気だけの飾り画像は置かない。
   カード本文とジャンプ先は [src/content/home.ts](src/content/home.ts) に集め、表示部品へ文言を直書きしない。
+- **長い設定欄**: 表示設定・詳細設定・デバッグ用の調整値のように、画面上部を長く占有するものは
+  `<details>` か `TechnicalDetails` にたたむ。上部に常時置く操作は、その場で頻繁に触るものだけに絞る。
+  折りたたみの summary は既存の操作部品と同じ面・線・文字サイズにし、開いた中身も `gap-*` と
+  `border-hairline` で区切る。長いラベルや選択肢は折り返し・横スクロールできる場所へ逃がし、
+  見出し行に詰め込まない。
 
 ---
 
@@ -273,6 +278,15 @@ UI層に色コード、`rgb()`、`text-white` / `bg-black` のような標準色
 - 更新カードには日付、カテゴリ、見出し、要約、要点を入れる。生成ログや検証コマンドの詳細は `TODO.md` や各ページの `technical` に置き、ホームには出さない
 - `ジャンプ` は主要ページへの入口だけに絞る。説明は 1 行程度にし、操作説明や機能一覧を長く書かない
 - ホームの文言・リンク・画像パスは [src/content/home.ts](src/content/home.ts) に集める。見た目は [src/components/organisms/HomeUpdateBoard.tsx](src/components/organisms/HomeUpdateBoard.tsx) が持つ
+
+### ワールドマップ
+
+ワールドマップは `スポーン周辺 3D`、`2D マップ` の順に常時表示する。
+3D は実際に動かせるビューアがある場合はスクリーンショットで代替しない。
+2D のディメンション、履歴、ツールチップ切替は補助操作なので、カード右上の `2D マップ設定` にたたむ。
+生成ログ、作り直し手順、公開範囲の判断材料は `地図の詳細` にたたみ、通常の閲覧導線へ出さない。
+スマートフォンの 3D は、縦長画面で見下ろすだけにならないように `worldMap3dCompactHeight` と
+`worldMap3dMinHeight` を広めに取る。全画面時は `dvh` 系の高さでブラウザUIの出入りに追従させる。
 
 読み物は [src/content/](src/content/) の節ごとに `audience` を持ち、
 `readerSections()` が本文へ、`builderSections()` が `technical` へ振り分ける
