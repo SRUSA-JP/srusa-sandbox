@@ -14,6 +14,7 @@ export type RouteId =
   | 'relationships'
   | 'zukan'
   | 'calendar'
+  | 'board-score'
   | 'valorant'
   | 'lol'
   | 'apex'
@@ -119,6 +120,15 @@ export const ROUTES: Route[] = [
     gameLabel: 'Minecraft',
     path: '#/minecraft/calendar',
     label: '活動カレンダー',
+    skinId: MINECRAFT_SKIN.id,
+  },
+  {
+    id: 'board-score',
+    section: 'games',
+    gameId: 'board-games',
+    gameLabel: 'ボドゲ',
+    path: '#/board-games/score',
+    label: 'ポイント集計',
     skinId: MINECRAFT_SKIN.id,
   },
   /*

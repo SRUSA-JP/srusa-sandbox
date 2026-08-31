@@ -154,6 +154,8 @@ export const LAYOUT = {
   proseMaxWidth: 760,
   /** ログイン画面のフォーム幅。スマートフォンでは画面幅に合わせて縮む。 */
   authFormWidth: 384,
+  /** 横並びフォームの最小幅。狭い画面ではこの幅を下限に折り返す。 */
+  inlineFormMinWidth: '14rem',
   /** ヘッダーとログイン画面に置くサイトロゴの一辺。 */
   logoSize: 32,
   /** スマートフォン下部ナビの高さ。 */

@@ -13,6 +13,7 @@ import { renderToString } from 'react-dom/server';
 import type { ReactElement } from 'react';
 import {
   ClipsPage,
+  BoardScorePage,
   EventRankingsPage,
   GamePlaceholderPage,
   HomePage,
@@ -38,6 +39,7 @@ const PAGES: Record<RouteId, PageRenderer> = {
   relationships: ({ route }) => <MapPage theme={themeFor(route)} />,
   zukan: ({ route }) => <ZukanPage theme={themeFor(route)} />,
   calendar: ({ route }) => <CalendarPage theme={themeFor(route)} />,
+  'board-score': () => <BoardScorePage />,
   valorant: ({ route }) => <GamePlaceholderPage route={route} />,
   lol: ({ route }) => <GamePlaceholderPage route={route} />,
   apex: ({ route }) => <GamePlaceholderPage route={route} />,
