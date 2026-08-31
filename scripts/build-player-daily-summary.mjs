@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const config = JSON.parse(fs.readFileSync('data/data-registry.json', 'utf8'));
 const sourcePath = config.paths.playerDataByDate;
+const playLogSourcePath = config.paths.playLogSource;
 const outputPath = config.paths.playerDailySummary;
 const csvPath = config.paths.playerDailySummaryCsv;
 const customMetrics = config.dailyCustomMetrics;
@@ -35,6 +36,11 @@ function valueAt(record, key) {
   return record?.summary?.[key] ?? 0;
 }
 
+function round(value, digits = 2) {
+  const scale = 10 ** digits;
+  return Math.round(value * scale) / scale;
+}
+
 function customValue(record, keys) {
   return keys.reduce((sum, key) => sum + (record?.stat_categories?.custom?.[key] ?? 0), 0);
 }
@@ -52,17 +58,94 @@ function csvCell(value) {
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
+function parseJstInstant(value) {
+  return new Date(value.includes('T') ? value : `${value}T00:00:00+09:00`);
+}
+
+function eventInstant(day, time) {
+  return new Date(`${day}T${time}+09:00`);
+}
+
+function logEventsFrom(source) {
+  return (source.days ?? [])
+    .flatMap((day) =>
+      (day.notable_events ?? []).map((event) => ({
+        at: eventInstant(day.date, event.time_jst),
+        message: event.message,
+      })),
+    )
+    .filter((event) => Number.isFinite(event.at.getTime()))
+    .sort((a, b) => a.at.getTime() - b.at.getTime());
+}
+
+function logSessions(source) {
+  const active = new Map();
+  const sessions = [];
+  for (const event of logEventsFrom(source)) {
+    const join = event.message.match(/^([A-Za-z0-9_]{3,16}) joined the game$/);
+    if (join) {
+      active.set(join[1], event.at);
+      continue;
+    }
+
+    const leave = event.message.match(/^([A-Za-z0-9_]{3,16}) left the game$/);
+    if (leave) {
+      const name = leave[1];
+      const start = active.get(name);
+      active.delete(name);
+      if (start && event.at > start) sessions.push({ player: name, start, end: event.at });
+      continue;
+    }
+
+    if (event.message.includes('Stopping server') || event.message.includes('Stopping the server')) {
+      for (const [player, start] of active) {
+        if (event.at > start) sessions.push({ player, start, end: event.at });
+      }
+      active.clear();
+    }
+  }
+  return sessions;
+}
+
+function intersectHours(session, from, to) {
+  if (session.end <= from || session.start >= to) return 0;
+  const start = Math.max(session.start.getTime(), from.getTime());
+  const end = Math.min(session.end.getTime(), to.getTime());
+  return Math.max(0, end - start) / 1000 / 60 / 60;
+}
+
+function playtimeByInterval(sessions, player, from, to) {
+  return round(
+    sessions
+      .filter((session) => session.player === player)
+      .reduce((sum, session) => sum + intersectHours(session, from, to), 0),
+  );
+}
+
+function suspiciousPlaytimeRows(rowsToCheck) {
+  return rowsToCheck.filter((row) => {
+    const from = parseJstInstant(row.from);
+    const to = parseJstInstant(row.to);
+    const intervalHours = Math.max(0, to.getTime() - from.getTime()) / 1000 / 60 / 60;
+    return intervalHours <= 30 && row.playtime_hours > 20;
+  });
+}
+
 const source = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
+const playLogSource = fs.existsSync(playLogSourcePath) ? JSON.parse(fs.readFileSync(playLogSourcePath, 'utf8')) : null;
+const sessions = playLogSource ? logSessions(playLogSource) : [];
 const rows = [];
 
 for (const delta of source.daily_deltas ?? []) {
+  const from = parseJstInstant(delta.from);
+  const to = parseJstInstant(delta.to);
   for (const [player, record] of Object.entries(delta.players ?? {})) {
     rows.push({
       from: delta.from,
       to: delta.to,
       player,
       uuid: record.uuid,
-      playtime_hours: valueAt(record, 'playtime_hours'),
+      playtime_hours: sessions.length > 0 ? playtimeByInterval(sessions, player, from, to) : valueAt(record, 'playtime_hours'),
       deaths: valueAt(record, 'deaths'),
       mob_kills: valueAt(record, 'mob_kills'),
       player_kills: valueAt(record, 'player_kills'),
@@ -90,7 +173,32 @@ for (const delta of source.daily_deltas ?? []) {
   }
 }
 
-fs.writeFileSync(outputPath, `${JSON.stringify({ generated_on: source.generated_on, source: sourcePath, rows }, null, 2)}\n`);
+const suspiciousRows = sessions.length > 0 ? suspiciousPlaytimeRows(rows) : [];
+if (suspiciousRows.length > 0) {
+  const examples = suspiciousRows
+    .slice(0, 5)
+    .map((row) => `${row.from}->${row.to} ${row.player} ${row.playtime_hours}h`)
+    .join('; ');
+  throw new Error(`Suspicious single-day playtime rows detected: ${examples}`);
+}
+
+fs.writeFileSync(
+  outputPath,
+  `${JSON.stringify(
+    {
+      generated_on: source.generated_on,
+      source: sourcePath,
+      playtime_source: sessions.length > 0 ? playLogSourcePath : sourcePath,
+      rows,
+    },
+    null,
+    2,
+  )}\n`,
+);
 fs.writeFileSync(csvPath, `${rowKeys.join(',')}\n${rows.map((row) => rowKeys.map((key) => csvCell(row[key])).join(',')).join('\n')}\n`);
 
-console.log(`Wrote ${outputPath} and ${csvPath} with ${rows.length} daily rows and ${rowKeys.length - 4} metrics.`);
+const maxPlaytime = rows.reduce((max, row) => Math.max(max, row.playtime_hours), 0);
+console.log(
+  `Wrote ${outputPath} and ${csvPath} with ${rows.length} daily rows and ${rowKeys.length - 4} metrics. ` +
+    `Playtime source: ${sessions.length > 0 ? playLogSourcePath : sourcePath}; max ${maxPlaytime}h.`,
+);

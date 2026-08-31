@@ -147,7 +147,7 @@ curl -I http://localhost:5173/bluemap-spawn/maps/overworld_spawn/settings.json
 | --- | --- | --- | --- |
 | Minecraft 統計 | `../aws_minecraft/data/minecraft-stats-YYYYMMDD.json` | `data/minecraft-stats-YYYYMMDD.json` | Minecraft統計のKPI、ランキング、散布図、指数推移の拾得/採掘ベース |
 | プレイヤー日別 | `../aws_minecraft/data/player-data-by-date-YYYYMMDD.json` | `data/player-data-by-date-YYYYMMDD.json` | Player Daily Log、日別の伸び、使用アイテム差分 |
-| 日別サマリー | プレイヤー日別から生成 | `data/player-daily-summary-YYYYMMDD.json` / `.csv` | プレイヤー別の日次テーブル、日ごとの比較 |
+| 日別サマリー | プレイヤー日別とサーバーログから生成 | `data/player-daily-summary-YYYYMMDD.json` / `.csv` | プレイヤー別の日次テーブル、日ごとの比較。`playtime_hours` はログの入退室セッションから再計算 |
 | 使用アイテムランキング | プレイヤー日別から生成 | `data/player-featured-used-items-YYYYMMDD.json` | セミ、溶岩バケツなどの切替ランキング |
 | 所有資産 | `../aws_minecraft/data/item-inventory-stats-YYYYMMDD-latest-player*.json` | `data/player-inventory-assets-YYYYMMDD.json` | 資産ランキング、ダイヤ/エメラルド内訳、所有ベースの鉱物指数 |
 | サーバーログ | `../aws_minecraft/data/mc-log-daily-summary-YYYYMMDD.json` | `data/mc-log-daily-summary-YYYYMMDD.json` | ログ由来のプレイ日、継続日数 |
@@ -168,10 +168,13 @@ curl -I http://localhost:5173/bluemap-spawn/maps/overworld_spawn/settings.json
 8. 最後に `npm run build` で公開ビルドを確認する
 
 `npm run refresh:data` と `npm run refresh:data:local` は、この順番を `scripts/update-data.mjs` と `scripts/sync-data.mjs` でまとめて実行する。
+`npm run build:player-daily` は、`data/mc-log-daily-summary-YYYYMMDD.json` があれば `joined the game` と
+`left the game` をペアにして公開用のプレイ時間を再計算する。
 
 ## 注意
 
 - 公開される統計JSONは UUID、AWSアカウント、EC2インスタンスID、リージョン、サーバーパスを伏せ字にする。
+- `mc-log-daily-summary-YYYYMMDD.json` の `first_seen_jst` から `last_seen_jst` までの差は、途中の離席やサーバー停止を含むためプレイ時間として使わない。プレイ時間は入退室ログのセッションだけから作る。
 - 所有資産の換算係数と内訳の分類（原石・ブロック・鉱石・装備・ツール）は`data/economy-assets.json` が唯一の管理場所。アイテムを足すときは `category` も付ける。
 - BlueMap のレンダリング自体はこのリポジトリの外。通常地形色のマップを更新するには、先に BlueMap 側を再レンダリングしてから同期する。
 - **3D（hires）はワールド全体では作らない。** `../srusa-portal/bluemap/config/maps/*.conf` は
