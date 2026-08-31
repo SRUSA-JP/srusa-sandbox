@@ -101,6 +101,7 @@ export function AuthGate({ children }: AuthGateProps) {
             onInput={() => setError('')}
             invalid={Boolean(error)}
           />
+          <p className="text-sm text-muted">{APP_TEXT.auth.passwordHint}</p>
           {error && (
             <p className="text-sm text-danger" role="alert">
               {error}

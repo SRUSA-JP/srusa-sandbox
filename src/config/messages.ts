@@ -47,6 +47,7 @@ export const APP_TEXT = {
   auth: {
     title: 'ログイン',
     passwordLabel: 'パスワード',
+    passwordHint: 'パスワードは #minecraft のピン留めに掲載しています。',
     showPassword: '表示',
     hidePassword: '隠す',
     submit: 'ログイン',
