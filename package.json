@@ -9,6 +9,7 @@
     "dev": "vite --host",
     "build": "npm run typecheck && npm run lint && npm run test:ui && npm run check:contrast && npm run check:design && npm run check:layout && npm run check:map && npm run check:world-map && vite build",
     "preview": "vite preview",
+    "deploy": "npm run build && npx netlify-cli deploy --prod --dir=dist",
     "deploy:preview": "npm run build && npx netlify-cli deploy --dir=dist --alias preview",
     "deplpy:preview": "npm run deploy:preview",
     "refresh:data": "npm run update:data --",

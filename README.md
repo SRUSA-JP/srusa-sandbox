@@ -60,6 +60,7 @@ npm run dev
 | `npm run dev` | 開発サーバーを起動する（`--host` 付き。同じ Wi-Fi のスマホからも開ける） |
 | `npm run build` | 型検査 → ESLint → コントラスト検査を通してから `dist/` に出力する |
 | `npm run preview` | ビルド成果物をローカルで確認する |
+| `npm run deploy` | `npm run build` の後、Netlify 本番へデプロイする |
 | `npm run deploy:preview` | `dist/` を Netlify の固定プレビューに送る（本番公開しない） |
 | `npm run typecheck` | 型検査だけを実行する |
 | `npm run lint` | ESLint を実行する |
