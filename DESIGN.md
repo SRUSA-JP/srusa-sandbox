@@ -14,6 +14,7 @@
 | 部品ごとの色の割り当て | [src/config/colors.ts](src/config/colors.ts) |
 | ページごとの見た目（スキン） | [src/config/skins.ts](src/config/skins.ts) |
 | グラフの寸法 | [src/config/charts.ts](src/config/charts.ts) |
+| ホームの更新ログとジャンプ先 | [src/content/home.ts](src/content/home.ts) |
 
 UI は Claude / Codex のどちらで編集する場合も、[CLAUDE.md](CLAUDE.md) のアトミックデザイン方針に従う。
 見た目の判断はこの文書、部品の層分けは `atoms` → `molecules` → `organisms` → `templates` の一方向で揃える。
@@ -217,6 +218,10 @@ UI層に色コード、`rgb()`、`text-white` / `bg-black` のような標準色
 - **維持費の試算**: お金の話は目立たせすぎず、統計の 1 パネルとして扱う。
   入力は `NumberField`、要約は `KpiTile`、配分は既存の横棒グラフと表で見せる。
   金額の内訳は CSV で持ち出せるようにし、判断根拠（基本割・傾斜係数・対象者）は注記か表に残す。
+- **ホームの更新カード**: 更新ログは、更新 1 件をカード 1 枚として扱う。
+  使う面・線・札は既存の `bg-surface`、`border-hairline`、`TAG` に揃え、ページ全体や節全体を
+  さらにカードで囲まない。写真は更新内容そのものを示す既存画像だけを使い、雰囲気だけの飾り画像は置かない。
+  カード本文とジャンプ先は [src/content/home.ts](src/content/home.ts) に集め、表示部品へ文言を直書きしない。
 
 ---
 
@@ -257,6 +262,17 @@ UI層に色コード、`rgb()`、`text-white` / `bg-black` のような標準色
 | 取得元のパス・インスタンス ID・データの検証結果 | `technical`（たたむ） |
 | JSON の読み込み・書き出し、配置の持ち出し | `technical`（たたむ） |
 | ファイル数や容量の見積り、作り直す手順、TODO | 読み物の節に `audience: 'builder'` を付ける |
+
+### ホーム
+
+ホームはサイト全体の入口で、ランディングページではなく更新ログ兼ジャンプページとして扱う。
+構成は `AppLayout` の見出し、短い lead、`更新ログ`、`ジャンプ` の順にする。
+
+- `更新ログ` は最新・重要な更新を上から並べる。主要更新は画像付きでもよいが、画像は地図・3Dビュー・スクリーンショットなど更新内容を直接示すものに限る
+- 更新カードは一覧の 1 項目なのでカード化してよい。節全体をさらに枠で囲まず、`SectionHeader` と余白で区切る
+- 更新カードには日付、カテゴリ、見出し、要約、要点を入れる。生成ログや検証コマンドの詳細は `TODO.md` や各ページの `technical` に置き、ホームには出さない
+- `ジャンプ` は主要ページへの入口だけに絞る。説明は 1 行程度にし、操作説明や機能一覧を長く書かない
+- ホームの文言・リンク・画像パスは [src/content/home.ts](src/content/home.ts) に集める。見た目は [src/components/organisms/HomeUpdateBoard.tsx](src/components/organisms/HomeUpdateBoard.tsx) が持つ
 
 読み物は [src/content/](src/content/) の節ごとに `audience` を持ち、
 `readerSections()` が本文へ、`builderSections()` が `technical` へ振り分ける
