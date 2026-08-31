@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { APP_TEXT } from '../../config/messages';
-import { SECTIONS, routesInSection, type Route } from '../../routes';
+import { SECTIONS, routesInSection, type Route, type SectionId } from '../../routes';
 import type { ThemeMode } from '../../theme/palette';
-import { IconButton } from '../atoms';
+import { Icon, IconButton, type IconName } from '../atoms';
 
 export interface AppShellProps {
   /** 表示中の画面。 */
@@ -24,6 +24,21 @@ const TAB = 'shrink-0 cursor-pointer whitespace-nowrap rounded-md border-b-thick
  * どちらが上位のまとまりなのか分からなくなる。
  */
 const SUB_TAB = 'shrink-0 cursor-pointer whitespace-nowrap rounded-md px-md py-xs text-sm transition-colors';
+
+type MobileNavItem = {
+  label: string;
+  icon: IconName;
+  targetSection: SectionId;
+  activeSections: readonly SectionId[];
+};
+
+const MOBILE_NAV_ITEMS: MobileNavItem[] = [
+  { label: 'ホーム', icon: 'home', targetSection: 'home', activeSections: ['home'] },
+  { label: 'ゲーム', icon: 'game', targetSection: 'games', activeSections: ['games'] },
+  { label: '人', icon: 'people', targetSection: 'members', activeSections: ['members', 'relationships'] },
+  { label: '記録', icon: 'record', targetSection: 'history', activeSections: ['history', 'events'] },
+  { label: 'ギャラリー', icon: 'gallery', targetSection: 'clips', activeSections: ['clips'] },
+];
 
 function gameClusters(siblings: Route[]): Array<{ id: string; label: string; entries: Route[] }> {
   const clusters: Array<{ id: string; label: string; entries: Route[] }> = [];
@@ -61,6 +76,28 @@ function subTabButton(entry: Route, route: Route, onNavigate: (route: Route) => 
   );
 }
 
+function mobileNavButton(item: MobileNavItem, route: Route, onNavigate: (route: Route) => void) {
+  const active = item.activeSections.includes(route.section);
+  const target = routesInSection(item.targetSection)[0];
+  if (!target) return null;
+  return (
+    <button
+      key={item.label}
+      type="button"
+      aria-current={active ? 'page' : undefined}
+      className={
+        active
+          ? 'grid min-h-[var(--sr-layout-mobile-nav-height)] min-w-0 place-items-center gap-xxs rounded-md bg-selected px-xs py-xs text-selected-ink'
+          : 'grid min-h-[var(--sr-layout-mobile-nav-height)] min-w-0 place-items-center gap-xxs rounded-md px-xs py-xs text-tab hover:bg-hover hover:text-tab-active'
+      }
+      onClick={() => onNavigate(target)}
+    >
+      <Icon name={item.icon} />
+      <span className="max-w-full truncate text-xs font-medium leading-tight">{item.label}</span>
+    </button>
+  );
+}
+
 /**
  * サイト全体の枠。
  *
@@ -75,7 +112,7 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
   const activeGameId = route.gameId ?? route.id;
   const activeGame = games.find((game) => game.id === activeGameId);
   return (
-    <div className="mx-auto max-w-[var(--sr-layout-max-width)] px-lg pb-page sm:px-xxl md:px-xxxl">
+    <div className="mx-auto max-w-[var(--sr-layout-max-width)] px-lg pb-[var(--sr-layout-mobile-nav-page-padding)] sm:px-xxl sm:pb-page md:px-xxxl">
       <header className="sticky top-0 z-40 -mx-lg border-b-hairline border-divider bg-page px-lg py-xs sm:-mx-xxl sm:px-xxl md:-mx-xxxl md:px-xxxl">
         <div className="mx-auto flex max-w-[var(--sr-layout-max-width)] items-center gap-md overflow-x-auto">
           <a href="#/" className="flex shrink-0 items-center gap-sm hover:bg-hover" aria-label={APP_TEXT.homeLink}>
@@ -88,7 +125,7 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
           </a>
 
           {/* 上の段: まとまり。押すとそのまとまりの最初の画面へ行く */}
-          <nav className="flex shrink-0 items-center gap-xs" aria-label={APP_TEXT.navLabel}>
+          <nav className="hidden shrink-0 items-center gap-xs sm:flex" aria-label={APP_TEXT.navLabel}>
             {SECTIONS.map((section) => {
               const active = section.id === route.section;
               const first = routesInSection(section.id)[0];
@@ -161,6 +198,15 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
       <div className="mb-xxl" />
 
       {children}
+
+      <nav
+        className="fixed inset-x-0 bottom-0 z-50 border-t-hairline border-divider bg-page px-xs pb-mobile-nav-safe pt-xs sm:hidden"
+        aria-label={APP_TEXT.mobileNavLabel}
+      >
+        <div className="mx-auto grid max-w-[var(--sr-layout-max-width)] grid-cols-5 gap-xxs">
+          {MOBILE_NAV_ITEMS.map((item) => mobileNavButton(item, route, onNavigate))}
+        </div>
+      </nav>
     </div>
   );
 }
