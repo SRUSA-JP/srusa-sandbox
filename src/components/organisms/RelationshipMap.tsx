@@ -5,15 +5,18 @@ import { usePanZoom } from '../../hooks/usePanZoom';
 import { toScreen, transformStyle } from '../../lib/viewport';
 import {
   clampToCanvas,
+  groupLabel,
   nodeRingColors,
   personLabel,
   regionPaintOrder,
+  regionStyle,
   type NodeState,
 } from '../../map/display';
-import type { EdgeStyleId } from '../../map/config';
+import { groupConnects, LEGEND, type EdgeStyleId } from '../../map/config';
 import type { MapLayout, PersonPlacement } from '../../map/layout';
 import type { Group } from '../../map/schema';
 import type { VizTheme } from '../../theme/palette';
+import { Swatch } from '../atoms';
 import { AffiliationEdge } from '../molecules/AffiliationEdge';
 import { GroupRegion } from '../molecules/GroupRegion';
 import { PersonNode } from '../molecules/PersonNode';
@@ -28,6 +31,8 @@ export interface RelationshipMapProps {
   centerId: string;
   /** 強調するグループの ID（空文字なら強調なし）。 */
   highlightedGroupId: string;
+  /** グループ凡例から強調対象を切り替える。 */
+  onHighlightGroup?: (groupId: string) => void;
   /** 描画する関係線。呼び出し側が絞り込んだものを渡す。 */
   edges: MapLayout['edges'];
   /** 所属から導いた線を出すか。消すとはっきり書かれた関係だけになる。 */
@@ -58,6 +63,8 @@ interface DragState {
   moved: boolean;
 }
 
+const RELATED_TOOLTIP_COUNT = 6;
+
 /**
  * 相関図の描画。
  *
@@ -72,6 +79,7 @@ export function RelationshipMap({
   theme,
   centerId,
   highlightedGroupId,
+  onHighlightGroup,
   edges,
   showAffiliationEdges = true,
   nameMode,
@@ -109,6 +117,40 @@ export function RelationshipMap({
    * どのグループがどの色かは display.ts が決め、ここは人と所属を結びつけるだけ。
    */
   const groupById = new Map(layout.regions.map((region) => [region.group.id, region.group]));
+  const connectingGroupIds = new Set(
+    layout.regions.filter((region) => groupConnects(region.group)).map((region) => region.group.id),
+  );
+  const connectedNamesFor = (personId: string) => {
+    const ids = new Set<string>();
+    for (const edge of layout.edges) {
+      if (edge.relation.source === personId) ids.add(edge.relation.target);
+      if (edge.relation.target === personId) ids.add(edge.relation.source);
+    }
+    for (const edge of layout.affiliationEdges) {
+      if (edge.hubId === personId) ids.add(edge.memberId);
+      if (edge.memberId === personId) ids.add(edge.hubId);
+    }
+    const names = [...ids]
+      .map((id) => layout.byId.get(id)?.person)
+      .filter((person): person is PersonPlacement['person'] => Boolean(person))
+      .sort((a, b) => personLabel(a, nameMode).localeCompare(personLabel(b, nameMode), 'ja'))
+      .map((person) => personLabel(person, nameMode));
+    return {
+      names: names.slice(0, RELATED_TOOLTIP_COUNT),
+      rest: Math.max(0, names.length - RELATED_TOOLTIP_COUNT),
+    };
+  };
+  const sharedGroupsFor = (edge: MapLayout['edges'][number]): Group[] => {
+    const source = layout.byId.get(edge.relation.source);
+    const target = layout.byId.get(edge.relation.target);
+    if (!source || !target) return [];
+    const targetGroups = new Set(target.groupIds);
+    return source.groupIds
+      .filter((id) => targetGroups.has(id) && connectingGroupIds.has(id))
+      .map((id) => groupById.get(id))
+      .filter((group): group is Group => group !== undefined)
+      .sort((a, b) => groupLabel(a).localeCompare(groupLabel(b), 'ja'));
+  };
   const nodeStateFor = (placement: PersonPlacement): NodeState => ({
     isCenter: placement.person.id === centerId,
     isRelated: relatedIds.has(placement.person.id),
@@ -202,19 +244,46 @@ export function RelationshipMap({
       status={VIEWPORT_TEXT.zoom(Math.round(panZoom.view.scale * 100))}
       actions={actions}
       overlay={
-        activePlacement && activePoint ? (
-          <div
-            className="absolute z-10 -translate-x-1/2 -translate-y-full"
-            style={{ left: activePoint.x, top: activePoint.y }}
-          >
-            <PersonProfileTooltip
-              person={activePlacement.person}
-              label={personLabel(activePlacement.person, nameMode)}
-              href={profileHref(activePlacement)}
-              onClose={() => setActivePersonId(null)}
-            />
+        <>
+          <div className="pointer-events-auto absolute top-md left-md z-10 grid max-h-[var(--sr-layout-viewport-legend-max-height)] max-w-[var(--sr-layout-person-tooltip-max-width)] gap-xxs overflow-y-auto rounded-md border-hairline border-divider bg-overlay px-md py-sm text-xs text-muted">
+            <strong className="text-sm text-heading">{MAP_TEXT.card.legend.title}</strong>
+            {regions.map((region) => {
+              const style = regionStyle(region.group, theme, region.group.id === highlightedGroupId);
+              return (
+                <button
+                  key={region.group.id}
+                  type="button"
+                  className="flex min-w-0 items-center gap-xs text-left hover:bg-hover"
+                  aria-pressed={region.group.id === highlightedGroupId}
+                  onClick={() => onHighlightGroup?.(region.group.id === highlightedGroupId ? '' : region.group.id)}
+                >
+                  <Swatch
+                    className="shrink-0 rounded-sm border-hairline"
+                    size={LEGEND.swatchSize}
+                    background={style.fill}
+                    borderColor={style.stroke}
+                  />
+                  <span className="truncate">{groupLabel(region.group)}</span>
+                </button>
+              );
+            })}
           </div>
-        ) : undefined
+          {activePlacement && activePoint ? (
+            <div
+              className="absolute z-10 -translate-x-1/2 -translate-y-full"
+              style={{ left: activePoint.x, top: activePoint.y }}
+            >
+              <PersonProfileTooltip
+                person={activePlacement.person}
+                label={personLabel(activePlacement.person, nameMode)}
+                href={profileHref(activePlacement)}
+                onClose={() => setActivePersonId(null)}
+                relatedNames={connectedNamesFor(activePlacement.person.id).names}
+                relatedRest={connectedNamesFor(activePlacement.person.id).rest}
+              />
+            </div>
+          ) : undefined}
+        </>
       }
     >
       <div
@@ -270,6 +339,7 @@ export function RelationshipMap({
                 nameOf={nameOf}
                 style={edgeStyleId}
                 showTooltip={showTooltips}
+                groups={sharedGroupsFor(edge)}
               />
             ))}
           </g>
@@ -286,6 +356,8 @@ export function RelationshipMap({
                 pointer={pointerFor(placement)}
                 grabbed={grabbedId === placement.person.id}
                 showTooltip={showTooltips}
+                relatedNames={connectedNamesFor(placement.person.id).names}
+                relatedRest={connectedNamesFor(placement.person.id).rest}
               />
             ))}
           </g>

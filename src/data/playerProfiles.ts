@@ -1,4 +1,5 @@
 import { loadRelationshipData } from '../map/data';
+import { groupConnects } from '../map/config';
 import type { Person, Relation } from '../map/schema';
 import { personLabel } from '../map/display';
 import type { NamedPlayer, StatsDocument } from './schema';
@@ -68,6 +69,15 @@ function findRelationshipPerson(record: PlayerDbRecord): Person | undefined {
   return people.find((person) => matchesPerson(person, record.username));
 }
 
+function relatedPeopleFor(person: Person, source: { people: Person[]; groups: Array<{ name: string; type: string; connects?: boolean }> }): Person[] {
+  const connectingGroups = new Set(source.groups.filter((group) => groupConnects(group)).map((group) => group.name));
+  const ownGroups = new Set(person.attributes.filter((attribute) => connectingGroups.has(attribute)));
+  return source.people
+    .filter((candidate) => candidate.id !== person.id)
+    .filter((candidate) => candidate.attributes.some((attribute) => ownGroups.has(attribute)))
+    .sort((a, b) => a.onlineName.localeCompare(b.onlineName, 'ja'));
+}
+
 function skinEntry(record: PlayerDbRecord): PlayerSkinAssetEntry | undefined {
   return record.ids.minecraft_uuid
     ? {
@@ -95,9 +105,11 @@ export function playerProfile(
   const relations = relationId
     ? (source?.relations.filter((relation) => relation.source === relationId || relation.target === relationId) ?? [])
     : [];
-  const relatedPeople = relations
+  const explicitRelatedPeople = relations
     .map((relation) => source?.people.find((person) => person.id === (relation.source === relationId ? relation.target : relation.source)))
     .filter((person): person is Person => Boolean(person));
+  const affiliationRelatedPeople = relationship && source ? relatedPeopleFor(relationship, source) : [];
+  const relatedPeople = [...new Map([...explicitRelatedPeople, ...affiliationRelatedPeople].map((person) => [person.id, person])).values()];
 
   return {
     slug: record.slug,

@@ -92,8 +92,11 @@ export function groupTooltip(group: Group, memberCount: number): string {
 }
 
 /** 人物ノードの説明文（ツールチップ）。所属があれば添える。 */
-export function personTooltip(person: Person, nameMode: string): string {
-  return MAP_TEXT.tooltip.person(personLabel(person, nameMode), person.attributes);
+export function personTooltip(person: Person, nameMode: string, relatedNames: string[] = [], rest = 0): string {
+  return [
+    MAP_TEXT.tooltip.person(personLabel(person, nameMode), person.attributes),
+    MAP_TEXT.tooltip.relatedPeople(relatedNames, rest),
+  ].filter(Boolean).join(' / ');
 }
 
 /* ------------------------------------------------------------------ *

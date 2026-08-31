@@ -9,6 +9,8 @@ import { TAG } from '../classes';
 import { Note } from '../atoms';
 import { PlayerIconPlaceholder } from '../molecules';
 
+const RELATED_PREVIEW_COUNT = 4;
+
 export interface PlayerDirectoryProps {
   /** 出す人。絞り込みはページ側で済ませておく。 */
   profiles: PlayerProfile[];
@@ -46,6 +48,10 @@ export function PlayerDirectory({ profiles, colorKeys, streaks, theme }: PlayerD
           hasDaily: Boolean(profile.dailyName),
           streak: streaks.get(profile.name) ?? null,
         });
+        const relatedNames = profile.relatedPeople
+          .slice(0, RELATED_PREVIEW_COUNT)
+          .map((person) => person.onlineName);
+        const relatedRest = Math.max(0, profile.relatedPeople.length - RELATED_PREVIEW_COUNT);
 
         return (
           <a
@@ -85,6 +91,12 @@ export function PlayerDirectory({ profiles, colorKeys, streaks, theme }: PlayerD
                   </span>
                 ))}
               </div>
+            )}
+
+            {relatedNames.length > 0 && (
+              <span className="line-clamp-2 text-xs text-muted">
+                {ZUKAN_TEXT.relatedPeople(relatedNames, relatedRest)}
+              </span>
             )}
           </a>
         );

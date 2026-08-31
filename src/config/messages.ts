@@ -614,10 +614,13 @@ export const MAP_TEXT = {
     group: (name: string, members: number) => `${name}: ${formatInt(members)} 人`,
     person: (name: string, attributes: string[]) =>
       attributes.length > 0 ? `${name}（${attributes.join('・')}）` : name,
+    relatedPeople: (names: string[], rest: number) =>
+      names.length > 0 ? `つながり: ${names.join('・')}${rest > 0 ? ` ほか ${formatInt(rest)} 人` : ''}` : '',
     profileLink: '紹介を見る',
     close: '閉じる',
     relation: (from: string, to: string, context?: string, uncertain?: boolean) =>
       `${from} ↔ ${to}${context ? `（${context}）` : ''}${uncertain ? ' ※確度が低い関係' : ''}`,
+    relationGroups: (groups: string[]) => `共有グループ: ${groups.join('・')}`,
     /** 所属から導いた線。親（線の集まる人）とその所属者を結ぶ。 */
     affiliation: (hub: string, member: string, group: string) => `${hub} ─ ${member}（${group}）`,
   },
@@ -722,6 +725,9 @@ export const ZUKAN_TEXT = {
   },
   /** 所属が多すぎて省いたとき。 */
   moreAttributes: (count: number) => `ほか ${count}`,
+  /** カードに出す、相関図上のつながり。 */
+  relatedPeople: (names: string[], rest: number) =>
+    names.length > 0 ? `つながり: ${names.join('・')}${rest > 0 ? ` ほか ${formatInt(rest)}` : ''}` : '',
   /** カード全体の読み上げ。 */
   open: (name: string) => `${name} の紹介ページを開く`,
   /** 他のページからメンバーへ飛ぶボタン。 */

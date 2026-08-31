@@ -235,6 +235,25 @@ export const FLOORPLAN = {
   aspectWeight: 1.5,
 } as const;
 
+/**
+ * 関係樹の配置。
+ *
+ * nodoame を根にして、明示関係と所属から導いた線をたどる。関係数が多い人ほど
+ * 親や枝の先頭に置き、中心から外へ枝分かれする形で読む。
+ */
+export const RELATION_TREE = {
+  /** 1 段に置く人数の上限。多すぎる枝は次の行へ折り返す。 */
+  maxColumns: 12,
+  /** 隣り合う枝の横方向の間隔。 */
+  branchGapX: 112,
+  /** 同じ深さの折り返し行の間隔。 */
+  branchGapY: 72,
+  /** 根から外側へ進む段の間隔。 */
+  levelGapY: 176,
+  /** 繋がりの無い成分を下へ逃がす間隔。 */
+  componentGapY: 180,
+} as const;
+
 export const GRID = {
   /** 交点の間隔。アイコンと名前が入る幅を取る。 */
   cell: 62,
@@ -528,6 +547,7 @@ export type EdgeMode = (typeof EDGE_MODES)[number]['value'];
 
 /** 相関図の配置アルゴリズム。 */
 export const LAYOUT_MODES = [
+  { value: 'relationshipTree', label: '関係樹' },
   { value: 'floorplan', label: '区画' },
   { value: 'cluster', label: '所属クラスタ' },
   { value: 'clusterHybrid', label: '所属ハイブリッド' },

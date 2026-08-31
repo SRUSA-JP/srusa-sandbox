@@ -1,8 +1,10 @@
-import { edgeStyle, relationLabel } from '../../map/display';
-import type { EdgeStyleId } from '../../map/config';
+import { affiliationEdgeStyle, edgeStyle, groupLabel, relationLabel } from '../../map/display';
+import { MAP_TEXT } from '../../config/messages';
+import { EDGE, type EdgeStyleId } from '../../map/config';
 import type { EdgePlacement } from '../../map/layout';
-import type { VizTheme } from '../../theme/palette';
+import type { Group } from '../../map/schema';
 import { WireLine } from '../atoms/WireLine';
+import type { VizTheme } from '../../theme/palette';
 
 export interface RelationEdgeProps {
   edge: EdgePlacement;
@@ -12,6 +14,8 @@ export interface RelationEdgeProps {
   showTooltip?: boolean;
   /** 線の見せ方（config.ts の EDGE_STYLES）。 */
   style?: EdgeStyleId;
+  /** この関係線を色分けする共有グループ。 */
+  groups?: Group[];
 }
 
 /**
@@ -30,7 +34,34 @@ export function RelationEdge({
   nameOf,
   showTooltip = true,
   style: styleId,
+  groups = [],
 }: RelationEdgeProps) {
+  if (groups.length > 0) {
+    const groupNames = groups.map(groupLabel);
+    return (
+      <g>
+        {groups.map((group, index) => {
+          const offset = edge.channelOffset + (index - (groups.length - 1) / 2) * EDGE.channelGap;
+          return (
+            <WireLine
+              key={group.id}
+              from={edge.from}
+              to={edge.to}
+              channelOffset={offset}
+              style={affiliationEdgeStyle(group, theme, false)}
+            >
+              {showTooltip && (
+                <title>
+                  {[relationLabel(edge.relation, nameOf), MAP_TEXT.tooltip.relationGroups(groupNames)].join(' / ')}
+                </title>
+              )}
+            </WireLine>
+          );
+        })}
+      </g>
+    );
+  }
+
   return (
     <WireLine
       from={edge.from}

@@ -22,7 +22,7 @@ import { manhattanPath } from '../src/map/geometry';
 import { affiliationEdgeStyle, nodeRingColors } from '../src/map/display';
 import { activeSkin } from '../src/config/skins';
 import { buildTheme } from '../src/theme/useThemeMode';
-import { buildLayout } from '../src/map/layout';
+import { affiliationHubs, buildLayout } from '../src/map/layout';
 import { parseRelationshipData } from '../src/map/parse';
 import type { Group } from '../src/map/schema';
 
@@ -89,6 +89,7 @@ const raw = JSON.parse(readFileSync('data/srusa-relationship-v0.2.json', 'utf8')
 const parsed = parseRelationshipData(raw);
 const data = parsed.data;
 const layout = buildLayout(data, 'floorplan', '');
+const treeLayout = buildLayout(data, 'relationshipTree', data.project.defaultCenterPersonId);
 const diagonal = Math.hypot(layout.width, layout.height);
 const canvas = layout.width * layout.height;
 /* 関係線と所属の線は同じ折り返しの列を取り合うので、配線の検査はまとめて行う */
@@ -131,6 +132,33 @@ function checkOverlap() {
     return;
   }
   console.log(`OK  重なり 0 組（いちばん近い ${worst.pair} で ${worst.gap.toFixed(1)}px 空き / 下限 ${SEPARATION.padding}px）`);
+}
+
+function checkRelationshipTree() {
+  const center = treeLayout.byId.get('nodoame');
+  if (!center) {
+    fail('関係樹', '中心人物', 'nodoame が配置されていません');
+    return;
+  }
+  const nodoame = data.people.find((person) => person.id === 'nodoame');
+  if (!nodoame?.aliases?.includes('nodoamenn')) {
+    fail('関係樹', '別名', 'nodoamenn が nodoame の aliases にありません');
+    return;
+  }
+  const connectingGroups = new Set(data.groups.filter((group) => groupConnects(group)).map((group) => group.name));
+  const rootGroups = new Set(nodoame.attributes.filter((name) => connectingGroups.has(name)));
+  for (const id of ['octbee', 'n', 'natch', 'mitiglia']) {
+    const person = data.people.find((candidate) => candidate.id === id);
+    const shared = person?.attributes.filter((name) => rootGroups.has(name)) ?? [];
+    if (shared.length === 0) {
+      fail('関係樹', 'nodoame 直結カテゴリ', `${id} が nodoame と繋がるカテゴリを共有していません`);
+      return;
+    }
+  }
+  const nodoameHubs = affiliationHubs(data).filter((hub) => hub.hubId === 'nodoame').length;
+  console.log(
+    `OK  関係樹 nodoame を中心根に配置（${treeLayout.people.length} 人 / ${treeLayout.width.toFixed(0)}×${treeLayout.height.toFixed(0)} / nodoame ${center.x.toFixed(0)},${center.y.toFixed(0)} / nodoameハブ ${nodoameHubs}カテゴリ）`,
+  );
 }
 
 /* ------------------------------------------------------------------ *
@@ -702,6 +730,7 @@ function checkData() {
 
 checkData();
 checkOverlap();
+checkRelationshipTree();
 checkNesting();
 checkEdges();
 checkAffiliationEdges();

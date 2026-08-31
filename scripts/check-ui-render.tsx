@@ -102,6 +102,10 @@ for (const route of ROUTES_TO_CHECK) {
   try {
     const html = withConsoleTrap(label, () => renderToString(PAGES[route.id]({ route })));
     if (html.length < 100) throw new Error(`レンダリング結果が短すぎます (${html.length} chars)`);
+    if (route.id === 'relationships') {
+      expectIncludes(label, html, '関係樹');
+      expectIncludes(label, html, 'nodoame');
+    }
 
     const overflow = svgTextOverflow(html);
     if (overflow.length > 0) {

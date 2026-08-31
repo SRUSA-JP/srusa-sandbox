@@ -7,6 +7,8 @@ export interface PersonProfileTooltipProps {
   label: string;
   href: string;
   onClose: () => void;
+  relatedNames?: string[];
+  relatedRest?: number;
 }
 
 /**
@@ -15,8 +17,16 @@ export interface PersonProfileTooltipProps {
  * 幅は `--sr-layout-*` の変数で指定する。`max-w-xs` のような
  * Tailwind の名前付きの幅は使えない（余白の名前と衝突して数 px になる）。
  */
-export function PersonProfileTooltip({ person, label, href, onClose }: PersonProfileTooltipProps) {
+export function PersonProfileTooltip({
+  person,
+  label,
+  href,
+  onClose,
+  relatedNames = [],
+  relatedRest = 0,
+}: PersonProfileTooltipProps) {
   const description = MAP_TEXT.tooltip.person(label, person.attributes);
+  const related = MAP_TEXT.tooltip.relatedPeople(relatedNames, relatedRest);
 
   return (
     <div
@@ -27,6 +37,7 @@ export function PersonProfileTooltip({ person, label, href, onClose }: PersonPro
       <div className="grid gap-xxs">
         <strong className="text-md font-bold text-heading">{label}</strong>
         <span>{description}</span>
+        {related && <span>{related}</span>}
       </div>
 
       <div className="flex flex-wrap items-center gap-xs">

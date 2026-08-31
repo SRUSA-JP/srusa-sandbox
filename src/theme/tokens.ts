@@ -182,6 +182,8 @@ export const LAYOUT = {
   viewportHeight: 640,
   /** 狭い画面での表示枠の高さ。境目は BREAKPOINT.compact。 */
   viewportCompactHeight: 420,
+  /** 図の中に重ねるコンパクト凡例の最大高さ。 */
+  viewportLegendMaxHeight: 220,
   /** 図に重ねる吹き出しの最小幅。座標が桁変わりしても幅が跳ねないようにする。 */
   tooltipMinWidth: 180,
   /** BlueMap の 3D ビューアを埋め込む高さ。 */

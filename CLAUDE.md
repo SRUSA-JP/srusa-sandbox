@@ -292,6 +292,15 @@ page で組み合わせる。
 [src/map/layout.ts](src/map/layout.ts) に集約する。新しい配置を試すときは、人物座標だけを変え、
 グループ領域と関係線は既存の再計算処理に通す。配置を切り替えたときは手動移動済みの座標をリセットし、
 別アルゴリズムの座標を混ぜない。
+既定の相関図は `relationshipTree`（関係樹）。このモードでは、nodoame を必ず中心根にする。
+nodoamen / nodoamenn は Minecraft 側や表記揺れの名前で、相関図データでは nodoame の `aliases` に入れる。
+関係樹の繋がりは、明示的な `relations` と、`groupConnects()` が true を返す所属から導く。
+Octbee / N / natch / mitiglia のように nodoame と繋がるカテゴリを共有する人は、明示関係が少なくても
+nodoame の枝として拾える設計にする。学校段階や活動状態の札だけで繋がりを作らない。
+Mitigli4 / Mitfli4 は mitiglia の `aliases` に入れる。
+メンバー一覧や tooltip で出す「つながり」は、明示関係と `groupConnects()` が true の所属共有から作る。
+明示関係線に共有グループがあるときは、そのグループ色の並行線で描き、複数所属を 1 色に混ぜない。
+相関図の中にもコンパクト凡例を重ね、色の意味を図の中だけで追えるようにする。
 
 どの値をどう使い分けるかは [DESIGN.md](DESIGN.md) に書いてある。
 

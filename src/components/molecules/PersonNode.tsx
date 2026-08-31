@@ -31,6 +31,10 @@ export interface PersonNodeProps {
   grabbed?: boolean;
   /** SVG の標準ツールチップを出すか。 */
   showTooltip?: boolean;
+  /** 関係している人の名前。多い場合は呼び出し側で省略して渡す。 */
+  relatedNames?: string[];
+  /** 省略した関係人数。 */
+  relatedRest?: number;
 }
 
 /** アイコンの中身。画像・顔・イニシャル・人型のどれをどの寸法で描くかは display.ts が決める。 */
@@ -109,6 +113,8 @@ export function PersonNode({
   pointer,
   grabbed = false,
   showTooltip = true,
+  relatedNames = [],
+  relatedRest = 0,
 }: PersonNodeProps) {
   const style = nodeStyle(theme, state);
   /* 所属が無い人は今までどおりの 1 本。所属があればその色を外側から重ねる */
@@ -143,7 +149,7 @@ export function PersonNode({
           : undefined
       }
     >
-      {showTooltip && <title>{personTooltip(placement.person, nameMode)}</title>}
+      {showTooltip && <title>{personTooltip(placement.person, nameMode, relatedNames, relatedRest)}</title>}
       {/* Minecraft のスキンが四角なので、囲いも四角にして顔が欠けないようにする */}
       <defs>
         <clipPath id={clipId}>

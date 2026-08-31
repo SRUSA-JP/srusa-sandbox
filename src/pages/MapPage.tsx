@@ -114,7 +114,7 @@ export function MapPage({ theme }: MapPageProps) {
   const [centerId, setCenterId] = useState(data?.view?.centerPersonId ?? data?.project.defaultCenterPersonId ?? '');
   const [highlightedGroupId, setHighlightedGroupId] = useState('');
   const [edgeMode, setEdgeMode] = useState<EdgeMode>(RELATIONSHIP_MAP_DEFAULT_EDGE_MODE);
-  const [layoutMode, setLayoutMode] = useState<LayoutMode>('floorplan');
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('relationshipTree');
   const [tooltipMode, setTooltipMode] = useState<TooltipMode>('on');
   const [regionMode, setRegionMode] = useState<RegionMode>('on');
   const [affiliationMode, setAffiliationMode] = useState<AffiliationMode>('on');
@@ -253,7 +253,7 @@ export function MapPage({ theme }: MapPageProps) {
         wrapped.schemaVersion === 'srusa-relationship-workspace-v1' &&
         LAYOUT_MODES.some((mode) => mode.value === nextLayoutMode)
           ? nextLayoutMode as LayoutMode
-          : 'floorplan';
+          : 'relationshipTree';
 
       setPositions(nextPositions);
       setCenterId(validCenter);
@@ -465,6 +465,7 @@ export function MapPage({ theme }: MapPageProps) {
             theme={theme}
             centerId={centerId}
             highlightedGroupId={highlightedGroupId}
+            onHighlightGroup={setHighlightedGroupId}
             edges={edges}
             nameMode={nameMode}
             profileHref={(placement) =>
