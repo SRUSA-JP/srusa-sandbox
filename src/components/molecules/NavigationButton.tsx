@@ -1,5 +1,5 @@
 import { LAYOUT } from '../../theme/tokens';
-import { Icon, PixelNavIcon, type IconName } from '../atoms';
+import { Icon, type IconName } from '../atoms';
 
 const PRIMARY_TAB = 'shrink-0 cursor-pointer whitespace-nowrap rounded-md border-b-thick px-md py-xs text-sm transition-colors';
 const SUB_TAB = 'shrink-0 cursor-pointer whitespace-nowrap rounded-md px-md py-xs text-sm transition-colors';
@@ -48,11 +48,8 @@ export function MobileNavButton({ label, icon, active, onClick }: MobileNavButto
         aria-hidden
         className={`h-[var(--sr-border-thick)] w-[var(--sr-space-xl)] ${active ? 'bg-tab-marker' : 'bg-transparent'}`}
       />
-      <span className="hidden flex-1 place-items-center sm:grid">
+      <span className="grid flex-1 place-items-center">
         <Icon name={icon} size={LAYOUT.mobileNavIconSize} />
-      </span>
-      <span className="grid flex-1 place-items-center sm:hidden">
-        <PixelNavIcon name={icon} />
       </span>
       <span className="sr-only">{label}</span>
     </button>
