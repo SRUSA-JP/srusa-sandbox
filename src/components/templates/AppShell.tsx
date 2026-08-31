@@ -75,18 +75,15 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
   const activeGameId = route.gameId ?? route.id;
   const activeGame = games.find((game) => game.id === activeGameId);
   return (
-    <div className="mx-auto max-w-[var(--sr-layout-max-width)] px-lg pt-lg pb-page sm:px-xxl sm:pt-xxl md:px-xxxl">
-      <header className="flex flex-wrap items-start justify-between gap-lg">
-        <a href="#/" className="flex min-w-0 items-start gap-sm hover:bg-hover" aria-label={APP_TEXT.homeLink}>
+    <div className="mx-auto max-w-[var(--sr-layout-max-width)] px-lg pt-md pb-page sm:px-xxl sm:pt-lg md:px-xxxl">
+      <header className="flex flex-wrap items-center justify-between gap-md">
+        <a href="#/" className="flex min-w-0 items-center gap-sm hover:bg-hover" aria-label={APP_TEXT.homeLink}>
           <img
             src={logoSrc}
             alt={APP_TEXT.logoAlt}
             className="h-[var(--sr-layout-logo-size)] w-[var(--sr-layout-logo-size)] shrink-0 rounded-sm border-hairline border-divider bg-sunken"
           />
-          <span className="min-w-0">
-            <span className="block text-lg font-medium tracking-tight text-heading">{APP_TEXT.siteName}</span>
-            <span className="mt-xxs block text-sm text-muted">{APP_TEXT.siteNote}</span>
-          </span>
+          <span className="min-w-0 text-lg font-medium tracking-tight text-heading">{APP_TEXT.siteName}</span>
         </a>
         {/* 絵は「押すと何になるか」を出す。説明も同じ言い方で揃える */}
         <IconButton
@@ -98,7 +95,7 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
 
       {/* 上の段: まとまり。押すとそのまとまりの最初の画面へ行く */}
       <nav
-        className="mt-lg flex flex-wrap gap-xs border-b-hairline border-divider sm:mt-xl"
+        className="mt-md flex flex-wrap gap-xs border-b-hairline border-divider"
         aria-label={APP_TEXT.navLabel}
       >
         {SECTIONS.map((section) => {
@@ -159,7 +156,7 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
         </nav>
       )}
 
-      <div className="mb-xxl sm:mb-section" />
+      <div className="mb-xxl" />
 
       {children}
     </div>
