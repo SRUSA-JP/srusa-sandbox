@@ -8,6 +8,7 @@
 import { MINECRAFT_SKIN, skinFor, type Skin } from './config/skins';
 
 export type RouteId =
+  | 'home'
   | 'stats'
   | 'world-map'
   | 'relationships'
@@ -29,6 +30,7 @@ export type RouteId =
  * 上のタブが何枚もあると、どれが同じ話題なのか分からなくなるため。
  */
 export const SECTIONS = [
+  { id: 'home', label: 'ホーム' },
   { id: 'games', label: 'ゲーム' },
   { id: 'relationships', label: '相関図' },
   { id: 'members', label: 'メンバー' },
@@ -81,6 +83,13 @@ export interface Route {
 export const ZUKAN_PATH = '#/zukan';
 
 export const ROUTES: Route[] = [
+  {
+    id: 'home',
+    section: 'home',
+    path: '#/',
+    label: 'ホーム',
+    skinId: MINECRAFT_SKIN.id,
+  },
   /* ゲーム。遊んでいるゲームをここにまとめ、下の段で切り替える */
   {
     id: 'stats',
@@ -168,6 +177,9 @@ export const DEFAULT_ROUTE = ROUTES[0];
 /** URL のハッシュから画面を決める唯一の入口。 */
 export function routeFromHash(hash: string): Route {
   const normalized = hash.replace(/\/$/, '');
+  if (normalized === '' || normalized === '#' || normalized === '#/home') {
+    return DEFAULT_ROUTE;
+  }
   if (normalized === '#/clips') {
     return ROUTES.find((route) => route.id === 'clips') ?? DEFAULT_ROUTE;
   }

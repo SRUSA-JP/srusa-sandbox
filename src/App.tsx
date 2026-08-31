@@ -6,6 +6,7 @@ import {
   ClipsPage,
   EventRankingsPage,
   GamePlaceholderPage,
+  HomePage,
   MapPage,
   PlayerPage,
   StatsPage,
@@ -21,6 +22,7 @@ import type { VizTheme } from './theme/palette';
 
 /** 画面 ID → 中身。並び順と URL は routes.ts が持つ。 */
 const PAGES: Record<RouteId, (props: { theme: VizTheme; route: Route }) => ReactElement> = {
+  home: HomePage,
   stats: StatsPage,
   'world-map': WorldMapPage,
   relationships: MapPage,

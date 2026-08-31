@@ -39,3 +39,4 @@ export * from './CalendarDayPanel';
 export * from './TuningPanel';
 export * from './HistoryTimeline';
 export * from './HistoryAxisScrubber';
+export * from './HomeUpdateBoard';

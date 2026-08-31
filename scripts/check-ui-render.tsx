@@ -15,6 +15,7 @@ import {
   ClipsPage,
   EventRankingsPage,
   GamePlaceholderPage,
+  HomePage,
   MapPage,
   PlayerPage,
   StatsPage,
@@ -31,6 +32,7 @@ import { svgTextOverflow } from './svg-text-fit';
 type PageRenderer = (props: { route: Route }) => ReactElement;
 
 const PAGES: Record<RouteId, PageRenderer> = {
+  home: () => <HomePage />,
   stats: ({ route }) => <StatsPage theme={themeFor(route)} />,
   'world-map': ({ route }) => <WorldMapPage theme={themeFor(route)} />,
   relationships: ({ route }) => <MapPage theme={themeFor(route)} />,

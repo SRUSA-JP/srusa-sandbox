@@ -8,3 +8,4 @@ export * from './ZukanPage';
 export * from './CalendarPage';
 export * from './HistoryPage';
 export * from './GamePlaceholderPage';
+export * from './HomePage';
