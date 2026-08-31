@@ -531,6 +531,8 @@ export const WORLD_MAP_TEXT = {
   threeD: {
     title: 'スポーン周辺 3D',
     note: 'スポーン地点の周辺だけを BlueMap の 3D ビューアで表示します。',
+    fullscreen: '全画面',
+    exitFullscreen: '全画面を終了',
     loading: 'スポーン周辺 3D の生成物を確認しています。',
     missing:
       'スポーン周辺 3D の生成物がありません。../srusa-portal/bluemap/web から public/bluemap-spawn/ へ同期すると表示できます。',

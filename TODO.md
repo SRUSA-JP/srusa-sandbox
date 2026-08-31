@@ -9,6 +9,12 @@
 
 #### 2026-08-31
 
+- 原文: `スマホの幅が縦幅小さいから見にくすぎるから広げる方向だねやってほしいの．あとは全画面表示切替ボタンも？３ｄマップの`
+  - スマートフォンのスポーン周辺 3D iframe 高さを `min(820px,82vh)`、最小高さを `520px` に広げた
+  - スポーン周辺 3D ビューア上部に `全画面` / `全画面を終了` ボタンを追加した
+  - 全画面表示中は iframe を画面高さいっぱいに近い高さへ切り替えるようにした
+  - 確認: `npm run typecheck`、`npm run lint`、`npm run check:design`、`npm run build` が通ることを確認
+
 - 原文: `多くない？406追跡しなくてよいよ`
   - BlueMap スポーン周辺 3D の生成物 371 件を Git 追跡から外し、`public/bluemap-spawn/README.md` だけを追跡する方針に変更した
   - `.gitignore` で `public/bluemap-spawn/` 配下の生成物を除外し、README だけを例外にした

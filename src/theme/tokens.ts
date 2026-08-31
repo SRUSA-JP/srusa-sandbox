@@ -174,9 +174,11 @@ export const LAYOUT = {
   /** BlueMap の 3D ビューアを埋め込む高さ。 */
   worldMap3dHeight: 'min(760px,75vh)',
   /** 狭い画面での BlueMap の 3D ビューア高さ。 */
-  worldMap3dCompactHeight: 'min(560px,65vh)',
+  worldMap3dCompactHeight: 'min(820px,82vh)',
+  /** BlueMap の 3D ビューアを全画面にしたときの高さ。 */
+  worldMap3dFullscreenHeight: 'calc(100vh - 48px)',
   /** BlueMap の 3D ビューアを埋め込む最小高さ。 */
-  worldMap3dMinHeight: 360,
+  worldMap3dMinHeight: 520,
   /**
    * 人物の吹き出しの最大幅。
    *
