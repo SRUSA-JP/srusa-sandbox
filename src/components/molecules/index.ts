@@ -4,6 +4,7 @@ export * from './ChartTooltip';
 export * from './DateStepper';
 export * from './GroupRegion';
 export * from './KpiTile';
+export * from './NavigationButton';
 export * from './PersonNode';
 export * from './PersonProfileTooltip';
 export * from './PasswordField';

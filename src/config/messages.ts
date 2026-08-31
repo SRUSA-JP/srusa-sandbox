@@ -27,15 +27,15 @@ export const APP_TEXT = {
   siteDescription:
     'SRUSA の試験用コンテンツを公開しているサイトです。Minecraft サーバーの統計・ワールドマップ・活動カレンダー、相関図、メンバー、年表、ギャラリーを置いています。掲載内容と公開範囲は検討中です。',
   /** タブ全体の読み上げ名。 */
-  navLabel: 'ページ',
+  navLabel: '親ジャンル',
   /** スマートフォン下部タブの読み上げ名。 */
   mobileNavLabel: 'スマートフォンのページ切替',
   /** 下の段（まとまりの中の切り替え）の読み上げ。 */
   sectionNavLabel: 'このまとまりの中の画面',
   /** ゲーム一覧の読み上げ。 */
-  gameNavLabel: 'ゲーム',
+  gameNavLabel: 'ジャンル内のまとまり',
   /** ゲーム内コンテンツ一覧の読み上げ。 */
-  gameContentNavLabel: 'ゲーム内の画面',
+  gameContentNavLabel: 'まとまり内の画面',
   /** ページ全体にかかる注意書きの見出し。本文の下に出す。 */
   disclaimer: 'このページについて',
   /**

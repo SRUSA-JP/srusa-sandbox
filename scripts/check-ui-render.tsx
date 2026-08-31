@@ -153,11 +153,31 @@ try {
   expectIncludes('AppShell mobile nav', navHtml, 'sr-only">ゲーム</span>');
   expectIncludes('AppShell mobile nav', navHtml, 'aria-current="page"');
   expectIncludes('AppShell mobile nav', navHtml, 'bg-tab-marker');
+  expectIncludes('AppShell mobile nav', navHtml, 'grid-cols-5 grid-rows-5');
   expectExcludes('AppShell mobile nav', navHtml, 'bg-selected');
   console.log(`OK  AppShell mobile nav (${html.length} chars)`);
 } catch (error) {
   failed = true;
   console.error('NG  AppShell mobile nav');
+  console.error(error instanceof Error ? error.message : String(error));
+}
+
+try {
+  const route = routeFromHash('#/zukan');
+  const html = withConsoleTrap('AppShell people context nav', () =>
+    renderToString(
+      <AppShell route={route} onNavigate={() => undefined} mode="light" onToggleTheme={() => undefined}>
+        <main>content</main>
+      </AppShell>,
+    ),
+  );
+  expectIncludes('AppShell people context nav', html, 'メンバー');
+  expectIncludes('AppShell people context nav', html, '相関図');
+  expectIncludes('AppShell people context nav', html, `aria-label="${APP_TEXT.gameNavLabel}"`);
+  console.log(`OK  AppShell people context nav (${html.length} chars)`);
+} catch (error) {
+  failed = true;
+  console.error('NG  AppShell people context nav');
   console.error(error instanceof Error ? error.message : String(error));
 }
 

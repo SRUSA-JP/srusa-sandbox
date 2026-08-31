@@ -42,10 +42,22 @@ export const SECTIONS = [
 
 export type SectionId = (typeof SECTIONS)[number]['id'];
 
+export const NAV_GROUPS = [
+  { id: 'home', label: 'ホーム' },
+  { id: 'games', label: 'ゲーム' },
+  { id: 'people', label: '人' },
+  { id: 'records', label: '記録' },
+  { id: 'gallery', label: 'ギャラリー' },
+] as const;
+
+export type NavGroupId = (typeof NAV_GROUPS)[number]['id'];
+
 export interface Route {
   id: RouteId;
   /** どのまとまりに属するか。上のタブはこれで選ばれる。 */
   section: SectionId;
+  /** 画面下部ナビやホームのジャンプ一覧で使う、表示上の親ジャンル。 */
+  navGroup: NavGroupId;
   /** URL のハッシュ。ブックマークと再読み込みができるようにする。 */
   path: string;
   /** タブに出す名前。 */
@@ -87,6 +99,7 @@ export const ROUTES: Route[] = [
   {
     id: 'home',
     section: 'home',
+    navGroup: 'home',
     path: '#/',
     label: 'ホーム',
     skinId: MINECRAFT_SKIN.id,
@@ -95,6 +108,7 @@ export const ROUTES: Route[] = [
   {
     id: 'stats',
     section: 'games',
+    navGroup: 'games',
     group: 'Minecraft',
     gameId: 'minecraft',
     gameLabel: 'Minecraft',
@@ -105,6 +119,7 @@ export const ROUTES: Route[] = [
   {
     id: 'world-map',
     section: 'games',
+    navGroup: 'games',
     group: 'Minecraft',
     gameId: 'minecraft',
     gameLabel: 'Minecraft',
@@ -115,6 +130,7 @@ export const ROUTES: Route[] = [
   {
     id: 'calendar',
     section: 'games',
+    navGroup: 'games',
     group: 'Minecraft',
     gameId: 'minecraft',
     gameLabel: 'Minecraft',
@@ -125,6 +141,7 @@ export const ROUTES: Route[] = [
   {
     id: 'board-score',
     section: 'games',
+    navGroup: 'games',
     gameId: 'board-games',
     gameLabel: 'ボドゲ',
     path: '#/board-games/score',
@@ -138,6 +155,7 @@ export const ROUTES: Route[] = [
   {
     id: 'valorant',
     section: 'games',
+    navGroup: 'games',
     gameId: 'valorant',
     gameLabel: 'VALORANT',
     path: '#/valorant',
@@ -147,6 +165,7 @@ export const ROUTES: Route[] = [
   {
     id: 'lol',
     section: 'games',
+    navGroup: 'games',
     gameId: 'lol',
     gameLabel: 'LOL',
     path: '#/lol',
@@ -156,6 +175,7 @@ export const ROUTES: Route[] = [
   {
     id: 'apex',
     section: 'games',
+    navGroup: 'games',
     gameId: 'apex',
     gameLabel: 'APEX',
     path: '#/apex',
@@ -166,19 +186,39 @@ export const ROUTES: Route[] = [
   {
     id: 'relationships',
     section: 'relationships',
+    navGroup: 'people',
     path: '#/relationships',
     label: '相関図',
     skinId: MINECRAFT_SKIN.id,
   },
-  { id: 'zukan', section: 'members', path: ZUKAN_PATH, label: 'メンバー', skinId: MINECRAFT_SKIN.id },
-  { id: 'history', section: 'history', path: '#/history', label: '年表', skinId: MINECRAFT_SKIN.id },
-  { id: 'events', section: 'events', path: '#/events', label: 'イベント', skinId: MINECRAFT_SKIN.id },
-  { id: 'clips', section: 'clips', path: '#/gallery', label: 'ギャラリー', skinId: MINECRAFT_SKIN.id },
+  { id: 'zukan', section: 'members', navGroup: 'people', path: ZUKAN_PATH, label: 'メンバー', skinId: MINECRAFT_SKIN.id },
+  { id: 'history', section: 'history', navGroup: 'records', path: '#/history', label: '年表', skinId: MINECRAFT_SKIN.id },
+  { id: 'events', section: 'events', navGroup: 'records', path: '#/events', label: 'イベント', skinId: MINECRAFT_SKIN.id },
+  { id: 'clips', section: 'clips', navGroup: 'gallery', path: '#/gallery', label: 'ギャラリー', skinId: MINECRAFT_SKIN.id },
 ];
 
 /** そのまとまりに入っている画面。下の段に並べる。 */
 export function routesInSection(section: SectionId): Route[] {
   return ROUTES.filter((route) => route.section === section);
+}
+
+/** 表示上の親ジャンルに入っている画面。スマホ下部ナビとホームの一覧に使う。 */
+export function routesInNavGroup(navGroup: NavGroupId): Route[] {
+  const preferred: Partial<Record<NavGroupId, RouteId[]>> = {
+    people: ['zukan', 'relationships'],
+    records: ['history', 'events'],
+  };
+  const order = preferred[navGroup] ?? [];
+  return ROUTES.filter((route) => route.navGroup === navGroup).sort((a, b) => {
+    const left = order.indexOf(a.id);
+    const right = order.indexOf(b.id);
+    if (left >= 0 || right >= 0) return (left < 0 ? Number.MAX_SAFE_INTEGER : left) - (right < 0 ? Number.MAX_SAFE_INTEGER : right);
+    return ROUTES.indexOf(a) - ROUTES.indexOf(b);
+  });
+}
+
+export function navGroupForRoute(route: Route): NavGroupId {
+  return route.navGroup;
 }
 
 /** ハッシュが無い・知らないときに出す画面。 */
@@ -200,6 +240,7 @@ export function routeFromHash(hash: string): Route {
     return {
       id: 'player',
       section: 'members',
+      navGroup: 'people',
       path: normalized,
       label: 'プレイヤー紹介',
       skinId: MINECRAFT_SKIN.id,

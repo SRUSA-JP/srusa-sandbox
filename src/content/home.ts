@@ -1,7 +1,8 @@
 export interface HomeJump {
   title: string;
-  href: string;
   description: string;
+  href?: string;
+  children?: HomeJump[];
 }
 
 export interface HomeUpdate {
@@ -81,29 +82,44 @@ export const HOME_UPDATES: HomeUpdate[] = [
 
 export const HOME_JUMPS: HomeJump[] = [
   {
-    title: 'Minecraft 統計',
-    href: '#/minecraft',
-    description: 'プレイ時間、移動距離、採掘、戦闘、維持費試算を見る',
+    title: 'ゲーム',
+    description: 'Minecraft、ボドゲ、その他ゲームの記録を見る',
+    children: [
+      {
+        title: 'Minecraft',
+        href: '#/minecraft',
+        description: '統計、ワールドマップ、活動カレンダー',
+        children: [
+          { title: '統計', href: '#/minecraft', description: 'プレイ時間、移動距離、採掘、戦闘、維持費試算を見る' },
+          { title: 'ワールドマップ', href: '#/minecraft/world-map', description: 'スポーン周辺 3D と 2D マップの履歴を見る' },
+          { title: '活動カレンダー', href: '#/minecraft/calendar', description: '日ごとのログイン状況とプレイヤー別の活動を見る' },
+        ],
+      },
+      {
+        title: 'ボドゲ',
+        href: '#/board-games/score',
+        description: 'ポイント集計と記録シートを使う',
+      },
+      { title: 'VALORANT', href: '#/valorant', description: 'VALORANT の入口' },
+      { title: 'LOL', href: '#/lol', description: 'LOL の入口' },
+      { title: 'APEX', href: '#/apex', description: 'APEX の入口' },
+    ],
   },
   {
-    title: 'ワールドマップ',
-    href: '#/minecraft/world-map',
-    description: 'スポーン周辺 3D と 2D マップの履歴を見る',
+    title: '人',
+    description: 'メンバーと相関図を行き来する',
+    children: [
+      { title: 'メンバー', href: '#/zukan', description: 'SRUSA 図鑑とプレイヤー紹介ページへ移動する' },
+      { title: '相関図', href: '#/relationships', description: '人物どうしの関係、所属、クラスタ配置を見る' },
+    ],
   },
   {
-    title: '活動カレンダー',
-    href: '#/minecraft/calendar',
-    description: '日ごとのログイン状況とプレイヤー別の活動を見る',
-  },
-  {
-    title: 'メンバー',
-    href: '#/zukan',
-    description: 'SRUSA 図鑑とプレイヤー紹介ページへ移動する',
-  },
-  {
-    title: '相関図',
-    href: '#/relationships',
-    description: '人物どうしの関係、所属、クラスタ配置を見る',
+    title: '記録',
+    description: '年表とイベント記録を見る',
+    children: [
+      { title: '年表', href: '#/history', description: 'SRUSA の流れを見る' },
+      { title: 'イベント', href: '#/events', description: 'イベントランキングを見る' },
+    ],
   },
   {
     title: 'ギャラリー',

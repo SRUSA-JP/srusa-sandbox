@@ -11,6 +11,41 @@ function assetPath(path: string) {
   return `${import.meta.env.BASE_URL}${path}`;
 }
 
+function JumpLink({ jump }: { jump: HomeJump }) {
+  const content = (
+    <>
+      <span className="text-md font-bold text-heading">{jump.title}</span>
+      <span className="text-sm leading-base text-muted">{jump.description}</span>
+    </>
+  );
+  if (!jump.href) return <div className="grid min-w-0 gap-xxs">{content}</div>;
+  return (
+    <a href={jump.href} className="grid min-w-0 gap-xxs hover:text-tab-active">
+      {content}
+    </a>
+  );
+}
+
+function JumpTree({ jumps, depth = 0 }: { jumps: HomeJump[]; depth?: number }) {
+  return (
+    <div className={depth === 0 ? 'grid gap-md sm:grid-cols-2 lg:grid-cols-4' : 'grid gap-xs'}>
+      {jumps.map((jump) => (
+        <div
+          key={`${jump.title}-${jump.href ?? depth}`}
+          className={
+            depth === 0
+              ? 'grid min-w-0 gap-md border-hairline border-divider bg-surface p-md'
+              : 'grid min-w-0 gap-xs border-l-thick border-divider pl-md'
+          }
+        >
+          <JumpLink jump={jump} />
+          {jump.children && <JumpTree jumps={jump.children} depth={depth + 1} />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** ホーム画面の更新ログと主要ページへの入口。 */
 export function HomeUpdateBoard({ updates, jumps }: HomeUpdateBoardProps) {
   return (
@@ -54,18 +89,7 @@ export function HomeUpdateBoard({ updates, jumps }: HomeUpdateBoardProps) {
 
       <section>
         <SectionHeader title={HOME_CONTENT.jumpsTitle} />
-        <div className="grid gap-xs sm:grid-cols-2 lg:grid-cols-3">
-          {jumps.map((jump) => (
-            <a
-              key={jump.href}
-              href={jump.href}
-              className="grid min-w-0 gap-xs border-hairline border-divider bg-surface p-md hover:bg-hover"
-            >
-              <span className="text-md font-bold text-heading">{jump.title}</span>
-              <span className="text-sm leading-base text-muted">{jump.description}</span>
-            </a>
-          ))}
-        </div>
+        <JumpTree jumps={jumps} />
       </section>
     </div>
   );

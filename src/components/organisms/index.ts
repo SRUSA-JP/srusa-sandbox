@@ -35,6 +35,7 @@ export * from './WorldMap3dViewer';
 export * from './WorldMapLog';
 export * from './WorldMapViewer';
 export * from './ActivityCalendar';
+export * from './AppNavigation';
 export * from './CalendarDayPanel';
 export * from './TuningPanel';
 export * from './HistoryTimeline';
