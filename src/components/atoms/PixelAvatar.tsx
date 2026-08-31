@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { PLAYER_ICON_GRID } from '../../lib/playerIcon';
 
 export interface PixelAvatarProps {
@@ -17,17 +18,23 @@ export interface PixelAvatarProps {
 export function PixelAvatar({ pixels, size }: PixelAvatarProps) {
   const cell = size / PLAYER_ICON_GRID;
   const origin = -size / 2;
+  const pixelSize = cell + 0.5;
+  const paths = useMemo(() => {
+    const byColor = new Map<string, string[]>();
+    pixels.forEach((color, index) => {
+      const x = origin + (index % PLAYER_ICON_GRID) * cell;
+      const y = origin + Math.floor(index / PLAYER_ICON_GRID) * cell;
+      byColor.set(color, [...(byColor.get(color) ?? []), `M${x} ${y}h${pixelSize}v${pixelSize}h-${pixelSize}Z`]);
+    });
+    return [...byColor.entries()];
+  }, [cell, origin, pixelSize, pixels]);
 
   return (
     <g aria-hidden>
-      {pixels.map((color, index) => (
-        <rect
-          key={index}
-          x={origin + (index % PLAYER_ICON_GRID) * cell}
-          y={origin + Math.floor(index / PLAYER_ICON_GRID) * cell}
-          /* 隣の升目との間に隙間が出ないよう、わずかに重ねる */
-          width={cell + 0.5}
-          height={cell + 0.5}
+      {paths.map(([color, segments], index) => (
+        <path
+          key={`${color}-${index}`}
+          d={segments.join('')}
           fill={color}
         />
       ))}

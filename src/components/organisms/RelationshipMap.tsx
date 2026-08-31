@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { MAP_TEXT, VIEWPORT_TEXT } from '../../config/messages';
 import { RELATIONSHIP_ZOOM, VIEWPORT } from '../../config/viewport';
 import { usePanZoom } from '../../hooks/usePanZoom';
@@ -65,6 +65,10 @@ interface DragState {
 
 const RELATED_TOOLTIP_COUNT = 6;
 
+function relationEdgeKey(edge: MapLayout['edges'][number]): string {
+  return `${edge.relation.source}\u0000${edge.relation.target}`;
+}
+
 /**
  * 相関図の描画。
  *
@@ -95,14 +99,18 @@ export function RelationshipMap({
   const [grabbedId, setGrabbedId] = useState<string | null>(null);
   const [activePersonId, setActivePersonId] = useState<string | null>(null);
 
-  const relatedIds = new Set<string>();
-  for (const edge of layout.edges) {
-    if (edge.relation.source === centerId) relatedIds.add(edge.relation.target);
-    if (edge.relation.target === centerId) relatedIds.add(edge.relation.source);
-  }
+  const relatedIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const edge of layout.edges) {
+      if (edge.relation.source === centerId) ids.add(edge.relation.target);
+      if (edge.relation.target === centerId) ids.add(edge.relation.source);
+    }
+    return ids;
+  }, [centerId, layout.edges]);
 
-  const highlightedMembers = new Set(
-    layout.regions.find((region) => region.group.id === highlightedGroupId)?.memberIds ?? [],
+  const highlightedMembers = useMemo(
+    () => new Set(layout.regions.find((region) => region.group.id === highlightedGroupId)?.memberIds ?? []),
+    [highlightedGroupId, layout.regions],
   );
 
   const nameOf = (personId: string) => layout.byId.get(personId)?.person.onlineName ?? personId;
@@ -119,41 +127,59 @@ export function RelationshipMap({
    * 枠線の色。所属の線と同じ色にして、アイコンを見ただけで所属が分かるようにする。
    * どのグループがどの色かは display.ts が決め、ここは人と所属を結びつけるだけ。
    */
-  const groupById = new Map(layout.regions.map((region) => [region.group.id, region.group]));
-  const connectingGroupIds = new Set(
-    layout.regions.filter((region) => groupConnects(region.group)).map((region) => region.group.id),
+  const groupById = useMemo(() => new Map(layout.regions.map((region) => [region.group.id, region.group])), [layout.regions]);
+  const connectingGroupIds = useMemo(
+    () => new Set(layout.regions.filter((region) => groupConnects(region.group)).map((region) => region.group.id)),
+    [layout.regions],
   );
-  const connectedNamesFor = (personId: string) => {
-    const ids = new Set<string>();
+  const relatedNameMap = useMemo(() => {
+    const idsByPerson = new Map(layout.people.map((placement) => [placement.person.id, new Set<string>()]));
     for (const edge of layout.edges) {
-      if (edge.relation.source === personId) ids.add(edge.relation.target);
-      if (edge.relation.target === personId) ids.add(edge.relation.source);
+      idsByPerson.get(edge.relation.source)?.add(edge.relation.target);
+      idsByPerson.get(edge.relation.target)?.add(edge.relation.source);
     }
     for (const edge of layout.affiliationEdges) {
-      if (edge.hubId === personId) ids.add(edge.memberId);
-      if (edge.memberId === personId) ids.add(edge.hubId);
+      idsByPerson.get(edge.hubId)?.add(edge.memberId);
+      idsByPerson.get(edge.memberId)?.add(edge.hubId);
     }
-    const names = [...ids]
-      .map((id) => layout.byId.get(id)?.person)
-      .filter((person): person is PersonPlacement['person'] => Boolean(person))
-      .sort((a, b) => personLabel(a, nameMode).localeCompare(personLabel(b, nameMode), 'ja'))
-      .map((person) => personLabel(person, nameMode));
-    return {
-      names: names.slice(0, RELATED_TOOLTIP_COUNT),
-      rest: Math.max(0, names.length - RELATED_TOOLTIP_COUNT),
-    };
-  };
-  const sharedGroupsFor = (edge: MapLayout['edges'][number]): Group[] => {
-    const source = layout.byId.get(edge.relation.source);
-    const target = layout.byId.get(edge.relation.target);
-    if (!source || !target) return [];
-    const targetGroups = new Set(target.groupIds);
-    return source.groupIds
-      .filter((id) => targetGroups.has(id) && connectingGroupIds.has(id))
-      .map((id) => groupById.get(id))
-      .filter((group): group is Group => group !== undefined)
-      .sort((a, b) => groupLabel(a).localeCompare(groupLabel(b), 'ja'));
-  };
+    return new Map(
+      [...idsByPerson.entries()].map(([personId, ids]) => {
+        const names = [...ids]
+          .map((id) => layout.byId.get(id)?.person)
+          .filter((person): person is PersonPlacement['person'] => Boolean(person))
+          .sort((a, b) => personLabel(a, nameMode).localeCompare(personLabel(b, nameMode), 'ja'))
+          .map((person) => personLabel(person, nameMode));
+        return [
+          personId,
+          {
+            names: names.slice(0, RELATED_TOOLTIP_COUNT),
+            rest: Math.max(0, names.length - RELATED_TOOLTIP_COUNT),
+          },
+        ];
+      }),
+    );
+  }, [layout.affiliationEdges, layout.byId, layout.edges, layout.people, nameMode]);
+  const sharedGroupsByEdge = useMemo(
+    () =>
+      new Map(
+        layout.edges.map((edge) => {
+          const source = layout.byId.get(edge.relation.source);
+          const target = layout.byId.get(edge.relation.target);
+          if (!source || !target) return [relationEdgeKey(edge), [] as Group[]] as const;
+          const targetGroups = new Set(target.groupIds);
+          const groups = source.groupIds
+            .filter((id) => targetGroups.has(id) && connectingGroupIds.has(id))
+            .map((id) => groupById.get(id))
+            .filter((group): group is Group => group !== undefined)
+            .sort((a, b) => groupLabel(a).localeCompare(groupLabel(b), 'ja'));
+          return [relationEdgeKey(edge), groups] as const;
+        }),
+      ),
+    [connectingGroupIds, groupById, layout.byId, layout.edges],
+  );
+  const connectedNamesFor = (personId: string) =>
+    relatedNameMap.get(personId) ?? { names: [], rest: 0 };
+  const sharedGroupsFor = (edge: MapLayout['edges'][number]): Group[] => sharedGroupsByEdge.get(relationEdgeKey(edge)) ?? [];
   const nodeStateFor = (placement: PersonPlacement): NodeState => ({
     isCenter: placement.person.id === centerId,
     isRelated: relatedIds.has(placement.person.id),

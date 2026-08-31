@@ -39,26 +39,18 @@ export interface PersonNodeProps {
 
 /** アイコンの中身。画像・顔・イニシャル・人型のどれをどの寸法で描くかは display.ts が決める。 */
 function AvatarContentShape({
-  placement,
-  nameMode,
+  content,
   radius,
   color,
   clipId,
 }: {
-  placement: PersonPlacement;
-  nameMode: string;
+  content: ReturnType<typeof avatarFor>;
   radius: number;
   color: string;
   clipId: string;
 }) {
-  const content = avatarFor(placement.person, nameMode, radius, color);
-
   if (content.kind === 'pixel') {
-    return (
-      <g clipPath={`url(#${clipId})`}>
-        <PixelAvatar pixels={content.pixels} size={radius * 2} />
-      </g>
-    );
+    return <PixelAvatar pixels={content.pixels} size={radius * 2} />;
   }
 
   if (content.kind === 'image') {
@@ -123,6 +115,8 @@ export function PersonNode({
   const innerRadius = Math.max(1, style.radius - rings.length * style.ringWidth);
   const label = personLabel(placement.person, nameMode);
   const clipId = `avatar-clip-${placement.person.id}`;
+  const content = avatarFor(placement.person, nameMode, innerRadius, style.glyphColor);
+  const needsClip = content.kind === 'image';
   const interactive = Boolean(onSelect || pointer);
 
   /*
@@ -151,11 +145,13 @@ export function PersonNode({
     >
       {showTooltip && <title>{personTooltip(placement.person, nameMode, relatedNames, relatedRest)}</title>}
       {/* Minecraft のスキンが四角なので、囲いも四角にして顔が欠けないようにする */}
-      <defs>
-        <clipPath id={clipId}>
-          <rect x={-innerRadius} y={-innerRadius} width={innerRadius * 2} height={innerRadius * 2} />
-        </clipPath>
-      </defs>
+      {needsClip && (
+        <defs>
+          <clipPath id={clipId}>
+            <rect x={-innerRadius} y={-innerRadius} width={innerRadius * 2} height={innerRadius * 2} />
+          </clipPath>
+        </defs>
+      )}
       <rect
         x={-style.radius}
         y={-style.radius}
@@ -164,8 +160,7 @@ export function PersonNode({
         fill={style.fill}
       />
       <AvatarContentShape
-        placement={placement}
-        nameMode={nameMode}
+        content={content}
         radius={innerRadius}
         color={style.glyphColor}
         clipId={clipId}

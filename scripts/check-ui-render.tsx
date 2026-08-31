@@ -95,6 +95,7 @@ function htmlFrom(html: string, marker: string): string {
   return end < 0 ? html.slice(start) : html.slice(start, end);
 }
 
+const RELATIONSHIP_HTML_MAX_CHARS = 320_000;
 let failed = false;
 
 for (const route of ROUTES_TO_CHECK) {
@@ -106,6 +107,9 @@ for (const route of ROUTES_TO_CHECK) {
       expectIncludes(label, html, '関係樹');
       expectIncludes(label, html, 'nodoame');
       expectIncludes(label, html, '<details');
+      if (html.length > RELATIONSHIP_HTML_MAX_CHARS) {
+        throw new Error(`相関図 HTML が大きすぎます (${html.length} chars)`);
+      }
     }
     if (route.id === 'history') expectExcludes(label, html, 'いま分かっていること');
 
