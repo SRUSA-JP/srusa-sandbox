@@ -14,6 +14,10 @@ import { OTHER_ENTRY } from './labels';
 export const APP_TEXT = {
   /** ブラウザのタブと画面左上に出す名前。 */
   siteName: 'SRUSA Sandbox',
+  /** サイトロゴ画像の説明。 */
+  logoAlt: 'SRUSA Sandbox ロゴ',
+  /** ロゴリンクの読み上げ。 */
+  homeLink: 'ホームへ移動',
   /** ホーム画面に追加したときなど、短く出す名前。 */
   shortName: 'SRUSA',
   /** サイト名の下に出す説明。 */

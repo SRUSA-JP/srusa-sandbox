@@ -69,6 +69,7 @@ function subTabButton(entry: Route, route: Route, onNavigate: (route: Route) => 
  */
 export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: AppShellProps) {
   const dark = mode === 'dark';
+  const logoSrc = `${import.meta.env.BASE_URL}icons/srusa-32.png`;
   const siblings = routesInSection(route.section);
   const games = route.section === 'games' ? gameClusters(siblings) : [];
   const activeGameId = route.gameId ?? route.id;
@@ -76,10 +77,17 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
   return (
     <div className="mx-auto max-w-[var(--sr-layout-max-width)] px-lg pt-lg pb-page sm:px-xxl sm:pt-xxl md:px-xxxl">
       <header className="flex flex-wrap items-start justify-between gap-lg">
-        <div className="min-w-0">
-          <span className="text-lg font-medium tracking-tight text-heading">{APP_TEXT.siteName}</span>
-          <p className="mt-xxs text-sm text-muted">{APP_TEXT.siteNote}</p>
-        </div>
+        <a href="#/" className="flex min-w-0 items-start gap-sm hover:bg-hover" aria-label={APP_TEXT.homeLink}>
+          <img
+            src={logoSrc}
+            alt={APP_TEXT.logoAlt}
+            className="h-[var(--sr-layout-logo-size)] w-[var(--sr-layout-logo-size)] shrink-0 rounded-sm border-hairline border-divider bg-sunken"
+          />
+          <span className="min-w-0">
+            <span className="block text-lg font-medium tracking-tight text-heading">{APP_TEXT.siteName}</span>
+            <span className="mt-xxs block text-sm text-muted">{APP_TEXT.siteNote}</span>
+          </span>
+        </a>
         {/* 絵は「押すと何になるか」を出す。説明も同じ言い方で揃える */}
         <IconButton
           icon={dark ? 'light' : 'dark'}
