@@ -11,7 +11,7 @@
 | --- | --- | --- |
 | Minecraft 統計・日別・ログ・在庫・スキン | `../aws_minecraft/data/` | `npm run refresh:data` または `npm run refresh:data:local` |
 | ワールドマップ 2D | `../srusa-portal/bluemap/web/` | `npm run refresh:data:local -- map` |
-| スポーン周辺 3D | `../srusa-portal/bluemap/web/maps/overworld_spawn/` | `public/bluemap-spawn/` に BlueMap ビューア一式と対象マップだけを置く |
+| スポーン周辺 3D | `../srusa-portal/bluemap/web/maps/overworld_spawn/` | `public/bluemap-spawn/` に BlueMap ビューア一式と対象マップだけを置く。生成物本体は Git 追跡しない |
 
 AWS 側から取り直すときは `npm run refresh:data` を使う。SSO セッションが切れている場合は、表示された URL とコードでログインしてから続行する。
 
@@ -127,8 +127,8 @@ npm run refresh:live -- --keep-instance
 - `../srusa-portal/bluemap/web/lang/`
 - `../srusa-portal/bluemap/web/maps/overworld_spawn/`
 
-置き先は `public/bluemap-spawn/`。`public/bluemap-spawn/settings.json` は `maps` を
-`["overworld_spawn"]` に絞り、他の BlueMap マップを読ませない。
+置き先は `public/bluemap-spawn/`。このディレクトリは `README.md` 以外を `.gitignore` で除外する。
+`public/bluemap-spawn/settings.json` は `maps` を `["overworld_spawn"]` に絞り、他の BlueMap マップを読ませない。
 
 確認する URL:
 
@@ -139,6 +139,7 @@ curl -I http://localhost:5173/bluemap-spawn/maps/overworld_spawn/settings.json
 ```
 
 画面側は `#/minecraft/world-map` の表示切り替えで `スポーン3D` を選ぶ。
+生成物が置かれていない環境では、3D ビューアの代わりに同期案内を表示する。
 
 ## 更新対象と反映先
 

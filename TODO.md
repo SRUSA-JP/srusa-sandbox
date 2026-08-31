@@ -9,6 +9,13 @@
 
 #### 2026-08-31
 
+- 原文: `多くない？406追跡しなくてよいよ`
+  - BlueMap スポーン周辺 3D の生成物 371 件を Git 追跡から外し、`public/bluemap-spawn/README.md` だけを追跡する方針に変更した
+  - `.gitignore` で `public/bluemap-spawn/` 配下の生成物を除外し、README だけを例外にした
+  - 3D ビューアは `index.html` の有無を確認し、生成物がない環境では iframe ではなく同期案内を表示するようにした
+  - README、Runbook、`srusa-data-refresh` skill に、BlueMap 生成物本体をコミットしないことを明記した
+  - 確認: `npm run typecheck`、`npm run lint`、`npm run check:design`、`npm run build` が通ることを確認
+
 - 原文: `ワールドマップとか統計も過去のログ？時系列で切り替えられるように．グラフとかで見れるのは切替する必要はないかな．マップみたいな１時点でのログが必要なのは切り替えできるように．過去分があれば`
   - ワールドマップの 2D 表示に `履歴` ピッカーを追加し、`最新` または保存済みの日付で地図を絞り込めるようにした
   - `最新` は各ディメンションの最新地図を表示し、日付指定時はその日に存在する地図だけを表示する
@@ -32,7 +39,7 @@
 
 - 原文: `gitignoreに適切に`
   - [`.gitignore`](.gitignore) に、データ取得時に誤って置きやすい `data/*.tar.gz` / `data/*.zip` と、公開に不要な BlueMap sourcemap `public/bluemap-spawn/assets/*.map` を追加した
-  - 3D 表示に必要な `public/bluemap-spawn/` 本体やタイルは追跡対象のままにした
+  - その後、BlueMap 生成物本体はファイル数が多すぎるため、`public/bluemap-spawn/README.md` だけを追跡し、ビューア本体やタイルは Git 追跡しない方針に変更した
   - 確認: `git status --ignored --short` で BlueMap sourcemap が ignored になることを確認
 
 - 原文: `プレイ時間でマイクラ鯖の維持費の傾斜をつけたいカスタムも・．DESIGN.ｍｄにも気を付けて`

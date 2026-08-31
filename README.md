@@ -81,7 +81,7 @@ npm run dev
 | [data/](data/) | ビルド時に取り込む JSON。Minecraft の集計、相関図のデータ、ワールドマップの範囲 |
 | [public/images/](public/images/) | 補足画像 |
 | [public/world-map/](public/world-map/) | 貼り合わせた 2D のワールドマップ（`npm run build:world-map` が作る） |
-| [public/bluemap-spawn/](public/bluemap-spawn/) | スポーン周辺だけの BlueMap 3D ビューア |
+| [public/bluemap-spawn/](public/bluemap-spawn/) | スポーン周辺だけの BlueMap 3D ビューア置き場。生成物本体は Git 追跡しない |
 | [scripts/sync-data.mjs](scripts/sync-data.mjs) | `../aws_minecraft` と BlueMap の出力からのデータ取り込み |
 | [scripts/check-contrast.ts](scripts/check-contrast.ts) | 配色のコントラスト検査 |
 | [scripts/build-world-map.ts](scripts/build-world-map.ts) | BlueMap の 2D タイルの貼り合わせ |
@@ -138,8 +138,8 @@ npm run dev
 
 地図の実体は BlueMap の出力から作ります。ワールド全体の 3D タイルはこのリポジトリに持たず、
 通常は真上から見た 2D タイルだけを 1 枚の PNG に貼り合わせて置きます。
-例外として、スポーン周辺 16x16 チャンク相当の `overworld_spawn` だけは `public/bluemap-spawn/` に置き、
-ワールドマップ画面の「スポーン3D」で iframe 表示します。
+例外として、スポーン周辺 16x16 チャンク相当の `overworld_spawn` だけは `public/bluemap-spawn/` に置けば、
+ワールドマップ画面の「スポーン3D」で iframe 表示できます。ただし BlueMap ビューア本体とタイルは生成物なので Git 追跡しません。
 
 ```shell
 # 1. srusa-portal でワールドをレンダリングする（Java 25 が要る）
@@ -157,7 +157,7 @@ BlueMap の出力が別の場所にあるときは `npm run build:world-map -- -
 
 スポーン周辺 3D を差し替える場合は、`../srusa-portal/bluemap/web/` から BlueMap ビューア一式と
 `maps/overworld_spawn/` だけを `public/bluemap-spawn/` に同期します。ライブ統計更新用の
-`npm run refresh:live` は 3D データを取得しません。
+`npm run refresh:live` は 3D データを取得しません。`public/bluemap-spawn/README.md` 以外は `.gitignore` で除外しています。
 
 ## データを差し替えるとき
 

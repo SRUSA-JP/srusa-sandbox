@@ -60,7 +60,7 @@ cd -
 npm run refresh:data:local -- nether
 ```
 
-For the limited 3D spawn map, use only the existing `overworld_spawn` BlueMap output. Do not add full-world 3D data to `srusa-sandbox`.
+For the limited 3D spawn map, use only the existing `overworld_spawn` BlueMap output. Do not add full-world 3D data to `srusa-sandbox`, and do not commit generated `public/bluemap-spawn/` files other than `README.md`.
 
 ## Verification
 

@@ -10,8 +10,10 @@ npm-debug.log*
 data/*.tar.gz
 data/*.zip
 
-# BlueMap の公開に不要なデバッグ用ファイル
-public/bluemap-spawn/**/*.map
+# BlueMap のスポーン周辺3D生成物
+public/bluemap-spawn/**
+!public/bluemap-spawn/
+!public/bluemap-spawn/README.md
 
 # ローカル設定と秘密情報
 .env
