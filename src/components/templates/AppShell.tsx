@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { APP_TEXT } from '../../config/messages';
 import { SECTIONS, routesInSection, type Route, type SectionId } from '../../routes';
 import type { ThemeMode } from '../../theme/palette';
+import { LAYOUT } from '../../theme/tokens';
 import { Icon, IconButton, type IconName } from '../atoms';
 
 export interface AppShellProps {
@@ -87,13 +88,13 @@ function mobileNavButton(item: MobileNavItem, route: Route, onNavigate: (route: 
       aria-current={active ? 'page' : undefined}
       className={
         active
-          ? 'grid min-h-[var(--sr-layout-mobile-nav-height)] min-w-0 place-items-center gap-xxs rounded-md bg-selected px-xs py-xs text-selected-ink'
-          : 'grid min-h-[var(--sr-layout-mobile-nav-height)] min-w-0 place-items-center gap-xxs rounded-md px-xs py-xs text-tab hover:bg-hover hover:text-tab-active'
+          ? 'grid min-h-[var(--sr-layout-mobile-nav-height)] min-w-0 place-items-center rounded-md bg-selected px-xs py-xxs text-selected-ink'
+          : 'grid min-h-[var(--sr-layout-mobile-nav-height)] min-w-0 place-items-center rounded-md px-xs py-xxs text-tab hover:bg-hover hover:text-tab-active'
       }
       onClick={() => onNavigate(target)}
     >
-      <Icon name={item.icon} />
-      <span className="max-w-full truncate text-xs font-medium leading-tight">{item.label}</span>
+      <Icon name={item.icon} size={LAYOUT.mobileNavIconSize} />
+      <span className="sr-only">{item.label}</span>
     </button>
   );
 }

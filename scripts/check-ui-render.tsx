@@ -11,6 +11,8 @@
  */
 import { renderToString } from 'react-dom/server';
 import type { ReactElement } from 'react';
+import { AppShell } from '../src/components';
+import { APP_TEXT } from '../src/config/messages';
 import {
   ClipsPage,
   BoardScorePage,
@@ -78,6 +80,10 @@ function withConsoleTrap<T>(label: string, fn: () => T): T {
   }
 }
 
+function expectIncludes(label: string, html: string, text: string) {
+  if (!html.includes(text)) throw new Error(`${label} に ${text} が見つかりません`);
+}
+
 let failed = false;
 
 for (const route of ROUTES_TO_CHECK) {
@@ -101,6 +107,25 @@ for (const route of ROUTES_TO_CHECK) {
     console.error(`NG  ${label}`);
     console.error(error instanceof Error ? error.message : String(error));
   }
+}
+
+try {
+  const route = routeFromHash('#/minecraft/world-map');
+  const html = withConsoleTrap('AppShell mobile nav', () =>
+    renderToString(
+      <AppShell route={route} onNavigate={() => undefined} mode="light" onToggleTheme={() => undefined}>
+        <main>content</main>
+      </AppShell>,
+    ),
+  );
+  expectIncludes('AppShell mobile nav', html, `aria-label="${APP_TEXT.mobileNavLabel}"`);
+  expectIncludes('AppShell mobile nav', html, 'sr-only">ゲーム</span>');
+  expectIncludes('AppShell mobile nav', html, 'aria-current="page"');
+  console.log(`OK  AppShell mobile nav (${html.length} chars)`);
+} catch (error) {
+  failed = true;
+  console.error('NG  AppShell mobile nav');
+  console.error(error instanceof Error ? error.message : String(error));
 }
 
 if (failed) process.exitCode = 1;

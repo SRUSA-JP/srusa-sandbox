@@ -159,7 +159,9 @@ export const LAYOUT = {
   /** ヘッダーとログイン画面に置くサイトロゴの一辺。 */
   logoSize: 32,
   /** スマートフォン下部ナビの高さ。 */
-  mobileNavHeight: 72,
+  mobileNavHeight: 56,
+  /** スマートフォン下部ナビのアイコンサイズ。 */
+  mobileNavIconSize: 24,
   /** スマートフォンで下部ナビに本文が隠れないためのページ下余白。 */
   mobileNavPagePadding: 'calc(var(--sr-space-page) + var(--sr-layout-mobile-nav-height))',
   /** iOS が入力時に画面を拡大しないためのログイン入力欄の文字サイズ。 */
