@@ -102,7 +102,7 @@ export const MINECRAFT_CONTENT: PageContent = {
               ['見た目', 'ドット絵風のスキン。プリセットは src/config/skins.ts'],
               [
                 'データ',
-                'data/minecraft-stats-20260818.json（取得元のAWS情報とプレイヤーUUIDは伏字）をビルド時に取り込み',
+                'data/minecraft-stats-*.json（取得元のAWS情報とプレイヤーUUIDは伏字）をビルド時に取り込み、画面右上のデータセットで切り替える',
               ],
               ['出典', 'ビューアの実装と統計は srusa-portal・aws_minecraft リポジトリ由来'],
             ],

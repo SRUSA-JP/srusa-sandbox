@@ -464,6 +464,7 @@ export const WORLD_MAP_TEXT = {
     view3d: 'スポーン3D',
     dimension: 'ディメンション',
     allDimensions: 'すべて',
+    snapshot: '履歴',
     map: '日付',
     latestMaps: '最新',
     tooltips: 'ツールチップ',

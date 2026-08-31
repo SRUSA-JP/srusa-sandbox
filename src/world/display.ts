@@ -117,6 +117,12 @@ export function latestWorldMapDate(maps: WorldMap[], fallbackDate = ''): string 
   )[0] ?? '';
 }
 
+export function worldMapDates(maps: WorldMap[], fallbackDate = ''): string[] {
+  return [...new Set(maps.map((entry) => mapDate(entry, fallbackDate)).filter(Boolean))].sort((a, b) =>
+    b.localeCompare(a),
+  );
+}
+
 export function worldMapLogRows(maps: WorldMap[], fallbackDate = '', latestDate = ''): WorldMapLogRow[] {
   return sortMapsForDisplay(maps, fallbackDate, latestDate).map((map) => {
     const size = coverage(map);

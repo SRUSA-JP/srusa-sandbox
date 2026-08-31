@@ -18,9 +18,11 @@ import type { VizTheme } from '../theme/palette';
 import {
   latestWorldMapDate,
   mapById,
+  mapDate,
   mapDimension,
   mapOptionsForDimension,
   sortDimensions,
+  worldMapDates,
 } from '../world/display';
 import { loadWorldMaps } from '../world/data';
 import type { WorldMap } from '../world/schema';
@@ -31,10 +33,12 @@ export interface WorldMapPageProps {
 
 const EMPTY_MAPS: WorldMap[] = [];
 const ALL_DIMENSIONS = '*';
+const LATEST_MAPS = 'latest';
 
 type TooltipMode = 'on' | 'off';
 type WorldMapViewMode = '2d' | 'spawn-3d';
 type DimensionSelection = typeof ALL_DIMENSIONS | string;
+type SnapshotSelection = typeof LATEST_MAPS | string;
 
 const VIEW_OPTIONS: Array<{ value: WorldMapViewMode; label: string }> = [
   { value: '2d', label: WORLD_MAP_TEXT.picker.view2d },
@@ -63,6 +67,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
     [document?.generated_on, maps],
   );
   const [viewMode, setViewMode] = useState<WorldMapViewMode>('spawn-3d');
+  const [selectedSnapshot, setSelectedSnapshot] = useState<SnapshotSelection>(LATEST_MAPS);
   const [selectedDimension, setSelectedDimension] = useState<DimensionSelection>(ALL_DIMENSIONS);
   const [selectedMapIds, setSelectedMapIds] = useState<Record<string, string>>({});
   /*
@@ -70,12 +75,24 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
    * 地図の上に重ねる分は「もっと大きく読みたい人」向けの追加にする。
    */
   const [tooltipMode, setTooltipMode] = useState<TooltipMode>('off');
+  const snapshotOptions = useMemo(
+    () => [
+      { value: LATEST_MAPS, label: WORLD_MAP_TEXT.picker.latestMaps },
+      ...worldMapDates(maps, document?.generated_on).map((date) => ({ value: date, label: date })),
+    ],
+    [document?.generated_on, maps],
+  );
   const dimensionMaps = useMemo(
-    () =>
-      selectedDimension === ALL_DIMENSIONS
-        ? maps
-        : maps.filter((entry) => mapDimension(entry) === selectedDimension),
-    [maps, selectedDimension],
+    () => {
+      const snapshotMaps =
+        selectedSnapshot === LATEST_MAPS
+          ? maps
+          : maps.filter((entry) => mapDate(entry, document?.generated_on) === selectedSnapshot);
+      return selectedDimension === ALL_DIMENSIONS
+        ? snapshotMaps
+        : snapshotMaps.filter((entry) => mapDimension(entry) === selectedDimension);
+    },
+    [document?.generated_on, maps, selectedDimension, selectedSnapshot],
   );
   const dimensions = useMemo(
     () => sortDimensions([...new Set(dimensionMaps.map(mapDimension))]),
@@ -145,6 +162,14 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
                 value={selectedDimension}
                 options={dimensionOptions}
                 onChange={setSelectedDimension}
+              />
+            )}
+            {viewMode === '2d' && snapshotOptions.length > 2 && (
+              <Picker
+                label={WORLD_MAP_TEXT.picker.snapshot}
+                value={selectedSnapshot}
+                options={snapshotOptions}
+                onChange={setSelectedSnapshot}
               />
             )}
             {viewMode === '2d' && (
