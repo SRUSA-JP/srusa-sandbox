@@ -138,7 +138,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
       }
     >
       <ChartCard title={WORLD_MAP_TEXT.threeD.title} note={WORLD_MAP_TEXT.threeD.note}>
-        <WorldMap3dViewer src={`${import.meta.env.BASE_URL}bluemap-spawn/index.html#overworld_spawn:0:80:0:700:0:0.85:0:0:perspective`} />
+        <WorldMap3dViewer src={`${import.meta.env.BASE_URL}bluemap-spawn/index.html#overworld_spawn:0:80:0:1100:0:0.85:0:0:perspective`} />
       </ChartCard>
 
       <ChartCard

@@ -309,6 +309,8 @@ CSV は確認用の表出力、JSON は状態復元用として役割を分け�
 3D ビューアは PC でもスマートフォンでもページ内の主役なので、通常表示から画面高の大半を使う。
 スマートフォンでは、縦長画面で見下ろすだけにならないように `worldMap3dCompactHeight` と
 `worldMap3dMinHeight` を広めに取る。全画面時は `dvh` 系の高さでブラウザUIの出入りに追従させる。
+物理的な画面高さが足りない場合は、iframe の内側を `worldMap3dScale` で縮小して論理ビューポートを広げる。
+スマートフォンではこの広い表示を既定にし、PC では `広く見る` ボタンで切り替えられるようにする。
 BlueMap 生成物本体は Git 追跡しないため、スマートフォン向けに BlueMap 内部 UI を補正する CSS は
 [src/components/organisms/WorldMap3dViewer.tsx](src/components/organisms/WorldMap3dViewer.tsx) の iframe 注入に閉じ込める。
 補正対象は `#app`、`.control-bar`、`#ff-mobile-controls` など、BlueMap 側の固定UIだけにする。

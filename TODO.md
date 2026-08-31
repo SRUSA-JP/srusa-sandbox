@@ -9,6 +9,14 @@
 
 #### 2026-08-31
 
+- 原文: `まだBlueマップの縦幅小さいな．．．これ物理的に不可能なのか？縦横比率の問題？横幅小さくして，縦横比を押さえたら表示できるとかない？色々試してみて，縦幅広くなるように`
+  - BlueMap 生成物の CSS を確認し、外側 iframe だけでなく BlueMap 内部の固定 UI とキャンバス領域が見え方に効いていることを確認した
+  - 3D ビューアの通常高さを `min(1400px,96dvh)`、スマホ高さを `calc(100dvh - mobileNavHeight)`、全画面高さを `100dvh` に広げた
+  - スマートフォンでは既定で、PC では `広く見る` ボタンで、iframe 内部を `worldMap3dScale` で縮小して論理ビューポートを広げる表示にした
+  - 初期カメラ距離を 700 から 1100 に引き、開いた直後に見える範囲を増やした
+  - [DESIGN.md](DESIGN.md) に、物理高さが足りない場合は iframe 内部の縮小表示で見える範囲を増やす方針を追記した
+  - 確認: `npm run typecheck`、`npm run lint`、`npm run check:design`、`npm run build` が通ることを確認。ローカルでは `http://127.0.0.1:5174/` と BlueMap iframe の HTTP 200 を確認
+
 - 原文: `netlify deploy --prod　を npm run deploy で実行できるように．テストは知らせて問題なかったら，勝手にこれやっていいよ．`
   - `npm run deploy` を追加し、`npm run build` が通ったあとに `npx netlify-cli deploy --prod --dir=dist` で本番公開するようにした
   - [README.md](README.md) のコマンド一覧に本番デプロイ用コマンドを追加した

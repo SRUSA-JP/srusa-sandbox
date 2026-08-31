@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { WORLD_MAP_TEXT } from '../../config/messages';
+import { useIsCompact } from '../../hooks/useMediaQuery';
 import { Button, Note } from '../atoms';
 
 export interface WorldMap3dViewerProps {
@@ -23,7 +24,7 @@ body {
 
 @media (max-width: 575.98px) {
   #app {
-    font-size: 1rem;
+    font-size: .9rem;
   }
 
   .control-bar {
@@ -36,7 +37,7 @@ body {
   }
 
   #ff-mobile-controls {
-    font-size: min(10vw, 7dvh);
+    font-size: min(8vw, 5.5dvh);
   }
 
   #ff-mobile-controls .move-fields,
@@ -69,6 +70,8 @@ export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
   const [available, setAvailable] = useState<boolean | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [wideView, setWideView] = useState(false);
+  const isCompact = useIsCompact();
   const frameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -117,6 +120,10 @@ export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
   }
 
   const immersive = isFullscreen || isExpanded;
+  const zoomedOut = wideView || isCompact;
+  const frameScaleClass = zoomedOut
+    ? 'h-[var(--sr-layout-world-map-3d-scaled-size)] w-[var(--sr-layout-world-map-3d-scaled-size)] origin-top-left scale-[var(--sr-layout-world-map-3d-scale)]'
+    : 'h-full w-full';
 
   return (
     <div
@@ -125,25 +132,34 @@ export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
         immersive ? 'fixed inset-0 z-50 border-0' : 'rounded-md border-hairline'
       }`}
     >
-      <div className="flex justify-end border-b-hairline border-divider bg-surface px-sm py-xs">
+      <div className={`flex justify-end gap-sm border-b-hairline border-divider bg-surface px-sm py-xs ${immersive ? 'absolute right-0 top-0 z-10 bg-overlay' : ''}`}>
+        <Button
+          label={zoomedOut ? WORLD_MAP_TEXT.threeD.normal : WORLD_MAP_TEXT.threeD.wide}
+          icon="zoom-out"
+          onClick={() => setWideView((value) => !value)}
+        />
         <Button
           label={immersive ? WORLD_MAP_TEXT.threeD.exitFullscreen : WORLD_MAP_TEXT.threeD.fullscreen}
           icon="fit"
           onClick={toggleFullscreen}
         />
       </div>
-      <iframe
-        title={WORLD_MAP_TEXT.threeD.title}
-        src={src}
-        className={`block w-full ${
+      <div
+        className={`overflow-hidden ${
           immersive
             ? 'h-[var(--sr-layout-world-map-3d-fullscreen-height)]'
             : 'h-[var(--sr-layout-world-map-3d-compact-height)] min-h-[var(--sr-layout-world-map-3d-min-height)] sm:h-[var(--sr-layout-world-map-3d-height)]'
         }`}
-        loading="lazy"
-        allow="fullscreen"
-        onLoad={(event) => applyBlueMapViewerStyle(event.currentTarget)}
-      />
+      >
+        <iframe
+          title={WORLD_MAP_TEXT.threeD.title}
+          src={src}
+          className={`block border-0 ${frameScaleClass}`}
+          loading="lazy"
+          allow="fullscreen"
+          onLoad={(event) => applyBlueMapViewerStyle(event.currentTarget)}
+        />
+      </div>
     </div>
   );
 }
