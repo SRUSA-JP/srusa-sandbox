@@ -116,6 +116,26 @@ npm run sync:data -- --dry-run    # 何をするかだけ出す
   広い範囲が必要な場合も BlueMap 側で通常地形色の地図としてレンダリングし、その成果物を取り込む
 - `player-db-*.json` はこのリポジトリでは作れない。`../aws_minecraft` 側で作り直して置く
 
+### 人物・参加者データの扱い
+
+相関図の `people[].id` は、Minecraft 以外の画面でも使う横断的な人物 ID として扱う。
+ボドゲ、オフラインイベント、カスタム、ログ集計などで「人」を保存するときは、表示名だけを主キーにせず、
+可能なら `personId` に相関図の人物 ID を入れる。Minecraft のスキン・統計に紐づく人は、
+あわせて `playerSlug` を持たせる。
+
+DB を使わない機能でも、JSON はあとでテーブルへ移しやすい形にする。
+1 つの JSON の中で、少なくとも次のように実体を分ける。
+
+| テーブル相当 | 役割 | 主なキー |
+| --- | --- | --- |
+| `participants` | 参加者。相関図の人物や自由入力の人をここで受ける | `id`, `personId`, `playerSlug`, `name` |
+| `sessions` / `rounds` | 試合・回・イベントなど、ログが属する単位 | `id`, `label`, `startedAt` |
+| `scores` / `events` | 得点や参加ログなど、参加者に紐づく明細 | `participantId`, `roundId` / `sessionId`, `value` |
+
+ボドゲの初期参加者は、相関図で `アクティブメンバー` 属性を持つ人から作る。
+顔アイコンは `player-db` に紐づく人ならスキン由来、無い人は名前から生成する。
+自由入力の参加者も `personId: null` として保存し、後から相関図の人物に紐づけられる余地を残す。
+
 配色・スキン・コントラストのしきい値を変えたら、必ず `npm run check:contrast` を通すこと。
 UI層に色や寸法の実値を足したり、カード構造を変えたりしたら `npm run check:design` も通すこと。
 図（SVG）の寸法・軸の名前・文字の大きさを触ったら `npm run check:layout` も通すこと。

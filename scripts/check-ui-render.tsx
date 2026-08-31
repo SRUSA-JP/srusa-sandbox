@@ -41,7 +41,7 @@ const PAGES: Record<RouteId, PageRenderer> = {
   relationships: ({ route }) => <MapPage theme={themeFor(route)} />,
   zukan: ({ route }) => <ZukanPage theme={themeFor(route)} />,
   calendar: ({ route }) => <CalendarPage theme={themeFor(route)} />,
-  'board-score': () => <BoardScorePage />,
+  'board-score': ({ route }) => <BoardScorePage theme={themeFor(route)} />,
   valorant: ({ route }) => <GamePlaceholderPage route={route} />,
   lol: ({ route }) => <GamePlaceholderPage route={route} />,
   apex: ({ route }) => <GamePlaceholderPage route={route} />,
@@ -118,6 +118,21 @@ for (const route of ROUTES_TO_CHECK) {
     console.error(`NG  ${label}`);
     console.error(error instanceof Error ? error.message : String(error));
   }
+}
+
+try {
+  const route = routeFromHash('#/board-games/score');
+  const html = withConsoleTrap('BoardScore active members', () =>
+    renderToString(<BoardScorePage theme={themeFor(route)} />),
+  );
+  expectIncludes('BoardScore active members', html, 'アクティブ');
+  expectIncludes('BoardScore active members', html, 'role="img"');
+  expectIncludes('BoardScore active members', html, 'nodoamenn');
+  console.log(`OK  BoardScore active members (${html.length} chars)`);
+} catch (error) {
+  failed = true;
+  console.error('NG  BoardScore active members');
+  console.error(error instanceof Error ? error.message : String(error));
 }
 
 try {
