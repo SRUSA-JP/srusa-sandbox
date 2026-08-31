@@ -287,6 +287,9 @@ UI層に色コード、`rgb()`、`text-white` / `bg-black` のような標準色
 生成ログ、作り直し手順、公開範囲の判断材料は `地図の詳細` にたたみ、通常の閲覧導線へ出さない。
 スマートフォンの 3D は、縦長画面で見下ろすだけにならないように `worldMap3dCompactHeight` と
 `worldMap3dMinHeight` を広めに取る。全画面時は `dvh` 系の高さでブラウザUIの出入りに追従させる。
+BlueMap 生成物本体は Git 追跡しないため、スマートフォン向けに BlueMap 内部 UI を補正する CSS は
+[src/components/organisms/WorldMap3dViewer.tsx](src/components/organisms/WorldMap3dViewer.tsx) の iframe 注入に閉じ込める。
+補正対象は `#app`、`.control-bar`、`#ff-mobile-controls` など、BlueMap 側の固定UIだけにする。
 
 読み物は [src/content/](src/content/) の節ごとに `audience` を持ち、
 `readerSections()` が本文へ、`builderSections()` が `technical` へ振り分ける
