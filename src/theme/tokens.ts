@@ -160,13 +160,10 @@ export const LAYOUT = {
   logoSize: 32,
   /** スマートフォン下部ナビの高さ。 */
   mobileNavHeight: 56,
-  /** スマートフォン下部ナビの上に置く、親ジャンル内切替 1 段ぶんの高さ。 */
-  mobileContextNavHeight: 44,
   /** スマートフォン下部ナビのアイコンサイズ。 */
   mobileNavIconSize: 24,
   /** スマートフォンで下部ナビに本文が隠れないためのページ下余白。 */
-  mobileNavPagePadding:
-    'calc(var(--sr-space-page) + var(--sr-layout-mobile-nav-height) + var(--sr-layout-mobile-context-nav-height) * 2)',
+  mobileNavPagePadding: 'calc(var(--sr-space-page) + var(--sr-layout-mobile-nav-height))',
   /** iOS が入力時に画面を拡大しないためのログイン入力欄の文字サイズ。 */
   authInputFontSize: 16,
   /** 相関図を縮めずに読める最小の幅。これより狭い画面では横スクロールさせる。 */

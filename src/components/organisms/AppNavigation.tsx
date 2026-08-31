@@ -73,11 +73,10 @@ export function PrimaryNavigation({ route, onNavigate }: PrimaryNavigationProps)
 export interface ContextNavigationProps {
   route: Route;
   onNavigate: (route: Route) => void;
-  mobile?: boolean;
 }
 
 /** 親ジャンルの中身を切り替えるナビ。ゲームでは「ゲーム名 → コンテンツ」の順に出す。 */
-export function ContextNavigation({ route, onNavigate, mobile = false }: ContextNavigationProps) {
+export function ContextNavigation({ route, onNavigate }: ContextNavigationProps) {
   const clusters = activeRouteClusters(route);
   const activeClusterId = route.gameId ?? route.id;
   const activeCluster = clusters.find((cluster) => cluster.id === activeClusterId);
@@ -86,15 +85,8 @@ export function ContextNavigation({ route, onNavigate, mobile = false }: Context
 
   if (!hasClusterChoices && !hasEntryChoices) return null;
 
-  const containerClass = mobile
-    ? 'fixed inset-x-0 z-40 border-t-hairline border-divider bg-page px-xs py-xs sm:hidden'
-    : 'mt-md hidden gap-xs sm:grid';
-
   return (
-    <div
-      className={containerClass}
-      style={mobile ? { bottom: 'calc(var(--sr-layout-mobile-nav-height) + env(safe-area-inset-bottom))' } : undefined}
-    >
+    <div className="mt-xs grid gap-xs">
       <div className="mx-auto grid max-w-[var(--sr-layout-max-width)] gap-xs">
         {hasClusterChoices && (
           <nav className="flex items-center gap-xs overflow-x-auto" aria-label={APP_TEXT.gameNavLabel}>

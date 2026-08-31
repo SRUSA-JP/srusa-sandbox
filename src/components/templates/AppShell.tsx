@@ -48,10 +48,8 @@ export function AppShell({ route, onNavigate, mode, onToggleTheme, children }: A
             />
           </div>
         </div>
+        <ContextNavigation route={route} onNavigate={onNavigate} />
       </header>
-
-      <ContextNavigation route={route} onNavigate={onNavigate} />
-      <ContextNavigation route={route} onNavigate={onNavigate} mobile />
 
       <div className="mb-xxl" />
 

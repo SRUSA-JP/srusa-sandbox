@@ -105,7 +105,9 @@ for (const route of ROUTES_TO_CHECK) {
     if (route.id === 'relationships') {
       expectIncludes(label, html, '関係樹');
       expectIncludes(label, html, 'nodoame');
+      expectIncludes(label, html, '<details');
     }
+    if (route.id === 'history') expectExcludes(label, html, 'いま分かっていること');
 
     const overflow = svgTextOverflow(html);
     if (overflow.length > 0) {
@@ -157,8 +159,10 @@ try {
   expectIncludes('AppShell mobile nav', navHtml, 'sr-only">ゲーム</span>');
   expectIncludes('AppShell mobile nav', navHtml, 'aria-current="page"');
   expectIncludes('AppShell mobile nav', navHtml, 'bg-tab-marker');
-  expectIncludes('AppShell mobile nav', navHtml, 'grid-cols-5 grid-rows-5');
+  expectIncludes('AppShell mobile nav', navHtml, 'shape-rendering="crispEdges"');
   expectExcludes('AppShell mobile nav', navHtml, 'bg-selected');
+  expectExcludes('AppShell mobile nav', navHtml, APP_TEXT.gameContentNavLabel);
+  expectIncludes('AppShell mobile context nav', html, `aria-label="${APP_TEXT.gameContentNavLabel}"`);
   console.log(`OK  AppShell mobile nav (${html.length} chars)`);
 } catch (error) {
   failed = true;

@@ -250,6 +250,10 @@ export const RELATION_TREE = {
   branchGapY: 72,
   /** 根から外側へ進む段の間隔。 */
   levelGapY: 176,
+  /** 同じ深さの中でカテゴリが切り替わるときに空ける角度スロット。 */
+  categoryGapSlots: 1.4,
+  /** 同じ深さでもカテゴリごとに少し半径をずらす量。 */
+  categoryRadiusStep: 28,
   /** 繋がりの無い成分を下へ逃がす間隔。 */
   componentGapY: 180,
 } as const;

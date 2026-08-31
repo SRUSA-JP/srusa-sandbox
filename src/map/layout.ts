@@ -782,15 +782,28 @@ function placeRelationshipTree(data: RelationshipData, centerId: string): Person
             primaryAttribute(a).localeCompare(primaryAttribute(b), 'ja') ||
             a.id.localeCompare(b.id),
         );
-        const radius = level * RELATION_TREE.levelGapY;
-        sorted.forEach((person, index) => {
-          const angle = -Math.PI / 2 + (Math.PI * 2 * index) / Math.max(sorted.length, 1);
-          placements.push({
-            person,
-            x: Math.cos(angle) * radius,
-            y: Math.sin(angle) * radius,
-            groupIds: [],
+        const buckets = new Map<string, Person[]>();
+        for (const person of sorted) {
+          const key = primaryAttribute(person) || UNASSIGNED.label;
+          buckets.set(key, [...(buckets.get(key) ?? []), person]);
+        }
+        const categoryGroups = [...buckets.entries()].sort((a, b) => a[0].localeCompare(b[0], 'ja'));
+        const slotCount =
+          sorted.length + Math.max(0, categoryGroups.length - 1) * RELATION_TREE.categoryGapSlots;
+        let slot = 0;
+        categoryGroups.forEach(([, groupMembers], groupIndex) => {
+          const radius = level * RELATION_TREE.levelGapY + groupIndex * RELATION_TREE.categoryRadiusStep;
+          groupMembers.forEach((person) => {
+            const angle = -Math.PI / 2 + (Math.PI * 2 * (slot + 0.5)) / Math.max(slotCount, 1);
+            placements.push({
+              person,
+              x: Math.cos(angle) * radius,
+              y: Math.sin(angle) * radius,
+              groupIds: [],
+            });
+            slot += 1;
           });
+          slot += RELATION_TREE.categoryGapSlots;
         });
       }
       componentOffsetY = Math.max(...placements.map((placement) => placement.y)) + RELATION_TREE.componentGapY;

@@ -107,6 +107,9 @@ export function RelationshipMap({
 
   const nameOf = (personId: string) => layout.byId.get(personId)?.person.onlineName ?? personId;
   const regions = [...layout.regions].sort(regionPaintOrder);
+  const visibleRegions = showRegions
+    ? regions
+    : regions.filter((region) => highlightedGroupId !== '' && region.group.id === highlightedGroupId);
   const activePlacement = activePersonId ? layout.byId.get(activePersonId) : undefined;
   const activePoint = activePlacement
     ? toScreen(panZoom.view, { x: activePlacement.x, y: activePlacement.y })
@@ -164,6 +167,15 @@ export function RelationshipMap({
       theme,
       nodeStateFor(placement),
     );
+  const attributeBadgesFor = (placement: PersonPlacement) =>
+    placement.groupIds
+      .map((id) => groupById.get(id))
+      .filter((group): group is Group => group !== undefined)
+      .sort((a, b) => groupLabel(a).localeCompare(groupLabel(b), 'ja'))
+      .map((group) => {
+        const style = regionStyle(group, theme, group.id === highlightedGroupId);
+        return { label: groupLabel(group), color: style.labelColor };
+      });
 
   /* ---------------------------------------------------------------- *
    * 人を掴んで動かす
@@ -245,29 +257,31 @@ export function RelationshipMap({
       actions={actions}
       overlay={
         <>
-          <div className="pointer-events-auto absolute top-md left-md z-10 grid max-h-[var(--sr-layout-viewport-legend-max-height)] max-w-[var(--sr-layout-person-tooltip-max-width)] gap-xxs overflow-y-auto rounded-md border-hairline border-divider bg-overlay px-md py-sm text-xs text-muted">
-            <strong className="text-sm text-heading">{MAP_TEXT.card.legend.title}</strong>
-            {regions.map((region) => {
-              const style = regionStyle(region.group, theme, region.group.id === highlightedGroupId);
-              return (
-                <button
-                  key={region.group.id}
-                  type="button"
-                  className="flex min-w-0 items-center gap-xs text-left hover:bg-hover"
-                  aria-pressed={region.group.id === highlightedGroupId}
-                  onClick={() => onHighlightGroup?.(region.group.id === highlightedGroupId ? '' : region.group.id)}
-                >
-                  <Swatch
-                    className="shrink-0 rounded-sm border-hairline"
-                    size={LEGEND.swatchSize}
-                    background={style.fill}
-                    borderColor={style.stroke}
-                  />
-                  <span className="truncate">{groupLabel(region.group)}</span>
-                </button>
-              );
-            })}
-          </div>
+          <details className="pointer-events-auto absolute top-md left-md z-10 max-h-[var(--sr-layout-viewport-legend-max-height)] max-w-[var(--sr-layout-person-tooltip-max-width)] overflow-y-auto rounded-md border-hairline border-divider bg-overlay px-md py-sm text-xs text-muted">
+            <summary className="cursor-pointer text-sm font-bold text-heading">{MAP_TEXT.card.legend.title}</summary>
+            <div className="mt-xs grid gap-xxs">
+              {regions.map((region) => {
+                const style = regionStyle(region.group, theme, region.group.id === highlightedGroupId);
+                return (
+                  <button
+                    key={region.group.id}
+                    type="button"
+                    className="flex min-w-0 items-center gap-xs text-left hover:bg-hover"
+                    aria-pressed={region.group.id === highlightedGroupId}
+                    onClick={() => onHighlightGroup?.(region.group.id === highlightedGroupId ? '' : region.group.id)}
+                  >
+                    <Swatch
+                      className="shrink-0 rounded-sm border-hairline"
+                      size={LEGEND.swatchSize}
+                      background={style.fill}
+                      borderColor={style.stroke}
+                    />
+                    <span className="truncate">{groupLabel(region.group)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </details>
           {activePlacement && activePoint ? (
             <div
               className="absolute z-10 -translate-x-1/2 -translate-y-full"
@@ -278,6 +292,7 @@ export function RelationshipMap({
                 label={personLabel(activePlacement.person, nameMode)}
                 href={profileHref(activePlacement)}
                 onClose={() => setActivePersonId(null)}
+                attributeBadges={attributeBadgesFor(activePlacement)}
                 relatedNames={connectedNamesFor(activePlacement.person.id).names}
                 relatedRest={connectedNamesFor(activePlacement.person.id).rest}
               />
@@ -302,9 +317,9 @@ export function RelationshipMap({
           role="img"
           aria-label={MAP_TEXT.card.map.ariaLabel}
         >
-          {showRegions && (
+          {visibleRegions.length > 0 && (
             <g>
-              {regions.map((region) => (
+              {visibleRegions.map((region) => (
                 <GroupRegion
                   key={region.group.id}
                   region={region}

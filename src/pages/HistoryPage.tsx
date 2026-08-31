@@ -4,8 +4,6 @@ import {
   ChartCard,
   HistoryAxisScrubber,
   HistoryTimeline,
-  KpiGrid,
-  KpiTile,
   Note,
   TrendLineChart,
 } from '../components';
@@ -13,8 +11,7 @@ import { HISTORY_TEXT } from '../config/messages';
 import { srusaHistory } from '../data/history';
 import { loadRelationshipData } from '../map/data';
 import { personLabel } from '../map/display';
-import { formatInt } from '../lib/format';
-import { memberGrowth, srusaReach } from '../lib/srusaReach';
+import { memberGrowth } from '../lib/srusaReach';
 import type { StackedSeries } from '../lib/selectors';
 import type { VizTheme } from '../theme/palette';
 
@@ -37,7 +34,6 @@ export function HistoryPage({ theme }: HistoryPageProps) {
   const source = useMemo(() => loadRelationshipData(), []);
   const data = source?.data ?? null;
 
-  const reach = useMemo(() => (data ? srusaReach(data) : null), [data]);
   const growth = useMemo(() => (data ? memberGrowth(data) : null), [data]);
 
   /* 人物 ID を、相関図と同じ表示名にする */
@@ -68,28 +64,6 @@ export function HistoryPage({ theme }: HistoryPageProps) {
 
   return (
     <AppLayout title={text.title} lead={text.lead}>
-      {reach && (
-        <ChartCard title={text.reach.title} note={text.reach.note}>
-          <KpiGrid>
-            <KpiTile
-              label={text.reach.universities}
-              value={formatInt(reach.universities.length)}
-              sub={text.reach.universityList(reach.universities)}
-            />
-            <KpiTile
-              label={text.reach.known}
-              value={formatInt(reach.known)}
-              sub={`${text.reach.knownUnit} / ${formatInt(reach.total)}${text.reach.knownUnit}`}
-            />
-            <KpiTile
-              label={text.reach.bridging}
-              value={formatInt(reach.bridging)}
-              sub={text.reach.bridgingUnit}
-            />
-          </KpiGrid>
-        </ChartCard>
-      )}
-
       {growth && (
         <ChartCard
           title={text.growth.title}

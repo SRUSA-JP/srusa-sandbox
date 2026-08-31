@@ -115,8 +115,8 @@ export function MapPage({ theme }: MapPageProps) {
   const [highlightedGroupId, setHighlightedGroupId] = useState('');
   const [edgeMode, setEdgeMode] = useState<EdgeMode>(RELATIONSHIP_MAP_DEFAULT_EDGE_MODE);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('relationshipTree');
-  const [tooltipMode, setTooltipMode] = useState<TooltipMode>('on');
-  const [regionMode, setRegionMode] = useState<RegionMode>('on');
+  const [tooltipMode, setTooltipMode] = useState<TooltipMode>('off');
+  const [regionMode, setRegionMode] = useState<RegionMode>('off');
   const [affiliationMode, setAffiliationMode] = useState<AffiliationMode>('on');
   const [edgeStyleId, setEdgeStyleId] = useState<EdgeStyleId>('wire');
   const [importMessage, setImportMessage] = useState('');
