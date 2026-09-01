@@ -21,8 +21,8 @@ body,
 #map-container,
 #app {
   width: 100%;
-  height: 100dvh;
-  min-height: 100dvh;
+  height: 100%;
+  min-height: 100%;
 }
 
 body {
@@ -135,7 +135,7 @@ export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
   }
 
   const immersive = isFullscreen || isExpanded;
-  const zoomedOut = wideView || isCompact;
+  const zoomedOut = wideView;
   const frameScaleClass = zoomedOut
     ? 'h-[var(--sr-layout-world-map-3d-scaled-size)] w-[var(--sr-layout-world-map-3d-scaled-size)] origin-top-left scale-[var(--sr-layout-world-map-3d-scale)]'
     : 'h-full w-full';

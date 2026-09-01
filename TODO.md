@@ -9,6 +9,11 @@
 
 #### 2026-08-31
 
+- 原文: `PCではブルーマップの縦幅大きくなってるけどスマホでは小さいままだな．外枠の表示領域は大きくなってるんだけど`
+  - スマートフォン通常表示で BlueMap iframe を自動縮小する処理をやめ、外枠の高さを中身がそのまま使うようにした
+  - iframe 注入CSSの `html/body/#map-container/#app` 高さを `100dvh` から `100%` に戻し、親 iframe の表示領域と BlueMap 内部の高さがずれにくいようにした
+  - [DESIGN.md](DESIGN.md) に、通常表示では縮小せず `広く見る` 時だけ縮小する方針を追記した
+
 - 原文: `バグってる まだ表示の縦枠小さい，`
   - `WorldMap3dViewer` の高さ指定を Tailwind の任意クラス依存から inline style へ移し、CSS 変数の初期化前でも 3D 表示枠が潰れないようにした
   - BlueMap の存在確認を `index.html` だけでなく `settings.json`、`maps/overworld_spawn/settings.json`、`textures.json.gz` まで見るようにし、生成物の一部欠落時に iframe 内の小さいロードエラー画面を出しにくくした

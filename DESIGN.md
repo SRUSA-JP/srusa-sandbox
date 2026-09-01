@@ -326,11 +326,12 @@ HTML は `caption`、`scope="col"`、`scope="row"` を使い、見た目だけ�
 `worldMap3dMinHeight` を広めに取る。全画面時は `dvh` 系の高さでブラウザUIの出入りに追従させる。
 高さは Tailwind の任意クラスだけに任せず、[src/components/organisms/WorldMap3dViewer.tsx](src/components/organisms/WorldMap3dViewer.tsx)
 で inline style として渡し、CSS 変数の初期化前でも縦枠が潰れないようにする。
-物理的な画面高さが足りない場合は、iframe の内側を `worldMap3dScale` で縮小して論理ビューポートを広げる。
-スマートフォンではこの広い表示を既定にし、PC では `広く見る` ボタンで切り替えられるようにする。
+通常表示では PC / スマートフォンとも iframe 内部を縮小しない。物理的な画面高さが足りない場合だけ、
+`広く見る` ボタンで iframe の内側を `worldMap3dScale` に縮小して論理ビューポートを広げる。
 BlueMap 生成物本体は Git 追跡しないため、スマートフォン向けに BlueMap 内部 UI を補正する CSS は
 [src/components/organisms/WorldMap3dViewer.tsx](src/components/organisms/WorldMap3dViewer.tsx) の iframe 注入に閉じ込める。
 補正対象は `#app`、`.control-bar`、`#ff-mobile-controls` など、BlueMap 側の固定UIだけにする。
+iframe 内部の高さは `100dvh` ではなく `100%` に揃え、親 iframe の縦幅をそのまま使わせる。
 
 読み物は [src/content/](src/content/) の節ごとに `audience` を持ち、
 `readerSections()` が本文へ、`builderSections()` が `technical` へ振り分ける
