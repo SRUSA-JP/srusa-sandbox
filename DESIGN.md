@@ -14,7 +14,7 @@
 | 部品ごとの色の割り当て | [src/config/colors.ts](src/config/colors.ts) |
 | ページごとの見た目（スキン） | [src/config/skins.ts](src/config/skins.ts) |
 | グラフの寸法 | [src/config/charts.ts](src/config/charts.ts) |
-| ホームの更新ログとジャンプ先 | [src/content/home.ts](src/content/home.ts) |
+| ホームの更新ログとページ目次 | [src/content/home.ts](src/content/home.ts) |
 
 UI は Claude / Codex のどちらで編集する場合も、[CLAUDE.md](CLAUDE.md) のアトミックデザイン方針に従う。
 見た目の判断はこの文書、部品の層分けは `atoms` → `molecules` → `organisms` → `templates` の一方向で揃える。
@@ -215,6 +215,8 @@ UI層に色コード、`rgb()`、`text-white` / `bg-black` のような標準色
 - **Minecraft 統計ページの密度**: トップはゲーム画面の HUD / Inventory として見せるため、
   Hero・Overview・Discovery・Filter の間は `section` ではなく `xxl` 程度に詰める。
   説明文は最初に大きく挟まず、下部の読み物に回して、初期表示で主役の統計画面がすぐ見えるようにする。
+- **ホームのページ目次**: ホーム下部は `ページ目次` として、親ジャンルから各ページへ辿れるリンク一覧にする。
+  URL は小さな補助ラベルとして添え、説明文とリンク先を [src/content/home.ts](src/content/home.ts) に集約する。
 - **維持費の試算**: お金の話は目立たせすぎず、統計の 1 パネルとして扱う。
   入力は `NumberField`、要約は `KpiTile`、配分は既存の横棒グラフと表で見せる。
   金額の内訳は CSV で持ち出せるようにし、判断根拠（基本割・傾斜係数・対象者）は注記か表に残す。

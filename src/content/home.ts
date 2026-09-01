@@ -20,9 +20,9 @@ export interface HomeUpdate {
 
 export const HOME_CONTENT = {
   title: 'SRUSA Sandbox',
-  lead: '最近入った更新を入口に、Minecraft 統計・ワールドマップ・活動カレンダー・メンバー図鑑へ移動できます。',
+  lead: '最近入った更新とページ目次から、見たい記録へ直接移動できます。',
   updatesTitle: '更新ログ',
-  jumpsTitle: 'ジャンプ',
+  jumpsTitle: 'ページ目次',
 } as const;
 
 export const HOME_UPDATES: HomeUpdate[] = [

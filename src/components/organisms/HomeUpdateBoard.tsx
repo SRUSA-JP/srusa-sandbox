@@ -1,5 +1,6 @@
 import { HOME_CONTENT, type HomeJump, type HomeUpdate } from '../../content/home';
 import { TAG } from '../classes';
+import { Icon } from '../atoms';
 import { SectionHeader } from '../molecules/SectionHeader';
 
 export interface HomeUpdateBoardProps {
@@ -14,13 +15,17 @@ function assetPath(path: string) {
 function JumpLink({ jump }: { jump: HomeJump }) {
   const content = (
     <>
-      <span className="text-md font-bold text-heading">{jump.title}</span>
+      <span className="flex min-w-0 items-center gap-xs">
+        {jump.href && <Icon name="next" size={14} />}
+        <span className="truncate text-md font-bold text-heading">{jump.title}</span>
+      </span>
       <span className="text-sm leading-base text-muted">{jump.description}</span>
+      {jump.href && <span className="w-fit rounded-sm bg-sunken px-xs py-xxs font-numeric text-xs text-subtle">{jump.href}</span>}
     </>
   );
   if (!jump.href) return <div className="grid min-w-0 gap-xxs">{content}</div>;
   return (
-    <a href={jump.href} className="grid min-w-0 gap-xxs hover:text-tab-active">
+    <a href={jump.href} className="grid min-w-0 gap-xxs hover:bg-hover hover:text-tab-active">
       {content}
     </a>
   );
@@ -35,7 +40,7 @@ function JumpTree({ jumps, depth = 0 }: { jumps: HomeJump[]; depth?: number }) {
           className={
             depth === 0
               ? 'grid min-w-0 gap-md border-hairline border-divider bg-surface p-md'
-              : 'grid min-w-0 gap-xs border-l-thick border-divider pl-md'
+              : 'grid min-w-0 gap-xs border-l-thick border-divider pl-md pt-xs'
           }
         >
           <JumpLink jump={jump} />
