@@ -36,6 +36,11 @@ export const APP_TEXT = {
   gameNavLabel: 'ジャンル内のまとまり',
   /** ゲーム内コンテンツ一覧の読み上げ。 */
   gameContentNavLabel: 'まとまり内の画面',
+  /** ヘッダー下段の文脈切替。 */
+  contextNav: {
+    show: '切替を表示',
+    hide: '切替を隠す',
+  },
   /** ページ全体にかかる注意書きの見出し。本文の下に出す。 */
   disclaimer: 'このページについて',
   /**
