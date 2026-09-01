@@ -35,6 +35,7 @@ export function ServiceCostPanel({ rows, options, onOptionsChange, theme, note }
   const effectiveCustomPlayer = customPlayerOptions.some((option) => option.value === customPlayer)
     ? customPlayer
     : customPlayerOptions[0]?.value ?? '';
+  const selectedCustomRow = summary.rows.find((row) => row.name === effectiveCustomPlayer);
   const customCost = options.customCosts[effectiveCustomPlayer] ?? 0;
   const tableRows = summary.rows.map<Row>((row) => ({
     player: row.name,
@@ -110,6 +111,14 @@ export function ServiceCostPanel({ rows, options, onOptionsChange, theme, note }
                   onOptionsChange({ ...options, customCosts });
                 }}
               />
+              {selectedCustomRow && (
+                <span className="w-full text-sm text-muted sm:w-auto">
+                  {STATS_TEXT.card.serviceCost.selectedPlaytime(
+                    selectedCustomRow.name,
+                    formatHours(selectedCustomRow.playtime_hours),
+                  )}
+                </span>
+              )}
             </>
           )}
         </>
@@ -156,6 +165,20 @@ export function ServiceCostPanel({ rows, options, onOptionsChange, theme, note }
             />
           </KpiGrid>
           {summary.customLimited && <Note tone="error">{STATS_TEXT.card.serviceCost.customLimited}</Note>}
+          <section className="grid gap-sm">
+            <h3 className="text-md font-bold text-heading">{STATS_TEXT.card.serviceCost.playerPlaytime}</h3>
+            <div className="grid gap-xs sm:grid-cols-2 lg:grid-cols-3">
+              {summary.rows.map((row) => (
+                <div
+                  key={row.name}
+                  className="flex min-w-0 items-center justify-between gap-md border-b-hairline border-divider py-xs"
+                >
+                  <span className="min-w-0 truncate text-md text-ink">{row.name}</span>
+                  <span className="shrink-0 font-numeric text-md text-muted">{formatHours(row.playtime_hours)}</span>
+                </div>
+              ))}
+            </div>
+          </section>
           <RankBarChart
             data={chartRows}
             theme={theme}

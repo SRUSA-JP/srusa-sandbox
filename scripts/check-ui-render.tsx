@@ -11,7 +11,7 @@
  */
 import { renderToString } from 'react-dom/server';
 import type { ReactElement } from 'react';
-import { AppShell } from '../src/components';
+import { AppShell, ServiceCostPanel } from '../src/components';
 import { APP_TEXT } from '../src/config/messages';
 import {
   ClipsPage,
@@ -31,6 +31,7 @@ import { ROUTES, routeFromHash, skinForRoute, type Route, type RouteId } from '.
 import { setActiveSkin } from '../src/config/skins';
 import { buildTheme } from '../src/theme/useThemeMode';
 import { svgTextOverflow } from './svg-text-fit';
+import type { PlayerRow } from '../src/lib/selectors';
 
 type PageRenderer = (props: { route: Route }) => ReactElement;
 
@@ -112,7 +113,6 @@ for (const route of ROUTES_TO_CHECK) {
       }
     }
     if (route.id === 'history') expectExcludes(label, html, 'いま分かっていること');
-
     const overflow = svgTextOverflow(html);
     if (overflow.length > 0) {
       throw new Error(
@@ -128,6 +128,79 @@ for (const route of ROUTES_TO_CHECK) {
     console.error(`NG  ${label}`);
     console.error(error instanceof Error ? error.message : String(error));
   }
+}
+
+const SERVICE_COST_ROWS: PlayerRow[] = [
+  {
+    name: 'nodoamenn',
+    uuid: 'sample-nodoamenn',
+    playtime_hours: 12.5,
+    deaths: 0,
+    deaths_per_hour: 0,
+    distance_km: 0,
+    jumps: 0,
+    mob_kills: 0,
+    mob_kills_per_hour: 0,
+    player_kills: 0,
+    damage_dealt_hp: 0,
+    damage_taken_hp: 0,
+    blocks_mined: 0,
+    items_crafted: 0,
+    items_used: 0,
+    items_picked_up: 0,
+    items_dropped: 0,
+    tools_broken: 0,
+    advancements: 0,
+    recipes_unlocked: 0,
+    chests_opened: 0,
+    villager_trades: 0,
+  },
+  {
+    name: 'Octbee',
+    uuid: 'sample-octbee',
+    playtime_hours: 3.25,
+    deaths: 0,
+    deaths_per_hour: 0,
+    distance_km: 0,
+    jumps: 0,
+    mob_kills: 0,
+    mob_kills_per_hour: 0,
+    player_kills: 0,
+    damage_dealt_hp: 0,
+    damage_taken_hp: 0,
+    blocks_mined: 0,
+    items_crafted: 0,
+    items_used: 0,
+    items_picked_up: 0,
+    items_dropped: 0,
+    tools_broken: 0,
+    advancements: 0,
+    recipes_unlocked: 0,
+    chests_opened: 0,
+    villager_trades: 0,
+  },
+];
+
+try {
+  const route = routeFromHash('#/minecraft');
+  const html = withConsoleTrap('ServiceCost playtime', () =>
+    renderToString(
+      <ServiceCostPanel
+        rows={SERVICE_COST_ROWS}
+        options={{ totalCost: 3000, basePercent: 20, slope: 1, roundingUnit: 1, customCosts: {} }}
+        onOptionsChange={() => undefined}
+        theme={themeFor(route)}
+      />,
+    ),
+  );
+  expectIncludes('ServiceCost playtime', html, 'プレイヤー別プレイ時間');
+  expectIncludes('ServiceCost playtime', html, 'nodoamenn のプレイ時間');
+  expectIncludes('ServiceCost playtime', html, '12時間30分');
+  console.log(`OK  ServiceCost playtime (${html.length} chars)`);
+} catch (error) {
+  failed = true;
+  console.error('NG  ServiceCost playtime');
+  console.error(error instanceof Error ? error.message : String(error));
 }
 
 try {
