@@ -9,6 +9,12 @@
 
 #### 2026-09-01
 
+- 原文: `アトミックデザインで`
+  - ホームの更新カードを [src/components/molecules/HomeUpdateCard.tsx](src/components/molecules/HomeUpdateCard.tsx) に切り出し、画像・見出しリンク・要点の折りたたみを molecule の責務にした
+  - ホームのページ目次ツリーを [src/components/molecules/HomeJumpTree.tsx](src/components/molecules/HomeJumpTree.tsx) に切り出し、親ジャンル要約と子リンクの折りたたみを molecule の責務にした
+  - [src/components/organisms/HomeUpdateBoard.tsx](src/components/organisms/HomeUpdateBoard.tsx) は、更新ログセクションとページ目次セクションを並べる organism に戻した
+  - [DESIGN.md](DESIGN.md) に、ホームは文言を content、カード・ツリーを molecules、セクション構成を organism に分ける規格を追記した
+
 - 原文: `それ目次更新も折りたたむか要約して`
   - ホームの更新ログは要約を常時表示し、各更新の細かい要点リストを `要点を表示` に折りたたむ形へ変更した
   - ホームのページ目次は親ジャンル単位の要約を先に見せ、子ページリンクを折りたたんで初期表示が長くなりすぎないようにした

@@ -317,7 +317,9 @@ HTML は `caption`、`scope="col"`、`scope="row"` を使い、見た目だけ�
 - `ジャンプ` は主要ページへの入口だけに絞る。説明は 1 行程度にし、操作説明や機能一覧を長く書かない
 - `ジャンプ` は下部ナビと同じ親ジャンルでインデントし、子ページへ直接飛べるようにする
 - `ジャンプ` は親ジャンルを要約として先に見せ、子ページリンクは折りたたんで、ホームの初期表示が長くなりすぎないようにする
-- ホームの文言・リンク・画像パスは [src/content/home.ts](src/content/home.ts) に集める。見た目は [src/components/organisms/HomeUpdateBoard.tsx](src/components/organisms/HomeUpdateBoard.tsx) が持つ
+- ホームの文言・リンク・画像パスは [src/content/home.ts](src/content/home.ts) に集める。更新カードや目次ツリーは
+  [src/components/molecules/](src/components/molecules/) に置き、[src/components/organisms/HomeUpdateBoard.tsx](src/components/organisms/HomeUpdateBoard.tsx)
+  はセクション構成だけを持つ
 
 ### ワールドマップ
 

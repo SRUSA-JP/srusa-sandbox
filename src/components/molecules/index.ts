@@ -3,6 +3,8 @@ export * from './ClipCard';
 export * from './ChartTooltip';
 export * from './DateStepper';
 export * from './GroupRegion';
+export * from './HomeJumpTree';
+export * from './HomeUpdateCard';
 export * from './KpiTile';
 export * from './NavigationButton';
 export * from './PersonNode';
