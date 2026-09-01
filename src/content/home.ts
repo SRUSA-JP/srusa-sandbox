@@ -23,6 +23,8 @@ export const HOME_CONTENT = {
   lead: '最近入った更新とページ目次から、見たい記録へ直接移動できます。',
   updatesTitle: '更新ログ',
   jumpsTitle: 'ページ目次',
+  updateDetailsLabel: '要点を表示',
+  jumpCount: (count: number) => `${count}件`,
 } as const;
 
 export const HOME_UPDATES: HomeUpdate[] = [
