@@ -204,6 +204,18 @@ try {
 }
 
 try {
+  const route = routeFromHash('#/minecraft/world-map');
+  const worldMapPageHtml = withConsoleTrap('WorldMap 3D smoke', () => renderToString(<WorldMapPage theme={themeFor(route)} />));
+  expectIncludes('WorldMap 3D smoke', worldMapPageHtml, 'スポーン周辺 3D');
+  expectIncludes('WorldMap 3D smoke', worldMapPageHtml, '生成物を確認しています');
+  console.log(`OK  WorldMap 3D smoke (${worldMapPageHtml.length} chars)`);
+} catch (error) {
+  failed = true;
+  console.error('NG  WorldMap 3D smoke');
+  console.error(error instanceof Error ? error.message : String(error));
+}
+
+try {
   const route = routeFromHash('#/board-games/score');
   const html = withConsoleTrap('BoardScore active members', () =>
     renderToString(<BoardScorePage theme={themeFor(route)} />),

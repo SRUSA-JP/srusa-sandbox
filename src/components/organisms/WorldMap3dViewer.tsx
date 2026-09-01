@@ -1,10 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { WORLD_MAP_TEXT } from '../../config/messages';
 import { useIsCompact } from '../../hooks/useMediaQuery';
+import { LAYOUT } from '../../theme/tokens';
 import { Button, Note } from '../atoms';
 
 export interface WorldMap3dViewerProps {
   src: string;
+}
+
+function assetUrl(src: string, path: string): string {
+  const [asset] = src.split('#');
+  const base = typeof window === 'undefined' ? 'http://localhost/' : window.location.href;
+  return new URL(path, new URL(asset, base)).toString();
 }
 
 const BLUEMAP_VIEWER_STYLE_ID = 'srusa-bluemap-viewer-style';
@@ -73,17 +80,25 @@ export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
   const [wideView, setWideView] = useState(false);
   const isCompact = useIsCompact();
   const frameRef = useRef<HTMLDivElement>(null);
+  const checkUrls = useMemo(
+    () => [
+      assetUrl(src, 'index.html'),
+      assetUrl(src, 'settings.json'),
+      assetUrl(src, 'maps/overworld_spawn/settings.json'),
+      assetUrl(src, 'maps/overworld_spawn/textures.json.gz'),
+    ],
+    [src],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
-    const [asset] = src.split('#');
-    fetch(asset, { method: 'HEAD', signal: controller.signal })
-      .then((response) => setAvailable(response.ok))
+    Promise.all(checkUrls.map((url) => fetch(url, { method: 'HEAD', signal: controller.signal })))
+      .then((responses) => setAvailable(responses.every((response) => response.ok)))
       .catch((cause) => {
         if ((cause as Error).name !== 'AbortError') setAvailable(false);
       });
     return () => controller.abort();
-  }, [src]);
+  }, [checkUrls]);
 
   useEffect(() => {
     const onFullscreenChange = () => {
@@ -124,6 +139,10 @@ export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
   const frameScaleClass = zoomedOut
     ? 'h-[var(--sr-layout-world-map-3d-scaled-size)] w-[var(--sr-layout-world-map-3d-scaled-size)] origin-top-left scale-[var(--sr-layout-world-map-3d-scale)]'
     : 'h-full w-full';
+  const viewerHeight = isCompact ? LAYOUT.worldMap3dCompactHeight : LAYOUT.worldMap3dHeight;
+  const viewerStyle = immersive
+    ? { height: LAYOUT.worldMap3dFullscreenHeight }
+    : { height: viewerHeight, minHeight: LAYOUT.worldMap3dMinHeight };
 
   return (
     <div
@@ -145,11 +164,8 @@ export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
         />
       </div>
       <div
-        className={`overflow-hidden ${
-          immersive
-            ? 'h-[var(--sr-layout-world-map-3d-fullscreen-height)]'
-            : 'h-[var(--sr-layout-world-map-3d-compact-height)] min-h-[var(--sr-layout-world-map-3d-min-height)] sm:h-[var(--sr-layout-world-map-3d-height)]'
-        }`}
+        className="overflow-hidden"
+        style={viewerStyle}
       >
         <iframe
           title={WORLD_MAP_TEXT.threeD.title}

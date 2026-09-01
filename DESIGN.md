@@ -324,6 +324,8 @@ HTML は `caption`、`scope="col"`、`scope="row"` を使い、見た目だけ�
 3D ビューアは PC でもスマートフォンでもページ内の主役なので、通常表示から画面高の大半を使う。
 スマートフォンでは、縦長画面で見下ろすだけにならないように `worldMap3dCompactHeight` と
 `worldMap3dMinHeight` を広めに取る。全画面時は `dvh` 系の高さでブラウザUIの出入りに追従させる。
+高さは Tailwind の任意クラスだけに任せず、[src/components/organisms/WorldMap3dViewer.tsx](src/components/organisms/WorldMap3dViewer.tsx)
+で inline style として渡し、CSS 変数の初期化前でも縦枠が潰れないようにする。
 物理的な画面高さが足りない場合は、iframe の内側を `worldMap3dScale` で縮小して論理ビューポートを広げる。
 スマートフォンではこの広い表示を既定にし、PC では `広く見る` ボタンで切り替えられるようにする。
 BlueMap 生成物本体は Git 追跡しないため、スマートフォン向けに BlueMap 内部 UI を補正する CSS は
