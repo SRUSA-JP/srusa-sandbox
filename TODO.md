@@ -9,6 +9,11 @@
 
 #### 2026-09-01
 
+- 原文: `マップデータを更新したい．`
+  - `JAVA_BIN=/home/emar27181/.jdks/jdk-25.0.4.1+1-jre/bin/java ./render.sh` で `../srusa-portal/bluemap` の BlueMap レンダリングを実行した
+  - `npm run refresh:data:local -- map` で `overworld` / `nether` / `end` / `twilightforest` の 2D 公開マップを同期し、[data/world-map.json](data/world-map.json) の生成日と各マップ更新日を 2026-09-01 に更新した
+  - BlueMap は `Your maps are now all up-to-date!` と出ており、Git 差分上は PNG 内容の変更はなくメタデータ日付だけが変わった
+
 - 原文: `相関図下の方の比とつながっていないoshizu sugi? とかは小学校のはず`
   - [data/srusa-relationship-v0.2.json](data/srusa-relationship-v0.2.json) の `小学校` グループに `connects: true` を明示し、`osizu` / `sugi` など小学校所属の人が関係樹で孤立しにくいようにした
   - `school_stage` 全体の既定は接続なしのままにし、同一校だと分かっている `小学校` だけを接続対象にする方針を [DESIGN.md](DESIGN.md) と [CLAUDE.md](CLAUDE.md) に追記した
