@@ -88,7 +88,7 @@
   ],
   "groups": [
     { "id": "kindergarten", "name": "幼稚園", "type": "school_stage", "connects": true },
-    { "id": "elementary", "name": "小学校", "type": "school_stage" },
+    { "id": "elementary", "name": "小学校", "type": "school_stage", "connects": true },
     { "id": "junior_high", "name": "中学校", "type": "school_stage" },
     { "id": "k_high", "name": "K高校", "type": "school" },
     { "id": "high_unknown", "name": "高校", "type": "school_stage" },

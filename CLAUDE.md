@@ -296,7 +296,8 @@ page で組み合わせる。
 nodoamen / nodoamenn は Minecraft 側や表記揺れの名前で、相関図データでは nodoame の `aliases` に入れる。
 関係樹の繋がりは、明示的な `relations` と、`groupConnects()` が true を返す所属から導く。
 Octbee / N / natch / mitiglia のように nodoame と繋がるカテゴリを共有する人は、明示関係が少なくても
-nodoame の枝として拾える設計にする。学校段階や活動状態の札だけで繋がりを作らない。
+nodoame の枝として拾える設計にする。活動状態の札だけで繋がりを作らない。
+学校段階は既定では繋がりを作らないが、同一校だと分かっている `小学校` はデータ側で `connects: true` を明示する。
 Mitigli4 / Mitfli4 は mitiglia の `aliases` に入れる。
 メンバー一覧や tooltip で出す「つながり」は、明示関係と `groupConnects()` が true の所属共有から作る。
 明示関係線に共有グループがあるときは、そのグループ色の並行線で描き、複数所属を 1 色に混ぜない。

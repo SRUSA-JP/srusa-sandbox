@@ -9,6 +9,10 @@
 
 #### 2026-09-01
 
+- 原文: `相関図下の方の比とつながっていないoshizu sugi? とかは小学校のはず`
+  - [data/srusa-relationship-v0.2.json](data/srusa-relationship-v0.2.json) の `小学校` グループに `connects: true` を明示し、`osizu` / `sugi` など小学校所属の人が関係樹で孤立しにくいようにした
+  - `school_stage` 全体の既定は接続なしのままにし、同一校だと分かっている `小学校` だけを接続対象にする方針を [DESIGN.md](DESIGN.md) と [CLAUDE.md](CLAUDE.md) に追記した
+
 - 原文: `アトミックデザインで`
   - ホームの更新カードを [src/components/molecules/HomeUpdateCard.tsx](src/components/molecules/HomeUpdateCard.tsx) に切り出し、画像・見出しリンク・要点の折りたたみを molecule の責務にした
   - ホームのページ目次ツリーを [src/components/molecules/HomeJumpTree.tsx](src/components/molecules/HomeJumpTree.tsx) に切り出し、親ジャンル要約と子リンクの折りたたみを molecule の責務にした
