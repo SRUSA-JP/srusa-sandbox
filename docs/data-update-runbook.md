@@ -127,8 +127,13 @@ npm run refresh:live -- --keep-instance
 - `../srusa-portal/bluemap/web/lang/`
 - `../srusa-portal/bluemap/web/maps/overworld_spawn/`
 
-置き先は `public/bluemap-spawn/`。このディレクトリは `README.md` 以外を `.gitignore` で除外する。
+置き先は `public/bluemap-spawn/`。スポーン周辺 3D ビューア一式と `maps/overworld_spawn/` は
+Git 追跡し、GitHub/Netlify ビルドへ含める。`maps/` 配下の他マップや全体 3D タイルは
+`.gitignore` で除外する。
 `public/bluemap-spawn/settings.json` は `maps` を `["overworld_spawn"]` に絞り、他の BlueMap マップを読ませない。
+Vite/Netlify は `.gz` ファイルを `Content-Encoding: gzip` 付きで配りやすい。BlueMap がさらに
+`DecompressionStream` で展開すると壊れるため、圧縮済みファイルは `.gzraw` にリネームして配る。
+`clientDecompression` は `true` のままにし、BlueMap 側で gzip 展開する。
 
 確認する URL:
 

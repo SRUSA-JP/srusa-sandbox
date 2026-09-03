@@ -2,10 +2,18 @@
 - やった日のログと原文を残して，やったらDONEに移動する
 
 ### TODO
-- 拠点回り(overworld 0 0 付近, 黄昏の森 ? ? )だけは3D表示に対応させる
 
 
 ### DONE
+
+#### 2026-09-03
+
+- 原文: `ワールドの３ｄの部分的なデータはgitで追跡されるようにしたい．`
+  - `.gitignore` を変更し、BlueMap の `public/bluemap-spawn/` ビューア一式と `maps/overworld_spawn/` を Git 追跡対象にした
+  - `maps/` 配下の他マップは引き続き無視し、ワールド全体の 3D タイルを誤って追加しにくいルールにした
+  - BlueMap の圧縮済みファイルを `.gzraw` にリネームし、Vite/Netlify が `.gz` を `Content-Encoding: gzip` 付きで配信して二重展開になる問題を避けた
+  - README、データ更新手順、`srusa-data-refresh` スキルを、限定 3D データを GitHub/Netlify ビルドに含める運用へ更新した
+  - 確認: `git check-ignore -v` で `overworld_spawn` は許可、`maps/overworld` / `maps/nether` は無視されることを確認
 
 #### 2026-09-01
 

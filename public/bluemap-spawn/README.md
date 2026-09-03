@@ -1,12 +1,12 @@
 # BlueMap Spawn Assets
 
-This directory is intentionally ignored except for this README.
+This directory contains the limited BlueMap viewer used by the public spawn-area 3D view.
 
-Put the locally generated limited BlueMap viewer here when you need the spawn-area 3D view:
+Put the locally generated limited BlueMap viewer here when updating the spawn-area 3D view:
 
 - `index.html`
 - `assets/`
 - `lang/`
 - `maps/overworld_spawn/`
 
-Do not commit the generated files. They are bulky build artifacts and can be recreated from `../srusa-portal/bluemap/web`.
+Commit only this limited viewer and `maps/overworld_spawn/`. Do not copy or commit full-world BlueMap maps here.

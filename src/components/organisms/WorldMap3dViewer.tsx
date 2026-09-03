@@ -85,7 +85,7 @@ export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
       assetUrl(src, 'index.html'),
       assetUrl(src, 'settings.json'),
       assetUrl(src, 'maps/overworld_spawn/settings.json'),
-      assetUrl(src, 'maps/overworld_spawn/textures.json.gz'),
+      assetUrl(src, 'maps/overworld_spawn/textures.json.gzraw'),
     ],
     [src],
   );

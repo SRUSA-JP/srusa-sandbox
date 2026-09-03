@@ -60,7 +60,7 @@ cd -
 npm run refresh:data:local -- nether
 ```
 
-For the limited 3D spawn map, use only the existing `overworld_spawn` BlueMap output. Do not add full-world 3D data to `srusa-sandbox`, and do not commit generated `public/bluemap-spawn/` files other than `README.md`.
+For the limited 3D spawn map, use only the existing `overworld_spawn` BlueMap output. Track the limited `public/bluemap-spawn/` viewer and `maps/overworld_spawn/` so GitHub/Netlify builds include the spawn-area 3D view. Do not add full-world 3D data or other BlueMap maps to `srusa-sandbox`. Rename compressed BlueMap files from `.gz` to `.gzraw` and patch the viewer asset to request `.gzraw`; keep `public/bluemap-spawn/settings.json` `clientDecompression` set to `true` so BlueMap decompresses those raw gzip payloads itself.
 
 ## Verification
 
