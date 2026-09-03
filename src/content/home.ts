@@ -24,10 +24,53 @@ export const HOME_CONTENT = {
   updatesTitle: '更新ログ',
   jumpsTitle: 'ページ目次',
   updateDetailsLabel: '要点を表示',
+  /** 折りたたんだ古い更新を開くラベル。件数は呼び出し側が渡す。 */
+  moreUpdatesLabel: (count: number) => `それ以前の更新（${count}件）を表示`,
   jumpCount: (count: number) => `${count}件`,
 } as const;
 
 export const HOME_UPDATES: HomeUpdate[] = [
+  {
+    date: '2026-09-03',
+    category: 'ワールドマップ',
+    title: '旧ワールド（before_srusa）のマップを追加',
+    href: '#/minecraft/world-map',
+    summary: '現行サーバーより前の旧ワールドを、別ディメンションとして 2D 地図とスポーン周辺 3D で見られるようにしました。',
+    image: {
+      src: 'world-map/before_srusa_overworld.png',
+      alt: '旧ワールドのオーバーワールド地図',
+    },
+    details: [
+      '旧オーバーワールドを overworld-before として、現行マップとは別に追加',
+      '旧ワールドのスポーン周辺 3D マップを追加',
+      'BlueMap 5.x のタイル形式変更と、Vite が .gz に付ける Content-Encoding による二重展開の不具合を修正',
+    ],
+  },
+  {
+    date: '2026-09-03',
+    category: 'ワールドマップ',
+    title: '限定 3D ビューアでマップを切り替え可能に',
+    href: '#/minecraft/world-map',
+    summary: 'スポーン周辺・黄昏の森など、狭い範囲だけ描いた 3D マップを、ビューア内で切り替えられるようにしました。',
+    details: [
+      '黄昏の森スポーン周辺（16 チャンク）の 3D マップを追加',
+      '3D ビューアにマップの切替を追加',
+      'BlueMap 5.x で dimension が抜けて読み込めない不具合と、自アプリが二重に表示される不具合を修正',
+    ],
+  },
+  {
+    date: '2026-09-03',
+    category: 'ホーム / ナビ',
+    title: 'ホームを刷新し、スマホは下部タブに',
+    href: '#/',
+    summary: 'ホームに更新ログとページ目次を追加し、スマートフォンではヘッダーに代えて下部タブで画面を切り替えられるようにしました。ボドゲのポイント集計も追加しています。',
+    details: [
+      'ホームに更新ログ・ページ目次を追加（このログもここ）',
+      'スマートフォンは下部タブ、それ以外は今までどおりヘッダーで画面を切り替え',
+      '相関図に、所属を辿った関係樹の表示を追加',
+      'ボドゲ（ポイント集計・記録シート）を追加',
+    ],
+  },
   {
     date: '2026-08-31',
     category: 'ワールドマップ',

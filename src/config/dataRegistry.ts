@@ -54,3 +54,11 @@ export const CALENDAR_DAY = {
  * ここを超えたぶんは「ほか n 人」にまとめる。
  */
 export const CALENDAR_DAY_AVATAR_LIMIT = 3;
+
+/**
+ * ホームの更新ログで、開かなくても見える件数。
+ *
+ * 更新は増え続けるので、全部並べるとホームが更新ログだけで埋まってしまう。
+ * 直近だけを見せ、それより前は開いて見る形にする。
+ */
+export const HOME_UPDATES_VISIBLE_LIMIT = 3;
