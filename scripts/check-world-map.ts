@@ -30,6 +30,15 @@ const LIMITED_BLUEMAP_MAPS = [
     expectedStartPos: [-50, 200],
     expectedTexturePrefix: 'twilightforest:',
   },
+  {
+    id: 'before_srusa_spawn',
+    name: 'オーバーワールド(旧)',
+    requiredTileExtension: '.prbm.gzraw',
+    requiredPaths: [] as string[],
+    maxTileCount: undefined,
+    expectedStartPos: undefined,
+    expectedTexturePrefix: undefined,
+  },
 ] as const;
 
 interface WorldMapEntry {
