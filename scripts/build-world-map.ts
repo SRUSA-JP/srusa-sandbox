@@ -67,15 +67,35 @@ function normalizeDimension(value: unknown, fallback: string): string {
   return key;
 }
 
-/** タイルの置き場所（tiles/1/x-2/z3.png）から座標を取り出す。 */
-function tileCoordinates(dir: string): { x: number; z: number }[] {
-  const tiles: { x: number; z: number }[] = [];
-  for (const xDir of readdirSync(dir)) {
-    const x = Number(xDir.replace(/^x/, ''));
-    if (Number.isNaN(x)) continue;
-    for (const file of readdirSync(join(dir, xDir))) {
-      const z = Number(file.replace(/^z/, '').replace(/\.png$/, ''));
-      if (!Number.isNaN(z)) tiles.push({ x, z });
+/**
+ * タイルの置き場所からすべての (座標, パス) を列挙する。
+ *
+ * BlueMap 4.x: tiles/1/x<n>/z<m>.png
+ * BlueMap 5.x: 同上に加え、tiles/1/x<sector>/<x>/z<m>.png という形式が混在する。
+ *   後者では <sector> は無意味なグループで、実際の x 座標はサブディレクトリ名に入っている。
+ */
+function tileCoordinates(dir: string): { x: number; z: number; path: string }[] {
+  const tiles: { x: number; z: number; path: string }[] = [];
+  for (const xDir of readdirSync(dir, { withFileTypes: true })) {
+    if (!xDir.isDirectory()) continue;
+    const sectorX = Number(xDir.name.replace(/^x/, ''));
+    if (Number.isNaN(sectorX)) continue;
+    const xPath = join(dir, xDir.name);
+    for (const entry of readdirSync(xPath, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        // BlueMap 5.x 形式: サブディレクトリ名が実際の x 座標
+        const x = Number(entry.name);
+        if (Number.isNaN(x)) continue;
+        const subPath = join(xPath, entry.name);
+        for (const subFile of readdirSync(subPath)) {
+          const z = Number(subFile.replace(/^z/, '').replace(/\.png$/, ''));
+          if (!Number.isNaN(z)) tiles.push({ x, z, path: join(subPath, subFile) });
+        }
+      } else if (entry.isFile() && entry.name.endsWith('.png')) {
+        // 従来形式: x<n>/z<m>.png
+        const z = Number(entry.name.replace(/^z/, '').replace(/\.png$/, ''));
+        if (!Number.isNaN(z)) tiles.push({ x: sectorX, z, path: join(xPath, entry.name) });
+      }
     }
   }
   return tiles;
@@ -111,7 +131,7 @@ function stitch(tilesDir: string, tileSize: number): Canvas {
   };
 
   for (const tile of tiles) {
-    const image = decodePng(readFileSync(join(tilesDir, `x${tile.x}`, `z${tile.z}.png`)));
+    const image = decodePng(readFileSync(tile.path));
     const left = (tile.x - minTileX) * tileSize;
     const top = (tile.z - minTileZ) * tileSize;
     /* 上半分（色）だけを、重なりの列を除いて写す */
