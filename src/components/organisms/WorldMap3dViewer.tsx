@@ -5,6 +5,7 @@ import { LAYOUT } from '../../theme/tokens';
 import { Button, Note } from '../atoms';
 
 export interface WorldMap3dViewerProps {
+  mapId: string;
   src: string;
 }
 
@@ -73,7 +74,7 @@ function applyBlueMapViewerStyle(frame: HTMLIFrameElement) {
 }
 
 /** BlueMap のスポーン周辺 3D ビューア。 */
-export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
+export function WorldMap3dViewer({ mapId, src }: WorldMap3dViewerProps) {
   const [available, setAvailable] = useState<boolean | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -84,10 +85,10 @@ export function WorldMap3dViewer({ src }: WorldMap3dViewerProps) {
     () => [
       assetUrl(src, 'index.html'),
       assetUrl(src, 'settings.json'),
-      assetUrl(src, 'maps/overworld_spawn/settings.json'),
-      assetUrl(src, 'maps/overworld_spawn/textures.json.gzraw'),
+      assetUrl(src, `maps/${mapId}/settings.json`),
+      assetUrl(src, `maps/${mapId}/textures.json.gzraw`),
     ],
-    [src],
+    [mapId, src],
   );
 
   useEffect(() => {

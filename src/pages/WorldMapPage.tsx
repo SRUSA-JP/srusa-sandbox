@@ -38,11 +38,22 @@ const LATEST_MAPS = 'latest';
 type TooltipMode = 'on' | 'off';
 type DimensionSelection = typeof ALL_DIMENSIONS | string;
 type SnapshotSelection = typeof LATEST_MAPS | string;
+type ThreeDMapId = 'overworld_spawn' | 'twilightforest_spawn';
 
 const TOOLTIP_OPTIONS: Array<{ value: TooltipMode; label: string }> = [
   { value: 'on', label: MAP_TEXT.picker.tooltipOn },
   { value: 'off', label: MAP_TEXT.picker.tooltipOff },
 ];
+
+const THREE_D_MAP_OPTIONS: Array<{ value: ThreeDMapId; label: string }> = [
+  { value: 'overworld_spawn', label: WORLD_MAP_TEXT.threeD.maps.overworld },
+  { value: 'twilightforest_spawn', label: WORLD_MAP_TEXT.threeD.maps.twilightForest },
+];
+
+const THREE_D_MAP_CAMERA: Record<ThreeDMapId, string> = {
+  overworld_spawn: 'overworld_spawn:0:80:0:1100:0:0.85:0:0:perspective',
+  twilightforest_spawn: 'twilightforest_spawn:-50:80:200:700:0:0.85:0:0:perspective',
+};
 
 /**
  * ワールドマップの画面。
@@ -62,6 +73,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
   const [selectedSnapshot, setSelectedSnapshot] = useState<SnapshotSelection>(LATEST_MAPS);
   const [selectedDimension, setSelectedDimension] = useState<DimensionSelection>(ALL_DIMENSIONS);
   const [selectedMapIds, setSelectedMapIds] = useState<Record<string, string>>({});
+  const [selectedThreeDMap, setSelectedThreeDMap] = useState<ThreeDMapId>('overworld_spawn');
   /*
    * 吹き出しは既定で出さない。座標は左下に常に出ているので、
    * 地図の上に重ねる分は「もっと大きく読みたい人」向けの追加にする。
@@ -137,8 +149,22 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
         ) : undefined
       }
     >
-      <ChartCard title={WORLD_MAP_TEXT.threeD.title} note={WORLD_MAP_TEXT.threeD.note}>
-        <WorldMap3dViewer src={`${import.meta.env.BASE_URL}bluemap-spawn/index.html#overworld_spawn:0:80:0:1100:0:0.85:0:0:perspective`} />
+      <ChartCard
+        title={WORLD_MAP_TEXT.threeD.title}
+        note={WORLD_MAP_TEXT.threeD.note}
+        actions={
+          <Picker
+            label={WORLD_MAP_TEXT.threeD.mapPicker}
+            value={selectedThreeDMap}
+            options={THREE_D_MAP_OPTIONS}
+            onChange={setSelectedThreeDMap}
+          />
+        }
+      >
+        <WorldMap3dViewer
+          mapId={selectedThreeDMap}
+          src={`${import.meta.env.BASE_URL}bluemap-spawn/index.html#${THREE_D_MAP_CAMERA[selectedThreeDMap]}`}
+        />
       </ChartCard>
 
       <ChartCard
