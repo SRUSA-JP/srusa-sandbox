@@ -7,6 +7,27 @@
 
 ### DONE
 
+#### 2026-08-27
+
+- 原文: `Minecraftの中に統計、ワールドマップ、相関図があるように / カレンダーにユーザーのアイコンを表示`
+  - 活動カレンダーの枠に、その日いた人の顔アイコンを最大 3 人まで表示し、あふれたぶんは「ほか n人」にまとめた
+  - `lib/timeline.ts` の `TimelineDay` に `players`（長くいた順の名前）を追加し、`PlayerIconPlaceholder` に極小サイズ `tiny` を足した
+  - 上限は `config/dataRegistry.ts` の `CALENDAR_DAY_AVATAR_LIMIT` で一元管理
+  - 確認: `npm run build` が通ること、Playwright でナローフォン（390px）・デスクトップ（1200px）を確認し横スクロールが出ないこと
+
+- 原文: `マイクラはマイクラでコンテンツまとめてね` / `統計と、マップとか、カレンダー APEXとかとは粒度違うから`
+  - ゲームタブの下段で、Minecraft の 3 画面（統計・ワールドマップ・活動カレンダー）を 1 つの囲いにまとめ、VALORANT・LOL・APEX（プレースホルダー）とは別だと分かるようにした
+  - `routes.ts` の `Route` に `group` を追加し、`AppShell.tsx` で同じ `group` が連続する区間を 1 つの囲いにまとめて描画するようにした
+  - 確認: `npm run build` が通ること、Playwright でナロー・デスクトップ双方の見た目を確認
+
+- 原文: `プレビューデプロイできていなう`
+  - `main` を `preview` ブランチへミラーするだけでは Netlify の実デプロイが走らないことが分かった（サンドボックス環境から Netlify API への通信がプロキシで遮断されているため）
+  - `.github/workflows/ci.yml` に、`preview` ブランチへの push をトリガーに `netlify-cli deploy --alias preview` を実行する `deploy-preview` ジョブを追加した
+  - 確認: マージ後、GitHub Secrets（`NETLIFY_AUTH_TOKEN` / `NETLIFY_SITE_ID`）の登録が別途必要。未登録の間はジョブ自体は走るが認証エラーで失敗する
+
+<details>
+<summary>2026-08-25 以前のログ</summary>
+
 #### 2026-08-25
 
 - 原文: `コントラスト比とかデザインもチェックできるようんい`
@@ -150,3 +171,5 @@
   - `.claude/settings.json` に `git commit --no-verify` と `core.hooksPath` 変更の deny を追加
   - CLAUDE.md に「main ブランチは保護する」節を追加、禁止事項と README にも追記
   - 記録: main への直接コミットは過去に 1 件だけ（`5571fde`、2026-08-23 23:40）
+
+</details>
