@@ -19,7 +19,7 @@ srusa-portal では MkDocs のページに iframe で埋め込んでいました
 | 画面 | URL | 内容 |
 | --- | --- | --- |
 | Minecraft 統計 | `#/minecraft` | プレイヤー比較・内訳・系列比較・日付ごとの推移・2指標の関係の 5 グラフ。絞り込み、表への切り替え、CSV / JSON 書き出し |
-| ワールドマップ | `#/minecraft/world-map` | BlueMap の 2D 出力を掴んで動かせる地図。スポーン周辺だけ 3D 表示に切り替え可能 |
+| ワールドマップ | `#/minecraft/world-map` | BlueMap の 2D 出力を掴んで動かせる地図。限定範囲の 3D 表示に切り替え可能 |
 | 活動カレンダー | `#/minecraft/calendar` | サーバーのログに残っている日を暦に並べた図。色の濃さで人数、印で初参加や記録の更新 |
 | 相関図 | `#/relationships` | 人物同士のつながりと所属を 1 枚にまとめた SVG の図。掴んで動かす・拡大縮小・人物の移動、中心人物・グループの強調・関係線の切り替え |
 | メンバー | `#/zukan` | 相関図と Minecraft に出てくる人の名簿。所属・種類で絞り込み、ひとりずつの紹介ページへ渡す |
@@ -82,7 +82,7 @@ npm run dev
 | [data/](data/) | ビルド時に取り込む JSON。Minecraft の集計、相関図のデータ、ワールドマップの範囲 |
 | [public/images/](public/images/) | 補足画像 |
 | [public/world-map/](public/world-map/) | 貼り合わせた 2D のワールドマップ（`npm run build:world-map` が作る） |
-| [public/bluemap-spawn/](public/bluemap-spawn/) | スポーン周辺だけの BlueMap 3D ビューア。`maps/overworld_spawn/` だけ Git 追跡する |
+| [public/bluemap-spawn/](public/bluemap-spawn/) | 限定範囲の BlueMap 3D ビューア。`maps/overworld_spawn/` と `maps/twilightforest_spawn/` だけ Git 追跡する |
 | [scripts/sync-data.mjs](scripts/sync-data.mjs) | `../aws_minecraft` と BlueMap の出力からのデータ取り込み |
 | [scripts/check-contrast.ts](scripts/check-contrast.ts) | 配色のコントラスト検査 |
 | [scripts/build-world-map.ts](scripts/build-world-map.ts) | BlueMap の 2D タイルの貼り合わせ |
@@ -139,8 +139,9 @@ npm run dev
 
 地図の実体は BlueMap の出力から作ります。ワールド全体の 3D タイルはこのリポジトリに持たず、
 通常は真上から見た 2D タイルだけを 1 枚の PNG に貼り合わせて置きます。
-例外として、スポーン周辺 16x16 チャンク相当の `overworld_spawn` だけは `public/bluemap-spawn/` に置き、
-ワールドマップ画面の「スポーン3D」で iframe 表示します。この限定 3D ビューア一式は Git 追跡し、
+例外として、スポーン周辺 16x16 チャンク相当の `overworld_spawn` と、黄昏の森 16x16 チャンクの `twilightforest_spawn` は
+`public/bluemap-spawn/` に置き、ワールドマップ画面の「限定 3D」で iframe 表示します。
+この限定 3D ビューア一式は Git 追跡し、
 GitHub/Netlify ビルドにも含めます。
 
 ```shell
@@ -157,12 +158,13 @@ BlueMap の出力が別の場所にあるときは `npm run build:world-map -- -
 ネザーだけ差し替えるときは `cd ../srusa-portal/bluemap && ./render.sh -r nether` のあとに、
 このリポジトリで `npm run build:world-map -- --map nether` を実行します。
 
-スポーン周辺 3D を差し替える場合は、`../srusa-portal/bluemap/web/` から BlueMap ビューア一式と
-`maps/overworld_spawn/` だけを `public/bluemap-spawn/` に同期します。ライブ統計更新用の
+限定 3D を差し替える場合は、`../srusa-portal/bluemap/web/` から BlueMap ビューア一式と
+`maps/overworld_spawn/` / `maps/twilightforest_spawn/` だけを `public/bluemap-spawn/` に同期します。
+ライブ統計更新用の
 `npm run refresh:live` は 3D データを取得しません。`public/bluemap-spawn/maps/` 配下では
-`overworld_spawn` だけを追跡し、それ以外のマップは `.gitignore` で除外しています。
+`overworld_spawn` と `twilightforest_spawn` だけを追跡し、それ以外のマップは `.gitignore` で除外しています。
 Vite/Netlify では `.gz` ファイルが `Content-Encoding: gzip` 付きで配信されやすいため、
-BlueMap の圧縮済み 3D タイルは `.gzraw` 拡張子で置きます。
+BlueMap の圧縮済みファイルは `.gzraw` 拡張子で置きます。
 `public/bluemap-spawn/settings.json` の `clientDecompression` は `true` のままにし、
 BlueMap 側で gzip 展開します。
 
