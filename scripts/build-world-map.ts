@@ -46,17 +46,21 @@ const BYTES_PER_PIXEL = 4;
 interface Args {
   source: string;
   maps: string[];
+  /** --dimension で明示指定されたディメンション（BlueMap 5.x では settings.json に含まれないため） */
+  dimension?: string;
 }
 
 function parseArgs(argv: string[]): Args {
   let source = DEFAULT_SOURCE;
+  let dimension: string | undefined;
   const maps: string[] = [];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--source') source = argv[++i];
     else if (argv[i] === '--map') maps.push(argv[++i]);
+    else if (argv[i] === '--dimension') dimension = argv[++i];
     else throw new Error(`知らない引数: ${argv[i]}`);
   }
-  return { source, maps: maps.length > 0 ? maps : DEFAULT_MAPS };
+  return { source, maps: maps.length > 0 ? maps : DEFAULT_MAPS, dimension };
 }
 
 function normalizeDimension(value: unknown, fallback: string): string {
@@ -67,15 +71,35 @@ function normalizeDimension(value: unknown, fallback: string): string {
   return key;
 }
 
-/** タイルの置き場所（tiles/1/x-2/z3.png）から座標を取り出す。 */
-function tileCoordinates(dir: string): { x: number; z: number }[] {
-  const tiles: { x: number; z: number }[] = [];
-  for (const xDir of readdirSync(dir)) {
-    const x = Number(xDir.replace(/^x/, ''));
-    if (Number.isNaN(x)) continue;
-    for (const file of readdirSync(join(dir, xDir))) {
-      const z = Number(file.replace(/^z/, '').replace(/\.png$/, ''));
-      if (!Number.isNaN(z)) tiles.push({ x, z });
+/**
+ * タイルの置き場所からすべての (座標, パス) を列挙する。
+ *
+ * BlueMap 4.x: tiles/1/x<n>/z<m>.png
+ * BlueMap 5.x: 同上に加え、tiles/1/x<sector>/<x>/z<m>.png という形式が混在する。
+ *   後者では <sector> は無意味なグループで、実際の x 座標はサブディレクトリ名に入っている。
+ */
+function tileCoordinates(dir: string): { x: number; z: number; path: string }[] {
+  const tiles: { x: number; z: number; path: string }[] = [];
+  for (const xDir of readdirSync(dir, { withFileTypes: true })) {
+    if (!xDir.isDirectory()) continue;
+    const sectorX = Number(xDir.name.replace(/^x/, ''));
+    if (Number.isNaN(sectorX)) continue;
+    const xPath = join(dir, xDir.name);
+    for (const entry of readdirSync(xPath, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        // BlueMap 5.x 形式: サブディレクトリ名が実際の x 座標
+        const x = Number(entry.name);
+        if (Number.isNaN(x)) continue;
+        const subPath = join(xPath, entry.name);
+        for (const subFile of readdirSync(subPath)) {
+          const z = Number(subFile.replace(/^z/, '').replace(/\.png$/, ''));
+          if (!Number.isNaN(z)) tiles.push({ x, z, path: join(subPath, subFile) });
+        }
+      } else if (entry.isFile() && entry.name.endsWith('.png')) {
+        // 従来形式: x<n>/z<m>.png
+        const z = Number(entry.name.replace(/^z/, '').replace(/\.png$/, ''));
+        if (!Number.isNaN(z)) tiles.push({ x: sectorX, z, path: join(xPath, entry.name) });
+      }
     }
   }
   return tiles;
@@ -111,7 +135,7 @@ function stitch(tilesDir: string, tileSize: number): Canvas {
   };
 
   for (const tile of tiles) {
-    const image = decodePng(readFileSync(join(tilesDir, `x${tile.x}`, `z${tile.z}.png`)));
+    const image = decodePng(readFileSync(tile.path));
     const left = (tile.x - minTileX) * tileSize;
     const top = (tile.z - minTileZ) * tileSize;
     /* 上半分（色）だけを、重なりの列を除いて写す */
@@ -178,7 +202,7 @@ interface WorldMapEntry {
   bytes: number;
 }
 
-function buildMap(sourceDir: string, id: string): WorldMapEntry {
+function buildMap(sourceDir: string, id: string, forceDimension?: string): WorldMapEntry {
   const mapDir = join(sourceDir, 'maps', id);
   if (!existsSync(mapDir)) throw new Error(`マップ '${id}' が無い: ${mapDir}`);
 
@@ -197,7 +221,7 @@ function buildMap(sourceDir: string, id: string): WorldMapEntry {
 
   return {
     id,
-    dimension: normalizeDimension(settings.dimension, id),
+    dimension: forceDimension ?? normalizeDimension(settings.dimension, id),
     label: typeof settings.name === 'string' ? settings.name : undefined,
     updated_on: new Date().toISOString().slice(0, 10),
     image,
@@ -214,13 +238,13 @@ function buildMap(sourceDir: string, id: string): WorldMapEntry {
 }
 
 function main() {
-  const { source, maps } = parseArgs(process.argv.slice(2));
+  const { source, maps, dimension } = parseArgs(process.argv.slice(2));
   const sourceDir = resolve(ROOT, source);
   if (!existsSync(join(sourceDir, 'settings.json'))) {
     throw new Error(`BlueMap の出力が無い: ${sourceDir}（先に srusa-portal の bluemap/render.sh を実行する）`);
   }
 
-  const built = maps.map((id) => buildMap(sourceDir, id));
+  const built = maps.map((id) => buildMap(sourceDir, id, dimension));
 
   /* 既にある地図の記述は残し、作り直したものだけ差し替える */
   const metadataPath = join(ROOT, METADATA_PATH);

@@ -533,6 +533,7 @@ export const WORLD_MAP_TEXT = {
     maps: {
       overworld: 'オーバーワールド',
       twilightForest: '黄昏の森',
+      beforeSrusa: '旧ワールド（スポーン）',
     },
     fullscreen: '全画面',
     exitFullscreen: '全画面を終了',

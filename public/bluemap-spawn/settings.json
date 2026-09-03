@@ -5,8 +5,8 @@
   "resolutionDefault": 1,
   "minZoomDistance": 5,
   "maxZoomDistance": 100000,
-  "hiresSliderMax": 500,
-  "hiresSliderDefault": 100,
+  "hiresSliderMax": 1000,
+  "hiresSliderDefault": 500,
   "hiresSliderMin": 0,
   "lowresSliderMax": 7000,
   "lowresSliderDefault": 2000,
@@ -14,7 +14,7 @@
   "mapDataRoot": "maps",
   "liveDataRoot": "maps",
   "clientDecompression": true,
-  "maps": ["overworld_spawn", "twilightforest_spawn"],
+  "maps": ["overworld_spawn", "twilightforest_spawn", "before_srusa_spawn"],
   "scripts": [],
   "styles": []
 }

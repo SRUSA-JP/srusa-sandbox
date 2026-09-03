@@ -9,13 +9,14 @@
 /** BlueMap のマップ名の日本語ラベル。 */
 export const WORLD_LABELS: Record<string, string> = {
   overworld: 'オーバーワールド',
+  'overworld-before': 'オーバーワールド（旧）',
   nether: 'ネザー',
   end: 'エンド',
   twilightforest: '黄昏の森',
 };
 
 /** ワールドマップを画面に並べる順番。 */
-export const WORLD_DIMENSION_ORDER = ['overworld', 'nether', 'end', 'twilightforest'] as const;
+export const WORLD_DIMENSION_ORDER = ['overworld', 'overworld-before', 'nether', 'end', 'twilightforest'] as const;
 
 /** ワールドマップに置く目印の日本語ラベル（config/worldMap.ts の marks）。 */
 export const WORLD_MARK_LABELS: Record<string, string> = {
