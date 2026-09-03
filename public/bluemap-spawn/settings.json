@@ -14,7 +14,7 @@
   "mapDataRoot": "maps",
   "liveDataRoot": "maps",
   "clientDecompression": true,
-  "maps": ["overworld_spawn"],
+  "maps": ["overworld_spawn", "twilightforest_spawn"],
   "scripts": [],
   "styles": []
 }
