@@ -527,15 +527,20 @@ export const WORLD_MAP_TEXT = {
   },
 
   threeD: {
-    title: 'スポーン周辺 3D',
-    note: 'スポーン地点の周辺だけを BlueMap の 3D ビューアで表示します。',
+    title: '限定 3D',
+    note: 'Git 追跡できる範囲に絞った BlueMap ビューアで表示します。',
+    mapPicker: '3D マップ',
+    maps: {
+      overworld: 'オーバーワールド',
+      twilightForest: '黄昏の森',
+    },
     fullscreen: '全画面',
     exitFullscreen: '全画面を終了',
     wide: '広く見る',
     normal: '通常表示',
-    loading: 'スポーン周辺 3D の生成物を確認しています。',
+    loading: '限定 3D の生成物を確認しています。',
     missing:
-      'スポーン周辺 3D の生成物がありません。../srusa-portal/bluemap/web から public/bluemap-spawn/ へ同期すると表示できます。',
+      '限定 3D の生成物がありません。../srusa-portal/bluemap/web から public/bluemap-spawn/ へ同期すると表示できます。',
   },
 } as const;
 

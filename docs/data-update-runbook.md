@@ -11,7 +11,7 @@
 | --- | --- | --- |
 | Minecraft 統計・日別・ログ・在庫・スキン | `../aws_minecraft/data/` | `npm run refresh:data` または `npm run refresh:data:local` |
 | ワールドマップ 2D | `../srusa-portal/bluemap/web/` | `npm run refresh:data:local -- map` |
-| スポーン周辺 3D | `../srusa-portal/bluemap/web/maps/overworld_spawn/` | `public/bluemap-spawn/` に BlueMap ビューア一式と対象マップだけを置く。生成物本体は Git 追跡しない |
+| 限定 3D | `../srusa-portal/bluemap/web/maps/overworld_spawn/` / `../srusa-portal/bluemap/web/maps/twilightforest_spawn/` | `public/bluemap-spawn/` に BlueMap ビューア一式と対象マップだけを置く。限定データは Git 追跡する |
 
 AWS 側から取り直すときは `npm run refresh:data` を使う。SSO セッションが切れている場合は、表示された URL とコードでログインしてから続行する。
 
@@ -115,10 +115,14 @@ npm run refresh:live -- --keep-instance
 - 取得に使うポートフォワードは `127.0.0.1:18123`。使用中なら先に別の転送やローカルプロセスを止める。
 - `session-manager-plugin` が `PATH` に無い環境があるため、スクリプト内で `$HOME/.local/bin` を足している。
 
-## スポーン周辺 3D を差し替える
+## 限定 3D を差し替える
 
-スポーン周辺 3D は、通常のライブ統計更新とは別扱いにする。`npm run refresh:live` では取得しない。
-ワールド全体の 3D データも入れず、BlueMap 側で作った `overworld_spawn` だけを公開用に置く。
+限定 3D は、通常のライブ統計更新とは別扱いにする。`npm run refresh:live` では取得しない。
+ワールド全体の 3D データも入れず、BlueMap 側で公開用に絞ったマップだけを置く。
+黄昏の森は `twilightforest-spawn.conf` で `X -50 / Z 200` 周辺の 16x16 チャンクだけをレンダリングする。
+render-mask は `X -176..80 / Z 64..320` にし、通常の `twilightforest` 全域マップは公開 3D に入れない。
+Twilight Forest のブロック見た目を出すため、BlueMap CLI は `-n packs` 付きで実行し、
+`../srusa-portal/bluemap/packs/twilightforest-*.jar` から読めるテクスチャを `textures.json.gzraw` に含める。
 
 差し替えるもの:
 
@@ -126,9 +130,15 @@ npm run refresh:live -- --keep-instance
 - `../srusa-portal/bluemap/web/assets/`
 - `../srusa-portal/bluemap/web/lang/`
 - `../srusa-portal/bluemap/web/maps/overworld_spawn/`
+- `../srusa-portal/bluemap/web/maps/twilightforest_spawn/`
 
-置き先は `public/bluemap-spawn/`。このディレクトリは `README.md` 以外を `.gitignore` で除外する。
-`public/bluemap-spawn/settings.json` は `maps` を `["overworld_spawn"]` に絞り、他の BlueMap マップを読ませない。
+置き先は `public/bluemap-spawn/`。限定 3D ビューア一式と `maps/overworld_spawn/` /
+`maps/twilightforest_spawn/` は Git 追跡し、GitHub/Netlify ビルドへ含める。`maps/` 配下の他マップや全体 3D タイルは
+`.gitignore` で除外する。
+`public/bluemap-spawn/settings.json` は `maps` を `["overworld_spawn", "twilightforest_spawn"]` に絞り、他の BlueMap マップを読ませない。
+Vite/Netlify は `.gz` ファイルを `Content-Encoding: gzip` 付きで配りやすい。BlueMap がさらに
+`DecompressionStream` で展開すると壊れるため、圧縮済みファイルは `.gzraw` にリネームして配る。
+`clientDecompression` は `true` のままにし、BlueMap 側で gzip 展開する。
 
 確認する URL:
 
@@ -136,9 +146,10 @@ npm run refresh:live -- --keep-instance
 npm run dev
 curl -I http://localhost:5173/bluemap-spawn/index.html
 curl -I http://localhost:5173/bluemap-spawn/maps/overworld_spawn/settings.json
+curl -I http://localhost:5173/bluemap-spawn/maps/twilightforest_spawn/settings.json
 ```
 
-画面側は `#/minecraft/world-map` の表示切り替えで `スポーン3D` を選ぶ。
+画面側は `#/minecraft/world-map` の `限定 3D` でマップを選ぶ。
 生成物が置かれていない環境では、3D ビューアの代わりに同期案内を表示する。
 
 ## 更新対象と反映先
@@ -182,6 +193,7 @@ curl -I http://localhost:5173/bluemap-spawn/maps/overworld_spawn/settings.json
   全体で有効にするとレンダリングが大幅に遅くなり、出力の大半が使わない 3D データになる
   （実測: overworld で hires 220MB に対し lowres 2.9MB）。無効化しても既存タイルは消えず、2D の取り込みには影響しない。
 - **3D で見せたい狭い範囲は専用のマップ設定を別に足す。** 現状は `overworld-spawn.conf`
-  （スポーン (0,0) から半径 256 ブロック＝16 チャンク、`enable-hires: true`）のみ。
+  （スポーン (0,0) から半径 256 ブロック＝16 チャンク、`enable-hires: true`）と、
+  黄昏の森 `twilightforest-spawn.conf`（`X -50 / Z 200` 周辺 16x16 チャンク、`enable-hires: true`）を公開ビューに入れている。
   BlueMap のビューアで見るためのマップなので、`data/data-registry.json` の `worldMaps` には入れない。
 - `player-db-YYYYMMDD.json` はこのリポジトリでは生成しない。必要なら `../aws_minecraft` 側で作ってから同期する。

@@ -60,7 +60,7 @@ cd -
 npm run refresh:data:local -- nether
 ```
 
-For the limited 3D spawn map, use only the existing `overworld_spawn` BlueMap output. Do not add full-world 3D data to `srusa-sandbox`, and do not commit generated `public/bluemap-spawn/` files other than `README.md`.
+For limited 3D maps, use only the narrow BlueMap outputs that are intended for publication: currently `overworld_spawn` and `twilightforest_spawn`. Track the limited `public/bluemap-spawn/` viewer and those map directories so GitHub/Netlify builds include the public 3D view. Do not add full-world 3D data or other BlueMap maps to `srusa-sandbox`. Render Twilight Forest with `-n packs` when the mod jar is available so `textures.json` includes `twilightforest:` resources. Rename compressed BlueMap files from `.gz` to `.gzraw` and patch the viewer asset to request `.gzraw`; keep `public/bluemap-spawn/settings.json` `clientDecompression` set to `true` so BlueMap decompresses those raw gzip payloads itself.
 
 ## Verification
 

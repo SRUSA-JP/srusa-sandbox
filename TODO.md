@@ -2,10 +2,26 @@
 - やった日のログと原文を残して，やったらDONEに移動する
 
 ### TODO
-- 拠点回り(overworld 0 0 付近, 黄昏の森 ? ? )だけは3D表示に対応させる
 
 
 ### DONE
+
+#### 2026-09-03
+
+- 原文: `黄昏の森も3dマップを同様に16チャンクやる感じでやってみて，これも追跡する感じで，その前に適切に一論理単位に分けてコミットして．今のマップデータ`
+  - 先に直前のスポーン周辺 3D 追跡対応を `feat: スポーン周辺3Dマップを追跡対象にする` としてコミットし、論理単位を分けた
+  - BlueMap 側に `twilightforest-spawn.conf` を作り、`X -50 / Z 200` 周辺の 16x16 チャンク（`X -176..80 / Z 64..320`）だけを `twilightforest_spawn` としてレンダリングした
+  - レンダリング時に `-n packs` で Twilight Forest の mod jar を読ませ、`textures.json.gzraw` に `twilightforest:` テクスチャが入ることを検査対象にした
+  - `public/bluemap-spawn/settings.json` の公開マップを `overworld_spawn` / `twilightforest_spawn` に絞り、全体マップは引き続き `.gitignore` で除外した
+  - 3D ビューアに `スポーン周辺` / `黄昏の森` の選択を追加し、選択中マップの生成物を確認してから iframe を表示するようにした
+  - BlueMap の圧縮済みファイルは `.gzraw` に揃え、README、データ更新手順、`srusa-data-refresh` スキル、デザイン規格を限定 3D 複数マップ運用へ更新した
+
+- 原文: `ワールドの３ｄの部分的なデータはgitで追跡されるようにしたい．`
+  - `.gitignore` を変更し、BlueMap の `public/bluemap-spawn/` ビューア一式と `maps/overworld_spawn/` を Git 追跡対象にした
+  - `maps/` 配下の他マップは引き続き無視し、ワールド全体の 3D タイルを誤って追加しにくいルールにした
+  - BlueMap の圧縮済みファイルを `.gzraw` にリネームし、Vite/Netlify が `.gz` を `Content-Encoding: gzip` 付きで配信して二重展開になる問題を避けた
+  - README、データ更新手順、`srusa-data-refresh` スキルを、限定 3D データを GitHub/Netlify ビルドに含める運用へ更新した
+  - 確認: `git check-ignore -v` で `overworld_spawn` は許可、`maps/overworld` / `maps/nether` は無視されることを確認
 
 #### 2026-09-01
 

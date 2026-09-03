@@ -184,13 +184,13 @@ export const LAYOUT = {
   /** 図に重ねる吹き出しの最小幅。座標が桁変わりしても幅が跳ねないようにする。 */
   tooltipMinWidth: 180,
   /** BlueMap の 3D ビューアを埋め込む高さ。 */
-  worldMap3dHeight: 'min(1400px,96dvh)',
+  worldMap3dHeight: 'min(1050px,72dvh)',
   /** 狭い画面での BlueMap の 3D ビューア高さ。 */
-  worldMap3dCompactHeight: 'calc(100dvh - var(--sr-layout-mobile-nav-height))',
+  worldMap3dCompactHeight: 'calc((100dvh - var(--sr-layout-mobile-nav-height)) * 0.75)',
   /** BlueMap の 3D ビューアを全画面にしたときの高さ。 */
   worldMap3dFullscreenHeight: '100dvh',
   /** BlueMap の 3D ビューアを埋め込む最小高さ。 */
-  worldMap3dMinHeight: 860,
+  worldMap3dMinHeight: 645,
   /** BlueMap を広く見るときの内側 iframe 縮小率。 */
   worldMap3dScale: 0.82,
   /** 縮小した BlueMap iframe の論理サイズ。1 / worldMap3dScale と揃える。 */

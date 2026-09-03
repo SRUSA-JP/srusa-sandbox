@@ -10,10 +10,14 @@ npm-debug.log*
 data/*.tar.gz
 data/*.zip
 
-# BlueMap のスポーン周辺3D生成物
-public/bluemap-spawn/**
-!public/bluemap-spawn/
-!public/bluemap-spawn/README.md
+# BlueMap の3D生成物
+# 限定マップだけは公開ビルドへ含めるため追跡する。
+# それ以外のワールド全体/別マップの3Dタイルは大きいので追跡しない。
+public/bluemap-spawn/maps/*
+!public/bluemap-spawn/maps/overworld_spawn/
+!public/bluemap-spawn/maps/overworld_spawn/**
+!public/bluemap-spawn/maps/twilightforest_spawn/
+!public/bluemap-spawn/maps/twilightforest_spawn/**
 
 # ローカル設定と秘密情報
 .env
