@@ -1,3 +1,5 @@
+import { createReadStream, statSync } from 'node:fs';
+import { join } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -9,6 +11,38 @@ import {
   MANIFEST_FILE,
   webManifest,
 } from './src/config/pwa';
+
+/**
+ * public/bluemap-spawn/ 以下の .gz ファイルをそのまま配信する。
+ *
+ * Vite のデフォルトは .gz ファイルに Content-Encoding: gzip を付けて返す。
+ * ブラウザがこれを受け取ると自動展開するため、BlueMap の clientDecompression: true が
+ * DecompressionStream で二重展開しようとしてエラーになる。
+ * このプラグインは bluemap-spawn/ 以下の .gz リクエストを先取りし、
+ * Content-Encoding なしで生バイトを返す。
+ */
+function blueMapGzRaw(): Plugin {
+  return {
+    name: 'srusa-bluemap-gz-raw',
+    configureServer(server) {
+      server.middlewares.use((request, response, next) => {
+        const url = request.url?.split('?')[0] ?? '';
+        if (!url.startsWith('/bluemap-spawn/') || !url.endsWith('.gz')) return next();
+        const filePath = join(process.cwd(), 'public', url);
+        let stat;
+        try {
+          stat = statSync(filePath);
+        } catch {
+          return next();
+        }
+        response.setHeader('Content-Type', 'application/octet-stream');
+        response.setHeader('Content-Length', stat.size);
+        response.setHeader('Cache-Control', 'no-cache');
+        createReadStream(filePath).pipe(response);
+      });
+    },
+  };
+}
 
 /**
  * ページの見出しまわり（タイトル・説明・アイコン・マニフェスト）を組み立てる。
@@ -102,7 +136,7 @@ function siteMetadata(): Plugin {
 export default defineConfig({
   /* GitHub Pages などのサブディレクトリ配信でもそのまま動くよう相対パスで出力する */
   base: './',
-  plugins: [react(), tailwindcss(), siteMetadata()],
+  plugins: [react(), tailwindcss(), blueMapGzRaw(), siteMetadata()],
   build: {
     outDir: 'dist',
     chunkSizeWarningLimit: 1200,
