@@ -3,6 +3,25 @@
   "source": "BlueMap lowres LOD1",
   "maps": [
     {
+      "id": "before_srusa_overworld",
+      "dimension": "overworld-before",
+      "label": "オーバーワールド（旧）",
+      "updated_on": "2026-09-03",
+      "image": "world-map/before_srusa_overworld.png",
+      "bounds": {
+        "minX": -3678,
+        "minZ": -2846,
+        "maxX": 4634,
+        "maxZ": 1890
+      },
+      "pixels": {
+        "width": 8312,
+        "height": 4736
+      },
+      "blocksPerPixel": 1,
+      "bytes": 5743505
+    },
+    {
       "id": "end",
       "dimension": "end",
       "label": "End",

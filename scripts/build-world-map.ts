@@ -46,17 +46,21 @@ const BYTES_PER_PIXEL = 4;
 interface Args {
   source: string;
   maps: string[];
+  /** --dimension で明示指定されたディメンション（BlueMap 5.x では settings.json に含まれないため） */
+  dimension?: string;
 }
 
 function parseArgs(argv: string[]): Args {
   let source = DEFAULT_SOURCE;
+  let dimension: string | undefined;
   const maps: string[] = [];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--source') source = argv[++i];
     else if (argv[i] === '--map') maps.push(argv[++i]);
+    else if (argv[i] === '--dimension') dimension = argv[++i];
     else throw new Error(`知らない引数: ${argv[i]}`);
   }
-  return { source, maps: maps.length > 0 ? maps : DEFAULT_MAPS };
+  return { source, maps: maps.length > 0 ? maps : DEFAULT_MAPS, dimension };
 }
 
 function normalizeDimension(value: unknown, fallback: string): string {
@@ -198,7 +202,7 @@ interface WorldMapEntry {
   bytes: number;
 }
 
-function buildMap(sourceDir: string, id: string): WorldMapEntry {
+function buildMap(sourceDir: string, id: string, forceDimension?: string): WorldMapEntry {
   const mapDir = join(sourceDir, 'maps', id);
   if (!existsSync(mapDir)) throw new Error(`マップ '${id}' が無い: ${mapDir}`);
 
@@ -217,7 +221,7 @@ function buildMap(sourceDir: string, id: string): WorldMapEntry {
 
   return {
     id,
-    dimension: normalizeDimension(settings.dimension, id),
+    dimension: forceDimension ?? normalizeDimension(settings.dimension, id),
     label: typeof settings.name === 'string' ? settings.name : undefined,
     updated_on: new Date().toISOString().slice(0, 10),
     image,
@@ -234,13 +238,13 @@ function buildMap(sourceDir: string, id: string): WorldMapEntry {
 }
 
 function main() {
-  const { source, maps } = parseArgs(process.argv.slice(2));
+  const { source, maps, dimension } = parseArgs(process.argv.slice(2));
   const sourceDir = resolve(ROOT, source);
   if (!existsSync(join(sourceDir, 'settings.json'))) {
     throw new Error(`BlueMap の出力が無い: ${sourceDir}（先に srusa-portal の bluemap/render.sh を実行する）`);
   }
 
-  const built = maps.map((id) => buildMap(sourceDir, id));
+  const built = maps.map((id) => buildMap(sourceDir, id, dimension));
 
   /* 既にある地図の記述は残し、作り直したものだけ差し替える */
   const metadataPath = join(ROOT, METADATA_PATH);
