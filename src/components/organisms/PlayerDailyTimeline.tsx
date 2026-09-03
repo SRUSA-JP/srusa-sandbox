@@ -12,6 +12,7 @@ import {
   type PlayerDailyMetricKey,
 } from '../../data/playerDaily';
 import { playerDataHighlightColors, playerDataHighlightLevel } from '../../config/colors';
+import { joinNotes } from '../../lib/display';
 import { formatCompact, formatDecimal, formatHours, formatInt } from '../../lib/format';
 import { SECTION } from '../classes';
 import { Picker } from '../atoms';
@@ -91,7 +92,10 @@ export function PlayerDailyTimeline({ doc, text, theme, profileHref }: PlayerDai
     <section className={SECTION}>
       <SectionHeader
         title={text.title}
-        note={`${text.note} 更新 ${doc.generated_on}`}
+        note={joinNotes(
+          `${text.note} 更新 ${doc.generated_on}`,
+          doc.playtime_source ? `プレイ時間はログの入退室から再計算しています（${doc.playtime_source}）。` : undefined,
+        )}
         actions={
           <>
             <Picker

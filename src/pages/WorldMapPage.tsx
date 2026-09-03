@@ -7,6 +7,7 @@ import {
   Picker,
   ProsePanel,
   TechnicalDetails,
+  WorldMap3dViewer,
   WorldMapGallery,
   WorldMapLog,
 } from '../components';
@@ -17,9 +18,11 @@ import type { VizTheme } from '../theme/palette';
 import {
   latestWorldMapDate,
   mapById,
+  mapDate,
   mapDimension,
   mapOptionsForDimension,
   sortDimensions,
+  worldMapDates,
 } from '../world/display';
 import { loadWorldMaps } from '../world/data';
 import type { WorldMap } from '../world/schema';
@@ -30,9 +33,11 @@ export interface WorldMapPageProps {
 
 const EMPTY_MAPS: WorldMap[] = [];
 const ALL_DIMENSIONS = '*';
+const LATEST_MAPS = 'latest';
 
 type TooltipMode = 'on' | 'off';
 type DimensionSelection = typeof ALL_DIMENSIONS | string;
+type SnapshotSelection = typeof LATEST_MAPS | string;
 
 const TOOLTIP_OPTIONS: Array<{ value: TooltipMode; label: string }> = [
   { value: 'on', label: MAP_TEXT.picker.tooltipOn },
@@ -42,8 +47,7 @@ const TOOLTIP_OPTIONS: Array<{ value: TooltipMode; label: string }> = [
 /**
  * ワールドマップの画面。
  *
- * 主役は操作できる 2D の地図なので先頭に置き、3D のスクリーンショットと
- * 経緯の説明はその下に回す（DESIGN.md の「主役を先に見せる」）。
+ * 主役はスポーン周辺 3D と操作できる 2D の地図なので、その順に置く。
  * 生成ログ（PNG の画素数やファイルの大きさ）は作り手向けなので、
  * ページのいちばん下でたたんでおく。
  * 3D の出力そのもの（数百 MB）はこのリポジトリに持たない。
@@ -55,6 +59,7 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
     () => latestWorldMapDate(maps, document?.generated_on),
     [document?.generated_on, maps],
   );
+  const [selectedSnapshot, setSelectedSnapshot] = useState<SnapshotSelection>(LATEST_MAPS);
   const [selectedDimension, setSelectedDimension] = useState<DimensionSelection>(ALL_DIMENSIONS);
   const [selectedMapIds, setSelectedMapIds] = useState<Record<string, string>>({});
   /*
@@ -62,12 +67,24 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
    * 地図の上に重ねる分は「もっと大きく読みたい人」向けの追加にする。
    */
   const [tooltipMode, setTooltipMode] = useState<TooltipMode>('off');
+  const snapshotOptions = useMemo(
+    () => [
+      { value: LATEST_MAPS, label: WORLD_MAP_TEXT.picker.latestMaps },
+      ...worldMapDates(maps, document?.generated_on).map((date) => ({ value: date, label: date })),
+    ],
+    [document?.generated_on, maps],
+  );
   const dimensionMaps = useMemo(
-    () =>
-      selectedDimension === ALL_DIMENSIONS
-        ? maps
-        : maps.filter((entry) => mapDimension(entry) === selectedDimension),
-    [maps, selectedDimension],
+    () => {
+      const snapshotMaps =
+        selectedSnapshot === LATEST_MAPS
+          ? maps
+          : maps.filter((entry) => mapDate(entry, document?.generated_on) === selectedSnapshot);
+      return selectedDimension === ALL_DIMENSIONS
+        ? snapshotMaps
+        : snapshotMaps.filter((entry) => mapDimension(entry) === selectedDimension);
+    },
+    [document?.generated_on, maps, selectedDimension, selectedSnapshot],
   );
   const dimensions = useMemo(
     () => sortDimensions([...new Set(dimensionMaps.map(mapDimension))]),
@@ -120,26 +137,43 @@ export function WorldMapPage({ theme }: WorldMapPageProps) {
         ) : undefined
       }
     >
+      <ChartCard title={WORLD_MAP_TEXT.threeD.title} note={WORLD_MAP_TEXT.threeD.note}>
+        <WorldMap3dViewer src={`${import.meta.env.BASE_URL}bluemap-spawn/index.html#overworld_spawn:0:80:0:1100:0:0.85:0:0:perspective`} />
+      </ChartCard>
+
       <ChartCard
         title={WORLD_MAP_TEXT.card.title}
         note={WORLD_MAP_TEXT.card.note}
         actions={
-          <>
-            {dimensionOptions.length > 1 && (
+          <details className="rounded-md border-hairline border-divider bg-sunken">
+            <summary className="cursor-pointer px-lg py-xs text-md font-medium text-heading hover:bg-hover">
+              {WORLD_MAP_TEXT.picker.mapSettings}
+            </summary>
+            <div className="flex flex-wrap items-center gap-md border-t-hairline border-divider p-md">
+              {dimensionOptions.length > 1 && (
+                <Picker
+                  label={WORLD_MAP_TEXT.picker.dimension}
+                  value={selectedDimension}
+                  options={dimensionOptions}
+                  onChange={setSelectedDimension}
+                />
+              )}
+              {snapshotOptions.length > 2 && (
+                <Picker
+                  label={WORLD_MAP_TEXT.picker.snapshot}
+                  value={selectedSnapshot}
+                  options={snapshotOptions}
+                  onChange={setSelectedSnapshot}
+                />
+              )}
               <Picker
-                label={WORLD_MAP_TEXT.picker.dimension}
-                value={selectedDimension}
-                options={dimensionOptions}
-                onChange={setSelectedDimension}
+                label={WORLD_MAP_TEXT.picker.tooltips}
+                value={tooltipMode}
+                options={TOOLTIP_OPTIONS}
+                onChange={setTooltipMode}
               />
-            )}
-            <Picker
-              label={WORLD_MAP_TEXT.picker.tooltips}
-              value={tooltipMode}
-              options={TOOLTIP_OPTIONS}
-              onChange={setTooltipMode}
-            />
-          </>
+            </div>
+          </details>
         }
       >
         {document?.issues && document.issues.length > 0 && (

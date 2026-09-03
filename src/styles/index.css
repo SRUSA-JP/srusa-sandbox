@@ -149,6 +149,10 @@
   padding-inline-end: max(var(--sr-space-lg), env(safe-area-inset-right));
 }
 
+@utility pb-mobile-nav-safe {
+  padding-bottom: max(var(--sr-space-xs), env(safe-area-inset-bottom));
+}
+
 @layer base {
   html,
   body,

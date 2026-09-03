@@ -6,10 +6,10 @@
     "nameMode": "online"
   },
   "people": [
-    { "id": "nodoame", "onlineName": "nodoame", "joinedOn": "2020-04", "attributes": ["幼稚園", "小学校", "M大学", "Y研究室", "K高校", "テニス部", "S塾", "K社", "アクティブメンバー"], "nicknames": [] },
+    { "id": "nodoame", "onlineName": "nodoame", "aliases": ["nodoamen", "nodoamenn"], "joinedOn": "2020-04", "attributes": ["幼稚園", "小学校", "M大学", "Y研究室", "K高校", "テニス部", "S塾", "K社", "アクティブメンバー"], "nicknames": [] },
     { "id": "octbee", "onlineName": "octbee", "attributes": ["幼稚園", "小学校", "中学校", "S塾"], "nicknames": [] },
     { "id": "n", "onlineName": "N", "attributes": ["幼稚園", "小学校", "中学校", "S塾"], "nicknames": [] },
-    { "id": "mitiglia", "onlineName": "mitiglia", "joinedOn": "2020-04", "attributes": ["K高校", "S塾", "アクティブメンバー"], "nicknames": [] },
+    { "id": "mitiglia", "onlineName": "mitiglia", "aliases": ["Mitigli4", "Mitfli4"], "joinedOn": "2020-04", "attributes": ["K高校", "S塾", "アクティブメンバー"], "nicknames": [] },
     { "id": "natch", "onlineName": "natch", "attributes": ["K高校", "S塾", "アクティブメンバー"], "nicknames": [] },
     { "id": "dekkaishi", "onlineName": "dekkaishi", "attributes": ["K高校", "テニス部"], "nicknames": [] },
     { "id": "kagyki", "onlineName": "kagyki", "attributes": ["K高校", "S塾", "アクティブメンバー"], "nicknames": [] },
@@ -88,7 +88,7 @@
   ],
   "groups": [
     { "id": "kindergarten", "name": "幼稚園", "type": "school_stage", "connects": true },
-    { "id": "elementary", "name": "小学校", "type": "school_stage" },
+    { "id": "elementary", "name": "小学校", "type": "school_stage", "connects": true },
     { "id": "junior_high", "name": "中学校", "type": "school_stage" },
     { "id": "k_high", "name": "K高校", "type": "school" },
     { "id": "high_unknown", "name": "高校", "type": "school_stage" },
@@ -165,10 +165,13 @@
       "複数属性は領域の重なりで表現する",
       "研究室領域はM大学領域の内部に配置する",
       "shion組はK高校とは独立した領域で、両方所属する人物のみ重なり部分に配置する",
+      "関係樹レイアウトではnodoameを中心根にする",
       "中心人物は可変"
     ]
   },
   "schemaNotes": [
-    "people[].nicknames は任意のニックネーム欄。onlineName（ネットネーム）やaliases（別名/表記揺れ）とは分離して保持する。"
+    "people[].nicknames は任意のニックネーム欄。onlineName（ネットネーム）やaliases（別名/表記揺れ）とは分離して保持する。",
+    "nodoamen / nodoamenn は Minecraft 側や表記揺れの名前で、相関図では nodoame の aliases に入れる。",
+    "Mitigli4 / Mitfli4 は Minecraft 側または表記揺れの名前で、相関図では mitiglia の aliases に入れる。"
   ]
 }

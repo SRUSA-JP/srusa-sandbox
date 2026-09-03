@@ -19,7 +19,7 @@ srusa-portal では MkDocs のページに iframe で埋め込んでいました
 | 画面 | URL | 内容 |
 | --- | --- | --- |
 | Minecraft 統計 | `#/minecraft` | プレイヤー比較・内訳・系列比較・日付ごとの推移・2指標の関係の 5 グラフ。絞り込み、表への切り替え、CSV / JSON 書き出し |
-| ワールドマップ | `#/minecraft/world-map` | BlueMap の 2D 出力を掴んで動かせる地図。3D はスクリーンショットで掲載 |
+| ワールドマップ | `#/minecraft/world-map` | BlueMap の 2D 出力を掴んで動かせる地図。スポーン周辺だけ 3D 表示に切り替え可能 |
 | 活動カレンダー | `#/minecraft/calendar` | サーバーのログに残っている日を暦に並べた図。色の濃さで人数、印で初参加や記録の更新 |
 | 相関図 | `#/relationships` | 人物同士のつながりと所属を 1 枚にまとめた SVG の図。掴んで動かす・拡大縮小・人物の移動、中心人物・グループの強調・関係線の切り替え |
 | メンバー | `#/zukan` | 相関図と Minecraft に出てくる人の名簿。所属・種類で絞り込み、ひとりずつの紹介ページへ渡す |
@@ -60,12 +60,14 @@ npm run dev
 | `npm run dev` | 開発サーバーを起動する（`--host` 付き。同じ Wi-Fi のスマホからも開ける） |
 | `npm run build` | 型検査 → ESLint → コントラスト検査を通してから `dist/` に出力する |
 | `npm run preview` | ビルド成果物をローカルで確認する |
+| `npm run deploy` | `npm run build` の後、Netlify 本番へデプロイする |
 | `npm run deploy:preview` | `dist/` を Netlify の固定プレビューに送る（本番公開しない） |
 | `npm run typecheck` | 型検査だけを実行する |
 | `npm run lint` | ESLint を実行する |
 | `npm run check:contrast` | 配色が WCAG のコントラスト比を満たすか検査する |
+| `npm run refresh:live` | ライブサーバーから統計・日別・活動カレンダー用データを取得し、抽出と同期まで行う |
 | `npm run build:world-map` | BlueMap の 2D タイルを 1 枚の PNG に貼り合わせる（下の「ワールドマップを作り直すとき」） |
-| `npm run update:data` | AWS SSO の確認、`../aws_minecraft` 側の抽出、こちらへの取り込みをまとめて行う |
+| `npm run refresh:data` | AWS SSO の確認、`../aws_minecraft` 側の抽出、こちらへの取り込みをまとめて行う |
 | `npm run sync:data` | `../aws_minecraft` と BlueMap の出力からデータを取り込む（下の「データを差し替えるとき」） |
 
 `main` への push と Pull Request では、GitHub Actions が同じ検査を実行します
@@ -78,8 +80,9 @@ npm run dev
 | パス | 内容 |
 | --- | --- |
 | [data/](data/) | ビルド時に取り込む JSON。Minecraft の集計、相関図のデータ、ワールドマップの範囲 |
-| [public/images/](public/images/) | BlueMap の 3D 表示のスクリーンショット |
+| [public/images/](public/images/) | 補足画像 |
 | [public/world-map/](public/world-map/) | 貼り合わせた 2D のワールドマップ（`npm run build:world-map` が作る） |
+| [public/bluemap-spawn/](public/bluemap-spawn/) | スポーン周辺だけの BlueMap 3D ビューア置き場。生成物本体は Git 追跡しない |
 | [scripts/sync-data.mjs](scripts/sync-data.mjs) | `../aws_minecraft` と BlueMap の出力からのデータ取り込み |
 | [scripts/check-contrast.ts](scripts/check-contrast.ts) | 配色のコントラスト検査 |
 | [scripts/build-world-map.ts](scripts/build-world-map.ts) | BlueMap の 2D タイルの貼り合わせ |
@@ -134,8 +137,10 @@ npm run dev
 
 ## ワールドマップを作り直すとき
 
-地図の実体は BlueMap の出力から作ります。BlueMap の 3D タイル（オーバーワールドだけで 308 MB）は
-このリポジトリに持たず、真上から見た 2D タイル（3 MB）だけを 1 枚の PNG（1.2 MB）に貼り合わせて置きます。
+地図の実体は BlueMap の出力から作ります。ワールド全体の 3D タイルはこのリポジトリに持たず、
+通常は真上から見た 2D タイルだけを 1 枚の PNG に貼り合わせて置きます。
+例外として、スポーン周辺 16x16 チャンク相当の `overworld_spawn` だけは `public/bluemap-spawn/` に置けば、
+ワールドマップ画面の「スポーン3D」で iframe 表示できます。ただし BlueMap ビューア本体とタイルは生成物なので Git 追跡しません。
 
 ```shell
 # 1. srusa-portal でワールドをレンダリングする（Java 25 が要る）
@@ -151,21 +156,24 @@ BlueMap の出力が別の場所にあるときは `npm run build:world-map -- -
 ネザーだけ差し替えるときは `cd ../srusa-portal/bluemap && ./render.sh -r nether` のあとに、
 このリポジトリで `npm run build:world-map -- --map nether` を実行します。
 
-3D の見た目はページに載せられないので、BlueMap の 3D 表示を撮った画像を `public/images/` に置き、
-[src/content/worldMap.ts](src/content/worldMap.ts) の節に追記します。
-操作できる地図と取り違えられないよう、画像には必ず `tag` を付けます。
+スポーン周辺 3D を差し替える場合は、`../srusa-portal/bluemap/web/` から BlueMap ビューア一式と
+`maps/overworld_spawn/` だけを `public/bluemap-spawn/` に同期します。ライブ統計更新用の
+`npm run refresh:live` は 3D データを取得しません。`public/bluemap-spawn/README.md` 以外は `.gitignore` で除外しています。
 
 ## データを差し替えるとき
 
-AWS からの再取得も含めて更新するときは `npm run update:data` を使います。
+ライブサーバーから現在の統計・日別・活動カレンダーを網羅更新するときは `npm run refresh:live` を使います。
+AWS からの再取得も含めた従来の更新は `npm run refresh:data` です。
 SSO セッションが切れている場合は、URL とコードが表示されるので、ブラウザで開いて入力すると続きが自動で進みます。
 
 ```shell
-npm run update:data                  # AWS認証 → 抽出 → 取り込み
-npm run update:data -- daily logs    # 日別データとログだけ
-npm run update:data -- skins         # スキンと顔アイコンだけ
-npm run update:data -- --dry-run     # AWS認証・抽出なしで、取り込み予定だけ確認
-npm run update:data -- --list        # 取り込める元データを見るだけ
+npm run refresh:live                 # ライブサーバー → 抽出 → 統計/日別/カレンダー同期
+npm run refresh:live -- --date 20260830
+npm run refresh:data                 # AWS認証 → 抽出 → 取り込み
+npm run refresh:data -- daily logs   # 日別データとログだけ
+npm run refresh:data -- skins        # スキンと顔アイコンだけ
+npm run refresh:data -- --dry-run    # AWS認証・抽出なしで、取り込み予定だけ確認
+npm run refresh:data -- --list       # 取り込める元データを見るだけ
 ```
 
 元データは 2 か所にあります。`npm run sync:data` が、取り込みから派生 JSON の作り直しまでをまとめて行います。

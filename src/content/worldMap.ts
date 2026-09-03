@@ -1,42 +1,17 @@
 /**
  * ワールドマップページの読み物。
  *
- * ページの主役は上に置く操作できる 2D の地図（components/organisms/WorldMapViewer.tsx）で、
- * ここはその補足。3D は出力が数百 MB あるためブラウザには載せず、
- * スクリーンショットで見せる。操作できる地図と取り違えられないよう、
- * 画像には必ず「スクリーンショット」の札を付ける。
+ * ページの主役はスポーン周辺 3D と操作できる 2D 地図。
+ * 細かい生成ログや作り直し手順は、ページ下部の詳細にたたむ。
  */
-import { WORLD_MAP_TEXT } from '../config/messages';
 import type { PageContent } from './schema';
 
 export const WORLD_MAP_CONTENT: PageContent = {
   title: 'ワールドマップ',
-  lead: 'サーバーのワールドを BlueMap でレンダリングしたものです。真上から見た 2D の地図はこのページ上で動かせます。3D の見た目はスクリーンショットで載せています。',
+  lead: 'サーバーのワールドを BlueMap でレンダリングしたものです。スポーン周辺 3D を先に表示し、その下で 2D の全ワールド地図を動かせます。',
   disclaimer:
     'レンダリングした時点のワールドです。自動では更新しません。載せているのはオーバーワールドの一部（x/z ±1024 ブロックの範囲）だけで、公開範囲はまだ検討中です。',
   sections: [
-    {
-      heading: '3D 表示のスクリーンショット',
-      note: WORLD_MAP_TEXT.screenshot.note,
-      blocks: [
-        {
-          kind: 'image',
-          tag: WORLD_MAP_TEXT.screenshot.tag,
-          src: 'images/bluemap-overworld-flat.png',
-          alt: 'BlueMap の 3D 表示でオーバーワールドを真上から見たスクリーンショット。中央から北側は白い雪原、東側は海、南側は緑の森林。',
-          caption:
-            'BlueMap の 3D 表示を真上から見たところ（スクリーンショット）。白い部分は積雪バイオーム（snowy_taiga）そのもので、描画の異常ではありません。',
-        },
-        {
-          kind: 'image',
-          tag: WORLD_MAP_TEXT.screenshot.tag,
-          src: 'images/bluemap-overworld-spawn.png',
-          alt: 'BlueMap の 3D 表示でスポーン拠点周辺を斜め上から見たスクリーンショット。桜の木、建物、街道、水場が見える。',
-          caption:
-            'スポーン拠点を斜めから見たところ（スクリーンショット）。この角度と立体感は 3D 表示でしか出せないので、写真で載せています。',
-        },
-      ],
-    },
     {
       heading: '2D だけを載せている理由',
       audience: 'builder',

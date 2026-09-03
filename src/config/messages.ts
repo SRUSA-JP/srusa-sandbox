@@ -7,28 +7,40 @@
  *
  * 値を含む文は関数にして、数値の整形は lib/format.ts に任せる。
  */
-import { formatInt, formatMegabytes } from '../lib/format';
+import { formatDecimal, formatInt, formatMegabytes } from '../lib/format';
 import { OTHER_ENTRY } from './labels';
 
 /** 画面の外枠（サイト名・タブ・配色の切り替え）。 */
 export const APP_TEXT = {
   /** ブラウザのタブと画面左上に出す名前。 */
   siteName: 'SRUSA Sandbox',
+  /** サイトロゴ画像の説明。 */
+  logoAlt: 'SRUSA Sandbox ロゴ',
+  /** ロゴリンクの読み上げ。 */
+  homeLink: 'ホームへ移動',
   /** ホーム画面に追加したときなど、短く出す名前。 */
   shortName: 'SRUSA',
-  /** サイト名の下に出す説明。 */
-  siteNote:
-    'SRUSA の試験用コンテンツを公開している場所です。Minecraft サーバーの統計・ワールドマップ・活動カレンダー、相関図、メンバー、年表、ギャラリーがあります。',
   /**
    * 検索結果やホーム画面に出る説明。
-   * 画面に出る siteNote と役割が違う（こちらは中身を見ずに読まれる）ので別に持つ。
+   * 画面に出る文言と役割が違う（こちらは中身を見ずに読まれる）ので別に持つ。
    */
   siteDescription:
     'SRUSA の試験用コンテンツを公開しているサイトです。Minecraft サーバーの統計・ワールドマップ・活動カレンダー、相関図、メンバー、年表、ギャラリーを置いています。掲載内容と公開範囲は検討中です。',
   /** タブ全体の読み上げ名。 */
-  navLabel: 'ページ',
+  navLabel: '親ジャンル',
+  /** スマートフォン下部タブの読み上げ名。 */
+  mobileNavLabel: 'スマートフォンのページ切替',
   /** 下の段（まとまりの中の切り替え）の読み上げ。 */
   sectionNavLabel: 'このまとまりの中の画面',
+  /** ゲーム一覧の読み上げ。 */
+  gameNavLabel: 'ジャンル内のまとまり',
+  /** ゲーム内コンテンツ一覧の読み上げ。 */
+  gameContentNavLabel: 'まとまり内の画面',
+  /** ヘッダー下段の文脈切替。 */
+  contextNav: {
+    show: '切替を表示',
+    hide: '切替を隠す',
+  },
   /** ページ全体にかかる注意書きの見出し。本文の下に出す。 */
   disclaimer: 'このページについて',
   /**
@@ -43,6 +55,7 @@ export const APP_TEXT = {
   auth: {
     title: 'ログイン',
     passwordLabel: 'パスワード',
+    passwordHint: 'パスワードは #minecraft のピン留めに掲載しています。',
     showPassword: '表示',
     hidePassword: '隠す',
     submit: 'ログイン',
@@ -372,6 +385,43 @@ export const STATS_TEXT = {
       rateValue: (rate: string) => `1 DI = ${rate} EM`,
       rateNote: '選択中の算出元から見た簡易レート',
     },
+    serviceCost: {
+      title: 'サーバー維持費の傾斜',
+      note:
+        'プレイ時間が 0 時間より大きい人を対象に、基本割とプレイ時間に応じた従量分で維持費を分けます。',
+      totalCost: '総額',
+      totalCostLabel: '維持費の総額',
+      basePercent: '基本割%',
+      basePercentLabel: '均等に分ける割合',
+      slope: '傾斜',
+      slopeLabel: 'プレイ時間への傾斜係数',
+      roundingUnit: '丸め',
+      roundingUnitLabel: '四捨五入する単位',
+      customPlayer: 'カスタム対象',
+      customCost: 'カスタム額',
+      customCostLabel: (name: string) => `${name} のカスタム請求額`,
+      selectedPlaytime: (name: string, hours: string) => `${name} のプレイ時間: ${hours}`,
+      clearCustom: '解除',
+      customLimited: 'カスタム額の合計が総額を超えたため、カスタム対象者の中で総額に収まるよう按分しています。',
+      participants: '対象人数',
+      totalHours: '対象プレイ時間',
+      playerPlaytime: 'プレイヤー別プレイ時間',
+      customTotal: 'カスタム',
+      baseCost: '基本割',
+      usageCost: '従量分',
+      averageCost: '平均',
+      yen: ' 円',
+      yenPerHour: ' 円/h',
+      shareColumn: '割合',
+      customColumn: 'カスタム',
+      baseColumn: '基本割',
+      usageColumn: '従量分',
+      costColumn: '負担額',
+      yenPerHourColumn: '円/h',
+      noPlayers: 'プレイ時間がある対象者がいません。',
+      basis: (basePercent: number, slope: number, roundingUnit: number) =>
+        `基本割 ${formatInt(basePercent)}% / 従量分は プレイ時間^${formatDecimal(slope)} で配分 / ${formatInt(roundingUnit)} 円単位で四捨五入。`,
+    },
   },
 
   /** 換算後の分母の説明。グラフの注記に使う。 */
@@ -399,6 +449,7 @@ export const STATS_TEXT = {
     series: (series: string, basis: string) => `series-${series}-${basis}.csv`,
     trend: (metric: string, basis: string) => `trend-${metric}-${basis}.csv`,
     economyRanking: (mode: string) => `economy-ranking-${mode}.csv`,
+    serviceCost: 'minecraft-service-cost.csv',
     scatter: (x: string, y: string, basis: string) => `scatter-${x}-${y}-${basis}.csv`,
   },
 } as const;
@@ -419,9 +470,10 @@ export const WORLD_MAP_TEXT = {
   },
 
   picker: {
-    view: '表示',
+    mapSettings: '2D マップ設定',
     dimension: 'ディメンション',
     allDimensions: 'すべて',
+    snapshot: '履歴',
     map: '日付',
     latestMaps: '最新',
     tooltips: 'ツールチップ',
@@ -474,15 +526,16 @@ export const WORLD_MAP_TEXT = {
     overworld: (x: number, z: number) => `通常世界 X ${formatInt(x)} / Z ${formatInt(z)}`,
   },
 
-  /**
-   * 3D の見た目を写真で見せる節。
-   * 地図そのものと取り違えられないよう、必ずスクリーンショットだと明記する。
-   */
-  screenshot: {
-    /** 各画像に付ける札。 */
-    tag: 'スクリーンショット',
-    /** 何を写したものかの説明。 */
-    note: '下の 2 枚は操作できません。BlueMap の 3D 表示を撮った画像です。',
+  threeD: {
+    title: 'スポーン周辺 3D',
+    note: 'スポーン地点の周辺だけを BlueMap の 3D ビューアで表示します。',
+    fullscreen: '全画面',
+    exitFullscreen: '全画面を終了',
+    wide: '広く見る',
+    normal: '通常表示',
+    loading: 'スポーン周辺 3D の生成物を確認しています。',
+    missing:
+      'スポーン周辺 3D の生成物がありません。../srusa-portal/bluemap/web から public/bluemap-spawn/ へ同期すると表示できます。',
   },
 } as const;
 
@@ -519,6 +572,7 @@ export const MAP_TEXT = {
     groupOption: (name: string, type: string, members: number) =>
       `${name}（${type}・${formatInt(members)}人）`,
     edges: '関係線',
+    displaySettings: '表示設定',
   },
 
   /** 掴んで動かした配置を元に戻すボタン。 */
@@ -567,10 +621,13 @@ export const MAP_TEXT = {
     group: (name: string, members: number) => `${name}: ${formatInt(members)} 人`,
     person: (name: string, attributes: string[]) =>
       attributes.length > 0 ? `${name}（${attributes.join('・')}）` : name,
+    relatedPeople: (names: string[], rest: number) =>
+      names.length > 0 ? `つながり: ${names.join('・')}${rest > 0 ? ` ほか ${formatInt(rest)} 人` : ''}` : '',
     profileLink: '紹介を見る',
     close: '閉じる',
     relation: (from: string, to: string, context?: string, uncertain?: boolean) =>
       `${from} ↔ ${to}${context ? `（${context}）` : ''}${uncertain ? ' ※確度が低い関係' : ''}`,
+    relationGroups: (groups: string[]) => `共有グループ: ${groups.join('・')}`,
     /** 所属から導いた線。親（線の集まる人）とその所属者を結ぶ。 */
     affiliation: (hub: string, member: string, group: string) => `${hub} ─ ${member}（${group}）`,
   },
@@ -675,6 +732,9 @@ export const ZUKAN_TEXT = {
   },
   /** 所属が多すぎて省いたとき。 */
   moreAttributes: (count: number) => `ほか ${count}`,
+  /** カードに出す、相関図上のつながり。 */
+  relatedPeople: (names: string[], rest: number) =>
+    names.length > 0 ? `つながり: ${names.join('・')}${rest > 0 ? ` ほか ${formatInt(rest)}` : ''}` : '',
   /** カード全体の読み上げ。 */
   open: (name: string) => `${name} の紹介ページを開く`,
   /** 他のページからメンバーへ飛ぶボタン。 */

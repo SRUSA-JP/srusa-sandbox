@@ -6,5 +6,6 @@ export * from './NumberField';
 export * from './Picker';
 export * from './RangeSlider';
 export * from './PixelAvatar';
+export * from './PixelNavIcon';
 export * from './Swatch';
 export * from './WireLine';

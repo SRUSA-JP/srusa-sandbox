@@ -87,13 +87,14 @@ const SOURCE_FILES = [
  * 実体は npm script が書き出す。ここでは「新しい日付の名前に変える」ことだけを持つ。
  */
 const DERIVED_FILES = [
+  { registryKey: 'minecraftStats', prefix: 'minecraft-stats', ext: 'json' },
   { registryKey: 'playerDailySummary', prefix: 'player-daily-summary', ext: 'json' },
   { registryKey: 'playerDailySummaryCsv', prefix: 'player-daily-summary', ext: 'csv' },
   { registryKey: 'playerFeaturedUsedItems', prefix: 'player-featured-used-items', ext: 'json' },
 ];
 
 /** 派生ファイルを作り直す npm script（この順に実行する）。 */
-const DERIVED_COMMANDS = ['build:player-daily', 'build:item-rankings'];
+const DERIVED_COMMANDS = ['build:minecraft-stats', 'build:player-daily', 'build:item-rankings'];
 
 /** ログを取り込んだときに作り直すもの。日別データとは出どころが違う。 */
 const LOG_DERIVED = {

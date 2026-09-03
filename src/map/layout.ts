@@ -21,6 +21,7 @@ import {
   groupTypeSetting,
   NODE,
   REGION,
+  RELATION_TREE,
   SATELLITE,
   SEPARATION,
   UNASSIGNED,
@@ -613,6 +614,230 @@ function placeCorePeriphery(data: RelationshipData): PersonPlacement[] {
         groupIds: [],
       });
     });
+  });
+
+  return placements;
+}
+
+interface TreeLink {
+  a: string;
+  b: string;
+  weight: number;
+}
+
+function addTreeLink(links: Map<string, TreeLink>, a: string, b: string, weight: number): void {
+  if (a === b) return;
+  const key = relationKey(a, b);
+  const current = links.get(key);
+  links.set(key, { a, b, weight: Math.max(current?.weight ?? 0, weight) });
+}
+
+function relationTreeLinks(data: RelationshipData, rootId = ''): TreeLink[] {
+  const links = new Map<string, TreeLink>();
+  for (const relation of data.relations) addTreeLink(links, relation.source, relation.target, 4);
+  for (const hub of affiliationHubs(data)) {
+    for (const memberId of hub.memberIds) addTreeLink(links, hub.hubId, memberId, 1);
+  }
+  const root = data.people.find((person) => person.id === rootId);
+  if (root) {
+    const connectingGroups = new Set(
+      data.groups.filter((group) => groupConnects(group)).map((group) => group.name),
+    );
+    const rootGroups = new Set(root.attributes.filter((name) => connectingGroups.has(name)));
+    for (const person of data.people) {
+      if (person.id === root.id) continue;
+      const shared = person.attributes.filter((name) => rootGroups.has(name));
+      if (shared.length > 0) addTreeLink(links, root.id, person.id, 2 + shared.length);
+    }
+  }
+  return [...links.values()];
+}
+
+function treeNeighbors(links: TreeLink[]): Map<string, string[]> {
+  const neighbors = new Map<string, Set<string>>();
+  for (const link of links) {
+    const a = neighbors.get(link.a) ?? new Set<string>();
+    const b = neighbors.get(link.b) ?? new Set<string>();
+    a.add(link.b);
+    b.add(link.a);
+    neighbors.set(link.a, a);
+    neighbors.set(link.b, b);
+  }
+  return new Map([...neighbors.entries()].map(([id, ids]) => [id, [...ids]]));
+}
+
+function treeDegree(links: TreeLink[]): Map<string, number> {
+  const degree = new Map<string, number>();
+  for (const link of links) {
+    degree.set(link.a, (degree.get(link.a) ?? 0) + link.weight);
+    degree.set(link.b, (degree.get(link.b) ?? 0) + link.weight);
+  }
+  return degree;
+}
+
+function preferredRoot(data: RelationshipData, centerId: string): string {
+  const candidates = ['nodoame', data.view?.centerPersonId, data.project.defaultCenterPersonId, centerId];
+  return candidates.find((id) => id && data.people.some((person) => person.id === id)) ?? data.people[0]?.id ?? '';
+}
+
+function relationTreeOrder(data: RelationshipData, rootId: string): Person[] {
+  const links = relationTreeLinks(data, rootId);
+  const degree = treeDegree(links);
+  const neighbors = treeNeighbors(links);
+  const byId = new Map(data.people.map((person) => [person.id, person]));
+  const seen = new Set<string>();
+  const ordered: Person[] = [];
+
+  const queueFrom = (startId: string) => {
+    const queue = [startId];
+    seen.add(startId);
+    for (let cursor = 0; cursor < queue.length; cursor += 1) {
+      const id = queue[cursor];
+      const person = byId.get(id);
+      if (person) ordered.push(person);
+
+      const next = (neighbors.get(id) ?? [])
+        .filter((candidate) => !seen.has(candidate))
+        .sort(
+          (a, b) =>
+            (degree.get(b) ?? 0) - (degree.get(a) ?? 0) ||
+            primaryAttribute(byId.get(a) ?? person ?? data.people[0]).localeCompare(
+              primaryAttribute(byId.get(b) ?? person ?? data.people[0]),
+              'ja',
+            ) ||
+            a.localeCompare(b),
+        );
+      for (const candidate of next) {
+        seen.add(candidate);
+        queue.push(candidate);
+      }
+    }
+  };
+
+  if (rootId) queueFrom(rootId);
+  const remaining = [...data.people]
+    .filter((person) => !seen.has(person.id))
+    .sort(
+      (a, b) =>
+        (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) ||
+        primaryAttribute(a).localeCompare(primaryAttribute(b), 'ja') ||
+        a.id.localeCompare(b.id),
+    );
+  for (const person of remaining) queueFrom(person.id);
+  return ordered;
+}
+
+function placeRelationshipTree(data: RelationshipData, centerId: string): PersonPlacement[] {
+  const rootId = preferredRoot(data, centerId);
+  const links = relationTreeLinks(data, rootId);
+  const degree = treeDegree(links);
+  const neighbors = treeNeighbors(links);
+  const byId = new Map(data.people.map((person) => [person.id, person]));
+  const depth = new Map<string, number>();
+  const seen = new Set<string>();
+  const components: Person[][] = [];
+
+  for (const root of relationTreeOrder(data, rootId)) {
+    if (seen.has(root.id)) continue;
+    const queue = [root.id];
+    const component: Person[] = [];
+    depth.set(root.id, 0);
+    seen.add(root.id);
+
+    for (let cursor = 0; cursor < queue.length; cursor += 1) {
+      const id = queue[cursor];
+      const person = byId.get(id);
+      if (person) component.push(person);
+      const next = (neighbors.get(id) ?? [])
+        .filter((candidate) => !seen.has(candidate))
+        .sort((a, b) => (degree.get(b) ?? 0) - (degree.get(a) ?? 0) || a.localeCompare(b));
+      for (const candidate of next) {
+        seen.add(candidate);
+        depth.set(candidate, (depth.get(id) ?? 0) + 1);
+        queue.push(candidate);
+      }
+    }
+    components.push(component);
+  }
+
+  const placements: PersonPlacement[] = [];
+  let componentOffsetY = 0;
+  components.forEach((component, componentIndex) => {
+    const byDepth = new Map<number, Person[]>();
+    for (const person of component) {
+      const list = byDepth.get(depth.get(person.id) ?? 0) ?? [];
+      list.push(person);
+      byDepth.set(depth.get(person.id) ?? 0, list);
+    }
+
+    if (componentIndex === 0) {
+      for (const [level, members] of [...byDepth.entries()].sort((a, b) => a[0] - b[0])) {
+        if (level === 0) {
+          members.forEach((person) => placements.push({ person, x: 0, y: 0, groupIds: [] }));
+          continue;
+        }
+        const sorted = [...members].sort(
+          (a, b) =>
+            (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) ||
+            primaryAttribute(a).localeCompare(primaryAttribute(b), 'ja') ||
+            a.id.localeCompare(b.id),
+        );
+        const buckets = new Map<string, Person[]>();
+        for (const person of sorted) {
+          const key = primaryAttribute(person) || UNASSIGNED.label;
+          buckets.set(key, [...(buckets.get(key) ?? []), person]);
+        }
+        const categoryGroups = [...buckets.entries()].sort((a, b) => a[0].localeCompare(b[0], 'ja'));
+        const slotCount =
+          sorted.length + Math.max(0, categoryGroups.length - 1) * RELATION_TREE.categoryGapSlots;
+        let slot = 0;
+        categoryGroups.forEach(([, groupMembers], groupIndex) => {
+          const radius = level * RELATION_TREE.levelGapY + groupIndex * RELATION_TREE.categoryRadiusStep;
+          groupMembers.forEach((person) => {
+            const angle = -Math.PI / 2 + (Math.PI * 2 * (slot + 0.5)) / Math.max(slotCount, 1);
+            placements.push({
+              person,
+              x: Math.cos(angle) * radius,
+              y: Math.sin(angle) * radius,
+              groupIds: [],
+            });
+            slot += 1;
+          });
+          slot += RELATION_TREE.categoryGapSlots;
+        });
+      }
+      componentOffsetY = Math.max(...placements.map((placement) => placement.y)) + RELATION_TREE.componentGapY;
+      return;
+    }
+
+    let componentHeight = 0;
+    for (const [level, members] of [...byDepth.entries()].sort((a, b) => a[0] - b[0])) {
+      const sorted = [...members].sort(
+        (a, b) =>
+          (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) ||
+          primaryAttribute(a).localeCompare(primaryAttribute(b), 'ja') ||
+          a.id.localeCompare(b.id),
+      );
+      const columns = Math.min(RELATION_TREE.maxColumns, Math.max(1, sorted.length));
+      const rows = Math.ceil(sorted.length / columns);
+      const width = (columns - 1) * RELATION_TREE.branchGapX;
+      sorted.forEach((person, index) => {
+        const column = index % columns;
+        const row = Math.floor(index / columns);
+        placements.push({
+          person,
+          x: column * RELATION_TREE.branchGapX - width / 2,
+          y: componentOffsetY + level * RELATION_TREE.levelGapY + row * RELATION_TREE.branchGapY,
+          groupIds: [],
+        });
+      });
+      componentHeight = Math.max(
+        componentHeight,
+        level * RELATION_TREE.levelGapY + Math.max(0, rows - 1) * RELATION_TREE.branchGapY,
+      );
+    }
+
+    componentOffsetY += componentHeight + RELATION_TREE.componentGapY;
   });
 
   return placements;
@@ -2115,6 +2340,7 @@ function placeClusterHybrid(data: RelationshipData): PersonPlacement[] {
 }
 
 function placementsFor(data: RelationshipData, mode: LayoutMode, centerId: string): PersonPlacement[] {
+  if (mode === 'relationshipTree') return placeRelationshipTree(data, centerId);
   if (mode === 'floorplan') return floorplanPlacements(data);
   if (mode === 'clusterHybrid') return placeClusterHybrid(data);
   if (mode === 'community') return placeCommunity(data);
@@ -2158,7 +2384,7 @@ export function buildLayout(data: RelationshipData, mode: LayoutMode = 'floorpla
    */
   if (mode !== 'floorplan') {
     separateNodes(people, effectiveCenterId);
-    enforceStrictRegions(data.groups, people);
+    if (mode !== 'relationshipTree') enforceStrictRegions(data.groups, people);
     separateNodes(people, effectiveCenterId);
     /* 整列は最後。ここで動かす量は交点 1 つぶん以内なので、囲いの入れ子は崩れない */
     alignToGrid(people);

@@ -6,6 +6,15 @@ dist/
 *.log
 npm-debug.log*
 
+# データ取得時のローカルアーカイブ
+data/*.tar.gz
+data/*.zip
+
+# BlueMap のスポーン周辺3D生成物
+public/bluemap-spawn/**
+!public/bluemap-spawn/
+!public/bluemap-spawn/README.md
+
 # ローカル設定と秘密情報
 .env
 .env.*

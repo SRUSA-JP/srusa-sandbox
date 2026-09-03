@@ -114,9 +114,9 @@ export function MapPage({ theme }: MapPageProps) {
   const [centerId, setCenterId] = useState(data?.view?.centerPersonId ?? data?.project.defaultCenterPersonId ?? '');
   const [highlightedGroupId, setHighlightedGroupId] = useState('');
   const [edgeMode, setEdgeMode] = useState<EdgeMode>(RELATIONSHIP_MAP_DEFAULT_EDGE_MODE);
-  const [layoutMode, setLayoutMode] = useState<LayoutMode>('floorplan');
-  const [tooltipMode, setTooltipMode] = useState<TooltipMode>('on');
-  const [regionMode, setRegionMode] = useState<RegionMode>('on');
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('relationshipTree');
+  const [tooltipMode, setTooltipMode] = useState<TooltipMode>('off');
+  const [regionMode, setRegionMode] = useState<RegionMode>('off');
   const [affiliationMode, setAffiliationMode] = useState<AffiliationMode>('on');
   const [edgeStyleId, setEdgeStyleId] = useState<EdgeStyleId>('wire');
   const [importMessage, setImportMessage] = useState('');
@@ -253,7 +253,7 @@ export function MapPage({ theme }: MapPageProps) {
         wrapped.schemaVersion === 'srusa-relationship-workspace-v1' &&
         LAYOUT_MODES.some((mode) => mode.value === nextLayoutMode)
           ? nextLayoutMode as LayoutMode
-          : 'floorplan';
+          : 'relationshipTree';
 
       setPositions(nextPositions);
       setCenterId(validCenter);
@@ -367,6 +367,19 @@ export function MapPage({ theme }: MapPageProps) {
           </section>
 
           <ProsePanel sections={builderSections(RELATIONSHIPS_CONTENT.sections)} />
+
+          <section className="grid gap-sm text-sm text-subtle">
+            <h3 className="text-md font-medium text-heading">{MAP_TEXT.tuning.title}</h3>
+            <span>{MAP_TEXT.tuning.note}</span>
+            <TuningPanel
+              values={tuning}
+              onChange={changeTuning}
+              onReset={resetTuningValues}
+              onExport={exportTuning}
+              onImport={importTuning}
+              message={tuningMessage}
+            />
+          </section>
         </TechnicalDetails>
       }
       footer={
@@ -382,64 +395,69 @@ export function MapPage({ theme }: MapPageProps) {
             centerPerson && MAP_TEXT.card.map.center(personLabel(centerPerson, nameMode)),
           )}
           actions={
-            <>
-              <Picker
-                showLabel
-                label={MAP_TEXT.picker.center}
-                value={centerId}
-                options={peopleOptions}
-                onChange={setCenterId}
-              />
-              <Picker
-                showLabel
-                label={MAP_TEXT.picker.group}
-                value={highlightedGroupId}
-                options={groupOptions}
-                onChange={setHighlightedGroupId}
-              />
-              <Picker
-                showLabel
-                label={MAP_TEXT.picker.layout}
-                value={layoutMode}
-                options={LAYOUT_MODES.map((mode) => ({ value: mode.value, label: mode.label }))}
-                onChange={changeLayoutMode}
-              />
-              <Picker
-                showLabel
-                label={MAP_TEXT.picker.edges}
-                value={edgeMode}
-                options={EDGE_MODES.map((mode) => ({ value: mode.value, label: mode.label }))}
-                onChange={setEdgeMode}
-              />
-              <Picker
-                showLabel
-                label={MAP_TEXT.picker.edgeStyle}
-                value={edgeStyleId}
-                options={EDGE_STYLES.map((entry) => ({ value: entry.value, label: entry.label }))}
-                onChange={setEdgeStyleId}
-              />
-              <Picker
-                showLabel
-                label={MAP_TEXT.picker.affiliationEdges}
-                value={affiliationMode}
-                options={AFFILIATION_OPTIONS}
-                onChange={setAffiliationMode}
-              />
-              <Picker
-                showLabel
-                label={MAP_TEXT.picker.regions}
-                value={regionMode}
-                options={REGION_OPTIONS}
-                onChange={setRegionMode}
-              />
-              <Picker
-                showLabel
-                label={MAP_TEXT.picker.tooltips}
-                value={tooltipMode}
-                options={TOOLTIP_OPTIONS}
-                onChange={setTooltipMode}
-              />
-            </>
+            <details className="rounded-md border-hairline border-divider bg-sunken">
+              <summary className="cursor-pointer px-lg py-xs text-md font-medium text-heading hover:bg-hover">
+                {MAP_TEXT.picker.displaySettings}
+              </summary>
+              <div className="flex flex-wrap items-center gap-md border-t-hairline border-divider p-md">
+                <Picker
+                  showLabel
+                  label={MAP_TEXT.picker.center}
+                  value={centerId}
+                  options={peopleOptions}
+                  onChange={setCenterId}
+                />
+                <Picker
+                  showLabel
+                  label={MAP_TEXT.picker.group}
+                  value={highlightedGroupId}
+                  options={groupOptions}
+                  onChange={setHighlightedGroupId}
+                />
+                <Picker
+                  showLabel
+                  label={MAP_TEXT.picker.layout}
+                  value={layoutMode}
+                  options={LAYOUT_MODES.map((mode) => ({ value: mode.value, label: mode.label }))}
+                  onChange={changeLayoutMode}
+                />
+                <Picker
+                  showLabel
+                  label={MAP_TEXT.picker.edges}
+                  value={edgeMode}
+                  options={EDGE_MODES.map((mode) => ({ value: mode.value, label: mode.label }))}
+                  onChange={setEdgeMode}
+                />
+                <Picker
+                  showLabel
+                  label={MAP_TEXT.picker.edgeStyle}
+                  value={edgeStyleId}
+                  options={EDGE_STYLES.map((entry) => ({ value: entry.value, label: entry.label }))}
+                  onChange={setEdgeStyleId}
+                />
+                <Picker
+                  showLabel
+                  label={MAP_TEXT.picker.affiliationEdges}
+                  value={affiliationMode}
+                  options={AFFILIATION_OPTIONS}
+                  onChange={setAffiliationMode}
+                />
+                <Picker
+                  showLabel
+                  label={MAP_TEXT.picker.regions}
+                  value={regionMode}
+                  options={REGION_OPTIONS}
+                  onChange={setRegionMode}
+                />
+                <Picker
+                  showLabel
+                  label={MAP_TEXT.picker.tooltips}
+                  value={tooltipMode}
+                  options={TOOLTIP_OPTIONS}
+                  onChange={setTooltipMode}
+                />
+              </div>
+            </details>
           }
         >
           <RelationshipMap
@@ -447,6 +465,7 @@ export function MapPage({ theme }: MapPageProps) {
             theme={theme}
             centerId={centerId}
             highlightedGroupId={highlightedGroupId}
+            onHighlightGroup={setHighlightedGroupId}
             edges={edges}
             nameMode={nameMode}
             profileHref={(placement) =>
@@ -466,17 +485,6 @@ export function MapPage({ theme }: MapPageProps) {
                 />
               ) : undefined
             }
-          />
-        </ChartCard>
-
-        <ChartCard title={MAP_TEXT.tuning.title} note={MAP_TEXT.tuning.note}>
-          <TuningPanel
-            values={tuning}
-            onChange={changeTuning}
-            onReset={resetTuningValues}
-            onExport={exportTuning}
-            onImport={importTuning}
-            message={tuningMessage}
           />
         </ChartCard>
 

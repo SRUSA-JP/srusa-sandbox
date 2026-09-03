@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { FIELD, FIELD_INPUT } from '../classes';
 
 export interface NumberFieldProps {
@@ -11,6 +12,9 @@ export interface NumberFieldProps {
 
 /** 数値の入力欄。刻みを決めず、小数もそのまま受ける。 */
 export function NumberField({ label, ariaLabel, value, onChange }: NumberFieldProps) {
+  const [draft, setDraft] = useState(String(value));
+  const [focused, setFocused] = useState(false);
+
   return (
     <label className={FIELD}>
       {label}
@@ -18,9 +22,23 @@ export function NumberField({ label, ariaLabel, value, onChange }: NumberFieldPr
         type="number"
         step="any"
         className={FIELD_INPUT}
-        value={value}
+        value={focused ? draft : String(value)}
         aria-label={ariaLabel}
-        onChange={(event) => onChange(Number(event.target.value))}
+        onFocus={() => {
+          setFocused(true);
+          setDraft(String(value));
+        }}
+        onBlur={() => {
+          setFocused(false);
+          setDraft(String(value));
+        }}
+        onChange={(event) => {
+          const next = event.target.value;
+          setDraft(next);
+          if (next === '') return;
+          const parsed = Number(next);
+          if (Number.isFinite(parsed)) onChange(parsed);
+        }}
       />
     </label>
   );

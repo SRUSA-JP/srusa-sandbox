@@ -154,6 +154,16 @@ export const LAYOUT = {
   proseMaxWidth: 760,
   /** ログイン画面のフォーム幅。スマートフォンでは画面幅に合わせて縮む。 */
   authFormWidth: 384,
+  /** 横並びフォームの最小幅。狭い画面ではこの幅を下限に折り返す。 */
+  inlineFormMinWidth: '14rem',
+  /** ヘッダーとログイン画面に置くサイトロゴの一辺。 */
+  logoSize: 32,
+  /** スマートフォン下部ナビの高さ。 */
+  mobileNavHeight: 56,
+  /** スマートフォン下部ナビのアイコンサイズ。 */
+  mobileNavIconSize: 24,
+  /** スマートフォンで下部ナビに本文が隠れないためのページ下余白。 */
+  mobileNavPagePadding: 'calc(var(--sr-space-page) + var(--sr-layout-mobile-nav-height))',
   /** iOS が入力時に画面を拡大しないためのログイン入力欄の文字サイズ。 */
   authInputFontSize: 16,
   /** 相関図を縮めずに読める最小の幅。これより狭い画面では横スクロールさせる。 */
@@ -169,8 +179,22 @@ export const LAYOUT = {
   viewportHeight: 640,
   /** 狭い画面での表示枠の高さ。境目は BREAKPOINT.compact。 */
   viewportCompactHeight: 420,
+  /** 図の中に重ねるコンパクト凡例の最大高さ。 */
+  viewportLegendMaxHeight: 220,
   /** 図に重ねる吹き出しの最小幅。座標が桁変わりしても幅が跳ねないようにする。 */
   tooltipMinWidth: 180,
+  /** BlueMap の 3D ビューアを埋め込む高さ。 */
+  worldMap3dHeight: 'min(1400px,96dvh)',
+  /** 狭い画面での BlueMap の 3D ビューア高さ。 */
+  worldMap3dCompactHeight: 'calc(100dvh - var(--sr-layout-mobile-nav-height))',
+  /** BlueMap の 3D ビューアを全画面にしたときの高さ。 */
+  worldMap3dFullscreenHeight: '100dvh',
+  /** BlueMap の 3D ビューアを埋め込む最小高さ。 */
+  worldMap3dMinHeight: 860,
+  /** BlueMap を広く見るときの内側 iframe 縮小率。 */
+  worldMap3dScale: 0.82,
+  /** 縮小した BlueMap iframe の論理サイズ。1 / worldMap3dScale と揃える。 */
+  worldMap3dScaledSize: '121.9512195122%',
   /**
    * 人物の吹き出しの最大幅。
    *

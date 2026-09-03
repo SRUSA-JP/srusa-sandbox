@@ -66,6 +66,7 @@ export interface PlayerDailyDelta {
 
 export interface PlayerDailyDocument {
   generated_on: string;
+  playtime_source?: string;
   rows: PlayerDailyDelta[];
 }
 
