@@ -88,13 +88,17 @@ export function WorldMap3dViewer({ mapId, src }: WorldMap3dViewerProps) {
       assetUrl(src, `maps/${mapId}/settings.json`),
       assetUrl(src, `maps/${mapId}/textures.json.gzraw`),
     ],
-    [mapId, src],
+    [src, mapId],
   );
 
   useEffect(() => {
     const controller = new AbortController();
-    Promise.all(checkUrls.map((url) => fetch(url, { method: 'HEAD', signal: controller.signal })))
-      .then((responses) => setAvailable(responses.every((response) => response.ok)))
+    Promise.all(
+      checkUrls.map((url) =>
+        fetch(url, { method: 'HEAD', signal: controller.signal }).then((r) => r.ok),
+      ),
+    )
+      .then((results) => setAvailable(results.every(Boolean)))
       .catch((cause) => {
         if ((cause as Error).name !== 'AbortError') setAvailable(false);
       });
