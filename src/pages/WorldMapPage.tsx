@@ -38,7 +38,7 @@ const LATEST_MAPS = 'latest';
 type TooltipMode = 'on' | 'off';
 type DimensionSelection = typeof ALL_DIMENSIONS | string;
 type SnapshotSelection = typeof LATEST_MAPS | string;
-type ThreeDMapId = 'overworld_spawn' | 'twilightforest_spawn';
+type ThreeDMapId = 'overworld_spawn' | 'twilightforest_spawn' | 'before_srusa_spawn';
 
 const TOOLTIP_OPTIONS: Array<{ value: TooltipMode; label: string }> = [
   { value: 'on', label: MAP_TEXT.picker.tooltipOn },
@@ -48,11 +48,13 @@ const TOOLTIP_OPTIONS: Array<{ value: TooltipMode; label: string }> = [
 const THREE_D_MAP_OPTIONS: Array<{ value: ThreeDMapId; label: string }> = [
   { value: 'overworld_spawn', label: WORLD_MAP_TEXT.threeD.maps.overworld },
   { value: 'twilightforest_spawn', label: WORLD_MAP_TEXT.threeD.maps.twilightForest },
+  { value: 'before_srusa_spawn', label: WORLD_MAP_TEXT.threeD.maps.beforeSrusa },
 ];
 
 const THREE_D_MAP_CAMERA: Record<ThreeDMapId, string> = {
   overworld_spawn: 'overworld_spawn:0:80:0:1100:0:0.85:0:0:perspective',
   twilightforest_spawn: 'twilightforest_spawn:-50:80:200:700:0:0.85:0:0:perspective',
+  before_srusa_spawn: 'before_srusa_spawn:0:80:0:3000:0:0.85:0:0:perspective',
 };
 
 /**

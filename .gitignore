@@ -18,6 +18,8 @@ public/bluemap-spawn/maps/*
 !public/bluemap-spawn/maps/overworld_spawn/**
 !public/bluemap-spawn/maps/twilightforest_spawn/
 !public/bluemap-spawn/maps/twilightforest_spawn/**
+!public/bluemap-spawn/maps/before_srusa_spawn/
+!public/bluemap-spawn/maps/before_srusa_spawn/**
 
 # ローカル設定と秘密情報
 .env
