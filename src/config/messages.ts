@@ -533,6 +533,7 @@ export const WORLD_MAP_TEXT = {
     maps: {
       overworld: 'オーバーワールド',
       twilightForest: '黄昏の森',
+      beforeSrusa: '旧ワールド（スポーン）',
     },
     fullscreen: '全画面',
     exitFullscreen: '全画面を終了',
@@ -541,11 +542,6 @@ export const WORLD_MAP_TEXT = {
     loading: '限定 3D の生成物を確認しています。',
     missing:
       '限定 3D の生成物がありません。../srusa-portal/bluemap/web から public/bluemap-spawn/ へ同期すると表示できます。',
-    maps: {
-      overworld: 'オーバーワールド',
-      twilightForest: '黄昏の森',
-      beforeSrusa: '旧ワールド（スポーン）',
-    },
   },
 } as const;
 
