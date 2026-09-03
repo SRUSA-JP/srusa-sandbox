@@ -13,13 +13,13 @@ import {
 } from './src/config/pwa';
 
 /**
- * public/bluemap-spawn/ 以下の .gz ファイルをそのまま配信する。
+ * public/bluemap-spawn/ 以下の .gz リクエストを .gzraw ファイルで配信する。
  *
- * Vite のデフォルトは .gz ファイルに Content-Encoding: gzip を付けて返す。
- * ブラウザがこれを受け取ると自動展開するため、BlueMap の clientDecompression: true が
- * DecompressionStream で二重展開しようとしてエラーになる。
- * このプラグインは bluemap-spawn/ 以下の .gz リクエストを先取りし、
- * Content-Encoding なしで生バイトを返す。
+ * BlueMap は clientDecompression: true のとき .gz を要求する。
+ * Vite は .gz ファイルに Content-Encoding: gzip を自動付加して返すため、
+ * ブラウザが自動展開してしまい、DecompressionStream が二重展開してエラーになる。
+ * タイルファイルを .gzraw 拡張子で保存しておくと Vite は Content-Encoding を付けない。
+ * このプラグインは .gz リクエストを受け取ったとき .gzraw ファイルを探して返す。
  */
 function blueMapGzRaw(): Plugin {
   return {
@@ -28,17 +28,17 @@ function blueMapGzRaw(): Plugin {
       server.middlewares.use((request, response, next) => {
         const url = request.url?.split('?')[0] ?? '';
         if (!url.startsWith('/bluemap-spawn/') || !url.endsWith('.gz')) return next();
-        const filePath = join(process.cwd(), 'public', url);
+        const rawPath = join(process.cwd(), 'public', url + 'raw');
         let stat;
         try {
-          stat = statSync(filePath);
+          stat = statSync(rawPath);
         } catch {
           return next();
         }
         response.setHeader('Content-Type', 'application/octet-stream');
         response.setHeader('Content-Length', stat.size);
         response.setHeader('Cache-Control', 'no-cache');
-        createReadStream(filePath).pipe(response);
+        createReadStream(rawPath).pipe(response);
       });
     },
   };
