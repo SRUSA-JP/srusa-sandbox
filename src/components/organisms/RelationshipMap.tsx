@@ -51,6 +51,15 @@ export interface RelationshipMapProps {
   /** 関係線の見せ方（map/config.ts の EDGE_STYLES）。 */
   edgeStyleId?: EdgeStyleId;
   /**
+   * 人を掴んで動かせるようにするか。既定は false（表示のみ）。
+   *
+   * スマホでは掴んだ瞬間に領域・関係線を引き直す処理が重く、一瞬表示が
+   * 崩れて見えることがある。ほとんどの人は配置を変えずに眺めるだけなので、
+   * 動かせる状態は明示的に選んだときだけにする。false でも人を押して
+   * 紹介を見ることはできる（掴んで動かす操作だけを止める）。
+   */
+  editable?: boolean;
+  /**
    * 「関連度ベースの重力アルゴリズム」（gravity）用のエッジと重み。
    *
    * 渡すと、人を掴んで動かしたときに引力の強い相手がつられて動く
@@ -105,6 +114,7 @@ export function RelationshipMap({
   showTooltips = true,
   showRegions = true,
   edgeStyleId,
+  editable = false,
   gravityEdges = NO_GRAVITY_EDGES,
 }: RelationshipMapProps) {
   const panZoom = usePanZoom(layout.width, layout.height, RELATIONSHIP_ZOOM);
@@ -230,11 +240,10 @@ export function RelationshipMap({
       });
 
   /* ---------------------------------------------------------------- *
-   * 人を掴んで動かす
+   * 人を押す・（編集できるときだけ）掴んで動かす
    * ---------------------------------------------------------------- */
 
   const pointerFor = (placement: PersonPlacement) => {
-    if (!onMovePerson) return undefined;
     const personId = placement.person.id;
 
     return {
@@ -257,7 +266,8 @@ export function RelationshipMap({
           startY: event.clientY,
           moved: false,
         };
-        setGrabbedId(personId);
+        /* 表示のみのときは、押しても「掴んだ」見た目にしない（動かせないため） */
+        if (editable) setGrabbedId(personId);
         setActivePersonId(null);
       },
 
@@ -276,13 +286,22 @@ export function RelationshipMap({
         }
 
         /* 指で触れると数 px は動くので、しきい値を越えるまでは掴んだだけとみなす */
+        let justStartedMoving = false;
         if (!state.moved) {
           const distance = Math.hypot(event.clientX - state.startX, event.clientY - state.startY);
           if (distance < VIEWPORT.dragThreshold) return;
           state.moved = true;
-          /* 動かし始めたところで、つられて動く相手を決める（gravity 配置のときだけ効く） */
-          startGravityFollow(personId);
+          justStartedMoving = true;
         }
+
+        /*
+         * 表示のみのときは、しきい値を越えても位置は変えない。
+         * 領域・関係線の引き直しは重く、動かすたびに一瞬表示が崩れて見えるため、
+         * 明示的に編集を選んだときだけそのコストを払う。
+         */
+        if (!editable || !onMovePerson) return;
+        /* 動かし始めたところで、つられて動く相手を決める（gravity 配置のときだけ効く） */
+        if (justStartedMoving) startGravityFollow(personId);
 
         const point = panZoom.toContentPoint(event.clientX, event.clientY);
         const next = clampToCanvas(layout, {
