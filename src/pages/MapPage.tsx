@@ -20,7 +20,7 @@ import {
 } from '../map/config';
 import { loadRelationshipData } from '../map/data';
 import { groupTypeLabel, personLabel } from '../map/display';
-import { buildLayout, withPositions } from '../map/layout';
+import { buildGravityEdges, buildLayout, withPositions } from '../map/layout';
 import { parseRelationshipData } from '../map/parse';
 import type { Point } from '../map/geometry';
 import type { RelationshipData } from '../map/schema';
@@ -175,7 +175,15 @@ export function MapPage({ theme }: MapPageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [centerId, data, layoutMode, tuningRevision],
   );
-  const layout = useMemo(() => (base ? withPositions(base, positions) : null), [base, positions]);
+  const layout = useMemo(
+    () => (base ? withPositions(base, positions, { enforceRegions: layoutMode !== 'gravity' }) : null),
+    [base, positions, layoutMode],
+  );
+  /* gravity 配置のときだけ、ドラッグ追従（つられて動く相手）を効かせる */
+  const gravityEdges = useMemo(
+    () => (data && layoutMode === 'gravity' ? buildGravityEdges(data) : []),
+    [data, layoutMode],
+  );
 
   const movePerson = useCallback((personId: string, x: number, y: number) => {
     setPositions((previous) => ({ ...previous, [personId]: { x, y } }));
@@ -476,6 +484,7 @@ export function MapPage({ theme }: MapPageProps) {
             showRegions={regionMode === 'on'}
             showAffiliationEdges={affiliationMode === 'on'}
             edgeStyleId={edgeStyleId}
+            gravityEdges={gravityEdges}
             actions={
               Object.keys(positions).length > 0 ? (
                 <Button

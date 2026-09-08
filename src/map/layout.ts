@@ -15,6 +15,8 @@ import {
   EDGE,
   FALLBACK_GROUP_TYPE,
   FLOORPLAN,
+  GRAVITY_LAYOUT,
+  GRAVITY_PHYSICS,
   GRID,
   GROUP_RELAX,
   groupConnects,
@@ -27,6 +29,7 @@ import {
   UNASSIGNED,
   type LayoutMode,
 } from './config';
+import { gravityDegree, gravityNodeRepulsion } from './gravityDrag';
 import { centroid, enclosingPolygon, inflatedBox, pointInPolygon, polygonArea, type Point } from './geometry';
 import type { Group, Person, Relation, RelationshipData } from './schema';
 
@@ -894,6 +897,152 @@ function placeForce(data: RelationshipData): PersonPlacement[] {
       point.y += (move.y / distance) * Math.min(distance, temperature);
     }
     temperature *= 0.96;
+  }
+
+  return people.map((person) => {
+    const point = positions.get(person.id)!;
+    return { person, x: point.x, y: point.y, groupIds: [] };
+  });
+}
+
+/** 「関連度ベースの重力アルゴリズム」1 本ぶんのエッジと重み w。 */
+export interface GravityEdge {
+  a: string;
+  b: string;
+  weight: number;
+}
+
+/**
+ * そのグループを共有していることの「珍しさ」。
+ *
+ * 同じ所属を持つ人が少ないグループほど、その繋がりの意味が大きい
+ * （2 人だけの部活と、30 人のサークルでは重みが違う）。
+ */
+function groupRarity(connectingMemberCount: number): number {
+  return 1 / Math.max(connectingMemberCount - 1, 1);
+}
+
+/**
+ * 「関連度ベースの重力アルゴリズム」用のエッジと重み w を作る（TODO.md 参照）。
+ *
+ * 手動で書かれた関係（Relation）は 1 + 共有タグ希少度。
+ * 明示関係が無く、知り合いを意味する所属（groupConnects）を共有しているだけの
+ * ペアは、希少度そのものを重みにする。同じペアが複数のグループを共有していれば、
+ * いちばん珍しいグループの希少度を採る。
+ */
+export function buildGravityEdges(data: RelationshipData): GravityEdge[] {
+  const rarityByPair = new Map<string, number>();
+
+  for (const group of data.groups) {
+    if (!groupConnects(group)) continue;
+    const members = data.people.filter((person) => person.attributes.includes(group.name));
+    if (members.length < 2) continue;
+    const rarity = groupRarity(members.length);
+    for (let i = 0; i < members.length; i += 1) {
+      for (let j = i + 1; j < members.length; j += 1) {
+        const key = relationKey(members[i].id, members[j].id);
+        rarityByPair.set(key, Math.max(rarityByPair.get(key) ?? 0, rarity));
+      }
+    }
+  }
+
+  const edges = new Map<string, GravityEdge>();
+  for (const [key, rarity] of rarityByPair) {
+    const [a, b] = key.split('|');
+    edges.set(key, { a, b, weight: rarity });
+  }
+
+  for (const relation of data.relations) {
+    if (relation.source === relation.target) continue;
+    const key = relationKey(relation.source, relation.target);
+    const weight = 1 + (rarityByPair.get(key) ?? 0);
+    const current = edges.get(key);
+    edges.set(key, { a: relation.source, b: relation.target, weight: Math.max(current?.weight ?? 0, weight) });
+  }
+
+  return [...edges.values()];
+}
+
+/**
+ * 「関連度ベースの重力アルゴリズム」の静止レイアウト（TODO.md 参照）。
+ *
+ * 重いエッジほど理想エッジ長を短くし、次数の高いノード（ハブ）ほど強く
+ * 周りを押し返し、全体を中心（原点）へ弱く引き戻す。3 つの力を積み上げて、
+ * ドラッグ追従（gravityDrag.ts）と同じ時間刻み・減衰・速度上限で釣り合うまで動かす。
+ */
+function placeGravity(data: RelationshipData): PersonPlacement[] {
+  const people = sortedPeople(data);
+  const edges = buildGravityEdges(data);
+  const degree = gravityDegree(edges);
+  const positions = new Map(placeCircular(data).map((placement) => [placement.person.id, { x: placement.x, y: placement.y }]));
+  const velocities = new Map(people.map((person) => [person.id, { x: 0, y: 0 }]));
+
+  for (let iteration = 0; iteration < GRAVITY_LAYOUT.iterations; iteration += 1) {
+    const forces = new Map(people.map((person) => [person.id, { x: 0, y: 0 }]));
+
+    /* ノード反発力。ハブは強く、通常のノードは弱く周りを押し返す */
+    for (let i = 0; i < people.length; i += 1) {
+      for (let j = i + 1; j < people.length; j += 1) {
+        const a = positions.get(people[i].id)!;
+        const b = positions.get(people[j].id)!;
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distance = Math.max(1, Math.hypot(dx, dy));
+        const repulsion = Math.max(
+          gravityNodeRepulsion(degree.get(people[i].id) ?? 0),
+          gravityNodeRepulsion(degree.get(people[j].id) ?? 0),
+        );
+        const force = repulsion / (distance * distance);
+        const fx = (dx / distance) * force;
+        const fy = (dy / distance) * force;
+        forces.get(people[i].id)!.x += fx;
+        forces.get(people[i].id)!.y += fy;
+        forces.get(people[j].id)!.x -= fx;
+        forces.get(people[j].id)!.y -= fy;
+      }
+    }
+
+    /* 理想エッジ長へ戻すばね。重いエッジほど短い長さに収束させる */
+    for (const edge of edges) {
+      const a = positions.get(edge.a);
+      const b = positions.get(edge.b);
+      if (!a || !b) continue;
+      const idealLength = GRAVITY_LAYOUT.idealLengthScale / Math.sqrt(Math.max(edge.weight, 1));
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const distance = Math.max(1, Math.hypot(dx, dy));
+      const force = (distance - idealLength) * GRAVITY_LAYOUT.springStrength;
+      const fx = (dx / distance) * force;
+      const fy = (dy / distance) * force;
+      forces.get(edge.a)!.x += fx;
+      forces.get(edge.a)!.y += fy;
+      forces.get(edge.b)!.x -= fx;
+      forces.get(edge.b)!.y -= fy;
+    }
+
+    /* 中心への求心力。図全体が原点から離れすぎないようにする */
+    for (const person of people) {
+      const point = positions.get(person.id)!;
+      const force = forces.get(person.id)!;
+      force.x -= point.x * GRAVITY_LAYOUT.centerPull;
+      force.y -= point.y * GRAVITY_LAYOUT.centerPull;
+    }
+
+    /* 速度積分。ドラッグ追従と同じ時間刻み・減衰・速度上限で動かす */
+    for (const person of people) {
+      const point = positions.get(person.id)!;
+      const velocity = velocities.get(person.id)!;
+      const force = forces.get(person.id)!;
+      velocity.x = (velocity.x + force.x * GRAVITY_PHYSICS.timeStep) * GRAVITY_PHYSICS.damping;
+      velocity.y = (velocity.y + force.y * GRAVITY_PHYSICS.timeStep) * GRAVITY_PHYSICS.damping;
+      const speed = Math.hypot(velocity.x, velocity.y);
+      if (speed > GRAVITY_PHYSICS.maxSpeed) {
+        velocity.x = (velocity.x / speed) * GRAVITY_PHYSICS.maxSpeed;
+        velocity.y = (velocity.y / speed) * GRAVITY_PHYSICS.maxSpeed;
+      }
+      point.x += velocity.x;
+      point.y += velocity.y;
+    }
   }
 
   return people.map((person) => {
@@ -2341,6 +2490,7 @@ function placeClusterHybrid(data: RelationshipData): PersonPlacement[] {
 
 function placementsFor(data: RelationshipData, mode: LayoutMode, centerId: string): PersonPlacement[] {
   if (mode === 'relationshipTree') return placeRelationshipTree(data, centerId);
+  if (mode === 'gravity') return placeGravity(data);
   if (mode === 'floorplan') return floorplanPlacements(data);
   if (mode === 'clusterHybrid') return placeClusterHybrid(data);
   if (mode === 'community') return placeCommunity(data);
@@ -2409,9 +2559,20 @@ export function buildLayout(data: RelationshipData, mode: LayoutMode = 'floorpla
  * 動いて領域が置き去りになり、所属の関係が読めなくなる。
  *
  * 元の layout は変更しない（純関数）。差し替えが無ければそのまま返す。
+ *
+ * `enforceRegions` は既定で true（今までどおり、はみ出した非所属者を押し出す）。
+ * 「関連度ベースの重力アルゴリズム」のドラッグ追従は 1 回のドラッグ中に毎フレーム
+ * 何人も動かすため、押し出し（最大で 1 回あたり数千 px 動かしうる）と追従の
+ * バネ力が押し合って発散する。その場合だけ false を渡し、押し出しをせず
+ * 現在位置から囲いを引き直すだけにする（放したあとに元へ戻せば直る）。
  */
-export function withPositions(layout: MapLayout, positions: Record<string, Point>): MapLayout {
+export function withPositions(
+  layout: MapLayout,
+  positions: Record<string, Point>,
+  options: { enforceRegions?: boolean } = {},
+): MapLayout {
   if (Object.keys(positions).length === 0) return layout;
+  const { enforceRegions = true } = options;
 
   const people = layout.people.map((placement) => {
     const moved = positions[placement.person.id];
@@ -2419,10 +2580,8 @@ export function withPositions(layout: MapLayout, positions: Record<string, Point
   });
   const byId = new Map(people.map((placement) => [placement.person.id, placement]));
 
-  const regions = enforceStrictRegions(
-    layout.regions.map((region) => region.group),
-    people,
-  )
+  const groups = layout.regions.map((region) => region.group);
+  const regions = (enforceRegions ? enforceStrictRegions(groups, people) : buildRegions(groups, people))
     .map((region) => {
       const points = region.memberIds
         .map((id) => byId.get(id))
