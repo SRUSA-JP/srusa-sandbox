@@ -53,6 +53,7 @@ interface RelationshipWorkspaceExport {
 type TooltipMode = 'on' | 'off';
 type RegionMode = 'on' | 'off';
 type AffiliationMode = 'on' | 'off';
+type EditMode = 'view' | 'edit';
 
 const TOOLTIP_OPTIONS: Array<{ value: TooltipMode; label: string }> = [
   { value: 'on', label: MAP_TEXT.picker.tooltipOn },
@@ -67,6 +68,11 @@ const REGION_OPTIONS: Array<{ value: RegionMode; label: string }> = [
 const AFFILIATION_OPTIONS: Array<{ value: AffiliationMode; label: string }> = [
   { value: 'on', label: MAP_TEXT.picker.affiliationOn },
   { value: 'off', label: MAP_TEXT.picker.affiliationOff },
+];
+
+const EDIT_OPTIONS: Array<{ value: EditMode; label: string }> = [
+  { value: 'view', label: MAP_TEXT.picker.editModeOff },
+  { value: 'edit', label: MAP_TEXT.picker.editModeOn },
 ];
 
 function isPoint(value: unknown): value is Point {
@@ -118,6 +124,8 @@ export function MapPage({ theme }: MapPageProps) {
   const [tooltipMode, setTooltipMode] = useState<TooltipMode>('off');
   const [regionMode, setRegionMode] = useState<RegionMode>('off');
   const [affiliationMode, setAffiliationMode] = useState<AffiliationMode>('on');
+  /* 既定は表示のみ。スマホでは掴んで動かすたびに一瞬表示が崩れて見えるため、明示的に選んだときだけ動かせるようにする */
+  const [editMode, setEditMode] = useState<EditMode>('view');
   const [edgeStyleId, setEdgeStyleId] = useState<EdgeStyleId>('wire');
   const [importMessage, setImportMessage] = useState('');
 
@@ -452,6 +460,13 @@ export function MapPage({ theme }: MapPageProps) {
                 />
                 <Picker
                   showLabel
+                  label={MAP_TEXT.picker.editMode}
+                  value={editMode}
+                  options={EDIT_OPTIONS}
+                  onChange={setEditMode}
+                />
+                <Picker
+                  showLabel
                   label={MAP_TEXT.picker.regions}
                   value={regionMode}
                   options={REGION_OPTIONS}
@@ -483,6 +498,7 @@ export function MapPage({ theme }: MapPageProps) {
             showTooltips={tooltipMode === 'on'}
             showRegions={regionMode === 'on'}
             showAffiliationEdges={affiliationMode === 'on'}
+            editable={editMode === 'edit'}
             edgeStyleId={edgeStyleId}
             gravityEdges={gravityEdges}
             actions={
