@@ -1,6 +1,7 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { MAP_TEXT, VIEWPORT_TEXT } from '../../config/messages';
 import { RELATIONSHIP_ZOOM, VIEWPORT } from '../../config/viewport';
+import { useGravityFollow } from '../../hooks/useGravityFollow';
 import { usePanZoom } from '../../hooks/usePanZoom';
 import { toScreen, transformStyle } from '../../lib/viewport';
 import {
@@ -13,7 +14,7 @@ import {
   type NodeState,
 } from '../../map/display';
 import { groupConnects, LEGEND, type EdgeStyleId } from '../../map/config';
-import type { MapLayout, PersonPlacement } from '../../map/layout';
+import type { GravityEdge, MapLayout, PersonPlacement } from '../../map/layout';
 import type { Group } from '../../map/schema';
 import type { VizTheme } from '../../theme/palette';
 import { Swatch } from '../atoms';
@@ -49,7 +50,18 @@ export interface RelationshipMapProps {
   showRegions?: boolean;
   /** 関係線の見せ方（map/config.ts の EDGE_STYLES）。 */
   edgeStyleId?: EdgeStyleId;
+  /**
+   * 「関連度ベースの重力アルゴリズム」（gravity）用のエッジと重み。
+   *
+   * 渡すと、人を掴んで動かしたときに引力の強い相手がつられて動く
+   * （hooks/useGravityFollow.ts）。この配置モードのときだけ渡す想定で、
+   * 空配列・未指定なら今までどおり掴んだ人だけが動く。
+   */
+  gravityEdges?: GravityEdge[];
 }
+
+const NO_GRAVITY_EDGES: GravityEdge[] = [];
+function noop(): void {}
 
 /** 掴んでいる最中の人物。動いたかどうかで「押した」と「動かした」を分ける。 */
 interface DragState {
@@ -93,11 +105,25 @@ export function RelationshipMap({
   showTooltips = true,
   showRegions = true,
   edgeStyleId,
+  gravityEdges = NO_GRAVITY_EDGES,
 }: RelationshipMapProps) {
   const panZoom = usePanZoom(layout.width, layout.height, RELATIONSHIP_ZOOM);
   const drag = useRef<DragState | null>(null);
   const [grabbedId, setGrabbedId] = useState<string | null>(null);
   const [activePersonId, setActivePersonId] = useState<string | null>(null);
+
+  /* 追従の計算は毎フレーム最新の座標を読むので、描画のたびに ref を更新しておく */
+  const layoutRef = useRef(layout);
+  useEffect(() => {
+    layoutRef.current = layout;
+  }, [layout]);
+  const { start: startGravityFollow, stop: stopGravityFollow } = useGravityFollow(
+    layoutRef,
+    gravityEdges,
+    onMovePerson ?? noop,
+  );
+  /* stop は useCallback（依存なし）で参照が固定なので、これは実際のアンマウント時にしか走らない */
+  useEffect(() => stopGravityFollow, [stopGravityFollow]);
 
   const relatedIds = useMemo(() => {
     const ids = new Set<string>();
@@ -245,6 +271,7 @@ export function RelationshipMap({
         if (panZoom.pointerCount() >= 2) {
           drag.current = null;
           setGrabbedId(null);
+          stopGravityFollow();
           return;
         }
 
@@ -253,6 +280,8 @@ export function RelationshipMap({
           const distance = Math.hypot(event.clientX - state.startX, event.clientY - state.startY);
           if (distance < VIEWPORT.dragThreshold) return;
           state.moved = true;
+          /* 動かし始めたところで、つられて動く相手を決める（gravity 配置のときだけ効く） */
+          startGravityFollow(personId);
         }
 
         const point = panZoom.toContentPoint(event.clientX, event.clientY);
@@ -271,6 +300,7 @@ export function RelationshipMap({
         if (state && !state.moved) setActivePersonId(personId);
         drag.current = null;
         setGrabbedId(null);
+        stopGravityFollow();
       },
     };
   };

@@ -258,6 +258,72 @@ export const RELATION_TREE = {
   componentGapY: 180,
 } as const;
 
+/**
+ * 「関連度ベースの重力アルゴリズム」の速度積分。
+ *
+ * 静止レイアウト（力を積み上げて座標を決める）と、ドラッグ追従
+ * （掴んだノードにつられて動く相手を動かす）の両方で、同じ時間刻み・
+ * 減衰・速度上限を使う。TODO.md に残した仕様のうち、ドラッグ追従の
+ * 手順 5 で明示されている値。静止レイアウトはこれをそのまま使い、
+ * 掴んでいるノードが無い状態で釣り合うまで回す。
+ */
+export const GRAVITY_PHYSICS = {
+  /** 1 回の積分あたりの時間刻み。 */
+  timeStep: 0.02,
+  /** 速度の減衰。1 に近いほど揺れが長く残る。 */
+  damping: 0.78,
+  /** 1 回の積分で動ける最大距離（px）。 */
+  maxSpeed: 40,
+} as const;
+
+/**
+ * 「関連度ベースの重力アルゴリズム」の静止レイアウト。
+ *
+ * TODO.md に残した仕様の「静止レイアウト」節の値をそのまま定数にする。
+ * ばねの強さ（springStrength）と繰り返し回数（iterations）は仕様に
+ * 無かったので、GRAVITY_PHYSICS の時間刻みで収束する値を実験で決めた。
+ */
+export const GRAVITY_LAYOUT = {
+  /** これ以上の次数（エッジの本数）を持つノードをハブとして扱う。 */
+  hubDegreeThreshold: 5,
+  /** ハブノードの反発力。 */
+  hubRepulsion: 90000,
+  /** 通常ノードの反発力。 */
+  normalRepulsion: 6000,
+  /** 理想エッジ長 = これ / √max(w, 1)。重いエッジほど短くまとまる。 */
+  idealLengthScale: 60,
+  /** 中心（原点）への求心力。 */
+  centerPull: 0.7,
+  /** 理想エッジ長からのずれを戻すばねの強さ。 */
+  springStrength: 0.5,
+  /** 力を積み上げて座標を決める繰り返し回数。 */
+  iterations: 400,
+} as const;
+
+/**
+ * 「関連度ベースの重力アルゴリズム」のドラッグ追従。
+ *
+ * TODO.md に残した仕様の「ドラッグ追従」節の値をそのまま定数にする。
+ */
+export const GRAVITY_DRAG = {
+  /** 1 本のエッジの引力 e(w) = w / (w + これ)。0〜1未満に飽和する。 */
+  attractionSaturation: 4,
+  /** 掴んだノードからの幅優先探索の上限ホップ数。 */
+  maxHops: 3,
+  /** これ未満に減衰した引力の伝搬は打ち切る。 */
+  minAttraction: 0.02,
+  /** 直接の隣接ノード（0 ホップ目）に掛けるブースト。 */
+  directBoost: 1.5,
+  /** 引力の上限。 */
+  maxAttraction: 0.99,
+  /** 引力が強い上位何ノードを追従対象にするか。 */
+  followCount: 16,
+  /** バネ力 = (目標位置 − 現在位置) × (引力 × これ)。 */
+  springScale: 3,
+  /** 反発力 = これ × ノード反発力 / 距離²。 */
+  repulsionScale: 0.08,
+} as const;
+
 export const GRID = {
   /** 交点の間隔。アイコンと名前が入る幅を取る。 */
   cell: 62,
@@ -552,6 +618,7 @@ export type EdgeMode = (typeof EDGE_MODES)[number]['value'];
 /** 相関図の配置アルゴリズム。 */
 export const LAYOUT_MODES = [
   { value: 'relationshipTree', label: '関係樹' },
+  { value: 'gravity', label: '関連度重力' },
   { value: 'floorplan', label: '区画' },
   { value: 'cluster', label: '所属クラスタ' },
   { value: 'clusterHybrid', label: '所属ハイブリッド' },
