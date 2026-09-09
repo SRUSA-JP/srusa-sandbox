@@ -459,3 +459,9 @@ git rev-parse --abbrev-ref HEAD
 
 - 配色を変えたら、ライト / ダーク × 標準 / ドット絵風の 4 通りで見え方を確認する
 - README の説明と実際のファイル構成・コマンドが一致していること
+- **利用者から見える変更（新機能・仕様変更・目立つ不具合修正）をしたら、ホームの更新ログにも追記する。**
+  [src/content/home.ts](src/content/home.ts) の `HOME_UPDATES` 配列の先頭に、今日の日付・分類（`category`）・
+  短い見出し（`title`）・1〜2文の要約（`summary`）・要点の箇条書き（`details`）を、既存の書き方に合わせて足す。
+  ホームは直近 `HOME_UPDATES_VISIBLE_LIMIT`（[src/config/dataRegistry.ts](src/config/dataRegistry.ts)）件だけを
+  開かなくても見せ、それより前は折りたたむ仕組みなので、配列の並び順（新しい変更が先頭）を保つこと。
+  内部実装だけの変更（リファクタリング、CI/CD 設定、ドキュメントのみの修正）は対象外
