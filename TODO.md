@@ -8,6 +8,9 @@
   - 面白クリップ（[src/pages/ClipsPage.tsx](src/pages/ClipsPage.tsx) / [src/config/clips.ts](src/config/clips.ts) の既存ギャラリー）へ、クリップの追加を行う
   - どちらも対象データ・件数・画面構成は未確定。着手時に何を集めるか・どこに置くかを利用者に確認すること
   - オフラインカスタムの参加者は、CLAUDE.md「人物・参加者データの扱い」に沿って `personId` / `playerSlug` を持たせる設計にする
+  - 原文: `これオフラインカスタムで https://youtube.com/live/Jc7kLYbY18U?si=1w4Y5zhpnYoHnz-b 20260327やね日付が`
+    - 記録対象の第1例。日付は 2026-03-27。実装時にこのアーカイブを最初のデータとして取り込む
+    - 参加者・場所・内容などの詳細は本文からは分からないため、着手時に確認する
 
 ### DONE
 
