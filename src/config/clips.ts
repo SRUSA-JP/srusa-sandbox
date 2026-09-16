@@ -102,24 +102,6 @@ export const CLIP_ENTRIES: ClipEntry[] = [
     cast: ['taraba01414', 'gaburichan', 'detkent', 'nodoame'],
     tags: ['highlight'],
   },
-  {
-    id: 'screenshot-spawn',
-    title: 'スポーン地点の空撮',
-    sourceUrl: 'images/bluemap-overworld-spawn.png',
-    category: 'screenshot',
-    map: 'minecraft',
-    tags: ['build', 'memorial'],
-    score: { smooth: 4, clutch: 0, tap: 3, '6kills': 0, onemag: 0 },
-  },
-  {
-    id: 'screenshot-flat',
-    title: '拠点まわりの俯瞰',
-    sourceUrl: 'images/bluemap-overworld-flat.png',
-    category: 'screenshot',
-    map: 'minecraft',
-    tags: ['build', 'highlight'],
-    score: { smooth: 4, clutch: 0, tap: 2, '6kills': 0, onemag: 0 },
-  },
 ];
 
 export const CLIP_TEXT = {
