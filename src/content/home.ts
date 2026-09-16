@@ -32,6 +32,17 @@ export const HOME_CONTENT = {
 export const HOME_UPDATES: HomeUpdate[] = [
   {
     date: '2026-09-16',
+    category: '年表',
+    title: 'SRUSA という名前の由来の時期が判明',
+    href: '#/history',
+    summary: '名前の由来が決まったのは創設と同じ時期（2020-04）と分かったので、年表に反映しました。',
+    details: [
+      '「SRUSA という名前の由来」の年月を 2020-04（創設と同時期）に更新',
+      'どの語の頭文字かは引き続き未確定のまま',
+    ],
+  },
+  {
+    date: '2026-09-16',
     category: 'ギャラリー',
     title: 'ギャラリーの並びを件数に合わせて調整',
     href: '#/gallery',
