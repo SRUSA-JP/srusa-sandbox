@@ -32,6 +32,17 @@ export const HOME_CONTENT = {
 export const HOME_UPDATES: HomeUpdate[] = [
   {
     date: '2026-09-16',
+    category: 'ギャラリー',
+    title: 'ギャラリーのタグを色分け',
+    href: '#/gallery',
+    summary: 'ゲーム・登場人物・シーンのタグを色分けし、見分けやすくしました。押して絞り込む操作は今までどおりです。',
+    details: [
+      'タグをゲーム / 登場人物 / シーンの種類ごとに色分け',
+      '絞り込んでも種類ごとの色は変わらない',
+    ],
+  },
+  {
+    date: '2026-09-16',
     category: '年表',
     title: 'SRUSA という名前の由来の時期が判明',
     href: '#/history',
