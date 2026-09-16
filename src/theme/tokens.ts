@@ -252,6 +252,8 @@ export const BREAKPOINT = {
 export const ICON = {
   /** 文字と並べるときの一辺（px）。本文の文字の高さに合わせる。 */
   size: 16,
+  /** サムネイルに重ねる再生ボタンなど、単体で目立たせるときの一辺（px）。 */
+  sizeLarge: 40,
   /** 図形を描く座標系の一辺。 */
   gridSize: 24,
   /** 線の太さ（座標系の値）。 */

@@ -275,33 +275,35 @@ export function playerDataHighlightColors(
   };
 }
 
+export interface ClipTagColorSet {
+  /** タグの地の色（種類ごとの categorical 色そのもの）。 */
+  background: string;
+  /** その地の上で読める文字色。 */
+  text: string;
+}
+
 export interface ClipTagColors {
-  map: string;
-  agent: string;
-  keyword: string;
+  map: ClipTagColorSet;
+  agent: ClipTagColorSet;
+  keyword: ClipTagColorSet;
 }
 
 /**
  * ギャラリーのタグ（ゲーム／登場人物／シーン・キーワード）の色。
  *
- * どのタグも [TAG](../components/classes.ts) の `bg-sunken` に載るので、
- * その面に対してコントラストを取ってから返す。フィルタで絞り込んでも
+ * 種類ごとの categorical 色をそのまま地の色にし、その上で読める文字色を
+ * 添える（枠線は使わない、塗りそのもので種類を示す）。フィルタで絞り込んでも
  * 種類ごとの色は変わらない（`COLOR_SLOTS` に固定しているため）。
  */
 export function clipTagColors(theme: VizTheme): ClipTagColors {
-  const background = theme.surfaceSunken;
+  const colorSet = (slot: number): ClipTagColorSet => {
+    const background = theme.categorical[slot % theme.categorical.length];
+    return { background, text: readableTextOn(background, theme, CONTRAST_MIN_TEXT) };
+  };
   return {
-    map: ensureContrast(theme.categorical[COLOR_SLOTS.clipMap % theme.categorical.length], background, CONTRAST_MIN_TEXT),
-    agent: ensureContrast(
-      theme.categorical[COLOR_SLOTS.clipAgent % theme.categorical.length],
-      background,
-      CONTRAST_MIN_TEXT,
-    ),
-    keyword: ensureContrast(
-      theme.categorical[COLOR_SLOTS.clipKeyword % theme.categorical.length],
-      background,
-      CONTRAST_MIN_TEXT,
-    ),
+    map: colorSet(COLOR_SLOTS.clipMap),
+    agent: colorSet(COLOR_SLOTS.clipAgent),
+    keyword: colorSet(COLOR_SLOTS.clipKeyword),
   };
 }
 

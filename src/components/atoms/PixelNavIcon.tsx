@@ -19,6 +19,7 @@ const PATTERNS: Record<IconName, readonly string[]> = {
   next: ['00100', '00110', '11111', '00110', '00100'],
   light: ['10101', '01110', '11111', '01110', '10101'],
   dark: ['01110', '11100', '11110', '01111', '00110'],
+  play: ['10000', '11000', '11100', '11000', '10000'],
 };
 
 export interface PixelNavIconProps {

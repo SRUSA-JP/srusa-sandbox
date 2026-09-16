@@ -25,25 +25,31 @@ export interface ClipCardProps {
  * サムネイルではなく画像・動画をそのまま貼り、タグだけを添える。
  * 見れば何のシーンか分かるため、題名や説明の文章は出さない
  * （読み上げ用の alt / iframe title には残す）。
- * タグはゲーム・登場人物・シーンの種類ごとに色を変え、押すと絞り込む。
+ * タグはゲーム・登場人物・シーンの種類ごとに地の色を変え、押すと絞り込む。
  */
 export function ClipCard({ clip, theme, onFilter }: ClipCardProps) {
   const media = clipMedia(clip);
   const imageUrl = media === 'image' ? imageUrlFromClipUrl(clip.sourceUrl) : '';
   const embedUrl = media === 'video' ? embedUrlFromClipUrl(clip.sourceUrl) : '';
   const tagColors = clipTagColors(theme);
-  const tagClass = `${TAG} cursor-pointer transition-opacity hover:opacity-80`;
+  const tagClass = `${TAG} cursor-pointer border-transparent transition-opacity hover:opacity-80`;
 
   return (
     <article className="w-full max-w-[var(--sr-layout-clip-card-max-width)] justify-self-center overflow-hidden rounded-md border-hairline border-divider bg-surface">
-      <ClipFrame title={clip.title} embedUrl={embedUrl} imageUrl={imageUrl} message={CLIP_TEXT.empty} />
+      <ClipFrame
+        title={clip.title}
+        embedUrl={embedUrl}
+        imageUrl={imageUrl}
+        posterUrl={clip.thumbnailUrl}
+        message={CLIP_TEXT.placeholder}
+      />
 
       <div className="flex flex-wrap gap-xs p-md">
         {clip.map && (
           <button
             type="button"
             className={tagClass}
-            style={{ borderColor: tagColors.map, color: tagColors.map }}
+            style={{ backgroundColor: tagColors.map.background, color: tagColors.map.text }}
             onClick={() => onFilter('map', clip.map!)}
           >
             {gameLabel(clip.map)}
@@ -55,7 +61,7 @@ export function ClipCard({ clip, theme, onFilter }: ClipCardProps) {
             key={person}
             type="button"
             className={tagClass}
-            style={{ borderColor: tagColors.agent, color: tagColors.agent }}
+            style={{ backgroundColor: tagColors.agent.background, color: tagColors.agent.text }}
             onClick={() => onFilter('agent', person)}
           >
             {person}
@@ -66,7 +72,7 @@ export function ClipCard({ clip, theme, onFilter }: ClipCardProps) {
             key={keyword}
             type="button"
             className={tagClass}
-            style={{ borderColor: tagColors.keyword, color: tagColors.keyword }}
+            style={{ backgroundColor: tagColors.keyword.background, color: tagColors.keyword.text }}
             onClick={() => onFilter('keyword', keyword)}
           >
             {clipKeywordLabel(keyword)}
