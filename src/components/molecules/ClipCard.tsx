@@ -25,7 +25,7 @@ export interface ClipCardProps {
  * サムネイルではなく画像・動画をそのまま貼り、タグだけを添える。
  * 見れば何のシーンか分かるため、題名や説明の文章は出さない
  * （読み上げ用の alt / iframe title には残す）。
- * タグはゲーム・登場人物・シーンの種類ごとに地の色を変え、押すと絞り込む。
+ * タグはゲーム・登場人物・シーンの種類ごとに枠線・文字の色を変え、押すと絞り込む。
  */
 export function ClipCard({ clip, theme, onFilter }: ClipCardProps) {
   const media = clipMedia(clip);
@@ -45,29 +45,17 @@ export function ClipCard({ clip, theme, onFilter }: ClipCardProps) {
 
       <div className="flex flex-wrap gap-xs p-md">
         {clip.map && (
-          <TagButton
-            label={gameLabel(clip.map)}
-            background={tagColors.map.background}
-            color={tagColors.map.text}
-            onClick={() => onFilter('map', clip.map!)}
-          />
+          <TagButton label={gameLabel(clip.map)} color={tagColors.map} onClick={() => onFilter('map', clip.map!)} />
         )}
         {/* 登場人物は出てくる順に並べる。並びに意味があるので並べ替えない */}
         {(clip.cast ?? []).map((person) => (
-          <TagButton
-            key={person}
-            label={person}
-            background={tagColors.agent.background}
-            color={tagColors.agent.text}
-            onClick={() => onFilter('agent', person)}
-          />
+          <TagButton key={person} label={person} color={tagColors.agent} onClick={() => onFilter('agent', person)} />
         ))}
         {clipKeywords(clip).map((keyword) => (
           <TagButton
             key={keyword}
             label={clipKeywordLabel(keyword)}
-            background={tagColors.keyword.background}
-            color={tagColors.keyword.text}
+            color={tagColors.keyword}
             onClick={() => onFilter('keyword', keyword)}
           />
         ))}
