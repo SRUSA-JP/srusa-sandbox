@@ -32,6 +32,18 @@ export const HOME_CONTENT = {
 export const HOME_UPDATES: HomeUpdate[] = [
   {
     date: '2026-09-16',
+    category: '年表',
+    title: 'オフラインカスタム・APEX カスタムの年月が判明',
+    href: '#/history',
+    summary: '配信アーカイブから、オフラインカスタムと APEX カスタムそれぞれ 1 回ぶんの開催日が分かりました。',
+    details: [
+      'オフラインカスタム（2026-03-27 開催ぶん）の年月を追記。参加者は引き続き未記入',
+      'APEX カスタム（2023-03-05 開催ぶん）の年月を追記。参加者は引き続き未記入',
+      'それぞれもう 1 回ぶんは、年月・参加者とも未記入のまま年表に残している',
+    ],
+  },
+  {
+    date: '2026-09-16',
     category: 'ギャラリー',
     title: 'ギャラリーを展示形式に作り直し',
     href: '#/gallery',
