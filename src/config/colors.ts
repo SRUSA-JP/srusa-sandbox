@@ -207,6 +207,12 @@ export const COLOR_SLOTS = {
   playerTop: 3,
   /** プレイヤーデータで目立つ値を示す色。 */
   playerNotable: 1,
+  /** ギャラリーのタグ：ゲーム。 */
+  clipMap: 2,
+  /** ギャラリーのタグ：登場人物。 */
+  clipAgent: 4,
+  /** ギャラリーのタグ：シーン・キーワード。 */
+  clipKeyword: 5,
 } as const;
 
 export type PlayerDataHighlightLevel = 'normal' | 'notable' | 'top';
@@ -266,6 +272,36 @@ export function playerDataHighlightColors(
     fill: roles.sunken,
     bar: fallback,
     text: roles.text,
+  };
+}
+
+export interface ClipTagColors {
+  map: string;
+  agent: string;
+  keyword: string;
+}
+
+/**
+ * ギャラリーのタグ（ゲーム／登場人物／シーン・キーワード）の色。
+ *
+ * どのタグも [TAG](../components/classes.ts) の `bg-sunken` に載るので、
+ * その面に対してコントラストを取ってから返す。フィルタで絞り込んでも
+ * 種類ごとの色は変わらない（`COLOR_SLOTS` に固定しているため）。
+ */
+export function clipTagColors(theme: VizTheme): ClipTagColors {
+  const background = theme.surfaceSunken;
+  return {
+    map: ensureContrast(theme.categorical[COLOR_SLOTS.clipMap % theme.categorical.length], background, CONTRAST_MIN_TEXT),
+    agent: ensureContrast(
+      theme.categorical[COLOR_SLOTS.clipAgent % theme.categorical.length],
+      background,
+      CONTRAST_MIN_TEXT,
+    ),
+    keyword: ensureContrast(
+      theme.categorical[COLOR_SLOTS.clipKeyword % theme.categorical.length],
+      background,
+      CONTRAST_MIN_TEXT,
+    ),
   };
 }
 

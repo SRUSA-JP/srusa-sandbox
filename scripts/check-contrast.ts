@@ -11,7 +11,7 @@ import {
 } from '../src/theme/palette';
 import { GROUP_BIOMES, GROUP_TYPE_SETTINGS } from '../src/map/config';
 import { SKINS, applySkin } from '../src/config/skins';
-import { roleColors } from '../src/config/colors';
+import { clipTagColors, roleColors } from '../src/config/colors';
 import { edgeStyle, nodeStyle, regionStyle } from '../src/map/display';
 import { calendarDayColors, calendarMarkAccent } from '../src/lib/display';
 
@@ -73,6 +73,11 @@ for (const { label, theme } of cases) {
     check(`系列${i + 1} ドット / ツールチップ背景`, tip.seriesColor(color), tip.background, CONTRAST_MIN_LARGE);
     check(`系列${i + 1} 上の値ラベル`, readableTextOn(color, theme), color, CONTRAST_MIN_TEXT);
   });
+
+  const tagColors = clipTagColors(theme);
+  check('ギャラリー タグ:ゲーム / 沈めた面', tagColors.map, role.sunken, CONTRAST_MIN_TEXT);
+  check('ギャラリー タグ:登場人物 / 沈めた面', tagColors.agent, role.sunken, CONTRAST_MIN_TEXT);
+  check('ギャラリー タグ:シーン / 沈めた面', tagColors.keyword, role.sunken, CONTRAST_MIN_TEXT);
 }
 
 /* 相関図: 領域・ノード・関係線の色も同じ基準で検査する */

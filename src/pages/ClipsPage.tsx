@@ -3,9 +3,14 @@ import { AppLayout, Button, ClipFrame, ClipGallery, Note, TechnicalDetails } fro
 import { ACTIONS, CONTROL_BOX, FIELD } from '../components/classes';
 import { CLIP_ENTRIES, CLIP_TEXT, embedUrlFromClipUrl, imageUrlFromClipUrl } from '../config/clips';
 import { TECHNICAL_TEXT } from '../config/messages';
+import type { VizTheme } from '../theme/palette';
+
+export interface ClipsPageProps {
+  theme: VizTheme;
+}
 
 /** ゲームの名シーン（動画と画像）をずらっと展示するギャラリーページ。 */
-export function ClipsPage() {
+export function ClipsPage({ theme }: ClipsPageProps) {
   const [draftUrl, setDraftUrl] = useState('');
   const [previewUrl, setPreviewUrl] = useState('');
 
@@ -48,7 +53,7 @@ export function ClipsPage() {
         </TechnicalDetails>
       }
     >
-      <ClipGallery clips={CLIP_ENTRIES} />
+      <ClipGallery clips={CLIP_ENTRIES} theme={theme} />
     </AppLayout>
   );
 }

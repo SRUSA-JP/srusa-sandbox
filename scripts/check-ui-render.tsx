@@ -48,7 +48,7 @@ const PAGES: Record<RouteId, PageRenderer> = {
   apex: ({ route }) => <GamePlaceholderPage route={route} />,
   history: ({ route }) => <HistoryPage theme={themeFor(route)} />,
   events: ({ route }) => <EventRankingsPage theme={themeFor(route)} />,
-  clips: () => <ClipsPage />,
+  clips: ({ route }) => <ClipsPage theme={themeFor(route)} />,
   player: ({ route }) => <PlayerPage theme={themeFor(route)} route={route} />,
 };
 

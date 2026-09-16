@@ -10,6 +10,7 @@ import {
 import { ACTIONS, CONTROL, CONTROL_HOVER } from '../classes';
 import { Note, Picker } from '../atoms';
 import { ClipCard, SectionHeader } from '../molecules';
+import type { VizTheme } from '../../theme/palette';
 
 interface ClipFilters {
   map: string;
@@ -19,6 +20,7 @@ interface ClipFilters {
 
 export interface ClipGalleryProps {
   clips: ClipEntry[];
+  theme: VizTheme;
 }
 
 const ALL = 'all';
@@ -35,7 +37,7 @@ const SORT_OPTIONS: Array<{ value: ClipSortKey; label: string }> = [
  * 絞り込み・並び替えは初期状態で折りたたんでおく。並べるだけなら
  * 一目で分かるため、細かい設定は開いた人だけが触れればよい。
  */
-export function ClipGallery({ clips }: ClipGalleryProps) {
+export function ClipGallery({ clips, theme }: ClipGalleryProps) {
   const [filters, setFilters] = useState<ClipFilters>({ map: ALL, agent: ALL, keyword: ALL });
   const [sortKey, setSortKey] = useState<ClipSortKey>('score');
   const filterGroups = useMemo(() => clipFilterGroups(clips), [clips]);
@@ -108,6 +110,7 @@ export function ClipGallery({ clips }: ClipGalleryProps) {
             <ClipCard
               key={clip.id}
               clip={clip}
+              theme={theme}
               onFilter={(type, value) => {
                 if (type === 'keyword') setFilters((current) => ({ ...current, keyword: value }));
                 if (type === 'map') setFilters((current) => ({ ...current, map: value }));
