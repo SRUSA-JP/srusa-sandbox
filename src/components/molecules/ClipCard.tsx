@@ -30,7 +30,7 @@ export function ClipCard({ clip, onFilter }: ClipCardProps) {
   const embedUrl = media === 'video' ? embedUrlFromClipUrl(clip.sourceUrl) : '';
 
   return (
-    <article className="mb-md break-inside-avoid overflow-hidden rounded-md border-hairline border-divider bg-surface">
+    <article className="w-full max-w-[var(--sr-layout-clip-card-max-width)] justify-self-center overflow-hidden rounded-md border-hairline border-divider bg-surface">
       <ClipFrame title={clip.title} embedUrl={embedUrl} imageUrl={imageUrl} message={CLIP_TEXT.empty} />
 
       <div className="flex flex-wrap gap-xs p-md">

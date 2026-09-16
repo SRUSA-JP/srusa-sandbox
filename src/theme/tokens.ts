@@ -216,6 +216,14 @@ export const LAYOUT = {
   numberInputWidth: '7em',
   /** 読み物の表のセルの最小幅（文字数で決めるので ch）。狭い画面で 1 文字ずつ折り返さないため。 */
   proseCellMinWidth: '16ch',
+  /**
+   * ギャラリーのカードの最小・最大幅。
+   *
+   * `auto-fit` の格子に渡す。件数が少ないときに余った列を潰して中央へ寄せ、
+   * 件数が多いときは折り返して並ぶようにするため、`columns` ではなく grid を使う。
+   */
+  clipCardMinWidth: 280,
+  clipCardMaxWidth: 360,
 } as const;
 
 /**
