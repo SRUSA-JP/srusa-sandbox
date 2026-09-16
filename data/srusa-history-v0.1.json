@@ -30,12 +30,20 @@
       "status": "todo"
     },
     {
-      "id": "offline-custom",
+      "id": "offline-custom-2026-03",
+      "date": "2026-03-27",
+      "title": "オフラインカスタム",
+      "detail": "配信アーカイブが残っている。参加者はまだ分かっていない。",
+      "status": "todo",
+      "count": 1
+    },
+    {
+      "id": "offline-custom-unknown",
       "date": "",
       "title": "オフラインカスタム",
-      "detail": "2 回開催。それぞれの年月と参加者がまだ分かっていない。",
+      "detail": "もう 1 回開催。年月と参加者がまだ分かっていない。",
       "status": "todo",
-      "count": 2
+      "count": 1
     },
     {
       "id": "villa-nomi",
@@ -54,12 +62,20 @@
       "count": 1
     },
     {
-      "id": "apex-custom",
+      "id": "apex-custom-2023-03",
+      "date": "2023-03-05",
+      "title": "APEX カスタム",
+      "detail": "配信アーカイブが残っている。参加者はまだ分かっていない。",
+      "status": "todo",
+      "count": 1
+    },
+    {
+      "id": "apex-custom-unknown",
       "date": "",
       "title": "APEX カスタム",
-      "detail": "2 回開催。それぞれの年月と参加者がまだ分かっていない。",
+      "detail": "もう 1 回開催。年月と参加者がまだ分かっていない。",
       "status": "todo",
-      "count": 2
+      "count": 1
     },
     {
       "id": "minecraft-server",
