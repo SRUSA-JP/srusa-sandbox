@@ -10,7 +10,7 @@ import {
   type ClipEntry,
 } from '../../config/clips';
 import type { VizTheme } from '../../theme/palette';
-import { TAG } from '../classes';
+import { TagButton } from '../atoms';
 import { ClipFrame } from './ClipFrame';
 
 export interface ClipCardProps {
@@ -25,14 +25,13 @@ export interface ClipCardProps {
  * サムネイルではなく画像・動画をそのまま貼り、タグだけを添える。
  * 見れば何のシーンか分かるため、題名や説明の文章は出さない
  * （読み上げ用の alt / iframe title には残す）。
- * タグはゲーム・登場人物・シーンの種類ごとに地の色を変え、押すと絞り込む。
+ * タグはゲーム・登場人物・シーンの種類ごとに枠線・文字の色を変え、押すと絞り込む。
  */
 export function ClipCard({ clip, theme, onFilter }: ClipCardProps) {
   const media = clipMedia(clip);
   const imageUrl = media === 'image' ? imageUrlFromClipUrl(clip.sourceUrl) : '';
   const embedUrl = media === 'video' ? embedUrlFromClipUrl(clip.sourceUrl) : '';
   const tagColors = clipTagColors(theme);
-  const tagClass = `${TAG} cursor-pointer border-transparent transition-opacity hover:opacity-80`;
 
   return (
     <article className="w-full max-w-[var(--sr-layout-clip-card-max-width)] justify-self-center overflow-hidden rounded-md border-hairline border-divider bg-surface">
@@ -46,37 +45,19 @@ export function ClipCard({ clip, theme, onFilter }: ClipCardProps) {
 
       <div className="flex flex-wrap gap-xs p-md">
         {clip.map && (
-          <button
-            type="button"
-            className={tagClass}
-            style={{ backgroundColor: tagColors.map.background, color: tagColors.map.text }}
-            onClick={() => onFilter('map', clip.map!)}
-          >
-            {gameLabel(clip.map)}
-          </button>
+          <TagButton label={gameLabel(clip.map)} color={tagColors.map} onClick={() => onFilter('map', clip.map!)} />
         )}
         {/* 登場人物は出てくる順に並べる。並びに意味があるので並べ替えない */}
         {(clip.cast ?? []).map((person) => (
-          <button
-            key={person}
-            type="button"
-            className={tagClass}
-            style={{ backgroundColor: tagColors.agent.background, color: tagColors.agent.text }}
-            onClick={() => onFilter('agent', person)}
-          >
-            {person}
-          </button>
+          <TagButton key={person} label={person} color={tagColors.agent} onClick={() => onFilter('agent', person)} />
         ))}
         {clipKeywords(clip).map((keyword) => (
-          <button
+          <TagButton
             key={keyword}
-            type="button"
-            className={tagClass}
-            style={{ backgroundColor: tagColors.keyword.background, color: tagColors.keyword.text }}
+            label={clipKeywordLabel(keyword)}
+            color={tagColors.keyword}
             onClick={() => onFilter('keyword', keyword)}
-          >
-            {clipKeywordLabel(keyword)}
-          </button>
+          />
         ))}
       </div>
     </article>

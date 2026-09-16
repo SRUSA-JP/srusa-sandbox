@@ -345,9 +345,10 @@ HTML は `caption`、`scope="col"`、`scope="row"` を使い、見た目だけ�
   件数が増えれば折り返して並ぶ。カード自体は `LAYOUT.clipCardMinWidth` 〜 `clipCardMaxWidth`
   の幅に収め、`justify-self-center` で余った横幅の中央に置く（1 件だけのときに画面いっぱいへ
   間延びしないため）
-- タグはゲーム・登場人物・シーンの種類ごとに地の色を分ける（[src/config/colors.ts](src/config/colors.ts) の
-  `clipTagColors()`）。地の色は種類ごとの categorical 色そのもの、文字色はその上で読める色を
-  `readableTextOn()` で計算する。色は `COLOR_SLOTS` に固定するので、絞り込んでもタグの色は変わらない
+- タグはゲーム・登場人物・シーンの種類ごとに枠線・文字の色を分ける（[src/config/colors.ts](src/config/colors.ts) の
+  `clipTagColors()`、[src/components/atoms/TagButton.tsx](src/components/atoms/TagButton.tsx)）。
+  地は `TAG` の `bg-sunken` のまま変えない。色は `COLOR_SLOTS` に固定するので、絞り込んでも
+  タグの色は変わらない
 
 ### ワールドマップ
 
