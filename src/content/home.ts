@@ -32,6 +32,17 @@ export const HOME_CONTENT = {
 export const HOME_UPDATES: HomeUpdate[] = [
   {
     date: '2026-09-16',
+    category: '年表',
+    title: 'オフラインカスタムの配信アーカイブがもう1件判明',
+    href: '#/history',
+    summary: 'オフラインカスタムのもう 1 回ぶんにも配信アーカイブが残っていることが分かりました。年月はまだ分かっていません。',
+    details: [
+      '「オフラインカスタム」の未記入ぶんに、配信アーカイブが残っていることを追記',
+      '年月・参加者はまだ分かっていないため、引き続き「これから埋めること」に残す',
+    ],
+  },
+  {
+    date: '2026-09-16',
     category: 'ギャラリー',
     title: '動画にサムネイルと再生ボタンを追加',
     href: '#/gallery',
