@@ -75,9 +75,9 @@ for (const { label, theme } of cases) {
   });
 
   const tagColors = clipTagColors(theme);
-  check('ギャラリー タグ:ゲーム / 沈めた面', tagColors.map, role.sunken, CONTRAST_MIN_TEXT);
-  check('ギャラリー タグ:登場人物 / 沈めた面', tagColors.agent, role.sunken, CONTRAST_MIN_TEXT);
-  check('ギャラリー タグ:シーン / 沈めた面', tagColors.keyword, role.sunken, CONTRAST_MIN_TEXT);
+  check('ギャラリー タグ:ゲーム 文字 / 地', tagColors.map.text, tagColors.map.background, CONTRAST_MIN_TEXT);
+  check('ギャラリー タグ:登場人物 文字 / 地', tagColors.agent.text, tagColors.agent.background, CONTRAST_MIN_TEXT);
+  check('ギャラリー タグ:シーン 文字 / 地', tagColors.keyword.text, tagColors.keyword.background, CONTRAST_MIN_TEXT);
 }
 
 /* 相関図: 領域・ノード・関係線の色も同じ基準で検査する */

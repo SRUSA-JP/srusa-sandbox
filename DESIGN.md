@@ -327,9 +327,15 @@ HTML は `caption`、`scope="col"`、`scope="row"` を使い、見た目だけ�
 一覧に並ぶカードそのものが画像・動画（[src/components/molecules/ClipFrame.tsx](src/components/molecules/ClipFrame.tsx)）を
 直接見せる展示台なので、選択中の 1 件だけを別枠で見せる仕組みは持たない。
 
-- 見せられるものが無いダミーデータは置かない。用意できた画像・動画だけを並べる
+- ダミーデータは常設しない。ただし、実際に URL を用意する予定がはっきりしている対象に限り、
+  URL が届くまでの一時的なプレースホルダー（`sourceUrl: ''`）を置いてよい。届き次第、
+  その項目を実データに差し替える（[src/config/clips.ts](src/config/clips.ts) の `CLIP_ENTRIES` コメント）
 - カードには題名や説明文を出さない。画像・動画そのもので何のシーンか分かるため
   （読み上げ用の alt / iframe title には残す）
+- 動画は最初にサムネイルと再生ボタンだけを見せ、押してから iframe を差し込む
+  （[src/components/molecules/ClipFrame.tsx](src/components/molecules/ClipFrame.tsx)）。
+  サムネイル画像が読み込めなくても、面と再生ボタンは必ず残るようにする
+  （iframe だけを置くと、埋め込み先に繋がらないときに何も見えなくなるため）
 - ゲーム・登場人物・シーン・タグの絞り込みと並び替えは 1 つの `<details>` にまとめてたたんでおく。
   開いたときは `flex-wrap` で折り返し、ボタンの文字が枠からはみ出したり見切れたりしないようにする
 - 動画・画像の URL を直接試す入力欄は作り手向けの機能なので `technical` の中に置き、
@@ -339,9 +345,9 @@ HTML は `caption`、`scope="col"`、`scope="row"` を使い、見た目だけ�
   件数が増えれば折り返して並ぶ。カード自体は `LAYOUT.clipCardMinWidth` 〜 `clipCardMaxWidth`
   の幅に収め、`justify-self-center` で余った横幅の中央に置く（1 件だけのときに画面いっぱいへ
   間延びしないため）
-- タグはゲーム・登場人物・シーンの種類ごとに色を分ける（[src/config/colors.ts](src/config/colors.ts) の
-  `clipTagColors()`）。色は `COLOR_SLOTS` に固定するので、絞り込んでもタグの色は変わらない。
-  背景は `TAG` の `bg-sunken` のまま変えず、枠線と文字だけを種類の色にする
+- タグはゲーム・登場人物・シーンの種類ごとに地の色を分ける（[src/config/colors.ts](src/config/colors.ts) の
+  `clipTagColors()`）。地の色は種類ごとの categorical 色そのもの、文字色はその上で読める色を
+  `readableTextOn()` で計算する。色は `COLOR_SLOTS` に固定するので、絞り込んでもタグの色は変わらない
 
 ### ワールドマップ
 

@@ -25,6 +25,12 @@
       （利用者側でマスク処理・Minecraft キャラクター等への置換をしてから渡す運用）
     - CLAUDE.md「個人情報の扱いに注意する」の匿名化方針に合わせ、置換前の生データを持ち込まない
 
+- 原文: `ギャラリーで動画まだ1個しかないな、一覧表示できてる？ダミーも1個だけ追加して、APEXカスタムとVALORANTカスタムがない` /
+  `まだ動画表示されていないなプレースホルダーも、いくつか出すのを確実にプレースホルダーでよいから`
+  - [src/config/clips.ts](src/config/clips.ts) の `CLIP_ENTRIES` に、APEX カスタム・VALORANT カスタムの
+    プレースホルダー（`sourceUrl: ''`、`id: apex-custom-placeholder` / `valorant-custom-placeholder`）を追加した
+  - 実際の動画 URL は「用意できる」とのことなので、届き次第この 2 件を実データに差し替える
+
 ### DONE
 
 #### 2026-09-08

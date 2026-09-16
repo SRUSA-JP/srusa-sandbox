@@ -55,6 +55,7 @@ const SCORE_DEFAULTS: ClipScore = { smooth: 2, clutch: 0, tap: 3, '6kills': 0, o
 const GAME_LABELS: Record<string, string> = {
   peak: 'PEAK',
   apex: 'APEX',
+  valorant: 'VALORANT',
   minecraft: 'Minecraft',
   mahjong: '麻雀',
   splatoon: 'Splatoon',
@@ -89,8 +90,10 @@ const TOPIC_TAGS = ['highlight', 'accident', 'teamwork', 'tutorial', 'memorial']
  * 画像（png / jpg / gif / webp など）もそのまま置ける。同梱の画像は
  * `public/` からの相対パス（`images/…`）で書く。
  *
- * まだ動画・画像を用意できていないダミーデータは置かない。ギャラリーは
- * 実際に見せられるものだけを並べる方針にしたため。
+ * ダミーデータは常設しない。ただし、実際に URL を用意する予定が
+ * はっきりしている対象（下の `id` が示すゲーム）に限り、URL が届くまでの
+ * 一時的なプレースホルダー（`sourceUrl: ''`）を置いてよい。届き次第、
+ * その項目を実データに差し替える。
  */
 export const CLIP_ENTRIES: ClipEntry[] = [
   {
@@ -101,6 +104,22 @@ export const CLIP_ENTRIES: ClipEntry[] = [
     map: 'peak',
     cast: ['taraba01414', 'gaburichan', 'detkent', 'nodoame'],
     tags: ['highlight'],
+  },
+  {
+    id: 'apex-custom-placeholder',
+    title: 'プレースホルダー: APEX カスタム',
+    sourceUrl: '',
+    category: 'placeholder',
+    map: 'apex',
+    tags: [],
+  },
+  {
+    id: 'valorant-custom-placeholder',
+    title: 'プレースホルダー: VALORANT カスタム',
+    sourceUrl: '',
+    category: 'placeholder',
+    map: 'valorant',
+    tags: [],
   },
 ];
 
@@ -115,6 +134,8 @@ export const CLIP_TEXT = {
   gallery: '名シーンギャラリー',
   /** 画像の読み上げと、画像が出ないときの説明。 */
   imageAlt: (title: string) => `${title} の画像`,
+  /** 動画の下敷き（サムネイル）を押して再生するボタンの読み上げ。 */
+  playButton: (title: string) => `${title} を再生`,
   result: (count: number, total: number) => `${count} / ${total} 件`,
   /** 絞り込み・並び替えを折りたたむ帯の見出し。初期状態は閉じておく。 */
   filterPanel: '絞り込み・並び替え',
@@ -132,6 +153,8 @@ export const CLIP_TEXT = {
     views: '再生数順',
   },
   empty: 'この名シーンにはまだ URL がありません。動画や画像の URL を入力すると、この画面で表示できます。',
+  /** ギャラリーのカードで、動画・画像をまだ用意できていないときに出す説明。 */
+  placeholder: '近日公開予定です。',
   noMatch: '条件に合う名シーンがありません。',
   invalidUrl: 'https:// または http:// で始まる動画・画像の URL を入力してください。',
   iframeTitle: (title: string) => `${title} の埋め込みプレイヤー`,
@@ -304,4 +327,15 @@ export function embedUrlFromClipUrl(sourceUrl: string, parentHost = globalThis.l
   }
 
   return trimmed;
+}
+
+/**
+ * 動画の下敷き（再生前に見せる 1 枚絵）。
+ *
+ * 埋め込み URL が YouTube のものであれば、動画 ID から既定のサムネイルを作れる。
+ * それ以外（Twitch など）は自動生成できないので、`thumbnailUrl` の手入力に任せる。
+ */
+export function youtubeThumbnailUrl(embedUrl: string): string {
+  const videoId = embedUrl.match(/\/embed\/([^/?]+)/)?.[1];
+  return videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : '';
 }

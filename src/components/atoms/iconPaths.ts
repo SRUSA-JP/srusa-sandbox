@@ -22,7 +22,8 @@ export type IconName =
   | 'previous'
   | 'next'
   | 'light'
-  | 'dark';
+  | 'dark'
+  | 'play';
 
 /**
  * アイコンの図形。
@@ -77,4 +78,6 @@ export const ICON_PATHS: Record<IconName, string[]> = {
   ],
   /** 暗い配色。 */
   dark: ['M20 14.3A8.5 8.5 0 0 1 9.7 4 8.5 8.5 0 1 0 20 14.3z'],
+  /** 動画の再生。 */
+  play: ['M8 6.5v11l9-5.5z'],
 };
