@@ -103,7 +103,7 @@ export function ClipGallery({ clips }: ClipGalleryProps) {
       </details>
 
       {filteredClips.length > 0 ? (
-        <div className="columns-1 gap-md sm:columns-2 xl:columns-3">
+        <div className="grid items-start justify-center gap-md grid-cols-[repeat(auto-fit,minmax(var(--sr-layout-clip-card-min-width),1fr))]">
           {filteredClips.map((clip) => (
             <ClipCard
               key={clip.id}

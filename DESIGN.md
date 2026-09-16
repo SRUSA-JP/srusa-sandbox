@@ -334,6 +334,11 @@ HTML は `caption`、`scope="col"`、`scope="row"` を使い、見た目だけ�
   開いたときは `flex-wrap` で折り返し、ボタンの文字が枠からはみ出したり見切れたりしないようにする
 - 動画・画像の URL を直接試す入力欄は作り手向けの機能なので `technical` の中に置き、
   そこだけで小さくプレビューする。一覧側の見せ方には影響させない
+- カードの並びは `columns`（段組み）ではなく `grid-template-columns: repeat(auto-fit, minmax(...,1fr))` を使う。
+  `auto-fit` は空いた列を潰すので、件数が少ないときに右側だけ広い空欄が残らず、
+  件数が増えれば折り返して並ぶ。カード自体は `LAYOUT.clipCardMinWidth` 〜 `clipCardMaxWidth`
+  の幅に収め、`justify-self-center` で余った横幅の中央に置く（1 件だけのときに画面いっぱいへ
+  間延びしないため）
 
 ### ワールドマップ
 
