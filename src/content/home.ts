@@ -33,6 +33,17 @@ export const HOME_UPDATES: HomeUpdate[] = [
   {
     date: '2026-09-16',
     category: '年表',
+    title: 'SRUSA という名前の由来に推定案を追記',
+    href: '#/history',
+    summary: 'SRUSA の略称が何の頭文字かはまだ未確定ですが、語呂が近い案を推定として年表に追記しました。',
+    details: [
+      '「Science-oriented Remote University Students Association」という語呂案を追記',
+      '厳密な略称の裏付けとなる資料は無いため、あくまで推定と明記',
+    ],
+  },
+  {
+    date: '2026-09-16',
+    category: '年表',
     title: 'オフラインカスタム・APEX カスタムの年月が判明',
     href: '#/history',
     summary: '配信アーカイブから、オフラインカスタムと APEX カスタムそれぞれ 1 回ぶんの開催日が分かりました。',
