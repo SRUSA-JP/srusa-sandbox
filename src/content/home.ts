@@ -32,6 +32,17 @@ export const HOME_CONTENT = {
 export const HOME_UPDATES: HomeUpdate[] = [
   {
     date: '2026-09-16',
+    category: 'ギャラリー',
+    title: 'ギャラリーの並びを件数に合わせて調整',
+    href: '#/gallery',
+    summary: '件数が少ないときに右側が大きく空くのを直し、カードが中央に寄って並ぶようにしました。件数が増えれば自動で折り返して並びます。',
+    details: [
+      '段組み（columns）から、余った列を潰す grid レイアウトに変更',
+      'カードの幅は上限・下限を決め、余った横幅の中央に配置',
+    ],
+  },
+  {
+    date: '2026-09-16',
     category: '年表',
     title: 'SRUSA という名前の由来に推定案を追記',
     href: '#/history',
