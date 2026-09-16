@@ -1,5 +1,6 @@
 export * from './AffiliationEdge';
 export * from './ClipCard';
+export * from './ClipFrame';
 export * from './ChartTooltip';
 export * from './DateStepper';
 export * from './GroupRegion';
