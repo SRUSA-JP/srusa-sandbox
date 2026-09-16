@@ -45,6 +45,21 @@
 
 ### DONE
 
+#### 2026-09-16
+
+- 原文: `まだ見れないよ`（「サイト全体が古いまま」と確認）
+  - GitHub API でコミットの check-runs / statuses を調べたところ、main への push（マージ）に対して
+    Netlify からの応答が一切無いことが分かった。Netlify は PR ブランチの「プレビュー」ビルドには
+    反応する（`deploy-preview` の status が付く）が、本番デプロイの仕組みはそもそも存在していなかった
+  - CLAUDE.md には「本番公開は `main` への push に任せる」とあったが、それを実現する仕組みが
+    無かった（想定と実態が食い違っていた）
+  - [.github/workflows/ci.yml](.github/workflows/ci.yml) に `deploy-production` ジョブを追加した。
+    `preview` ブランチ用の `deploy-preview` ジョブと同じ形で、`main` への push のときに
+    `netlify-cli deploy --prod` を実行する。認証情報はプレビュー用と共通の
+    `NETLIFY_AUTH_TOKEN` / `NETLIFY_SITE_ID` をそのまま使う
+  - 確認: このジョブ自体は次に `main` が更新されたときに実行される。実行後、Netlify の
+    check-runs / status が main のコミットに付くことと、本番サイトが実際に更新されることを確認すること
+
 #### 2026-09-08
 
 - 原文: `スマホでノードを移動すると一瞬表示が崩れる、編集モードを追加してデフォルトオフで，すなわちデフォルトはビューモードで`
