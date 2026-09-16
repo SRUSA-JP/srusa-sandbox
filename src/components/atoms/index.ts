@@ -8,4 +8,5 @@ export * from './RangeSlider';
 export * from './PixelAvatar';
 export * from './PixelNavIcon';
 export * from './Swatch';
+export * from './TagButton';
 export * from './WireLine';

@@ -10,7 +10,7 @@ import {
   type ClipEntry,
 } from '../../config/clips';
 import type { VizTheme } from '../../theme/palette';
-import { TAG } from '../classes';
+import { TagButton } from '../atoms';
 import { ClipFrame } from './ClipFrame';
 
 export interface ClipCardProps {
@@ -32,7 +32,6 @@ export function ClipCard({ clip, theme, onFilter }: ClipCardProps) {
   const imageUrl = media === 'image' ? imageUrlFromClipUrl(clip.sourceUrl) : '';
   const embedUrl = media === 'video' ? embedUrlFromClipUrl(clip.sourceUrl) : '';
   const tagColors = clipTagColors(theme);
-  const tagClass = `${TAG} cursor-pointer border-transparent transition-opacity hover:opacity-80`;
 
   return (
     <article className="w-full max-w-[var(--sr-layout-clip-card-max-width)] justify-self-center overflow-hidden rounded-md border-hairline border-divider bg-surface">
@@ -46,37 +45,31 @@ export function ClipCard({ clip, theme, onFilter }: ClipCardProps) {
 
       <div className="flex flex-wrap gap-xs p-md">
         {clip.map && (
-          <button
-            type="button"
-            className={tagClass}
-            style={{ backgroundColor: tagColors.map.background, color: tagColors.map.text }}
+          <TagButton
+            label={gameLabel(clip.map)}
+            background={tagColors.map.background}
+            color={tagColors.map.text}
             onClick={() => onFilter('map', clip.map!)}
-          >
-            {gameLabel(clip.map)}
-          </button>
+          />
         )}
         {/* 登場人物は出てくる順に並べる。並びに意味があるので並べ替えない */}
         {(clip.cast ?? []).map((person) => (
-          <button
+          <TagButton
             key={person}
-            type="button"
-            className={tagClass}
-            style={{ backgroundColor: tagColors.agent.background, color: tagColors.agent.text }}
+            label={person}
+            background={tagColors.agent.background}
+            color={tagColors.agent.text}
             onClick={() => onFilter('agent', person)}
-          >
-            {person}
-          </button>
+          />
         ))}
         {clipKeywords(clip).map((keyword) => (
-          <button
+          <TagButton
             key={keyword}
-            type="button"
-            className={tagClass}
-            style={{ backgroundColor: tagColors.keyword.background, color: tagColors.keyword.text }}
+            label={clipKeywordLabel(keyword)}
+            background={tagColors.keyword.background}
+            color={tagColors.keyword.text}
             onClick={() => onFilter('keyword', keyword)}
-          >
-            {clipKeywordLabel(keyword)}
-          </button>
+          />
         ))}
       </div>
     </article>
