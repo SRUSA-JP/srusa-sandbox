@@ -321,6 +321,20 @@ HTML は `caption`、`scope="col"`、`scope="row"` を使い、見た目だけ�
   [src/components/molecules/](src/components/molecules/) に置き、[src/components/organisms/HomeUpdateBoard.tsx](src/components/organisms/HomeUpdateBoard.tsx)
   はセクション構成だけを持つ
 
+### ギャラリー
+
+名シーンギャラリー（[src/pages/ClipsPage.tsx](src/pages/ClipsPage.tsx)）は「選んでから見る」画面にしない。
+一覧に並ぶカードそのものが画像・動画（[src/components/molecules/ClipFrame.tsx](src/components/molecules/ClipFrame.tsx)）を
+直接見せる展示台なので、選択中の 1 件だけを別枠で見せる仕組みは持たない。
+
+- 見せられるものが無いダミーデータは置かない。用意できた画像・動画だけを並べる
+- カードには題名や説明文を出さない。画像・動画そのもので何のシーンか分かるため
+  （読み上げ用の alt / iframe title には残す）
+- ゲーム・登場人物・シーン・タグの絞り込みと並び替えは 1 つの `<details>` にまとめてたたんでおく。
+  開いたときは `flex-wrap` で折り返し、ボタンの文字が枠からはみ出したり見切れたりしないようにする
+- 動画・画像の URL を直接試す入力欄は作り手向けの機能なので `technical` の中に置き、
+  そこだけで小さくプレビューする。一覧側の見せ方には影響させない
+
 ### ワールドマップ
 
 ワールドマップは `限定 3D`、`2D マップ` の順に常時表示する。

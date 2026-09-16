@@ -20,7 +20,6 @@ export interface ClipEntry {
   tags: string[];
   score?: Partial<ClipScore>;
   thumbnailUrl?: string;
-  note?: string;
 }
 
 export interface ClipScore {
@@ -89,6 +88,9 @@ const TOPIC_TAGS = ['highlight', 'accident', 'teamwork', 'tutorial', 'memorial']
  * 通常の共有 URL でも iframe 用 URL に変換される。
  * 画像（png / jpg / gif / webp など）もそのまま置ける。同梱の画像は
  * `public/` からの相対パス（`images/…`）で書く。
+ *
+ * まだ動画・画像を用意できていないダミーデータは置かない。ギャラリーは
+ * 実際に見せられるものだけを並べる方針にしたため。
  */
 export const CLIP_ENTRIES: ClipEntry[] = [
   {
@@ -100,86 +102,6 @@ export const CLIP_ENTRIES: ClipEntry[] = [
     cast: ['taraba01414', 'gaburichan', 'detkent', 'nodoame'],
     tags: ['highlight'],
   },
-  {
-    id: 'screenshot-spawn',
-    title: 'スポーン地点の空撮',
-    sourceUrl: 'images/bluemap-overworld-spawn.png',
-    category: 'screenshot',
-    map: 'minecraft',
-    tags: ['build', 'memorial'],
-    score: { smooth: 4, clutch: 0, tap: 3, '6kills': 0, onemag: 0 },
-    note: 'BlueMap の 3D 表示を撮ったスクリーンショットです。',
-  },
-  {
-    id: 'screenshot-flat',
-    title: '拠点まわりの俯瞰',
-    sourceUrl: 'images/bluemap-overworld-flat.png',
-    category: 'screenshot',
-    map: 'minecraft',
-    tags: ['build', 'highlight'],
-    score: { smooth: 4, clutch: 0, tap: 2, '6kills': 0, onemag: 0 },
-    note: 'BlueMap の 3D 表示を撮ったスクリーンショットです。',
-  },
-  {
-    id: 'sample-minecraft',
-    title: 'ダミー: Minecraft 建築名シーン',
-    sourceUrl: '',
-    category: 'sample',
-    map: 'minecraft',
-    cast: ['nodoamen'],
-    views: 0,
-    tags: ['build', 'tutorial'],
-    score: { smooth: 3, clutch: 0, tap: 2, '6kills': 0, onemag: 0 },
-    note: '本番動画を入れる前の表示確認用データです。',
-  },
-  {
-    id: 'sample-mahjong',
-    title: 'ダミー: 麻雀 逆転名シーン',
-    sourceUrl: '',
-    category: 'sample',
-    map: 'mahjong',
-    cast: ['natch'],
-    views: 0,
-    tags: ['comeback', 'highlight'],
-    score: { smooth: 4, clutch: 0, tap: 3, '6kills': 0, onemag: 0 },
-    note: '本番動画を入れる前の表示確認用データです。',
-  },
-  {
-    id: 'sample-apex',
-    title: 'ダミー: Apex 連携名シーン',
-    sourceUrl: '',
-    category: 'sample',
-    map: 'apex',
-    cast: ['mitiglia'],
-    views: 0,
-    tags: ['clutch', 'teamwork'],
-    score: { smooth: 2, clutch: 2, tap: 4, '6kills': 0, onemag: 0 },
-    note: '本番動画を入れる前の表示確認用データです。',
-  },
-  {
-    id: 'sample-splatoon',
-    title: 'ダミー: Splatoon ミラクル名シーン',
-    sourceUrl: '',
-    category: 'sample',
-    map: 'splatoon',
-    cast: ['octbee'],
-    views: 0,
-    tags: ['miracle', 'accident'],
-    score: { smooth: 3, clutch: 1, tap: 3, '6kills': 0, onemag: 0 },
-    note: '本番動画を入れる前の表示確認用データです。',
-  },
-  {
-    id: 'sample-party',
-    title: 'ダミー: パーティゲーム わちゃわちゃ名シーン',
-    sourceUrl: '',
-    category: 'sample',
-    map: 'party',
-    cast: ['sohei'],
-    views: 0,
-    tags: ['chaos', 'memorial'],
-    score: { smooth: 2, clutch: 0, tap: 2, '6kills': 0, onemag: 1 },
-    note: '本番動画を入れる前の表示確認用データです。',
-  },
 ];
 
 export const CLIP_TEXT = {
@@ -190,17 +112,12 @@ export const CLIP_TEXT = {
   customUrl: '動画・画像の URL',
   customTitle: '入力したURL',
   show: '表示',
-  featured: '選択中の名シーン',
   gallery: '名シーンギャラリー',
-  /** 一覧のカードに重ねる札。何をするものかが見て分かるようにする。 */
-  overlay: {
-    play: '再生',
-    image: '画像',
-    pending: '準備中',
-  },
   /** 画像の読み上げと、画像が出ないときの説明。 */
   imageAlt: (title: string) => `${title} の画像`,
   result: (count: number, total: number) => `${count} / ${total} 件`,
+  /** 絞り込み・並び替えを折りたたむ帯の見出し。初期状態は閉じておく。 */
+  filterPanel: '絞り込み・並び替え',
   sort: '並び替え',
   filters: {
     all: 'ALL',
@@ -219,14 +136,6 @@ export const CLIP_TEXT = {
   invalidUrl: 'https:// または http:// で始まる動画・画像の URL を入力してください。',
   iframeTitle: (title: string) => `${title} の埋め込みプレイヤー`,
 } as const;
-
-export function clipOptions() {
-  return CLIP_ENTRIES.map((clip) => ({ value: clip.id, label: clip.title }));
-}
-
-export function findClip(id: string): ClipEntry | undefined {
-  return CLIP_ENTRIES.find((clip) => clip.id === id);
-}
 
 export function normalizedClipScore(clip: ClipEntry): ClipScore {
   return { ...SCORE_DEFAULTS, ...clip.score };

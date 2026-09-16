@@ -19,8 +19,6 @@ interface ClipFilters {
 
 export interface ClipGalleryProps {
   clips: ClipEntry[];
-  selectedClip?: ClipEntry;
-  onSelect: (clip: ClipEntry) => void;
 }
 
 const ALL = 'all';
@@ -31,8 +29,13 @@ const SORT_OPTIONS: Array<{ value: ClipSortKey; label: string }> = [
   { value: 'views', label: CLIP_TEXT.sorts.views },
 ];
 
-/** Pinterest 風の名シーン一覧。フィルタとカード配置をまとめる。 */
-export function ClipGallery({ clips, selectedClip, onSelect }: ClipGalleryProps) {
+/**
+ * 画像・動画をずらっと並べる展示ギャラリー。
+ *
+ * 絞り込み・並び替えは初期状態で折りたたんでおく。並べるだけなら
+ * 一目で分かるため、細かい設定は開いた人だけが触れればよい。
+ */
+export function ClipGallery({ clips }: ClipGalleryProps) {
   const [filters, setFilters] = useState<ClipFilters>({ map: ALL, agent: ALL, keyword: ALL });
   const [sortKey, setSortKey] = useState<ClipSortKey>('score');
   const filterGroups = useMemo(() => clipFilterGroups(clips), [clips]);
@@ -49,53 +52,55 @@ export function ClipGallery({ clips, selectedClip, onSelect }: ClipGalleryProps)
 
   return (
     <section className="mb-section">
-      <SectionHeader
-        title={CLIP_TEXT.gallery}
-        note={CLIP_TEXT.result(filteredClips.length, clips.length)}
-        actions={<Picker showLabel label={CLIP_TEXT.sort} value={sortKey} options={SORT_OPTIONS} onChange={setSortKey} />}
-      />
+      <SectionHeader title={CLIP_TEXT.gallery} note={CLIP_TEXT.result(filteredClips.length, clips.length)} />
 
-      <div className="mb-lg grid gap-sm rounded-md border-hairline border-divider bg-surface p-md">
-        {filterGroups.map((group) => {
-          const activeValue = group.id === 'map' || group.id === 'agent' ? filters[group.id] : filters.keyword;
-          return (
-            <div key={group.id} className="grid gap-xs sm:grid-cols-[7rem_1fr] sm:items-start">
-              <div className="pt-xs text-sm font-medium text-muted">{group.label}</div>
-              <div className={ACTIONS}>
-                <button
-                  type="button"
-                  className={filterButtonClass(activeValue === ALL)}
-                  onClick={() => {
-                    if (group.id === 'map' || group.id === 'agent') {
-                      setFilters((current) => ({ ...current, [group.id]: ALL }));
-                    } else {
-                      setFilters((current) => ({ ...current, keyword: ALL }));
-                    }
-                  }}
-                >
-                  {CLIP_TEXT.filters.all} ({clips.length})
-                </button>
-                {group.options.map((option) => (
+      <details className="mb-lg rounded-md border-hairline border-divider bg-sunken">
+        <summary className="cursor-pointer px-lg py-xs text-md font-medium text-heading hover:bg-hover">
+          {CLIP_TEXT.filterPanel}
+        </summary>
+        <div className="grid gap-sm border-t-hairline border-divider p-md">
+          <Picker showLabel label={CLIP_TEXT.sort} value={sortKey} options={SORT_OPTIONS} onChange={setSortKey} />
+          {filterGroups.map((group) => {
+            const activeValue = group.id === 'map' || group.id === 'agent' ? filters[group.id] : filters.keyword;
+            return (
+              <div key={group.id} className="grid gap-xs sm:grid-cols-[7rem_1fr] sm:items-start">
+                <div className="pt-xs text-sm font-medium text-muted">{group.label}</div>
+                <div className={ACTIONS}>
                   <button
-                    key={option.value}
                     type="button"
-                    className={filterButtonClass(activeValue === option.value)}
+                    className={filterButtonClass(activeValue === ALL)}
                     onClick={() => {
                       if (group.id === 'map' || group.id === 'agent') {
-                        setFilters((current) => ({ ...current, [group.id]: option.value }));
+                        setFilters((current) => ({ ...current, [group.id]: ALL }));
                       } else {
-                        setFilters((current) => ({ ...current, keyword: option.value }));
+                        setFilters((current) => ({ ...current, keyword: ALL }));
                       }
                     }}
                   >
-                    {option.label} ({option.count})
+                    {CLIP_TEXT.filters.all} ({clips.length})
                   </button>
-                ))}
+                  {group.options.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={filterButtonClass(activeValue === option.value)}
+                      onClick={() => {
+                        if (group.id === 'map' || group.id === 'agent') {
+                          setFilters((current) => ({ ...current, [group.id]: option.value }));
+                        } else {
+                          setFilters((current) => ({ ...current, keyword: option.value }));
+                        }
+                      }}
+                    >
+                      {option.label} ({option.count})
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      </details>
 
       {filteredClips.length > 0 ? (
         <div className="columns-1 gap-md sm:columns-2 xl:columns-3">
@@ -103,8 +108,6 @@ export function ClipGallery({ clips, selectedClip, onSelect }: ClipGalleryProps)
             <ClipCard
               key={clip.id}
               clip={clip}
-              active={clip.id === selectedClip?.id}
-              onSelect={onSelect}
               onFilter={(type, value) => {
                 if (type === 'keyword') setFilters((current) => ({ ...current, keyword: value }));
                 if (type === 'map') setFilters((current) => ({ ...current, map: value }));
